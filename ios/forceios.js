@@ -15,6 +15,7 @@ var appTypeToDefaultTemplatePath = {
 // Dependencies
 var shelljs = require('shelljs'),
     exec = require('child_process').exec,
+    execSync = require('child_process').execSync,
     fs = require('fs'),
     path = require('path'),
     commandLineUtils = require('../shared/commandLineUtils'),
@@ -57,6 +58,9 @@ function main(args) {
 // Usage
 //
 function usage() {
+    
+    // TODO we should add a few more operations (which would rely on npm like run and update?
+
     console.log(outputColors.cyan + 'Usage:\n');
     console.log(outputColors.magenta + 'forceios create');
     console.log('    --apptype=<Application Type> (native, native_swift, react_native, hybrid_remote, hybrid_local)');
@@ -173,12 +177,21 @@ function createHybridApp(config) {
 // Helper to create native application
 //
 function createNativeApp(config) {
-    // TODO change wmathurin to forcedotcom and master to unstable
     var templateRepoUrl = config.templaterepourl || defaultTemplateRepoUrl;
     var templateBranch = config.templatebranch || defaultTemplateBranch;
     var templatePath = config.templatePath || (config.templaterepourl === defaultTemplateRepoUrl ? appTypeToDefaultTemplatePath[config.apptype] : '');
 
-    // TODO reading instructions 
+    var outputDir = config.outputDir
+    
+    // Clone template repo
+    runProcessThrowError('git clone --branch ' + templateBranch + ' --single-branch --depth 1' + templateRepoUrl + ' ' + outputDir);
+
+    // Next
+    // go to templatePath
+
+    // Read in from config files what changes need to be made
+    // Move
+    // Run npm install and pod install
 
 }
 
@@ -263,4 +276,18 @@ function addProcessorFor(argProcessorList, argName, prompt, error, validation, p
 //
 function addProcessorForOptional(argProcessorList, argName, prompt) {
     addProcessorFor(argProcessorList, argName, prompt, undefined, function() { return true;}, undefined, undefined);
+}
+
+//
+// Helper to run arbitrary shell command - errors thrown
+//
+function runProcessThrowError(cmd, dir) {
+    log('Running: ' + cmd);
+    if (dir) shelljs.pushd(dir);
+    try {
+        execSync(cmd);
+    }
+    finally {
+        if (dir) shelljs.popd();
+    }
 }
