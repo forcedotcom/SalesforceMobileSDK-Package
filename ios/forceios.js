@@ -1,15 +1,15 @@
 #!/usr/bin/env node
 
 // Constants
-var version = '5.0.0',
+var version = '5.0.0';
 var minimumCordovaCliVersion = '5.4.0';
 var cordovaPlatformVersion = '4.2.0';
 var defaultTemplateRepoUrl = 'https://github.com/wmathurin/SalesforceMobileSDK-Templates';
 var defaultTemplateBranch = 'unstable';
 var appTypeToDefaultTemplatePath = {
-    native: 'iOSNativeTemplate',
-    native_swift: 'iOSNativeSwiftTemplate',
-    react_native: 'ReactNativeTemplate'
+    'native': 'iOSNativeTemplate',
+    'native_swift': 'iOSNativeSwiftTemplate',
+    'react_native': 'ReactNativeTemplate'
 };
 
 // Dependencies
@@ -21,7 +21,7 @@ var shelljs = require('shelljs'),
     commandLineUtils = require('../shared/commandLineUtils'),
     miscUtils = require('../shared/utils'),
     cordovaHelper = require('../shared/cordovaHelper'),
-    outputColors = require('../shared/outputColors');
+    COLOR = require('../shared/outputColors');
 
 // Calling main
 main(process.argv);
@@ -38,7 +38,7 @@ function main(args) {
 
     switch (command || '') {
     case 'version':
-        console.log('forceios version ' + version);
+        log('forceios version ' + version);
         process.exit(0);
         break;
     case 'create':
@@ -61,28 +61,31 @@ function usage() {
     
     // TODO we should add a few more operations (which would rely on npm like run and update?
 
-    console.log(outputColors.cyan + 'Usage:\n');
-    console.log(outputColors.magenta + 'forceios create');
-    console.log('    --apptype=<Application Type> (native, native_swift, react_native, hybrid_remote, hybrid_local)');
-    console.log('    --appname=<Application Name>');
-    console.log('    --companyid=<Company Identifier> (com.myCompany.myApp)');
-    console.log('    --organization=<Organization Name> (Your company\'s/organization\'s name)');
-    console.log('    --startpage=<App Start Page> (The start page of your remote app. Only required for hybrid_remote)');
-    console.log('    [--outputdir=<Output directory> (Defaults to the current working directory)]');
-    console.log('    [--appid=<Salesforce App Identifier> (The Consumer Key for your app. Defaults to the sample app.)]');
-    console.log('    [--callbackuri=<Salesforce App Callback URL> (The Callback URL for your app. Defaults to the sample app.)]');
-    console.log('    [--templaterepourl=<Template repo URL> (URL of repo containing template application.)]');
-    console.log('    [--templatebranch=<Branch> (Branch of template repo to use. Defaults to master.)]');
-    console.log('    [--templatepath=<Path> (Path of template application in template repo. Defaults to "".)]');
-
-    console.log(outputColors.cyan + '\n OR \n');
-    console.log(outputColors.magenta + 'forceios version' + outputColors.reset);
+    log('Usage:\n', COLOR.cyan);
+    log('forceios create', COLOR.magenta);
+    log('    --apptype=<Application Type> (native, native_swift, react_native, hybrid_remote, hybrid_local)', COLOR.magenta);
+    log('    --appname=<Application Name>', COLOR.magenta);
+    log('    --companyid=<Company Identifier> (com.myCompany.myApp)', COLOR.magenta);
+    log('    --organization=<Organization Name> (Your company\'s/organization\'s name)', COLOR.magenta);
+    log('    --startpage=<App Start Page> (The start page of your remote app. Only required for hybrid_remote)', COLOR.magenta);
+    log('    [--outputdir=<Output directory> (Defaults to the current working directory)]', COLOR.magenta);
+    log('    [--appid=<Salesforce App Identifier> (The Consumer Key for your app. Defaults to the sample app.)]', COLOR.magenta);
+    log('    [--callbackuri=<Salesforce App Callback URL> (The Callback URL for your app. Defaults to the sample app.)]', COLOR.magenta);
+    log('    [--templaterepourl=<Template repo URL> (URL of repo containing template application. Optional.)]', COLOR.magenta);
+    log('    [--templatebranch=<Branch> (Branch of template repo to use. Defaults to ' + defaultTemplateBranch + '.)]', COLOR.magenta);
+    log('    [--templatepath=<Path> (Path of template application in template repo. Defaults to "".)]', COLOR.magenta);
+    log('\n OR \n', COLOR.cyan);
+    log('forceios version', COLOR.magenta);
 }
 
 //
 // Helper for 'create' command
 //
 function createApp(config) {
+    // Computing config.projectdir
+    config.projectdir = config.outputDir ? path.resolve(config.outputDir) : path.join(process.cwd(),config.appname);
+
+
     // Native app creation
     if (config.apptype === 'native' || config.apptype === 'native_swift' || config.apptype === 'react_native') {
         createNativeApp(config);
@@ -97,32 +100,24 @@ function createApp(config) {
 // Helper to create hybrid application
 //
 function createHybridApp(config) {
-    var outputDir = config.outputdir;
-
-    var projectDir;
-    if(!outputDir)
-        projectDir = path.join(process.cwd(),config.appname);
-    else
-        projectDir = path.resolve(outputDir);
-
     // Make sure the Cordova CLI client exists.
     var cordovaCliVersion = cordovaHelper.getCordovaCliVersion();
     if (cordovaCliVersion === null) {
-        console.log('cordova command line tool could not be found.  Make sure you install the cordova CLI from https://www.npmjs.org/package/cordova.');
+        log('cordova command line tool could not be found.  Make sure you install the cordova CLI from https://www.npmjs.org/package/cordova.');
         process.exit(11);
     }
 
     var minimumCordovaCliVersionNum = miscUtils.getVersionNumberFromString(minimumCordovaCliVersion);
     var cordovaCliVersionNum = miscUtils.getVersionNumberFromString(cordovaCliVersion);
     if (cordovaCliVersionNum < minimumCordovaCliVersionNum) {
-        console.log('Installed cordova command line tool version (' + cordovaCliVersion + ') is less than the minimum required version (' + minimumCordovaCliVersion + ').  Please update your version of Cordova.');
+        log('Installed cordova command line tool version (' + cordovaCliVersion + ') is less than the minimum required version (' + minimumCordovaCliVersion + ').  Please update your version of Cordova.');
         process.exit(12);
     }
 
-    console.log('Using cordova CLI version ' + cordovaCliVersion + ' to create the hybrid app.');
+    log('Using cordova CLI version ' + cordovaCliVersion + ' to create the hybrid app.');
 
-    shelljs.exec('cordova create "' + projectDir + '" ' + config.companyid + ' ' + config.appname);
-    shelljs.pushd(projectDir);
+    shelljs.exec('cordova create "' + config.projectdir + '" ' + config.companyid + ' ' + config.appname);
+    shelljs.pushd(config.projectdir);
     shelljs.exec('cordova platform add ios@' + cordovaPlatformVersion);
     shelljs.exec('cordova plugin add https://github.com/forcedotcom/SalesforceMobileSDK-CordovaPlugin#unstable');
 
@@ -146,31 +141,23 @@ function createHybridApp(config) {
         "shouldAuthenticate": true,
         "attemptOfflineLoad": false
     };
-    // console.log("Bootconfig:" + JSON.stringify(bootconfig, null, 2));
 
     fs.writeFileSync(path.join('www', 'bootconfig.json'), JSON.stringify(bootconfig, null, 2));
     shelljs.exec('cordova prepare ios');
     shelljs.popd();
 
     // Inform the user of next steps.
-    var nextStepsOutput =
-        ['',
-         outputColors.green + 'Your application project is ready in ' + projectDir + '.',
-         '',
-         outputColors.cyan + 'To build the new application, do the following:' + outputColors.reset,
-         '   - cd ' + projectDir,
-         '   - cordova build',
-         '',
-         outputColors.cyan + 'To run the application, start an emulator or plug in your device and run:' + outputColors.reset,
-         '   - cordova run',
-         '',
-         outputColors.cyan + 'To use your new application in XCode, do the following:' + outputColors.reset,
-         '   - open ' + projectDir + '/platforms/ios/' + config.appname + '.xcodeproj in XCode',
-         '   - build and run',
-         ''].join('\n');
-    console.log(nextStepsOutput);
-    console.log(outputColors.cyan + 'Before you ship, make sure to plug your OAuth Client ID,\nCallback URI, and OAuth Scopes into '
-        + outputColors.magenta + 'www/bootconfig.json' + outputColors.reset);
+    log('Next steps:', COLOR.cyan);
+    log('Your application project is ready in ' + config.projectdir + '.', COLOR.magenta);
+    log('To build the new application, do the following:', COLOR.magenta);
+    log('   - cd ' + config.projectdir, COLOR.magenta);
+    log('   - cordova build', COLOR.magenta);
+    log('To run the application, start an emulator or plug in your device and run:', COLOR.magenta);
+    log('   - cordova run', COLOR.magenta);
+    log('To use your new application in XCode, do the following:', COLOR.magenta);
+    log('   - open ' + config.projectdir + '/platforms/ios/' + config.appname + '.xcodeproj in XCode', COLOR.magenta);
+    log('   - build and run', COLOR.magenta);
+    log('Before you ship, make sure to plug your OAuth Client ID,\nCallback URI, and OAuth Scopes into www/bootconfig.json', COLOR.cyan);
 }
 
 //
@@ -179,20 +166,38 @@ function createHybridApp(config) {
 function createNativeApp(config) {
     var templateRepoUrl = config.templaterepourl || defaultTemplateRepoUrl;
     var templateBranch = config.templatebranch || defaultTemplateBranch;
-    var templatePath = config.templatePath || (config.templaterepourl === defaultTemplateRepoUrl ? appTypeToDefaultTemplatePath[config.apptype] : '');
+    var templatePath = config.templatepath || (templateRepoUrl === defaultTemplateRepoUrl ? appTypeToDefaultTemplatePath[config.apptype] : '');
 
-    var outputDir = config.outputDir
-    
+    // Create tmp dir
+    var tmpDir = mkTmpDir();
+
     // Clone template repo
-    runProcessThrowError('git clone --branch ' + templateBranch + ' --single-branch --depth 1' + templateRepoUrl + ' ' + outputDir);
+    runProcessThrowError('git clone --branch ' + templateBranch + ' --single-branch --depth 1 ' + templateRepoUrl + ' ' + tmpDir);
 
-    // Next
-    // go to templatePath
+    // Copy template to project dir
+    shelljs.cp('-R', path.join(tmpDir, templatePath), config.projectdir);
+    
+    // Run prepare method of template
+    var templatePrepare = require(path.join(config.projectdir, 'template.js')).prepare;
+    var workspace;
+    shelljs.pushd(config.projectdir);
+    try {
+        var workspace = templatePrepare(config, replaceInFiles, moveFile, runProcessThrowError);
+    }
+    finally {
+        shelljs.popd();
+    }
 
-    // Read in from config files what changes need to be made
-    // Move
-    // Run npm install and pod install
+    // Cleanup
+    removeFile(tmpDir);
+    removeFile(path.join(config.projectdir, 'template.hs'));
 
+    // Next steps
+    log('Next steps:', COLOR.cyan);
+    log('Your application project is ready in ' + config.projectdir + '.', COLOR.magenta);
+    log('To use your new application in XCode, do the following:', COLOR.magenta);
+    log('   - open ' + path.join(config.projectdir, workspace) + ' in XCode', COLOR.magenta);
+    log('   - build and run', COLOR.magenta);
 }
 
 // -----
@@ -230,10 +235,10 @@ function createArgProcessorList() {
     addProcessorForOptional(argProcessorList, 'callbackuri', 'Enter your Connected App Callback URI (defaults to the sample app\'s URI):');
 
     // Template Repo URL
-    addProcessorForOptional(argProcessorList, 'templaterepourl', 'Enter URL of repo containing template application:');
+    addProcessorForOptional(argProcessorList, 'templaterepourl', 'Enter URL of repo containing template application (leave empty for default template):');
 
     // Template Branch
-    addProcessorForOptional(argProcessorList, 'templatebranch', 'Enter branch of template repo to use (defaults to master):');
+    addProcessorForOptional(argProcessorList, 'templatebranch', 'Enter branch of template repo to use (defaults to ' + defaultTemplateBranch + '):');
 
     // Template Path
     addProcessorForOptional(argProcessorList, 'templatepath', 'Enter path of template application in template repo (defaults to ""):');
@@ -282,12 +287,69 @@ function addProcessorForOptional(argProcessorList, argName, prompt) {
 // Helper to run arbitrary shell command - errors thrown
 //
 function runProcessThrowError(cmd, dir) {
-    log('Running: ' + cmd);
+    log('Running: ' + cmd, COLOR.green);
     if (dir) shelljs.pushd(dir);
     try {
-        execSync(cmd);
+        execSync(cmd, {stdio:[0,1,2]});
     }
     finally {
         if (dir) shelljs.popd();
+    }
+}
+
+//
+// Helper to make temp dir and return its path
+//
+function mkTmpDir() {
+    var tmpDir = path.join('tmp' + random(1000));
+    log('Making temp dir:' + tmpDir, COLOR.green);
+    shelljs.mkdir('-p', tmpDir);
+    return tmpDir;
+}
+
+//
+// Helper to return random number between n/10 and n
+//
+function random(n) {
+    return (n/10)+Math.floor(Math.random()*(9*n/10));
+}
+
+//
+// Helper to replace string in multiple files
+//
+function replaceInFiles(from, to, files) {
+    var fromRegexp = typeof(from) === 'string' ? new RegExp(from, 'g') : from;
+    for (var i=0; i<files.length; i++) {
+        log('Replacing ' + from + ' with ' + to + ' in: ' + files[i], COLOR.green);
+        miscUtils.replaceTextInFile(files[i], fromRegexp, to, COLOR.green);
+    }
+}
+
+//
+// Helper to move file
+//
+function moveFile(from, to) {
+    log('Moving: ' + from + ' to ' + to, COLOR.green);
+    shelljs.mv(from, to);
+}
+
+//
+// Helper to remove file
+//
+function removeFile(path) {
+    log('Removing: ' + path, COLOR.green);
+    shelljs.rm('-rf', path);
+}
+
+
+//
+// Print important information
+//
+function log(msg, color) {
+    if (color) {
+        console.log(color + msg + COLOR.reset);
+    }
+    else {
+        console.log(msg);
     }
 }
