@@ -82,9 +82,11 @@ function usage() {
 // Helper for 'create' command
 //
 function createApp(config) {
+    // Adding platform
+    config.platform = 'ios';
+
     // Computing config.projectdir
     config.projectdir = config.outputDir ? path.resolve(config.outputDir) : path.join(process.cwd(),config.appname);
-
 
     // Native app creation
     if (config.apptype === 'native' || config.apptype === 'native_swift' || config.apptype === 'react_native') {
@@ -190,7 +192,7 @@ function createNativeApp(config) {
 
     // Cleanup
     removeFile(tmpDir);
-    removeFile(path.join(config.projectdir, 'template.hs'));
+    removeFile(path.join(config.projectdir, 'template.js'));
 
     // Next steps
     log('Next steps:', COLOR.cyan);
@@ -302,7 +304,7 @@ function runProcessThrowError(cmd, dir) {
 //
 function mkTmpDir() {
     var tmpDir = path.join('tmp' + random(1000));
-    log('Making temp dir:' + tmpDir, COLOR.green);
+    log('Making temp dir:' + tmpDir);
     shelljs.mkdir('-p', tmpDir);
     return tmpDir;
 }
@@ -320,8 +322,8 @@ function random(n) {
 function replaceInFiles(from, to, files) {
     var fromRegexp = typeof(from) === 'string' ? new RegExp(from, 'g') : from;
     for (var i=0; i<files.length; i++) {
-        log('Replacing ' + from + ' with ' + to + ' in: ' + files[i], COLOR.green);
-        miscUtils.replaceTextInFile(files[i], fromRegexp, to, COLOR.green);
+        log('Replacing ' + from + ' with ' + to + ' in: ' + files[i]);
+        miscUtils.replaceTextInFile(files[i], fromRegexp, to);
     }
 }
 
@@ -329,7 +331,7 @@ function replaceInFiles(from, to, files) {
 // Helper to move file
 //
 function moveFile(from, to) {
-    log('Moving: ' + from + ' to ' + to, COLOR.green);
+    log('Moving: ' + from + ' to ' + to);
     shelljs.mv(from, to);
 }
 
@@ -337,7 +339,7 @@ function moveFile(from, to) {
 // Helper to remove file
 //
 function removeFile(path) {
-    log('Removing: ' + path, COLOR.green);
+    log('Removing: ' + path);
     shelljs.rm('-rf', path);
 }
 
