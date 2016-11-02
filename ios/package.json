@@ -9,17 +9,13 @@
 	    { "type": "Salesforce.com Mobile SDK License", "url": "https://github.com/forcedotcom/SalesforceMobileSDK-iOS/blob/master/LICENSE.md" }
 	],
 	"os" : [ "darwin" ],
-	"bin" : { "forceios" : "node/forceios.js" },
+	"bin" : { "forceios" : "forceios.js" },
     "dependencies": {
         "shelljs": "~0.7.0"
     },
-    "scripts": {
-        "prepublish": "external/shared/node/prepublish.js",
-        "postpublish": "external/shared/node/postpublish.js"
-    },
 	"repository": {
 		"type" : "git",
-		"url" : "https://github.com/forcedotcom/SalesforceMobileSDK-iOS.git"
+		"url" : "https://github.com/forcedotcom/SalesforceMobileSDK-Package.git"
 	},
 	"author": { "name": "Kevin Hawkins", "email": "khawkins@salesforce.com" },
 	"contributors": [

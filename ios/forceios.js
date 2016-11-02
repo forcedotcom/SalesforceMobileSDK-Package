@@ -18,10 +18,10 @@ var shelljs = require('shelljs'),
     execSync = require('child_process').execSync,
     fs = require('fs'),
     path = require('path'),
-    commandLineUtils = require('../shared/commandLineUtils'),
-    miscUtils = require('../shared/utils'),
-    cordovaHelper = require('../shared/cordovaHelper'),
-    COLOR = require('../shared/outputColors');
+    commandLineUtils = require('./shared/commandLineUtils'),
+    miscUtils = require('./shared/utils'),
+    cordovaHelper = require('./shared/cordovaHelper'),
+    COLOR = require('./shared/outputColors');
 
 // Calling main
 main(process.argv);
