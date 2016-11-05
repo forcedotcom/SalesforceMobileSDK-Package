@@ -173,8 +173,9 @@ function copyFromTemplate(templateRepoUrl, templateBranch, templatePath, destina
     // Log
     log('Copying template into ' + destinationDir);
 
-    shelljs.cp('-R', path.join('/Users/wmathurin/Development/github/wmathurin/SalesforceMobileSDK-Templates', templatePath), destinationDir);
-    return;
+// TESTING only
+//    shelljs.cp('-R', path.join('/Users/wmathurin/Development/github/wmathurin/SalesforceMobileSDK-Templates', templatePath), destinationDir);
+//    return;
 
     // Create tmp dir
     var tmpDir = mkTmpDir();

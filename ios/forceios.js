@@ -5,7 +5,7 @@ var version = '5.0.0';
 var minimumCordovaCliVersion = '5.4.0';
 var cordovaPlatformVersion = '4.2.0';
 var defaultTemplateRepoUrl = 'https://github.com/wmathurin/SalesforceMobileSDK-Templates';
-var defaultTemplateBranch = 'unstable';
+var defaultTemplateBranch = 'templates-android';
 var appTypeToDefaultTemplatePath = {
     'native': 'iOSNativeTemplate',
     'native_swift': 'iOSNativeSwiftTemplate',
