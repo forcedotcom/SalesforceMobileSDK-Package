@@ -140,6 +140,10 @@ function replaceInFiles(from, to, files) {
  */
 function moveFile(from, to) {
     log('Moving: ' + from + ' to ' + to);
+    var targetDir = path.parse(to).dir;
+    if (targetDir && shelljs.test('-e', targetDir)) {
+        shelljs.mkdir('-p', targetDir);
+    }
     shelljs.mv(from, to);
 }
 
@@ -205,7 +209,7 @@ function runTemplatePrepare(projectDir, config) {
     var templatePrepare = require(path.join(projectDir, 'template.js')).prepare;
     shelljs.pushd(projectDir);
     try {
-        return templatePrepare(config, replaceInFiles, moveFile);
+        return templatePrepare(config, replaceInFiles, moveFile, removeFile);
     }
     finally {
         shelljs.popd();
