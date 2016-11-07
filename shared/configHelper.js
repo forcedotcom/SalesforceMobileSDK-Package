@@ -62,8 +62,8 @@ function usage(toolName, appTypes) {
     log('    --startpage=<App Start Page> (The start page of your remote app. Only required for hybrid_remote)', COLOR.magenta);
     log('    [--outputdir=<Output directory> (Defaults to the current working directory)]', COLOR.magenta);
     log('    [--templaterepourl=<Template repo URL> (URL of repo containing template application. Optional.)]', COLOR.magenta);
-    log('    [--templatebranch=<Branch> (Branch of template repo to use. Optional.)]', COLOR.magenta);
-    log('    [--templatepath=<Path> (Path of template application in template repo. Optional.)]', COLOR.magenta);
+    log('    [--templatebranch=<Branch> (Branch of template repo to use. Only required if template repo url provided.)]', COLOR.magenta);
+    log('    [--templatepath=<Path> (Path of template application in template repo. Only required if template repo url provided.)]', COLOR.magenta);
     log('\n OR \n', COLOR.cyan);
     log(toolName + ' version', COLOR.magenta);
 }
@@ -75,20 +75,25 @@ function createArgsProcessorList(appTypes) {
     var argProcessorList = new commandLineUtils.ArgProcessorList();
 
     // App type
-    addProcessorFor(argProcessorList, 'apptype', 'Enter your application type (' + appTypes.join(', ') + '):', 'App type must be ' + appTypes.join(', ') + '.', 
+    addProcessorFor(argProcessorList, 'apptype', 'Enter your application type (' + appTypes.join(', ') + '):',
+                    'App type must be ' + appTypes.join(', ') + '.', 
                     function(val) { return appTypes.indexOf(val) >= 0; });
 
     // App name
-    addProcessorFor(argProcessorList, 'appname', 'Enter your application name:', 'Invalid value for application name: \'$val\'.', /^\S+$/);
+    addProcessorFor(argProcessorList, 'appname', 'Enter your application name:',
+                    'Invalid value for application name: \'$val\'.', /^\S+$/);
 
     // Package name
-    addProcessorFor(argProcessorList, 'packagename', 'Enter the package name for your app (com.mycompany.myapp):', '\'$val\' is not a valid package name.', /^[a-z]+[a-z0-9_]*(\.[a-z]+[a-z0-9_]*)*$/);
+    addProcessorFor(argProcessorList, 'packagename', 'Enter the package name for your app (com.mycompany.myapp):',
+                    '\'$val\' is not a valid package name.', /^[a-z]+[a-z0-9_]*(\.[a-z]+[a-z0-9_]*)*$/);
 
     // Organization
-    addProcessorFor(argProcessorList, 'organization', 'Enter your organization name (Acme, Inc.):', 'Invalid value for organization: \'$val\'.',  /\S+/);
+    addProcessorFor(argProcessorList, 'organization', 'Enter your organization name (Acme, Inc.):',
+                    'Invalid value for organization: \'$val\'.',  /\S+/);
 
     // Start page
-    addProcessorFor(argProcessorList, 'startpage', 'Enter the start page for your app (only applicable for hybrid_remote apps):', 'Invalid value for start page: \'$val\'.', /\S+/, 
+    addProcessorFor(argProcessorList, 'startpage', 'Enter the start page for your app (only applicable for hybrid_remote apps):',
+                    'Invalid value for start page: \'$val\'.', /\S+/, 
                     function(argsMap) { return (argsMap['apptype'] === 'hybrid_remote'); });
 
     // Output dir
@@ -98,10 +103,14 @@ function createArgsProcessorList(appTypes) {
     addProcessorForOptional(argProcessorList, 'templaterepourl', 'Enter URL of repo containing template application (leave empty for default template):');
 
     // Template Branch
-    addProcessorForOptional(argProcessorList, 'templatebranch', 'Enter branch of template repo to use (leave empty for default template):');
+    addProcessorFor(argProcessorList, 'templatebranch', 'Enter branch of template repo to use:',
+                    'Invalid value for template branch: \'$val\'.', /.*/, 
+                    function(argsMap) { return argsMap['templaterepourl']; });
 
     // Template Path
-    addProcessorForOptional(argProcessorList, 'templatepath', 'Enter path of template application in template repo (leave empty for default template):');
+    addProcessorFor(argProcessorList, 'templatepath', 'Enter path of template application in template repo:',
+                    'Invalid value for template path: \'$val\'.', /.*/, 
+                    function(argsMap) { return argsMap['templaterepourl']; });
 
     return argProcessorList;
 }
