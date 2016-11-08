@@ -183,6 +183,9 @@ function copyFromTemplate(templateRepoUrl, templateBranch, templatePath, destina
     // Log
     log('Copying template into ' + destinationDir);
 
+    shelljs.cp('-R', '/Users/wmathurin/Development/github/wmathurin/SalesforceMobileSDK-Templates/HybridLocal', destinationDir);
+    return;
+
     // Create tmp dir
     var tmpDir = mkTmpDir();
 

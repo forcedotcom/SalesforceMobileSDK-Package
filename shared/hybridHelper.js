@@ -107,7 +107,7 @@ function createHybridApp(config) {
     // Create app with cordova
     utils.runProcessThrowError('cordova create "' + projectDir + '" ' + config.packagename + ' ' + config.appname);
     utils.runProcessThrowError('cordova platform add ' + config.platform + '@' + config.cordovaPlatformVersion, projectDir);
-//    utils.runProcessThrowError('cordova plugin add ' + config.pluginRepoUrl, projectDir);
+    utils.runProcessThrowError('cordova plugin add ' + config.cordovaPluginRepoUrl, projectDir);
 
 
     // Web directory - the home for the template
