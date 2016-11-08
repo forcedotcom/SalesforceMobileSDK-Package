@@ -27,7 +27,6 @@
 
 // Dependencies
 var path = require('path'),
-    shelljs = require('shelljs'),
     utils = require('./utils');
 
 /**
@@ -38,11 +37,14 @@ var path = require('path'),
  * @throws {Error} if cordova cli not found or version too low
  */
 function checkCordovaCliVersion(minimumCordovaCliVersion) {
-	var cordovaVersionResult = shelljs.exec('cordova -v', { 'silent' : true });
-    if (cordovaVersionResult.code !== 0) {
+    var cordovaCliVersion;
+    try {
+	    var cordovaVersionResult = utils.runProcessThrowError('cordova -v', null, true /* return output */);
+        cordovaCliVersion = cordovaVersionResult.replace(/\r?\n|\r/, '');
+    }
+    catch (error) {
         throw new Error('cordova command line tool could not be found.  Make sure you install the cordova CLI from https://www.npmjs.org/package/cordova.');
     }
-    var cordovaCliVersion = cordovaVersionResult.stdout.replace(/\r?\n|\r/, '');
 
     var minimumCordovaCliVersionNum = utils.getVersionNumberFromString(minimumCordovaCliVersion);
     var cordovaCliVersionNum = utils.getVersionNumberFromString(cordovaCliVersion);
@@ -104,24 +106,31 @@ function createHybridApp(config) {
 
     // Create app with cordova
     utils.runProcessThrowError('cordova create "' + projectDir + '" ' + config.packagename + ' ' + config.appname);
-    shelljs.pushd(projectDir);
-    utils.runProcessThrowError('cordova platform add ' + config.platform + '@' + config.cordovaPlatformVersion);
-    utils.runProcessThrowError('cordova plugin add ' + config.pluginRepoUrl);
+    utils.runProcessThrowError('cordova platform add ' + config.platform + '@' + config.cordovaPlatformVersion, projectDir);
+//    utils.runProcessThrowError('cordova plugin add ' + config.pluginRepoUrl, projectDir);
 
+
+    // Web directory - the home for the template
+    var webDir = path.join(projectDir, 'www')    
+    
     // Remove the default Cordova app.
-    utils.removeFile('www');
+    utils.removeFile(webDir);
 
     // Copying template to www
-    utils.copyFromTemplate(config.templaterepourl, config.templatebranch, config.templatepath, 'www');
-    shelljs.popd();
+    utils.copyFromTemplate(config.templaterepourl, config.templatebranch, config.templatepath, webDir);
+
+    // Run prepare function of template
+    var prepareResult = utils.runTemplatePrepare(webDir, config);
+
+    // Cleanup
+    utils.removeFile(path.join(webDir, 'template.js'));
 
     // Done
     var result = {
         projectPath: projectPath,
-        workspacePath: path.join(projectPath, 'platform', config.platform),
-        bootconfigFile: path.join(projectPath, 'www', 'bootconfig.json')
+        workspacePath: path.join(projectPath, prepareResult.workspacePath),
+        bootconfigFile: path.join(projectPath, prepareResult.bootconfigFile)
     }
-
     return result;
 
 }

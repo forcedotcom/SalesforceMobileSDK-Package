@@ -9,7 +9,7 @@ var defaultTemplateRepoUrl = 'https://github.com/wmathurin/SalesforceMobileSDK-T
 var defaultTemplateBranch = 'templates-android';
 var appTypeToDefaultTemplatePath = {
     'native': 'AndroidNativeTemplate',
-    'react_native': 'ReactNativeTemplate'
+    'react_native': 'ReactNativeTemplate',
     'hybrid_local': 'HybridLocal'
 };
 var appTypes = ['native', 'react_native', 'hybrid_local', 'hybrid_remote'];

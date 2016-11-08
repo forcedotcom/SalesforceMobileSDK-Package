@@ -82,12 +82,18 @@ function replaceTextInFile(fileName, textInFile, replacementText) {
  *
  * @param {String} cmd The command to execute
  * @param {String} dir Optional. The directory the command should be executed in
+ * @param {Boolean} returnOutput. If true, returns output as string. If false, pipes output through.
  */
-function runProcessThrowError(cmd, dir) {
+function runProcessThrowError(cmd, dir, returnOutput) {
     log('Running: ' + cmd);
     if (dir) shelljs.pushd(dir);
     try {
-        execSync(cmd, {stdio:[0,1,2]});
+        if (returnOutput) {
+            return execSync(cmd).toString();
+        }
+        else {
+            execSync(cmd, {stdio:[0,1,2]});
+        }
     }
     finally {
         if (dir) shelljs.popd();
@@ -176,10 +182,6 @@ function failIfExists(path) {
 function copyFromTemplate(templateRepoUrl, templateBranch, templatePath, destinationDir) {
     // Log
     log('Copying template into ' + destinationDir);
-
-// TESTING only
-//    shelljs.cp('-R', path.join('/Users/wmathurin/Development/github/wmathurin/SalesforceMobileSDK-Templates', templatePath), destinationDir);
-//    return;
 
     // Create tmp dir
     var tmpDir = mkTmpDir();

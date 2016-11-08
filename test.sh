@@ -7,3 +7,4 @@ node android/forcedroid.js create --apptype=native --appname=App4 --packagename=
 node android/forcedroid.js create --apptype=react_native --appname=App5 --packagename=com.acme.app5 --organization=Acme5 --outputdir=app5 --templaterepourl
 
 node ios/forceios.js create --apptype=hybrid_local --appname=App6 --packagename=com.acme.app6 --organization=Acme6 --outputdir=app6 --templaterepourl
+node android/forcedroid.js create --apptype=hybrid_local --appname=App7 --packagename=com.acme.app7 --organization=Acme7 --outputdir=app7 --templaterepourl
