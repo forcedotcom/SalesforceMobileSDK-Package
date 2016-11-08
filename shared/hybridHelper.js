@@ -1,101 +1,129 @@
-var shelljs = require('shelljs');
+/*
+ * Copyright (c) 2016-present, salesforce.com, inc.
+ * All rights reserved.
+ * Redistribution and use of this software in source and binary forms, with or
+ * without modification, are permitted provided that the following conditions
+ * are met:
+ * - Redistributions of source code must retain the above copyright notice, this
+ * list of conditions and the following disclaimer.
+ * - Redistributions in binary form must reproduce the above copyright notice,
+ * this list of conditions and the following disclaimer in the documentation
+ * and/or other materials provided with the distribution.
+ * - Neither the name of salesforce.com, inc. nor the names of its contributors
+ * may be used to endorse or promote products derived from this software without
+ * specific prior written permission of salesforce.com, inc.
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ */
+
+// Dependencies
+var path = require('path'),
+    shelljs = require('shelljs'),
+    utils = require('./utils');
 
 /**
- * Gets the the version of the currently installed cordova CLI tool.
+ * Checks the the version of the currently installed cordova CLI tool.
+ * 
+ * @param {String} minimumCordovaCliVersion Minimum cordova cli version required
  *
- * @return {String} The version of the cordova CLI tool, or null if the tool is not installed.
+ * @throws {Error} if cordova cli not found or version too low
  */
-function getCordovaCliVersion() {
+function checkCordovaCliVersion(minimumCordovaCliVersion) {
 	var cordovaVersionResult = shelljs.exec('cordova -v', { 'silent' : true });
     if (cordovaVersionResult.code !== 0) {
-        return null;
+        throw new Error('cordova command line tool could not be found.  Make sure you install the cordova CLI from https://www.npmjs.org/package/cordova.');
     }
-
     var cordovaCliVersion = cordovaVersionResult.stdout.replace(/\r?\n|\r/, '');
-    return cordovaCliVersion;
+
+    var minimumCordovaCliVersionNum = utils.getVersionNumberFromString(minimumCordovaCliVersion);
+    var cordovaCliVersionNum = utils.getVersionNumberFromString(cordovaCliVersion);
+
+    if (cordovaCliVersionNum < minimumCordovaCliVersionNum) {
+        throw new Error('Installed cordova command line tool version (' + cordovaCliVersion + ') is less than the minimum required version (' + minimumCordovaCliVersion + ').  Please update your version of Cordova.');
+    }
 };
 
 /**
  * Create hybrid application
+ *
  * @param config
- *  targetDir
- *  packagename
- *  appname
- *  apptype 'hybrid_local' or 'hybrid_remote'
- *  startpage
- *  platform 'iOS' or 'android'
- *  cordovaplatformversion
- *  pluginrepourl
+ *   platform
+ *   apptype
+ *   appname
+ *   packagename  
+ *   organization
+ *   templaterepourl
+ *   templatebranch
+ *   templatepath
+ *   startpage
+ *   cordovaPlatformVersion
+ *   minimumCordovaCliVersion
+ *   cordovaPluginRepoUrl
+ *
+ * @return result map with
+ *   projectPath     relative path to new project
+ *   workspacePath   relative path to workspace 
+ *   bootconfigFile  relative path to file that contains the oauth app id and callback uri
  */
 function createHybridApp(config) {
-    var templateRepoUrl = config.templaterepourl || defaultTemplateRepoUrl;
-    var templateBranch = config.templatebranch || defaultTemplateBranch;
-    var templatePath = config.templatepath || (templateRepoUrl === defaultTemplateRepoUrl ? appTypeToDefaultTemplatePath[config.apptype] : '');
 
-    // Create tmp dir
-    var tmpDir = mkTmpDir();
+    // Computing projectDir
+    var projectDir = config.outputdir ? path.resolve(config.outputdir) : path.join(process.cwd(),config.appname)
+    var projectPath = path.relative(process.cwd(), projectDir);
 
-    // Clone template repo
-    runProcessThrowError('git clone --branch ' + templateBranch + ' --single-branch --depth 1 ' + templateRepoUrl + ' ' + tmpDir);
+    // Check if directory exists
+    utils.failIfExists(projectDir);
 
-    // Make sure the Cordova CLI client exists.
-    var cordovaCliVersion = cordovaHelper.getCordovaCliVersion();
-    if (cordovaCliVersion === null) {
-        console.log('cordova command line tool could not be found.  Make sure you install the cordova CLI from https://www.npmjs.org/package/cordova.');
-        process.exit(6);
-    }
-    var minimumCordovaVersionNum = miscUtils.getVersionNumberFromString(minimumCordovaCliVersion);
-    var cordovaCliVersionNum = miscUtils.getVersionNumberFromString(cordovaCliVersion);
-    if (cordovaCliVersionNum < minimumCordovaVersionNum) {
-        console.log('Installed cordova command line tool version (' + cordovaCliVersion + ') is less than the minimum required version (' + minimumCordovaCliVersion + ').  Please update your version of Cordova.');
-        process.exit(7);
-    }
-    shelljs.exec('cordova create "' + config.targetDir + '" ' + config.packagename + ' ' + config.appname);
-    shelljs.pushd(config.targetDir);
-    shelljs.exec('cordova platform add ' + config.platform + '@' + config.cordovaplatformversion);
-    shelljs.exec('cordova plugin add ' + config.pluginrepourl);
+    // Printing out details
+    utils.logHeader(['Creating ' + config.platform + ' ' + config.apptype + ' application using Salesforce Mobile SDK',
+                     '  with app name:        ' + config.appname,
+                     '       package name:    ' + config.packagename,
+                     '       organization:    ' + config.organization,
+                     '',
+                     '  in:                   ' + projectPath,
+                     '',
+                     '  from template repo:   ' + config.templaterepourl,
+                     '       template branch: ' + config.templatebranch,
+                     '       template path:   ' + config.templatepath,
+                     '',
+                     '       cordova version  ' + config.cordovaPlatformVersion,
+                     '       plugin repo:     ' + config.cordovaPluginRepoUrl
+                    ]);
+    
+    // Check cordova cli
+    checkCordovaCliVersion(config.minimumCordovaCliVersion);
+
+    // Create app with cordova
+    utils.runProcessThrowError('cordova create "' + projectDir + '" ' + config.packagename + ' ' + config.appname);
+    shelljs.pushd(projectDir);
+    utils.runProcessThrowError('cordova platform add ' + config.platform + '@' + config.cordovaPlatformVersion);
+    utils.runProcessThrowError('cordova plugin add ' + config.pluginRepoUrl);
 
     // Remove the default Cordova app.
-    shelljs.rm('-rf', path.join('www', '*'));
+    utils.removeFile('www');
 
-
-
-    // Copy the sample app, if a local app was selected.
-    if (config.apptype === 'hybrid_local') {
-        var sampleAppFolder = path.join(__dirname, '..', 'external', 'shared', 'samples', 'userlist');
-        shelljs.cp('-R', path.join(sampleAppFolder, '*'), 'www');
-    }
-    var bootconfig = {
-        "remoteAccessConsumerKey": "3MVG9Iu66FKeHhINkB1l7xt7kR8czFcCTUhgoA8Ol2Ltf1eYHOU4SqQRSEitYFDUpqRWcoQ2.dBv_a1Dyu5xa",
-        "oauthRedirectURI": "testsfdc:///mobilesdk/detect/oauth/done",
-        "oauthScopes": ["web", "api"],
-        "isLocal": config.apptype === 'hybrid_local',
-        "startPage": config.startpage || 'index.html',
-        "errorPage": "error.html",
-        "shouldAuthenticate": true,
-        "attemptOfflineLoad": false,
-        "androidPushNotificationClientId": ""
-    };
-    fs.writeFileSync(path.join('www', 'bootconfig.json'), JSON.stringify(bootconfig, null, 2));
-    shelljs.exec('cordova prepare ' + config.platform);
+    // Copying template to www
+    utils.copyFromTemplate(config.templaterepourl, config.templatebranch, config.templatepath, 'www');
     shelljs.popd();
 
-    // Inform the user of next steps.
-    var nextStepsOutput =
-        ['',
-         outputColors.green + 'Your application project is ready in ' + config.targetdir + '.',
-         '',
-         outputColors.cyan + 'To use your new application in Android Studio, do the following:' + outputColors.reset,
-         '   - Launch Android Studio and select `Import project (Eclipse ADT, Gradle, etc.)` from the Welcome screen',
-         '   - Navigate to the ' + outputColors.magenta + config.targetdir + '/' + config.appname + '/platforms/android' + outputColors.reset + ' folder, select it and click `Ok`',
-         '   - From the dropdown that displays the available targets, choose the sample app you want to run and click the play button',
-         ''].join('\n');
-    console.log(nextStepsOutput);
-    console.log(outputColors.cyan + 'Before you ship, make sure to plug your OAuth Client ID,\nCallback URI, and OAuth Scopes into '
-        + outputColors.magenta + 'www/bootconfig.json' + outputColors.reset);
+    // Done
+    var result = {
+        projectPath: projectPath,
+        workspacePath: path.join(projectPath, 'platform', config.platform),
+        bootconfigFile: path.join(projectPath, 'www', 'bootconfig.json')
+    }
+
+    return result;
+
 }
 
-
-
-module.exports.getCordovaCliVersion = getCordovaCliVersion;
 module.exports.createHybridApp = createHybridApp;

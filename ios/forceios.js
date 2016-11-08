@@ -4,12 +4,14 @@
 var version = '5.0.0';
 var minimumCordovaCliVersion = '5.4.0';
 var cordovaPlatformVersion = '4.2.0';
+var cordovaPluginRepoUrl = 'file:///Users/wmathurin/Development/github/wmathurin/SalesforceMobileSDK-CordovaPlugin';
 var defaultTemplateRepoUrl = 'https://github.com/wmathurin/SalesforceMobileSDK-Templates';
 var defaultTemplateBranch = 'templates-android';
 var appTypeToDefaultTemplatePath = {
     'native': 'iOSNativeTemplate',
     'native_swift': 'iOSNativeSwiftTemplate',
-    'react_native': 'ReactNativeTemplate'
+    'react_native': 'ReactNativeTemplate',
+    'hybrid_local': 'HybridLocal'
 };
 var appTypes = ['native', 'native_swift', 'react_native', 'hybrid_local', 'hybrid_remote'];
 
@@ -47,6 +49,7 @@ function createApp(config) {
         else {
             config.minimumCordovaCliVersion = minimumCordovaCliVersion;
             config.cordovaPlatformVersion = cordovaPlatformVersion;
+            config.cordovaPluginRepoUrl = cordovaPluginRepoUrl;
             result = createHybridApp(config);
         }
 

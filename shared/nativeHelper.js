@@ -30,7 +30,16 @@ var path = require('path'),
     utils = require('./utils');
 
 /**
- * Create native app 
+ * Create native app
+ * @param config
+ *   platform
+ *   apptype
+ *   appname
+ *   packagename  
+ *   organization
+ *   templaterepourl
+ *   templatebranch
+ *   templatepath
  *
  * @return result map with
  *   projectPath     relative path to new project

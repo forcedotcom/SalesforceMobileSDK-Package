@@ -5,3 +5,5 @@ node ios/forceios.js create --apptype=react_native --appname=App3 --packagename=
 
 node android/forcedroid.js create --apptype=native --appname=App4 --packagename=com.acme.app4 --organization=Acme4 --outputdir=app4 --templaterepourl
 node android/forcedroid.js create --apptype=react_native --appname=App5 --packagename=com.acme.app5 --organization=Acme5 --outputdir=app5 --templaterepourl
+
+node ios/forceios.js create --apptype=hybrid_local --appname=App6 --packagename=com.acme.app6 --organization=Acme6 --outputdir=app6 --templaterepourl
