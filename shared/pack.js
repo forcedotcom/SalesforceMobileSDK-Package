@@ -46,9 +46,13 @@ function main(args) {
 }
 
 //
-// Create forcexxx package for given os
+// Create forceios/droid-xxx.tgz package for given os
 // 
 function pack(os) {
+    var packageName = 'force' + (os === 'ios' ? os : 'droid') + '-' + SDK.version + '.tgz';
+
+    utils.log('Creating ' + packageName, COLOR.green);
+    
     // Packing
     var packageRepoDir = path.join(__dirname, '..');
     var osDir = path.join(packageRepoDir, os);
@@ -60,12 +64,14 @@ function pack(os) {
     utils.runProcessThrowError('npm pack', osDir);
     utils.removeFile(osSharedDir);
     shelljs.ln('-s', path.join('..', 'shared'), osSharedDir);
+
+    // Moving package to current directory
+    utils.moveFile(path.join(osDir, packageName), packageName);
 }
 
 // 
 // Like split, but splitting null returns [] instead of throwing an error
 //                 splitting '' returns [] instead of ['']
-//
 //
 function cleanSplit(str, delimiter) {
     if (str == null || str === '') {
