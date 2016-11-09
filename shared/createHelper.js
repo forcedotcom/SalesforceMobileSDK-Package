@@ -125,7 +125,7 @@ function printNextSteps(devToolName, projectPath, result) {
                         '',
                         'Your application project is ready in ' + projectPath + '.',
                         'To use your new application in ' + devToolName + ', do the following:', 
-                        '   - open ' + workspacePath + ' in XCode', 
+                        '   - open ' + workspacePath + ' in ' + devToolName, 
                         '   - build and run', 
                         'Before you ship, make sure to plug your OAuth Client ID and Callback URI, and OAuth Scopes into ' + bootconfigFile
                        ]);
