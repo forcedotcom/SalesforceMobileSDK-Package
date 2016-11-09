@@ -147,7 +147,7 @@ function replaceInFiles(from, to, files) {
 function moveFile(from, to) {
     log('Moving: ' + from + ' to ' + to);
     var targetDir = path.parse(to).dir;
-    if (targetDir && shelljs.test('-e', targetDir)) {
+    if (targetDir && !shelljs.test('-e', targetDir)) {
         shelljs.mkdir('-p', targetDir);
     }
     shelljs.mv(from, to);
