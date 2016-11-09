@@ -84,6 +84,31 @@ function createHybridApp(config) {
 
 }
 
+/**
+ * Checks the the version of the currently installed cordova CLI tool.
+ * 
+ * @param {String} minimumCordovaCliVersion Minimum cordova cli version required
+ *
+ * @throws {Error} if cordova cli not found or version too low
+ */
+function checkCordovaCliVersion(minimumCordovaCliVersion) {
+    var cordovaCliVersion;
+    try {
+	    var cordovaVersionResult = utils.runProcessThrowError('cordova -v', null, true /* return output */);
+        cordovaCliVersion = cordovaVersionResult.replace(/\r?\n|\r/, '');
+    }
+    catch (error) {
+        throw new Error('cordova command line tool could not be found.  Make sure you install the cordova CLI from https://www.npmjs.org/package/cordova.');
+    }
+
+    var minimumCordovaCliVersionNum = utils.getVersionNumberFromString(minimumCordovaCliVersion);
+    var cordovaCliVersionNum = utils.getVersionNumberFromString(cordovaCliVersion);
+
+    if (cordovaCliVersionNum < minimumCordovaCliVersionNum) {
+        throw new Error('Installed cordova command line tool version (' + cordovaCliVersion + ') is less than the minimum required version (' + minimumCordovaCliVersion + ').  Please update your version of Cordova.');
+    }
+};
+
 //
 // Print details
 //
