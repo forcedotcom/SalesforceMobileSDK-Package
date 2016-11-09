@@ -29,7 +29,7 @@ module.exports = {
     version: '5.0.0',
 
     cordova: {
-        pluginRepoUrl: '/Users/wmathurin/Development/github/wmathurin/SalesforceMobileSDK-CordovaPlugin',
+        pluginRepoUrl: 'https://github.com/forcedotcom/SalesforceMobileSDK-CordovaPlugin',
         minimumCliVersion: '5.4.0',
         platformVersion: {
             ios: '4.2.0',
@@ -43,22 +43,21 @@ module.exports = {
     },
 
     templates: {
-        repoUrl: 'https://github.com/wmathurin/SalesforceMobileSDK-Templates',
-        branch: 'templates-android',
+        repoUrl: 'https://github.com/forcedotcom/SalesforceMobileSDK-Templates',
+        branch: 'unstable',
         appTypesToPath: {
             ios: {
                 'native': 'iOSNativeTemplate',
                 'native_swift': 'iOSNativeSwiftTemplate',
                 'react_native': 'ReactNativeTemplate',
-                'hybrid_local': 'HybridLocal',
-                'hybrid_remote': 'HybridRemote'
-                
+                'hybrid_local': 'HybridLocalTemplate',
+                'hybrid_remote': 'HybridRemoteTemplate'
             },
             android: {
                 'native': 'AndroidNativeTemplate',
                 'react_native': 'ReactNativeTemplate',
-                'hybrid_local': 'HybridLocal',
-                'hybrid_remote': 'HybridRemote'
+                'hybrid_local': 'HybridLocalTemplate',
+                'hybrid_remote': 'HybridRemoteTemplate'
             }
         }
     }
