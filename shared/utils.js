@@ -261,15 +261,16 @@ function log(msg, color) {
 }
 
 module.exports = {
+    copyFromTemplate,
+    failIfExists,
     getVersionNumberFromString,
-    runProcessThrowError,
-    replaceInFiles,
+    log,
+    logError,
+    logParagraph,
+    mkTmpDir,
     moveFile,
     removeFile,
-    failIfExists,
-    copyFromTemplate,
+    replaceInFiles,
+    runProcessThrowError,
     runTemplatePrepare,
-    logParagraph,
-    logError,
-    log
 };
