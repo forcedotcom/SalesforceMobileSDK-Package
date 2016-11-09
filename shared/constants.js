@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 /*
  * Copyright (c) 2016-present, salesforce.com, inc.
  * All rights reserved.
@@ -27,30 +25,41 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-// Dependencies
-var SDK = require('./shared/constants'),
-    configHelper = require('./shared/configHelper'),
-    createHelper = require('./shared/createHelper'),
-    utils = require('./shared/utils');
+module.exports = {
+    version: '5.0.0',
 
-// Reading parameters from command line
-configHelper.readConfig(process.argv, 'forceios', SDK.version, SDK.appTypes.ios, createApp);
+    cordova: {
+        pluginRepoUrl: '/Users/wmathurin/Development/github/wmathurin/SalesforceMobileSDK-CordovaPlugin',
+        minimumCliVersion: '5.4.0',
+        platformVersion: {
+            ios: '4.2.0',
+            android: '5.0.0'
+        }
+    },
 
-//
-// Helper for 'create' command
-//
-function createApp(config) {
-    try {
-        // Adding platform
-        config.platform = 'ios';
+    appTypes: {
+        ios: ['native', 'native_swift', 'react_native', 'hybrid_local', 'hybrid_remote'],
+        android: ['native', 'react_native', 'hybrid_local', 'hybrid_remote']
+    },
 
-        // Creating application
-        createHelper.createApp(config, 'ios', 'XCode');
-
+    templates: {
+        repoUrl: 'https://github.com/wmathurin/SalesforceMobileSDK-Templates',
+        branch: 'templates-android',
+        appTypesToPath: {
+            ios: {
+                'native': 'iOSNativeTemplate',
+                'native_swift': 'iOSNativeSwiftTemplate',
+                'react_native': 'ReactNativeTemplate',
+                'hybrid_local': 'HybridLocal',
+                'hybrid_remote': 'HybridRemote'
+                
+            },
+            android: {
+                'native': 'AndroidNativeTemplate',
+                'react_native': 'ReactNativeTemplate',
+                'hybrid_local': 'HybridLocal',
+                'hybrid_remote': 'HybridRemote'
+            }
+        }
     }
-    catch (error) {
-        utils.logError('forceios create failed: ', error);
-    }
-}
-
-
+};

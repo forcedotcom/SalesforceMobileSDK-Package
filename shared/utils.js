@@ -183,9 +183,6 @@ function copyFromTemplate(templateRepoUrl, templateBranch, templatePath, destina
     // Log
     log('Copying template into ' + destinationDir);
 
-    shelljs.cp('-R', '/Users/wmathurin/Development/github/wmathurin/SalesforceMobileSDK-Templates/HybridLocal', destinationDir);
-    return;
-
     // Create tmp dir
     var tmpDir = mkTmpDir();
 
@@ -222,11 +219,11 @@ function runTemplatePrepare(projectDir, config) {
 }    
 
 /**
- * Log multiline header
+ * Log paragraph (header or footer)
  *
  * @param {String} lines
  */
-function logHeader(lines) {
+function logParagraph(lines) {
     log("");
     log("********************************************************************************", COLOR.green);
     log("*", COLOR.green);
@@ -236,6 +233,16 @@ function logHeader(lines) {
     log("*", COLOR.green);
     log("********************************************************************************", COLOR.green);
     log("");
+}
+
+/**
+ * Log error
+ *
+ * @param {Error} error
+ */
+function logError(context, error) {
+    log(context + error.message, COLOR.red);
+    console.log(error.stack);
 }
 
 /**
@@ -262,6 +269,7 @@ module.exports = {
     failIfExists,
     copyFromTemplate,
     runTemplatePrepare,
-    logHeader,
+    logParagraph,
+    logError,
     log
 };

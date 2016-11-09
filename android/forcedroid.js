@@ -1,67 +1,55 @@
 #!/usr/bin/env node
 
-// Constants
-var version = '5.0.0';
-var minimumCordovaCliVersion = '5.4.0';
-var cordovaPlatformVersion = '5.0.0';
-var cordovaPluginRepoUrl = '/Users/wmathurin/Development/github/wmathurin/SalesforceMobileSDK-CordovaPlugin';
-var defaultTemplateRepoUrl = 'https://github.com/wmathurin/SalesforceMobileSDK-Templates';
-var defaultTemplateBranch = 'templates-android';
-var appTypeToDefaultTemplatePath = {
-    'native': 'AndroidNativeTemplate',
-    'react_native': 'ReactNativeTemplate',
-    'hybrid_local': 'HybridLocal'
-};
-var appTypes = ['native', 'react_native', 'hybrid_local', 'hybrid_remote'];
+/*
+ * Copyright (c) 2016-present, salesforce.com, inc.
+ * All rights reserved.
+ * Redistribution and use of this software in source and binary forms, with or
+ * without modification, are permitted provided that the following conditions
+ * are met:
+ * - Redistributions of source code must retain the above copyright notice, this
+ * list of conditions and the following disclaimer.
+ * - Redistributions in binary form must reproduce the above copyright notice,
+ * this list of conditions and the following disclaimer in the documentation
+ * and/or other materials provided with the distribution.
+ * - Neither the name of salesforce.com, inc. nor the names of its contributors
+ * may be used to endorse or promote products derived from this software without
+ * specific prior written permission of salesforce.com, inc.
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ */
 
 // Dependencies
-var readConfig = require('./shared/configHelper').readConfig,
-    createNativeApp = require('./shared/nativeHelper').createNativeApp,
-    createHybridApp = require('./shared/hybridHelper').createHybridApp,
-    log = require('./shared/utils').log,
-    COLOR = require('./shared/outputColors');
-
+var SDK = require('./shared/constants'),
+    configHelper = require('./shared/configHelper'),
+    createHelper = require('./shared/createHelper'),
+    utils = require('./shared/utils');
 
 // Reading parameters from command line
-readConfig(process.argv, 'forcedroid', version, appTypes, createApp);
+configHelper.readConfig(process.argv, 'forcedroid', SDK.version, SDK.appTypes.android, createApp);
 
 //
 // Helper for 'create' command
 //
 function createApp(config) {
     try {
-
         // Adding platform
         config.platform = 'android';
 
-        // Adding defaults
-        config.templaterepourl = config.templaterepourl || defaultTemplateRepoUrl;
-        config.templatebranch = config.templatebranch || defaultTemplateBranch;
-        config.templatepath = config.templatepath || (config.templaterepourl === defaultTemplateRepoUrl ? appTypeToDefaultTemplatePath[config.apptype] : '');
+        // Creating application
+        createHelper.createApp(config, 'android', 'Android Studio');
 
-        var result;
-        // Native app creation
-        if (config.apptype === 'native' || config.apptype === 'react_native') {
-            result = createNativeApp(config);
-        }
-        // Hybrid app creation
-        else {
-            config.minimumCordovaCliVersion = minimumCordovaCliVersion;
-            config.cordovaPlatformVersion = cordovaPlatformVersion;
-            config.cordovaPluginRepoUrl = cordovaPluginRepoUrl;
-            result = createHybridApp(config);
-        }
-
-        log('Next steps:', COLOR.cyan);
-        log('Your application project is ready in ' + result.projectDir + '.', COLOR.magenta);
-        log('To use your new application in Android Studio, do the following:', COLOR.magenta);
-        log('   - open ' + result.workspacePath + ' in Android Studio', COLOR.magenta);
-        log('   - build and run', COLOR.magenta);
-        log('Before you ship, make sure to plug your OAuth Client ID and Callback URI, and OAuth Scopes into ' + result.bootconfigFile, COLOR.cyan);
     }
     catch (error) {
-        log('forcedroid create failed: ' + error.message, COLOR.red);
-        console.log(error.stack);
+        utils.logError('forcedroid create failed: ', error);
     }
 }
 
