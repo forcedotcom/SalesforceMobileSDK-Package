@@ -33,12 +33,10 @@ function main(args) {
 
     // Pack
     if (buildingiOS) {
-        utils.log('Creating forceios-' + SDK.version + '.tgz package in ios directory', COLOR.green);
         pack('ios');
     }
 
     if (buildingAndroid) {
-        utils.log('Creating forcedroid-' + SDK.version + '.tgz package in android directory', COLOR.green);
         pack('android');
     }
 

@@ -32,7 +32,7 @@ var outputColors = require('./outputColors');
 
 /**
  * Parses an array of command line arguments, each of the form '--argName=argValue', or
- * optionally, '--argName'.
+ * optionally, '--argName'. Treats '--argName=' as '--argName'.
  *
  * @param {Array} argsArray The array of String arguments of the specified format.
  * @return A map in the form of { 'argName': 'argValue' [, ...] }
@@ -41,7 +41,7 @@ var parseArgs = function(argsArray) {
     var argMap = {};
     for (var i = 0; i < argsArray.length; i++) {
         var fullArg = argsArray[i];
-        var argSplitRegExp = /^--([^=]+)(=(.+))?$/;
+        var argSplitRegExp = /^--([^=]+)(=(.*))?$/;
         if (!argSplitRegExp.test(fullArg)) {
             throw new Error('Illegal argument: ' + fullArg);
         }

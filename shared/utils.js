@@ -113,12 +113,11 @@ function runProcessCatchError(cmd, msg, dir) {
     var success = false;
     log('Running: ' + cmd);
     try {
-        utils.runProcessThrowError(cmd, dir);
-        if (msg) log('!SUCCESS! ' + msg, COLOR.yellow);
+        runProcessThrowError(cmd, dir);
+        if (msg) log('!SUCCESS! ' + msg, COLOR.green);
         success = true;
     } catch (err) {
-        if (msg) log('!FAILURE! ' + msg, COLOR.red);
-        console.error(err.stderr.toString());
+        logError(msg ? '!FAILURE! ' + msg : '', err);
     }
     finally {
         return success;
@@ -293,8 +292,9 @@ function logParagraph(lines) {
  * @param {Error} error
  */
 function logError(context, error) {
-    log(context + error.message, COLOR.red);
-    console.log(error.stack);
+    log(context, COLOR.red)
+    log(error.message, COLOR.red);
+    log(error.stack);
 }
 
 /**

@@ -50,6 +50,7 @@ function createApp(config) {
     }
     catch (error) {
         utils.logError('forceios create failed: ', error);
+        process.exit(1);
     }
 }
 

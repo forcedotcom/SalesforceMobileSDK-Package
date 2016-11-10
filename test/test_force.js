@@ -1,34 +1,42 @@
 #!/usr/bin/env node
 
+// Defaults
+var defaultTemplateRepoUrl = 'https://github.com/wmathurin/SalesforceMobileSDK-Templates#templates-android';
+// var defaultTemplateRepoUrl = 'https://github.com/forcedotcom/SalesforceMobileSDK-Templates#unstable';
+var defaultPluginRepoUrl = '/Users/wmathurin/Development/github/wmathurin/SalesforceMobileSDK-CordovaPlugin';
+// var defaultPluginRepoUrl = 'https://github.com/forcedotcom/SalesforceMobileSDK-CordovaPlugin#unstable';
+var defaultSdkBranch = 'unstable';
+
 // Dependencies
 var execSync = require('child_process').execSync,
     path = require('path'),
-    commandLineUtils = require('./commandLineUtils'),
-    utils = require('./utils'),
     shelljs = require('shelljs'),
-    SDK = require('./constants'),
-    COLOR = require('./outputColors'),
-    SDK = require('./constants')
+    commandLineUtils = require('../shared/commandLineUtils'),
+    utils = require('../shared/utils'),
+    SDK = require('../shared/constants'),
+    COLOR = require('../shared/outputColors'),
+    SDK = require('../shared/constants')
 ;
 
 // Enums
 var OS = {
-    ios,
-    android
+    ios: 'ios',
+    android: 'android'
 };
 
 var APP_TYPE = {
-    'native',
-    native_swift,
-    react_native,
-    hybrid_local,
-    hybrid_remote
+    native: 'native',
+    native_swift: 'native_swift',
+    react_native: 'react_native',
+    hybrid_local: 'hybrid_local',
+    hybrid_remote: 'hybrid_remote'
 };
 
-// Defaults
-var defaultTemplateRepoUrl = 'https://github.com/forcedotcom/SalesforceMobileSDK-Templates#unstable';
-var defaultPluginRepoUrl = 'https://github.com/forcedotcom/SalesforceMobileSDK-CordovaPlugin#unstable';
-var defaultSdkBranch = 'unstable';
+var FORCE_CLI = {
+    ios: 'forceios',
+    android: 'forcedroid'
+};
+
 
 // Calling main
 main(process.argv);
@@ -44,17 +52,15 @@ function main(args) {
     var usageRequested = parsedArgs.hasOwnProperty('usage');
     var chosenOperatingSystems = cleanSplit(parsedArgs.os, ',');
     var templateRepoUrl = parsedArgs.templaterepourl || defaultTemplateRepoUrl;
-    var templatePath = parsedArgs.templatepath || '';
     var pluginRepoUrl = parsedArgs.pluginrepourl || defaultPluginRepoUrl;
     var sdkBranch = parsedArgs.sdkbranch || defaultSdkBranch;
     
-    var chosenAppTypes = cleanSplit(parsedArgs.test, ',');
+    var chosenAppTypes = cleanSplit(parsedArgs.apptype, ',');
     var testingIOS = chosenOperatingSystems.indexOf(OS.ios) >= 0;
     var testingAndroid = chosenOperatingSystems.indexOf(OS.android) >= 0;
     var testingHybrid = chosenAppTypes.indexOf(APP_TYPE.hybrid_local) >= 0 || chosenAppTypes.indexOf(APP_TYPE.hybrid_remote) >= 0;
 
     // Validation
-    validateVersion(version);
     validateOperatingSystems(chosenOperatingSystems);
     validateAppTypes(chosenAppTypes);
 
@@ -65,15 +71,14 @@ function main(args) {
     }
 
     // Actual testing
-    cleanup();
     var tmpDir = utils.mkTmpDir();
 
-    // Get ios repo if requested
+    // forceios
     if (testingIOS) {
         createDeployForcePackage(tmpDir, OS.ios);
     }
 
-    // Get android repo if requested
+    // forcedroid
     if (testingAndroid) {
         createDeployForcePackage(tmpDir, OS.android);
     }
@@ -81,8 +86,8 @@ function main(args) {
     // Get cordova plugin repo if any hybrid testing requested
     if (testingHybrid) {
         var pluginRepoDir = utils.cloneRepo(tmpDir, pluginRepoUrl);
-        if (testingIOS) updatePluginRepo(tmpDir, pluginRepoDir, sdkBranch, OS.ios);
-        if (testingAndroid) updatePluginRepo(tmpDir, pluginRepoDir, sdkBranch, OS.android);
+        if (testingIOS) updatePluginRepo(tmpDir, OS.ios, pluginRepoDir, sdkBranch);
+        if (testingAndroid) updatePluginRepo(tmpDir, OS.android, pluginRepoDir, sdkBranch);
     }
     
     // Test all the platforms / app types requested
@@ -90,7 +95,7 @@ function main(args) {
         var os = chosenOperatingSystems[i];
         for (var j=0; j<chosenAppTypes.length; j++) {
             var appType = chosenAppTypes[j];
-            createCompileApp(tmpDir, appType, os);
+            createCompileApp(tmpDir, os, appType, templateRepoUrl, pluginRepoUrl);
         }
     }
 }
@@ -99,109 +104,85 @@ function main(args) {
 // Usage
 //
 function usage() {
-    log('Usage:',  COLOR.cyan);
-    log('  test_force.js --usage\n'
-        + 'OR \n'
-        + '  test_force.js\n'
-        + '    --os=os1,os2,etc\n'
-        + '      where osN are : ios, android\n'
-        + '    --test=appType1,appType2,etc\n'
-        + '      where appTypeN are in: native, native_swift, react_native, hybrid_local, hybrid_remote\n'
-        + '    [--templaterepourl=TEMPLATE_REPO_URL (Defaults to https://github.com/forcedotcom/SalesforceMobileSDK-Templates#unstable)]\n'
-        + '    [--templatepath=TEMPLATE_PATH (Optional.)]\n'
-        + '    [--pluginrepourl=PLUGIN_REPO_URL (Defaults to https://github.com/forcedotcom/SalesforceMobileSDK-Templates#unstable)]\n'
-        + '    [--sdkbranch=SDK_BRANCH (Defaults to unstable)]\n'
-        + '\n'
-        + '  If ios is targeted:\n'
-        + '  - generates forceios package and deploys it to a temporary directory\n'
-        + '  - creates and compile the application types using specified template and plugin\n'
-        + '\n'
-        + '  If android is targeted:\n'
-        + '  - generates forcedroid package and deploys it to a temporary directory\n'
-        + '  - creates and compile the application types using specified template and plugin\n'
-        + '\n'
-        + '  If hybrid is targeted:\n'
-        + '  - clones PLUGIN_REPO_URL \n'
-        + '  - runs ./tools/update.sh -b SDK_BRANCH to update clone of plugin repo\n'
-        , COLOR.magenta);
-}
-
-//
-// Cleanup
-//
-function cleanup() {
-    log('Cleaning up temp dirs', COLOR.green);
-    shelljs.rm('-rf', 'tmp');
+    utils.log('Usage:',  COLOR.cyan);
+    utils.log('  test_force.js --usage', COLOR.magenta);
+    utils.log('OR ', COLOR.cyan);
+    utils.log('  test_force.js', COLOR.magenta);
+    utils.log('    --os=os1,os2,etc', COLOR.magenta);
+    utils.log('    --apptype=appType1,appType2,etc', COLOR.magenta);
+    utils.log('    [--templaterepourl=TEMPLATE_REPO_URL (Defaults to https://github.com/forcedotcom/SalesforceMobileSDK-Templates#unstable)]', COLOR.magenta);
+    utils.log('    [--pluginrepourl=PLUGIN_REPO_URL (Defaults to https://github.com/forcedotcom/SalesforceMobileSDK-Templates#unstable)]', COLOR.magenta);
+    utils.log('    [--sdkbranch=SDK_BRANCH (Defaults to unstable)]', COLOR.magenta);
+    utils.log('  Where:', COLOR.cyan);
+    utils.log('  - osX is : ios or android', COLOR.cyan);
+    utils.log('  - appTypeX is: native, native_swift, react_native, hybrid_local or hybrid_remote', COLOR.cyan);
+    utils.log('', COLOR.cyan);
+    utils.log('  If hybrid is targeted, the following are first done:', COLOR.cyan);
+    utils.log('  - clones PLUGIN_REPO_URL ', COLOR.cyan);
+    utils.log('  - runs ./tools/update.sh -b SDK_BRANCH to update clone of plugin repo', COLOR.cyan);
+    utils.log('', COLOR.cyan);
+    utils.log('  If ios is targeted:', COLOR.cyan);
+    utils.log('  - generates forceios package and deploys it to a temporary directory', COLOR.cyan);
+    utils.log('  - creates and compile the application types using specified template and plugin', COLOR.cyan);
+    utils.log('', COLOR.cyan);
+    utils.log('  If android is targeted:', COLOR.cyan);
+    utils.log('  - generates forcedroid package and deploys it to a temporary directory', COLOR.cyan);
+    utils.log('  - creates and compile the application types using specified template and plugin', COLOR.cyan);
 }
 
 //
 // Create and deploy forceios/forcedroid
 //
 function createDeployForcePackage(tmpDir, os) {
-    runProcessThrowError('node ./pack.js --os=' + os, __dirname);
-    runProcessThrowError('npm install --prefix ' + tmpDir + ' ' + forcePackageNameForOs(os) + '-' + SDK.version + '.tgz'));
+    var packJs = path.join(__dirname, '..', 'shared', 'pack.js');
+    utils.runProcessThrowError('node ' + packJs + ' --os=' + os);
+    utils.runProcessThrowError('npm install --prefix ' + tmpDir + ' ' + FORCE_CLI[os] + '-' + SDK.version + '.tgz');
+}
+
+//
+// Update cordova plugin repo
+//
+function updatePluginRepo(tmpDir, os, pluginRepoDir, sdkBranch) {
+    utils.log('Updating cordova plugin at ' + branch);
+    utils.unProcessThrowError(path.join('tools', 'update.sh') + ' -b ' + sdkBranch + ' -o ' + os, pluginRepoDir);
 }
 
 //
 // Create and compile app 
 //
-function createCompileApp(tmpDir, appType, os) {
+function createCompileApp(tmpDir, os, appType, templateRepoUrl, pluginRepoUrl) {
     if (appType === APP_TYPE.native_swift && os === OS.android) return; // that app type doesn't exist for android
 
+    var isNative = appType.indexOf('native') >= 0;
     var target = appType + ' app for ' + os;
-    log('==== ' + target + ' ====', COLOR.green);
     var appName = appType + os + 'App';
-    var appId = '3MVG9Iu66FKeHhINkB1l7xt7kR8czFcCTUhgoA8Ol2Ltf1eYHOU4SqQRSEitYFDUpqRWcoQ2.dBv_a1Dyu5xa';
-    var callbackUri = 'testsfdc:///mobilesdk/detect/oauth/done';
     var appDir = path.join(tmpDir, appName);
-    var forcePath = path.join(tmpDir, 'node_modules', '.bin', forcePackageNameForOs(os));
+    var forcePath = path.join(tmpDir, 'node_modules', '.bin', FORCE_CLI[os]);
 
     var forceArgs = 'create '
         + ' --apptype=' + appType
-        + ' --appname=' + appName;
-
-    if (os == OS.ios) {
-        // ios only args
-        forceArgs += ' --companyid=com.mycompany'
-            + ' --organization=MyCompany'
-            + ' --outputdir=' + tmpDir
-            + ' --appid=' + appId
-            + ' --callbackuri=' + callbackUri
-            + ' --startPage=/apex/testPage';
-    }
-    else {
-        // android only args
-        var targetDir;
-
-        if (appType.indexOf('native')>=0) {
-            targetDir = appDir;
-            shelljs.mkdir('-p', targetDir);
-        }
-        else {
-            targetDir = tmpDir;
-        }
-
-        forceArgs += ' --packagename=com.mycompany'
-            + ' --targetdir=' + targetDir
-            + ' --usesmartstore=yes'
-            +' --startpage=/apex/testPage';
-    }
+        + ' --appname=' + appName
+        + ' --packagename=com.mycompany'
+        + ' --organization=MyCompany'
+        + ' --outputdir=' + appDir
+        + (isNative ? '' : ' --startpage=/apex/testPage')
+        + ' --templaterepourl=' + templateRepoUrl
+        + ' --templatepath' 
+        + ' --pluginrepourl=' + pluginRepoUrl
 
     // Generation
-    var generationSucceeded = runProcessCatchError(forcePath + ' ' + forceArgs, 'GENERATING ' + target);
+    var generationSucceeded = utils.runProcessCatchError(forcePath + ' ' + forceArgs, 'GENERATING ' + target);
 
     if (!generationSucceeded) {
         return; // no point continuing
     }
 
     // Compilation
-    if (appType.indexOf('native') >=0) {
+    if (isNative) {
         if (os == OS.ios) {
             // IOS - Native
-            editPodfileToUseLocalRepo(appDir);
             var workspacePath = path.join(appDir, appName + '.xcworkspace');
-            runProcessThrowError('pod update', appDir);    
-            runProcessCatchError('xcodebuild -workspace ' + workspacePath 
+            utils.runProcessCatchError('xcodebuild -workspace ' + workspacePath 
                                  + ' -scheme ' + appName
                                  + ' clean build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO', 
                                  'COMPILING ' + target); 
@@ -209,28 +190,20 @@ function createCompileApp(tmpDir, appType, os) {
         else {
             // Android - Native
             var gradle = isWindows() ? '.\\gradlew.bat' : './gradlew';
-            runProcessCatchError(gradle + ' assembleDebug', 'COMPILING ' + target, appDir);
+            utils.runProcessCatchError(gradle + ' assembleDebug', 'COMPILING ' + target, appDir);
         }
     }
     else {
         if (os == OS.ios) {
-            // IOS - Native
-            runProcessCatchError('cordova build', 'COMPILING ' + target, appDir);    
+            // IOS - Hybrid
+            utils.runProcessCatchError('cordova build', 'COMPILING ' + target, appDir);    
         }
         else {
-            // Android - Native
+            // Android - Hybrid
             var gradle = isWindows() ? '.\\gradlew.bat' : './gradlew';
-            runProcessCatchError(gradle + ' assembleDebug', 'COMPILING ' + target, path.join(appDir, 'platforms', 'android'));
+            utils.runProcessCatchError(gradle + ' assembleDebug', 'COMPILING ' + target, path.join(appDir, 'platforms', 'android'));
         }
     }
-}
-
-//
-// Update cordova plugin repo
-//
-function updatePluginRepo(tmpDir, pluginRepoDir, sdkBranch, os) {
-    log('Updating cordova plugin at ' + branch, COLOR.green);
-    runProcessThrowError(path.join('tools', 'update.sh') + ' -b ' + sdkBranch + ' -o ' + os, pluginRepoDir);
 }
 
 //
@@ -238,8 +211,8 @@ function updatePluginRepo(tmpDir, pluginRepoDir, sdkBranch, os) {
 // 
 function validateVersion(version) {
     if (version.match(/\d\.\d\.\d/) == null) {
-            log('Invalid version: ' + version, COLOR.red);
-            process.exit(1);
+        utilslog('Invalid version: ' + version, COLOR.red);
+        process.exit(1);
     }
 }
 
@@ -263,7 +236,7 @@ function validateAppTypes(chosenAppTypes) {
     for (var i=0; i<chosenAppTypes.length; i++) {
         var appType = chosenAppTypes[i];
         if (!APP_TYPE.hasOwnProperty(appType)) {
-            log('Invalid appType: ' + appType, COLOR.red);
+            utils.log('Invalid appType: ' + appType, COLOR.red);
             process.exit(1);
         }
     }
@@ -281,16 +254,6 @@ function cleanSplit(str, delimiter) {
     }
     else {
         return str.split(delimiter);
-    }
-}
-
-//
-// Return forceios for ios and forcedroid for android
-//
-function forcePackageNameForOs(os) {
-    switch(os) {
-        case OS.android: return 'forcedroid';
-        case OS.ios: return 'forceios';
     }
 }
 

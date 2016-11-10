@@ -50,6 +50,7 @@ function createApp(config) {
     }
     catch (error) {
         utils.logError('forcedroid create failed: ', error);
+        process.exit(1);
     }
 }
 
