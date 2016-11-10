@@ -105,7 +105,7 @@ function createArgsProcessorList(appTypes) {
     // Template Path
     addProcessorFor(argProcessorList, 'templatepath', 'Enter path of template application in template repo:',
                     'Invalid value for template path: \'$val\'.', /.*/, 
-                    function(argsMap) { return argsMap['templaterepourl']; });
+                    function(argsMap) { return (argsMap['templaterepourl'] && argsMap['templaterepourl'].indexOf('SalesforceMobileSDK-Templates') == -1); });
 
     // Plugin URL
     addProcessorFor(argProcessorList, 'pluginrepourl', 'Enter the URL or path of mobile sdk cordova plugin (only applicable for hybrid apps):',

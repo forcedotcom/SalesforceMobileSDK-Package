@@ -128,11 +128,14 @@ function printDetails(config) {
 
     // Hybrid extra details
     if (config.apptype.indexOf('hybrid') >= 0) {
-        details.concat([
-            '       start page:      ' + config.startpage,
+        details = details.concat([
             '       cordova version: ' + config.cordovaPlatformVersion,
             '       plugin repo:     ' + config.cordovaPluginRepoUrl
         ]);
+
+        if (config.apptype === 'hybrid_remote') {
+            details = details.concat(['       start page:      ' + config.startpage]);
+        }
     }
             
     utils.logParagraph(details);
