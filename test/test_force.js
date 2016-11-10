@@ -143,8 +143,8 @@ function createDeployForcePackage(tmpDir, os) {
 // Update cordova plugin repo
 //
 function updatePluginRepo(tmpDir, os, pluginRepoDir, sdkBranch) {
-    utils.log('Updating cordova plugin at ' + branch);
-    utils.unProcessThrowError(path.join('tools', 'update.sh') + ' -b ' + sdkBranch + ' -o ' + os, pluginRepoDir);
+    utils.log('Updating cordova plugin at ' + sdkBranch);
+    utils.runProcessThrowError(path.join('tools', 'update.sh') + ' -b ' + sdkBranch + ' -o ' + os, pluginRepoDir);
 }
 
 //
@@ -156,7 +156,7 @@ function createCompileApp(tmpDir, os, appType, templateRepoUrl, pluginRepoUrl) {
     var isNative = appType.indexOf('native') >= 0;
     var target = appType + ' app for ' + os;
     var appName = appType + os + 'App';
-    var appDir = path.join(tmpDir, appName);
+    var outputDir = path.join(tmpDir, appName);
     var forcePath = path.join(tmpDir, 'node_modules', '.bin', FORCE_CLI[os]);
 
     var forceArgs = 'create '
@@ -164,7 +164,7 @@ function createCompileApp(tmpDir, os, appType, templateRepoUrl, pluginRepoUrl) {
         + ' --appname=' + appName
         + ' --packagename=com.mycompany'
         + ' --organization=MyCompany'
-        + ' --outputdir=' + appDir
+        + ' --outputdir=' + outputDir
         + (isNative ? '' : ' --startpage=/apex/testPage')
         + ' --templaterepourl=' + templateRepoUrl
         + ' --templatepath' 
@@ -176,6 +176,9 @@ function createCompileApp(tmpDir, os, appType, templateRepoUrl, pluginRepoUrl) {
     if (!generationSucceeded) {
         return; // no point continuing
     }
+
+    // App dir
+    var appDir = appType === APP_TYPE.react_native ? path.join(outputDir, os) : outputDir;
 
     // Compilation
     if (isNative) {
@@ -189,6 +192,7 @@ function createCompileApp(tmpDir, os, appType, templateRepoUrl, pluginRepoUrl) {
         }
         else {
             // Android - Native
+            var appDir = appType === APP_TYPE.react_native ? path.join(outputDir, os) : outputDir;
             var gradle = isWindows() ? '.\\gradlew.bat' : './gradlew';
             utils.runProcessCatchError(gradle + ' assembleDebug', 'COMPILING ' + target, appDir);
         }
