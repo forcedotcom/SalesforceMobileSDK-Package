@@ -123,7 +123,6 @@ function printDetails(config) {
                         '  in:                   ' + config.projectPath,
                         '',
                         '  from template repo:   ' + config.templaterepourl,
-                        '       template branch: ' + config.templatebranch,
                         '       template path:   ' + config.templatepath
                   ];
 

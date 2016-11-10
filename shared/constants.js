@@ -25,11 +25,14 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+var VERSION = '5.0.0';
+
 module.exports = {
-    version: '5.0.0',
+    version: VERSION,
 
     cordova: {
-        pluginRepoUrl: 'https://github.com/forcedotcom/SalesforceMobileSDK-CordovaPlugin',
+        pluginRepoUrl: '/Users/wmathurin/Development/github/wmathurin/SalesforceMobileSDK-CordovaPlugin',
+//        pluginRepoUrl: 'https://github.com/forcedotcom/SalesforceMobileSDK-CordovaPlugin#v' + VERSION,
         minimumCliVersion: '5.4.0',
         platformVersion: {
             ios: '4.2.0',
@@ -43,7 +46,8 @@ module.exports = {
     },
 
     templates: {
-        repoUrl: 'https://github.com/forcedotcom/SalesforceMobileSDK-Templates',
+        repoUrl: 'https://github.com/wmathurin/SalesforceMobileSDK-Templates#templates-android',
+//        repoUrl: 'https://github.com/forcedotcom/SalesforceMobileSDK-Templates#v' + VERSION,
         appTypesToPath: {
             ios: {
                 'native': 'iOSNativeTemplate',

@@ -238,7 +238,7 @@ function cloneRepo(tmpDir, repoUrlWithBranch) {
     // Clone template repo
     var parts = repoUrlWithBranch.split('#');
     var repoUrl = parts[0];
-    var branch = parts.length > 0 ? parts[1] : 'master';
+    var branch = parts.length > 1 ? parts[1] : 'master';
     var subparts = repoUrl.split('/');
     var repoName = subparts[subparts.length - 1];
     var repoDir = path.join(tmpDir, repoName);
