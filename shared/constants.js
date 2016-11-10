@@ -44,7 +44,6 @@ module.exports = {
 
     templates: {
         repoUrl: 'https://github.com/forcedotcom/SalesforceMobileSDK-Templates',
-        branch: 'unstable',
         appTypesToPath: {
             ios: {
                 'native': 'iOSNativeTemplate',

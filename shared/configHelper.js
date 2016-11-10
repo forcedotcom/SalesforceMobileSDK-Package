@@ -62,8 +62,8 @@ function usage(toolName, appTypes) {
     log('    --startpage=<App Start Page> (The start page of your remote app. Only required for hybrid_remote)', COLOR.magenta);
     log('    [--outputdir=<Output directory> (Defaults to the current working directory)]', COLOR.magenta);
     log('    [--templaterepourl=<Template repo URL> (URL of repo containing template application. Optional.)]', COLOR.magenta);
-    log('    [--templatebranch=<Branch> (Branch of template repo to use. Only required if template repo url provided.)]', COLOR.magenta);
-    log('    [--templatepath=<Path> (Path of template application in template repo. Only required if template repo url provided.)]', COLOR.magenta);
+    log('    [--templatepath=<Path> (Path of template application in template repo. Optional.)]', COLOR.magenta);
+    log('    [--pluginrepourl=<Cordova plugin URL> (URL or path of mobile sdk cordova plugin. Optional.)]', COLOR.magenta);
     log('\n OR \n', COLOR.cyan);
     log(toolName + ' version', COLOR.magenta);
 }
@@ -102,15 +102,16 @@ function createArgsProcessorList(appTypes) {
     // Template Repo URL
     addProcessorForOptional(argProcessorList, 'templaterepourl', 'Enter URL of repo containing template application (leave empty for default template):');
 
-    // Template Branch
-    addProcessorFor(argProcessorList, 'templatebranch', 'Enter branch of template repo to use:',
-                    'Invalid value for template branch: \'$val\'.', /.*/, 
-                    function(argsMap) { return argsMap['templaterepourl']; });
-
     // Template Path
     addProcessorFor(argProcessorList, 'templatepath', 'Enter path of template application in template repo:',
                     'Invalid value for template path: \'$val\'.', /.*/, 
                     function(argsMap) { return argsMap['templaterepourl']; });
+
+    // Plugin URL
+    addProcessorFor(argProcessorList, 'pluginrepourl', 'Enter the URL or path of mobile sdk cordova plugin (only applicable for hybrid apps):',
+                    'Invalid value for plugin repo url: \'$val\'.', /.*/, 
+                    function(argsMap) { return (argsMap['apptype'].indexOf('hybrid') >= 0); });
+
 
     return argProcessorList;
 }

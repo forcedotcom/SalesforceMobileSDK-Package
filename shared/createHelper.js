@@ -37,7 +37,7 @@ var path = require('path'),
 function createNativeApp(config) {
 
     // Copying template to projectDir
-    utils.copyFromTemplate(config.templaterepourl, config.templatebranch, config.templatepath, config.projectDir);
+    utils.copyFromTemplate(config.templaterepourl, config.templatepath, config.projectDir);
 
     // Run prepare function of template
     var prepareResult = utils.runTemplatePrepare(config.projectDir, config);
@@ -59,6 +59,7 @@ function createHybridApp(config) {
 
     // Create app with cordova
     utils.runProcessThrowError('cordova create "' + config.projectDir + '" ' + config.packagename + ' ' + config.appname);
+    utils.runProcessThrowError('npm install shelljs@0.7.0', config.projectDir);
     utils.runProcessThrowError('cordova platform add ' + config.platform + '@' + config.cordovaPlatformVersion, config.projectDir);
     utils.runProcessThrowError('cordova plugin add ' + config.cordovaPluginRepoUrl, config.projectDir);
     utils.runProcessThrowError('cordova prepare', config.projectDir);
@@ -71,7 +72,7 @@ function createHybridApp(config) {
     utils.removeFile(webDir);
 
     // Copying template to www
-    utils.copyFromTemplate(config.templaterepourl, config.templatebranch, config.templatepath, webDir);
+    utils.copyFromTemplate(config.templaterepourl, config.templatepath, webDir);
 
     // Run prepare function of template
     var prepareResult = utils.runTemplatePrepare(webDir, config);
@@ -167,8 +168,7 @@ function createApp(config, platform, devToolName) {
     
     // Adding defaults
     config.templaterepourl = config.templaterepourl || SDK.templates.repoUrl;
-    config.templatebranch = config.templatebranch || SDK.templates.branch;
-    config.templatepath = config.templatepath || (config.templaterepourl === SDK.templates.repoUrl ? SDK.templates.appTypesToPath[platform][config.apptype] : '');
+    config.templatepath = config.templatepath || (config.templaterepourl.indexOf('SalesforceMobileSDK-Templates') >= 0 ? SDK.templates.appTypesToPath[platform][config.apptype] : '');
 
     // Computing projectDir
     config.projectDir = config.outputdir ? path.resolve(config.outputdir) : path.join(process.cwd(),config.appname)
@@ -178,7 +178,7 @@ function createApp(config, platform, devToolName) {
     if (!isNative) {
         config.minimumCordovaCliVersion = SDK.cordova.minimumCliVersion;
         config.cordovaPlatformVersion = SDK.cordova.platformVersion[platform];
-        config.cordovaPluginRepoUrl = SDK.cordova.pluginRepoUrl
+        config.cordovaPluginRepoUrl = config.pluginrepourl || SDK.cordova.pluginRepoUrl;
     }
 
     // Check if directory exists

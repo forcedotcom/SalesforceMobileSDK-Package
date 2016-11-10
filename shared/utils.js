@@ -78,7 +78,7 @@ function replaceTextInFile(fileName, textInFile, replacementText) {
 
 
 /**
- * Run shell command
+ * Run shell command - throws error if any
  *
  * @param {String} cmd The command to execute
  * @param {String} dir Optional. The directory the command should be executed in
@@ -99,6 +99,32 @@ function runProcessThrowError(cmd, dir, returnOutput) {
         if (dir) shelljs.popd();
     }
 }
+
+/**
+ * Run shell command - throws error if any
+ *
+ * @param {String} cmd The command to execute
+ * @param {String} msg Message to print on success/failure
+ * @param {String} dir Optional. The directory the command should be executed in
+ *
+ * @return true if successful, false otherwise
+ */
+function runProcessCatchError(cmd, msg, dir) {
+    var success = false;
+    log('Running: ' + cmd);
+    try {
+        utils.runProcessThrowError(cmd, dir);
+        if (msg) log('!SUCCESS! ' + msg, COLOR.yellow);
+        success = true;
+    } catch (err) {
+        if (msg) log('!FAILURE! ' + msg, COLOR.red);
+        console.error(err.stderr.toString());
+    }
+    finally {
+        return success;
+    }
+}
+
 
 /**
  * Makes temp directory.
@@ -177,9 +203,11 @@ function failIfExists(path) {
 /**
  * Copy from template.
  * 
- * @param {String} path Path of file or directory to remove.
+ * @param {String} templateRepoUrl
+ * @param {String} templatePath
+ * @param {String} destinationDir
  */
-function copyFromTemplate(templateRepoUrl, templateBranch, templatePath, destinationDir) {
+function copyFromTemplate(templateRepoUrl, templatePath, destinationDir) {
     // Log
     log('Copying template into ' + destinationDir);
 
@@ -187,14 +215,38 @@ function copyFromTemplate(templateRepoUrl, templateBranch, templatePath, destina
     var tmpDir = mkTmpDir();
 
     // Clone template repo
-    runProcessThrowError('git clone --branch ' + templateBranch + ' --single-branch --depth 1 ' + templateRepoUrl + ' ' + tmpDir);
+    var repoDir = cloneRepo(tmpDir, templateRepoUrl);
 
     // Copy template to project dir
-    shelljs.cp('-R', path.join(tmpDir, templatePath), destinationDir);
+    shelljs.cp('-R', path.join(repoDir, templatePath), destinationDir);
 
     // Remove tmp dir
     removeFile(tmpDir);
-}    
+}
+
+/**
+ * Clone repo.
+ *
+ * @param {String} tmpDir Parent dir for clone
+ * @param {String} repoUrlWithBranch Repo URL e.g. https://github.com/xyz/abc or https://github.com/xyz/abc#branch
+ *
+ * @return repoDir
+ */
+
+function cloneRepo(tmpDir, repoUrlWithBranch) {
+
+    // Clone template repo
+    var parts = repoUrlWithBranch.split('#');
+    var repoUrl = parts[0];
+    var branch = parts.length > 0 ? parts[1] : 'master';
+    var subparts = repoUrl.split('/');
+    var repoName = subparts[subparts.length - 1];
+    var repoDir = path.join(tmpDir, repoName);
+
+    shelljs.mkdir('-p', repoDir);
+    runProcessThrowError('git clone --branch ' + branch + ' --single-branch --depth 1 --recurse-submodules ' + repoUrl + ' ' + repoDir);
+    return repoDir;
+}
 
 /**
  * Run prepare function of template.js
@@ -261,6 +313,7 @@ function log(msg, color) {
 }
 
 module.exports = {
+    cloneRepo,
     copyFromTemplate,
     failIfExists,
     getVersionNumberFromString,
@@ -271,6 +324,7 @@ module.exports = {
     moveFile,
     removeFile,
     replaceInFiles,
+    runProcessCatchError,
     runProcessThrowError,
     runTemplatePrepare,
 };
