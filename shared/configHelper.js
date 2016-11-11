@@ -44,7 +44,7 @@ function readConfig(args, toolName, toolVersion, appTypes, handler) {
     case 'create': 
         processorList = createArgsProcessorList(appTypes); 
         break;
-    case 'create2': 
+    case 'createWithConfig': 
         processorList = createArgsProcessorList(appTypes, true); 
         break;
     default:
@@ -64,7 +64,7 @@ function usage(toolName, toolVersion, appTypes) {
     log('    --organization=<Organization Name> (Your company\'s/organization\'s name)', COLOR.magenta);
     log('    --startpage=<App Start Page> (The start page of your remote app. Only required for hybrid_remote)', COLOR.magenta);
     log('\n OR \n', COLOR.cyan);
-    log(toolName + ' create2', COLOR.magenta);
+    log(toolName + ' createWithConfig', COLOR.magenta);
     log('   Same arguments as create plus the following:', COLOR.magenta);
     log('    --outputdir=<Output directory> (Leave empty for current directory.)]', COLOR.magenta);
     log('    --templaterepourl=<Template repo URL> (Leave empty for default template repo.)]', COLOR.magenta);
@@ -77,7 +77,7 @@ function usage(toolName, toolVersion, appTypes) {
 //
 // Processor list for 'create' command
 //
-function createArgsProcessorList(appTypes, extraArgs) {
+function createArgsProcessorList(appTypes, presentExtraArgs) {
     var argProcessorList = new commandLineUtils.ArgProcessorList();
 
     // App type
@@ -102,7 +102,7 @@ function createArgsProcessorList(appTypes, extraArgs) {
                     'Invalid value for start page: \'$val\'.', /\S+/, 
                     function(argsMap) { return (argsMap['apptype'] === 'hybrid_remote'); });
 
-    if (extraArgs) {
+    if (presentExtraArgs) {
         // Output dir
         addProcessorFor(argProcessorList, 'outputdir', 'Enter the output directory for your app (leave empty for the current directory):',
                      'Invalid value for output directory: \'$val\'.', /.*/); 

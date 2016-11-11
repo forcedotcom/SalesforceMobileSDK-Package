@@ -159,7 +159,7 @@ function createCompileApp(tmpDir, os, appType, templateRepoUrl, pluginRepoUrl) {
     var outputDir = path.join(tmpDir, appName);
     var forcePath = path.join(tmpDir, 'node_modules', '.bin', FORCE_CLI[os]);
 
-    var forceArgs = 'create2 '
+    var forceArgs = 'createWithConfig '
         + ' --apptype=' + appType
         + ' --appname=' + appName
         + ' --packagename=com.mycompany'
