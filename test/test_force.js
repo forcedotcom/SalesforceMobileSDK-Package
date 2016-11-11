@@ -211,16 +211,6 @@ function createCompileApp(tmpDir, os, appType, templateRepoUrl, pluginRepoUrl) {
 }
 
 //
-// Helper to validate version
-// 
-function validateVersion(version) {
-    if (version.match(/\d\.\d\.\d/) == null) {
-        utilslog('Invalid version: ' + version, COLOR.red);
-        process.exit(1);
-    }
-}
-
-//
 // Helper to validate operating systems
 //
 function validateOperatingSystems(chosenOperatingSystems) {

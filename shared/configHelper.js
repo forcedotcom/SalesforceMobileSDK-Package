@@ -92,7 +92,7 @@ function createArgsProcessorList(appTypes) {
                     'Invalid value for organization: \'$val\'.',  /\S+/);
 
     // Start page
-    addProcessorFor(argProcessorList, 'startpage', 'Enter the start page for your app (only applicable for hybrid_remote apps):',
+    addProcessorFor(argProcessorList, 'startpage', 'Enter the start page for your app:',
                     'Invalid value for start page: \'$val\'.', /\S+/, 
                     function(argsMap) { return (argsMap['apptype'] === 'hybrid_remote'); });
 
@@ -108,7 +108,7 @@ function createArgsProcessorList(appTypes) {
                     function(argsMap) { return (argsMap['templaterepourl'] && argsMap['templaterepourl'].indexOf('SalesforceMobileSDK-Templates') == -1); });
 
     // Plugin URL
-    addProcessorFor(argProcessorList, 'pluginrepourl', 'Enter the URL or path of mobile sdk cordova plugin (only applicable for hybrid apps):',
+    addProcessorFor(argProcessorList, 'pluginrepourl', 'Enter the URL or path of mobile sdk cordova plugin (leave empty for latest plugin):',
                     'Invalid value for plugin repo url: \'$val\'.', /.*/, 
                     function(argsMap) { return (argsMap['apptype'].indexOf('hybrid') >= 0); });
 
