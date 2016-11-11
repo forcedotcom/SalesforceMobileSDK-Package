@@ -44,26 +44,32 @@ function readConfig(args, toolName, toolVersion, appTypes, handler) {
     case 'create': 
         processorList = createArgsProcessorList(appTypes); 
         break;
+    case 'create2': 
+        processorList = createArgsProcessorList(appTypes, true); 
+        break;
     default:
-        usage(toolName, appTypes);
+        usage(toolName, toolVersion, appTypes);
         process.exit(1);
     };
 
     commandLineUtils.processArgsInteractive(commandLineArgs, processorList, handler);
 }
 
-function usage(toolName, appTypes) {
+function usage(toolName, toolVersion, appTypes) {
     log('Usage:\n', COLOR.cyan);
     log(toolName + ' create', COLOR.magenta);
     log('    --apptype=<Application Type> (' + appTypes.join(', ') + ')', COLOR.magenta);
     log('    --appname=<Application Name>', COLOR.magenta);
-    log('    --packagename=<App Package Identifier> (com.mycompany.myapp)', COLOR.magenta);
+    log('    --packagename=<App Package Identifier> (e.g. com.mycompany.myapp)', COLOR.magenta);
     log('    --organization=<Organization Name> (Your company\'s/organization\'s name)', COLOR.magenta);
     log('    --startpage=<App Start Page> (The start page of your remote app. Only required for hybrid_remote)', COLOR.magenta);
-    log('    [--outputdir=<Output directory> (Defaults to the current working directory)]', COLOR.magenta);
-    log('    [--templaterepourl=<Template repo URL> (URL of repo containing template application. Optional.)]', COLOR.magenta);
-    log('    [--templatepath=<Path> (Path of template application in template repo. Optional.)]', COLOR.magenta);
-    log('    [--pluginrepourl=<Cordova plugin URL> (URL or path of mobile sdk cordova plugin. Optional.)]', COLOR.magenta);
+    log('\n OR \n', COLOR.cyan);
+    log(toolName + ' create2', COLOR.magenta);
+    log('   Same arguments as create plus the following:', COLOR.magenta);
+    log('    --outputdir=<Output directory> (Leave empty for current directory.)]', COLOR.magenta);
+    log('    --templaterepourl=<Template repo URL> (Leave empty for default template repo.)]', COLOR.magenta);
+    log('    --templatepath=<Path> (Path of template application in template repo. Optional.)]', COLOR.magenta);
+    log('    --pluginrepourl=<Cordova plugin URL> (Leave empty for version ' + toolVersion + ' of mobile sdk plugin.)]', COLOR.magenta);
     log('\n OR \n', COLOR.cyan);
     log(toolName + ' version', COLOR.magenta);
 }
@@ -71,7 +77,7 @@ function usage(toolName, appTypes) {
 //
 // Processor list for 'create' command
 //
-function createArgsProcessorList(appTypes) {
+function createArgsProcessorList(appTypes, extraArgs) {
     var argProcessorList = new commandLineUtils.ArgProcessorList();
 
     // App type
@@ -96,21 +102,26 @@ function createArgsProcessorList(appTypes) {
                     'Invalid value for start page: \'$val\'.', /\S+/, 
                     function(argsMap) { return (argsMap['apptype'] === 'hybrid_remote'); });
 
-    // Output dir
-    addProcessorForOptional(argProcessorList, 'outputdir', 'Enter the output directory for your app (defaults to the current directory):');
+    if (extraArgs) {
+        // Output dir
+        addProcessorFor(argProcessorList, 'outputdir', 'Enter the output directory for your app (leave empty for the current directory):',
+                     'Invalid value for output directory: \'$val\'.', /.*/); 
 
-    // Template Repo URL
-    addProcessorForOptional(argProcessorList, 'templaterepourl', 'Enter URL of repo containing template application (leave empty for default template):');
+        // Template Repo URL
+        addProcessorFor(argProcessorList, 'templaterepourl', 'Enter URL of repo containing template application (leave empty for default template):',
+                     'Invalid value for template repo url: \'$val\'.', /.*/);
 
-    // Template Path
-    addProcessorFor(argProcessorList, 'templatepath', 'Enter path of template application in template repo:',
-                    'Invalid value for template path: \'$val\'.', /.*/, 
-                    function(argsMap) { return (argsMap['templaterepourl'] && argsMap['templaterepourl'].indexOf('SalesforceMobileSDK-Templates') == -1); });
 
-    // Plugin URL
-    addProcessorFor(argProcessorList, 'pluginrepourl', 'Enter the URL or path of mobile sdk cordova plugin (leave empty for latest plugin):',
-                    'Invalid value for plugin repo url: \'$val\'.', /.*/, 
-                    function(argsMap) { return (argsMap['apptype'].indexOf('hybrid') >= 0); });
+        // Template Path
+        addProcessorFor(argProcessorList, 'templatepath', 'Enter path of template application in template repo:',
+                        'Invalid value for template path: \'$val\'.', /.*/, 
+                        function(argsMap) { return (argsMap['templaterepourl'] && argsMap['templaterepourl'].indexOf('SalesforceMobileSDK-Templates') == -1); });
+
+        // Plugin URL
+        addProcessorFor(argProcessorList, 'pluginrepourl', 'Enter the URL or path of mobile sdk cordova plugin (leave empty for latest plugin):',
+                        'Invalid value for plugin repo url: \'$val\'.', /.*/, 
+                        function(argsMap) { return (argsMap['apptype'].indexOf('hybrid') >= 0); });
+    }
 
 
     return argProcessorList;
@@ -127,30 +138,20 @@ function createArgsProcessorList(appTypes) {
 // * postprocessor: function or null
 // 
 function addProcessorFor(argProcessorList, argName, prompt, error, validation, preprocessor, postprocessor) {
-   argProcessorList.addArgProcessor(argName, prompt, function(val) {
-       val = val.trim();
+    argProcessorList.addArgProcessor(argName, prompt, function(val) {
+        val = val.trim();
 
-       // validation is either a function or a regexp
-       if (typeof validation === 'function' && validation(val)
-           || typeof validation === 'object' && typeof validation.test === 'function' && validation.test(val))
-       {
-           return new commandLineUtils.ArgProcessorOutput(true, typeof postprocessor === 'function' ? postprocessor(val) : val);
-       }
-       else {
-           return new commandLineUtils.ArgProcessorOutput(false, error.replace('$val', val));
-       }
+        // validation is either a function or a regexp
+        if (typeof validation === 'function' && validation(val)
+            || typeof validation === 'object' && typeof validation.test === 'function' && validation.test(val))
+        {
+            return new commandLineUtils.ArgProcessorOutput(true, typeof postprocessor === 'function' ? postprocessor(val) : val);
+        }
+        else {
+            return new commandLineUtils.ArgProcessorOutput(false, error.replace('$val', val));
+        }
 
-   }, preprocessor);
-}
-
-//
-// Helper function to add arg processor for optional arg- should unset value when nothing is typed in
-// * argProcessorList: ArgProcessorList
-// * argName: string, name of argument
-// * prompt: string for prompt
-//
-function addProcessorForOptional(argProcessorList, argName, prompt) {
-    addProcessorFor(argProcessorList, argName, prompt, undefined, function() { return true;}, undefined, undefined);
+    }, preprocessor);
 }
 
 module.exports.readConfig = readConfig;
