@@ -1,10 +1,8 @@
 #!/usr/bin/env node
 
 // Defaults
-var defaultTemplateRepoUrl = 'https://github.com/wmathurin/SalesforceMobileSDK-Templates#templates-android';
-// var defaultTemplateRepoUrl = 'https://github.com/forcedotcom/SalesforceMobileSDK-Templates#unstable';
-var defaultPluginRepoUrl = '/Users/wmathurin/Development/github/wmathurin/SalesforceMobileSDK-CordovaPlugin';
-// var defaultPluginRepoUrl = 'https://github.com/forcedotcom/SalesforceMobileSDK-CordovaPlugin#unstable';
+var defaultTemplateRepoUrl = ''; // let constants.js drive
+var defaultPluginRepoUrl = '';   // let constants.js drive
 var defaultSdkBranch = 'unstable';
 
 // Dependencies
