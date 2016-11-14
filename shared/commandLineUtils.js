@@ -142,14 +142,17 @@ var processArgument = function(argValue, argsMap, argProcessor, postProcessingCa
             console.log(outputColors.red + 'Invalid value for \'' + argProcessor.argName + '\'.' + outputColors.reset);
         }
     }
-    var rl = readline.createInterface({
-        input: process.stdin,
-        output: process.stdout
-    });
-    rl.question(argProcessor.inputPrompt + ' ', function(answer) {
-        rl.close();
-        processArgument(answer, argsMap, argProcessor, postProcessingCallback);
-    });
+    // If we have an inputPrompt, prompt the user
+    if (argProcessor.inputPrompt) {
+        var rl = readline.createInterface({
+            input: process.stdin,
+            output: process.stdout
+        });
+        rl.question(argProcessor.inputPrompt + ' ', function(answer) {
+            rl.close();
+            processArgument(answer, argsMap, argProcessor, postProcessingCallback);
+        });
+    }
 };
 
 /**
@@ -165,7 +168,7 @@ var ArgProcessorList = function() {
  * Adds an ArgProcessor to the list of processors.
  *
  * @param {String} argName The name of the argument.
- * @param {String} inputPrompt The prompt to show the user, when interactively configuring the arg value.
+ * @param {String} inputPrompt The prompt to show the user, when interactively configuring the arg value. If null, the user will not be prompted interactively.
  * @param {Function} processorFunction The function used to validate the arg value.
  * @param {Function} preprocessorFunction An optional function that can be used to determine whether the argument should be configured.
  * @return {ArgProcessorList} The updated ArgProcessorList, for chaining calls.
@@ -181,16 +184,13 @@ ArgProcessorList.prototype.addArgProcessor = function(argName, inputPrompt, proc
  *
  * @constructor
  * @param {String} argName The name of the argument.
- * @param {String} inputPrompt The prompt to show the user, when interactively configuring the arg value.
+ * @param {String} inputPrompt The prompt to show the user, when interactively configuring the arg value. If null, the user will not be prompted interactively.
  * @param {Function} processorFunction The function used to validate the arg value.
  * @param {Function} preprocessorFunction An optional function that can be used to determine whether the argument should be configured.
  */
 var ArgProcessor = function(argName, inputPrompt, processorFunction, preprocessorFunction) {
     if ((typeof argName !== 'string') || argName.trim() === '') {
         throw new Error('Invalid value for argName: \'' + argName + '\'.');
-    }
-    if ((typeof inputPrompt !== 'string') || (inputPrompt.trim() === '')) {
-        throw new Error('Invalid value for inputPrompt: \'' + inputPrompt + '\'.');
     }
     if (typeof processorFunction !== 'function') {
         throw new Error('processorFunction should be a function.');

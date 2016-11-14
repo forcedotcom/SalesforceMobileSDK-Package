@@ -157,7 +157,7 @@ function createCompileApp(tmpDir, os, appType, templateRepoUrl, pluginRepoUrl) {
     var outputDir = path.join(tmpDir, appName);
     var forcePath = path.join(tmpDir, 'node_modules', '.bin', FORCE_CLI[os]);
 
-    var forceArgs = 'createWithConfig '
+    var forceArgs = 'createWithTemplate '
         + ' --apptype=' + appType
         + ' --appname=' + appName
         + ' --packagename=com.mycompany'
@@ -165,7 +165,6 @@ function createCompileApp(tmpDir, os, appType, templateRepoUrl, pluginRepoUrl) {
         + ' --outputdir=' + outputDir
         + (isNative ? '' : ' --startpage=/apex/testPage')
         + ' --templaterepourl=' + templateRepoUrl
-        + ' --templatepath' 
         + ' --pluginrepourl=' + pluginRepoUrl
 
     // Generation
