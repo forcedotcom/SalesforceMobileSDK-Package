@@ -62,9 +62,9 @@ function getVersionNumberFromString(versionString) {
 /** 
  * Replaces text in a file
  *
- * @param {String} fileName The file in which the text needs to be replaced
- * @param {String} textInFile Text in the file to be replaced
- * @param {String} replacementText Text used to replace the text in file
+ * @param {String} fileName The file in which the text needs to be replaced.
+ * @param {String} textInFile Text in the file to be replaced.
+ * @param {String} replacementText Text used to replace the text in file.
  */
 function replaceTextInFile(fileName, textInFile, replacementText) {
     var contents = fs.readFileSync(fileName, 'utf8');
@@ -80,8 +80,8 @@ function replaceTextInFile(fileName, textInFile, replacementText) {
 /**
  * Run shell command - throws error if any
  *
- * @param {String} cmd The command to execute
- * @param {String} dir Optional. The directory the command should be executed in
+ * @param {String} cmd The command to execute.
+ * @param {String} dir Optional. The directory the command should be executed in.
  * @param {Boolean} returnOutput. If true, returns output as string. If false, pipes output through.
  */
 function runProcessThrowError(cmd, dir, returnOutput) {
@@ -103,9 +103,9 @@ function runProcessThrowError(cmd, dir, returnOutput) {
 /**
  * Run shell command - throws error if any
  *
- * @param {String} cmd The command to execute
- * @param {String} msg Message to print on success/failure
- * @param {String} dir Optional. The directory the command should be executed in
+ * @param {String} cmd The command to execute.
+ * @param {String} msg Message to print on success/failure.
+ * @param {String} dir Optional. The directory the command should be executed in.
  *
  * @return true if successful, false otherwise
  */
@@ -124,6 +124,21 @@ function runProcessCatchError(cmd, msg, dir) {
     }
 }
 
+/**
+ * Run function - throws error if any
+ *
+ * @param {Function} func The function to execute.
+ * @param {String} dir Optional. The directory the function should be executed from.
+ */
+function runFunctionThrowError(func, dir) {
+    if (dir) shelljs.pushd(dir);
+    try {
+        return func();
+    }
+    finally {
+        if (dir) shelljs.popd();
+    }
+}
 
 /**
  * Makes temp directory.
@@ -132,7 +147,7 @@ function runProcessCatchError(cmd, msg, dir) {
  */
 
 function mkTmpDir() {
-    var tmpDir = path.join('tmp' + random(1000));
+    var tmpDir = path.resolve('tmp' + random(1000));
     log('Making temp dir:' + tmpDir);
     shelljs.mkdir('-p', tmpDir);
     return tmpDir;
@@ -151,9 +166,9 @@ function random(n) {
 /**
  * Replace string in files.
  * 
- * @param {String or RegExp} from String to match
- * @param {String} to Replacement string
- * @param {Array} files List of files to do the replacements in
+ * @param {String or RegExp} from String to match.
+ * @param {String} to Replacement string.
+ * @param {Array} files List of files to do the replacements in.
  */
 function replaceInFiles(from, to, files) {
     var fromRegexp = typeof(from) === 'string' ? new RegExp(from, 'g') : from;
@@ -179,6 +194,18 @@ function moveFile(from, to) {
 }
 
 /**
+ * Copy recursively.
+ * 
+ * @param {String} from Path of file or directory to move.
+ * @param {String} to New path for file or directory.
+ */
+function copyFile(from, to) {
+    log('Copying: ' + from + ' to ' + to);
+    shelljs.cp('-R', from, to);
+}
+
+
+/**
  * Remove file or directory.
  * 
  * @param {String} path Path of file or directory to remove.
@@ -200,30 +227,6 @@ function failIfExists(path) {
 }
 
 /**
- * Copy from template.
- * 
- * @param {String} templateRepoUrl
- * @param {String} templatePath
- * @param {String} destinationDir
- */
-function copyFromTemplate(templateRepoUrl, templatePath, destinationDir) {
-    // Log
-    log('Copying template into ' + destinationDir);
-
-    // Create tmp dir
-    var tmpDir = mkTmpDir();
-
-    // Clone template repo
-    var repoDir = cloneRepo(tmpDir, templateRepoUrl);
-
-    // Copy template to project dir
-    shelljs.cp('-R', path.join(repoDir, templatePath), destinationDir);
-
-    // Remove tmp dir
-    removeFile(tmpDir);
-}
-
-/**
  * Clone repo.
  *
  * @param {String} tmpDir Parent dir for clone
@@ -233,8 +236,6 @@ function copyFromTemplate(templateRepoUrl, templatePath, destinationDir) {
  */
 
 function cloneRepo(tmpDir, repoUrlWithBranch) {
-
-    // Clone template repo
     var parts = repoUrlWithBranch.split('#');
     var repoUrl = parts[0];
     var branch = parts.length > 1 ? parts[1] : 'master';
@@ -246,28 +247,6 @@ function cloneRepo(tmpDir, repoUrlWithBranch) {
     runProcessThrowError('git clone --branch ' + branch + ' --single-branch --depth 1 --recurse-submodules ' + repoUrl + ' ' + repoDir);
     return repoDir;
 }
-
-/**
- * Run prepare function of template.js
- *
- * @param {String} projectDir
- * @param {Object} config
- *
- * @return the value returned by template.js prepare function
- */
-function runTemplatePrepare(projectDir, config) {
-    // Run prepare function of template
-    log('Preparing template into ' + projectDir);
-
-    var templatePrepare = require(path.join(projectDir, 'template.js')).prepare;
-    shelljs.pushd(projectDir);
-    try {
-        return templatePrepare(config, replaceInFiles, moveFile, removeFile);
-    }
-    finally {
-        shelljs.popd();
-    }
-}    
 
 /**
  * Log paragraph (header or footer)
@@ -314,7 +293,7 @@ function log(msg, color) {
 
 module.exports = {
     cloneRepo,
-    copyFromTemplate,
+    copyFile,
     failIfExists,
     getVersionNumberFromString,
     log,
@@ -324,7 +303,7 @@ module.exports = {
     moveFile,
     removeFile,
     replaceInFiles,
+    runFunctionThrowError,
     runProcessCatchError,
-    runProcessThrowError,
-    runTemplatePrepare,
+    runProcessThrowError
 };

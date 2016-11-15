@@ -32,15 +32,27 @@ var path = require('path'),
     COLOR = require('./outputColors');
 
 //
+// Helper to prepare template
+// 
+function prepareTemplate(config, dir) {
+    return utils.runFunctionThrowError(
+        function() {
+            return config.template.prepare(config, utils.replaceInFiles, utils.moveFile, utils.removeFile);
+        },
+        dir
+    );
+}
+
+//
 // Helper for native application creation
 //
 function createNativeApp(config) {
 
     // Copying template to projectDir
-    utils.copyFromTemplate(config.templaterepourl, config.templatepath, config.projectDir);
+    utils.copyFile(config.templateLocalPath, config.projectDir);
 
     // Run prepare function of template
-    var prepareResult = utils.runTemplatePrepare(config.projectDir, config);
+    var prepareResult = prepareTemplate(config, config.projectDir);
 
     // Cleanup
     utils.removeFile(path.join(config.projectDir, 'template.js'));
@@ -72,10 +84,10 @@ function createHybridApp(config) {
     utils.removeFile(webDir);
 
     // Copying template to www
-    utils.copyFromTemplate(config.templaterepourl, config.templatepath, webDir);
+    utils.copyFile(config.templateLocalPath, webDir);
 
     // Run prepare function of template
-    var prepareResult = utils.runTemplatePrepare(webDir, config);
+    var prepareResult = prepareTemplate(config, config.webDir);
 
     // Cleanup
     utils.removeFile(path.join(webDir, 'template.js'));
@@ -163,18 +175,35 @@ function printNextSteps(devToolName, projectPath, result) {
 // Helper for 'create' command
 //
 function createApp(config, platform, devToolName) {
-    var isNative = config.apptype.indexOf('native') >= 0;
-    
-    // Adding platform
-    config.platform = platform;
-    
-    // Adding defaults
-    config.templaterepourl = config.templaterepourl || SDK.templates.repoUrl;
-    config.templatepath = config.templatepath || (config.templaterepourl.indexOf('SalesforceMobileSDK-Templates') >= 0 ? SDK.templates.appTypesToPath[platform][config.apptype] : '');
 
     // Computing projectDir
     config.projectDir = config.outputdir ? path.resolve(config.outputdir) : path.join(process.cwd(),config.appname)
     config.projectPath = path.relative(process.cwd(), config.projectDir);
+
+    // Checking if directory exists
+    utils.failIfExists(config.projectDir);
+
+    // Adding platform
+    config.platform = platform;
+    
+    // Adding template repo url and path if none provided
+    config.templaterepourl = config.templaterepourl || SDK.templates.repoUrl;
+    config.templatepath = config.templatepath || (config.templaterepourl.indexOf('SalesforceMobileSDK-Templates') >= 0 ? SDK.templates.appTypesToPath[platform][config.apptype] : '');
+
+    // Creating tmp dir for template clone
+    var tmpDir = utils.mkTmpDir();
+
+    // Cloning template repo
+    var repoDir = utils.cloneRepo(tmpDir, config.templaterepourl);
+    config.templateLocalPath = path.join(repoDir, config.templatepath);
+
+    // Getting template
+    config.template = require(path.join(repoDir, config.templatepath, 'template.js'));
+                              
+    // Getting apptype from template
+    config.apptype = config.template.appType;
+
+    var isNative = config.apptype.indexOf('native') >= 0;
 
     // Adding hybrid only config
     if (!isNative) {
@@ -183,18 +212,19 @@ function createApp(config, platform, devToolName) {
         config.cordovaPluginRepoUrl = config.pluginrepourl || SDK.cordova.pluginRepoUrl;
     }
 
-    // Check if directory exists
-    utils.failIfExists(config.projectDir);
-
     // Print details
     printDetails(config);
 
-    // Create application = 
+    // Creating application
     var result = isNative ? createNativeApp(config) : createHybridApp(config);
 
-    // Print next steps
+    // Cleanup
+    utils.removeFile(tmpDir);
+    
+    // Printing next steps
     printNextSteps(devToolName, config.projectPath, result);
 }
+
 
 module.exports = {
     createApp

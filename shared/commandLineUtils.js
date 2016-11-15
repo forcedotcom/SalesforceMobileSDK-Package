@@ -153,6 +153,9 @@ var processArgument = function(argValue, argsMap, argProcessor, postProcessingCa
             processArgument(answer, argsMap, argProcessor, postProcessingCallback);
         });
     }
+    else {
+        processArgument('', argsMap, argProcessor, postProcessingCallback);
+    }
 };
 
 /**
