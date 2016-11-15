@@ -108,8 +108,8 @@ function usage() {
     utils.log('  test_force.js', COLOR.magenta);
     utils.log('    --os=os1,os2,etc', COLOR.magenta);
     utils.log('    --apptype=appType1,appType2,etc', COLOR.magenta);
-    utils.log('    [--templaterepourl=TEMPLATE_REPO_URL (Defaults to https://github.com/forcedotcom/SalesforceMobileSDK-Templates#unstable)]', COLOR.magenta);
-    utils.log('    [--pluginrepourl=PLUGIN_REPO_URL (Defaults to https://github.com/forcedotcom/SalesforceMobileSDK-Templates#unstable)]', COLOR.magenta);
+    utils.log('    [--templaterepourl=TEMPLATE_REPO_URL (Defaults to url in shared/constants.js)]', COLOR.magenta);
+    utils.log('    [--pluginrepourl=PLUGIN_REPO_URL (Defaults to url in shared/constants.js)]', COLOR.magenta);
     utils.log('    [--sdkbranch=SDK_BRANCH (Defaults to unstable)]', COLOR.magenta);
     utils.log('  Where:', COLOR.cyan);
     utils.log('  - osX is : ios or android', COLOR.cyan);
@@ -152,6 +152,7 @@ function createCompileApp(tmpDir, os, appType, templateRepoUrl, pluginRepoUrl) {
     if (appType === APP_TYPE.native_swift && os === OS.android) return; // that app type doesn't exist for android
 
     var isNative = appType.indexOf('native') >= 0;
+    var isHybridRemote = appType === APP_TYPE.hybrid_remote;
     var target = appType + ' app for ' + os;
     var appName = appType + os + 'App';
     var outputDir = path.join(tmpDir, appName);
@@ -163,7 +164,7 @@ function createCompileApp(tmpDir, os, appType, templateRepoUrl, pluginRepoUrl) {
         + ' --packagename=com.mycompany'
         + ' --organization=MyCompany'
         + ' --outputdir=' + outputDir
-        + (isNative ? '' : ' --startpage=/apex/testPage')
+        + (isHybridRemote ? '' : ' --startpage=/apex/testPage')
         + ' --templaterepourl=' + templateRepoUrl
         + ' --pluginrepourl=' + pluginRepoUrl
 
