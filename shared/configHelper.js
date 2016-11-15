@@ -44,7 +44,7 @@ function readConfig(args, toolName, toolVersion, appTypes, handler) {
     case 'create': 
         processorList = createArgsProcessorList(appTypes); 
         break;
-    case 'createWithConfig': 
+    case 'createWithTemplate': 
         processorList = createArgsProcessorList(appTypes, true); 
         break;
     default:
@@ -62,14 +62,15 @@ function usage(toolName, toolVersion, appTypes) {
     log('    --appname=<Application Name>', COLOR.magenta);
     log('    --packagename=<App Package Identifier> (e.g. com.mycompany.myapp)', COLOR.magenta);
     log('    --organization=<Organization Name> (Your company\'s/organization\'s name)', COLOR.magenta);
+    log('    --outputdir=<Output directory> (Leave empty for current directory)]', COLOR.magenta);
     log('    --startpage=<App Start Page> (The start page of your remote app. Only required for hybrid_remote)', COLOR.magenta);
     log('\n OR \n', COLOR.cyan);
-    log(toolName + ' createWithConfig', COLOR.magenta);
-    log('   Same arguments as create plus the following:', COLOR.magenta);
-    log('    --outputdir=<Output directory> (Leave empty for current directory.)]', COLOR.magenta);
-    log('    --templaterepourl=<Template repo URL> (Leave empty for default template repo.)]', COLOR.magenta);
-    log('    --templatepath=<Path> (Path of template application in template repo. Optional.)]', COLOR.magenta);
-    log('    --pluginrepourl=<Cordova plugin URL> (Leave empty for version ' + toolVersion + ' of mobile sdk plugin.)]', COLOR.magenta);
+    log(toolName + ' createWithTemplate', COLOR.magenta);
+    log('    --templaterepourl=<Template repo URL> (e.g. https://github.com/forcedotcom/SmartSyncExplorerReactNative)]', COLOR.magenta);
+    log('    --appname=<Application Name>', COLOR.magenta);
+    log('    --packagename=<App Package Identifier> (e.g. com.mycompany.myapp)', COLOR.magenta);
+    log('    --organization=<Organization Name> (Your company\'s/organization\'s name)', COLOR.magenta);
+    log('    --outputdir=<Output directory> (Leave empty for current directory)]', COLOR.magenta);
     log('\n OR \n', COLOR.cyan);
     log(toolName + ' version', COLOR.magenta);
 }
@@ -77,13 +78,20 @@ function usage(toolName, toolVersion, appTypes) {
 //
 // Processor list for 'create' command
 //
-function createArgsProcessorList(appTypes, presentExtraArgs) {
+function createArgsProcessorList(appTypes, isCreateWithTemplate) {
     var argProcessorList = new commandLineUtils.ArgProcessorList();
 
-    // App type
-    addProcessorFor(argProcessorList, 'apptype', 'Enter your application type (' + appTypes.join(', ') + '):',
-                    'App type must be ' + appTypes.join(', ') + '.', 
-                    function(val) { return appTypes.indexOf(val) >= 0; });
+    if (isCreateWithTemplate) {
+        // Template Repo URL
+        addProcessorFor(argProcessorList, 'templaterepourl', 'Enter URL of repo containing template application:',
+                     'Invalid value for template repo url: \'$val\'.', /^\S+$/);
+    }
+    else {
+        // App type
+        addProcessorFor(argProcessorList, 'apptype', 'Enter your application type (' + appTypes.join(', ') + '):',
+                        'App type must be ' + appTypes.join(', ') + '.', 
+                        function(val) { return appTypes.indexOf(val) >= 0; });
+    }
 
     // App name
     addProcessorFor(argProcessorList, 'appname', 'Enter your application name:',
@@ -102,28 +110,19 @@ function createArgsProcessorList(appTypes, presentExtraArgs) {
                     'Invalid value for start page: \'$val\'.', /\S+/, 
                     function(argsMap) { return (argsMap['apptype'] === 'hybrid_remote'); });
 
-    if (presentExtraArgs) {
-        // Output dir
-        addProcessorFor(argProcessorList, 'outputdir', 'Enter the output directory for your app (leave empty for the current directory):',
-                     'Invalid value for output directory: \'$val\'.', /.*/); 
-
-        // Template Repo URL
-        addProcessorFor(argProcessorList, 'templaterepourl', 'Enter URL of repo containing template application (leave empty for default template):',
-                     'Invalid value for template repo url: \'$val\'.', /.*/);
+    // Output dir
+    addProcessorFor(argProcessorList, 'outputdir', 'Enter the output directory for your app (leave empty for the current directory):',
+                    'Invalid value for output directory: \'$val\'.', /.*/); 
 
 
-        // Template Path
-        addProcessorFor(argProcessorList, 'templatepath', 'Enter path of template application in template repo:',
-                        'Invalid value for template path: \'$val\'.', /.*/, 
-                        function(argsMap) { return (argsMap['templaterepourl'] && argsMap['templaterepourl'].indexOf('SalesforceMobileSDK-Templates') == -1); });
+    // Template Path - private param (not documented in usage, user is never prompted)
+    addProcessorFor(argProcessorList, 'templatepath', null,
+                    'Invalid value for template path: \'$val\'.', /.*/);
 
-        // Plugin URL
-        addProcessorFor(argProcessorList, 'pluginrepourl', 'Enter the URL or path of mobile sdk cordova plugin (leave empty for latest plugin):',
-                        'Invalid value for plugin repo url: \'$val\'.', /.*/, 
-                        function(argsMap) { return (argsMap['apptype'].indexOf('hybrid') >= 0); });
-    }
-
-
+    // Plugin URL - private param (not documented in usage, user is never prompted)
+    addProcessorFor(argProcessorList, 'pluginrepourl', null,
+                    'Invalid value for plugin repo url: \'$val\'.', /.*/);
+    
     return argProcessorList;
 }
 

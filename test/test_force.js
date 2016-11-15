@@ -49,23 +49,26 @@ function main(args) {
     // Args extraction
     var usageRequested = parsedArgs.hasOwnProperty('usage');
     var chosenOperatingSystems = cleanSplit(parsedArgs.os, ',');
-    var templateRepoUrl = parsedArgs.templaterepourl || defaultTemplateRepoUrl;
-    var pluginRepoUrl = parsedArgs.pluginrepourl || defaultPluginRepoUrl;
+    var appTypes = parsedArgs.apptype || '';
+    var templateRepoUrl = parsedArgs.templaterepourl || '';
+    var pluginRepoUrl = parsedArgs.pluginrepourl;
     var sdkBranch = parsedArgs.sdkbranch || defaultSdkBranch;
-    
     var chosenAppTypes = cleanSplit(parsedArgs.apptype, ',');
+
+    
+    var testingWithAppType = chosenAppTypes.length > 0;
+    var testingWithTemplate = templateRepoUrl != '';
     var testingIOS = chosenOperatingSystems.indexOf(OS.ios) >= 0;
     var testingAndroid = chosenOperatingSystems.indexOf(OS.android) >= 0;
     var testingHybrid = chosenAppTypes.indexOf(APP_TYPE.hybrid_local) >= 0 || chosenAppTypes.indexOf(APP_TYPE.hybrid_remote) >= 0;
 
     // Validation
     validateOperatingSystems(chosenOperatingSystems);
-    validateAppTypes(chosenAppTypes);
+    validateAppTypesTemplateRepoUrl(chosenAppTypes, templateRepoUrl);
 
     // Usage
-    if (usageRequested || (!testingIOS && !testingAndroid) || chosenAppTypes.length === 0) {
-        usage();
-        process.exit(1);
+    if (usageRequested) {
+        usage(0);
     }
 
     // Actual testing
@@ -91,9 +94,14 @@ function main(args) {
     // Test all the platforms / app types requested
     for (var i=0; i<chosenOperatingSystems.length; i++) {
         var os = chosenOperatingSystems[i];
-        for (var j=0; j<chosenAppTypes.length; j++) {
-            var appType = chosenAppTypes[j];
-            createCompileApp(tmpDir, os, appType, templateRepoUrl, pluginRepoUrl);
+        if (testingWithAppType) {
+            for (var j=0; j<chosenAppTypes.length; j++) {
+                var appType = chosenAppTypes[j];
+                createCompileApp(tmpDir, os, appType, null, pluginRepoUrl);
+            }
+        }
+        if (testingWithTemplate) {
+            createCompileApp(tmpDir, os, null, templateRepoUrl, null);
         }
     }
 }
@@ -101,19 +109,20 @@ function main(args) {
 //
 // Usage
 //
-function usage() {
-    utils.log('Usage:',  COLOR.cyan);
+function usage(exitCode) {
+    utils.log('Usage:\n',  COLOR.cyan);
     utils.log('  test_force.js --usage', COLOR.magenta);
-    utils.log('OR ', COLOR.cyan);
+    utils.log('\n OR \n', COLOR.cyan);
     utils.log('  test_force.js', COLOR.magenta);
     utils.log('    --os=os1,os2,etc', COLOR.magenta);
-    utils.log('    --apptype=appType1,appType2,etc', COLOR.magenta);
-    utils.log('    [--templaterepourl=TEMPLATE_REPO_URL (Defaults to https://github.com/forcedotcom/SalesforceMobileSDK-Templates#unstable)]', COLOR.magenta);
-    utils.log('    [--pluginrepourl=PLUGIN_REPO_URL (Defaults to https://github.com/forcedotcom/SalesforceMobileSDK-Templates#unstable)]', COLOR.magenta);
+    utils.log('    --apptype=appType1,appType2,etc OR --templaterepourl=TEMPLATE_REPO_URL', COLOR.magenta);
+    utils.log('    [--pluginrepourl=PLUGIN_REPO_URL (Defaults to url in shared/constants.js)]', COLOR.magenta);
     utils.log('    [--sdkbranch=SDK_BRANCH (Defaults to unstable)]', COLOR.magenta);
+    utils.log('', COLOR.cyan);
     utils.log('  Where:', COLOR.cyan);
     utils.log('  - osX is : ios or android', COLOR.cyan);
     utils.log('  - appTypeX is: native, native_swift, react_native, hybrid_local or hybrid_remote', COLOR.cyan);
+    utils.log('  - templaterepourl is a template repo url e.g. https://github.com/forcedotcom/SmartSyncExplorerReactNative#unstable', COLOR.cyan);
     utils.log('', COLOR.cyan);
     utils.log('  If hybrid is targeted, the following are first done:', COLOR.cyan);
     utils.log('  - clones PLUGIN_REPO_URL ', COLOR.cyan);
@@ -126,6 +135,8 @@ function usage() {
     utils.log('  If android is targeted:', COLOR.cyan);
     utils.log('  - generates forcedroid package and deploys it to a temporary directory', COLOR.cyan);
     utils.log('  - creates and compile the application types using specified template and plugin', COLOR.cyan);
+
+    process.exit(exitCode);
 }
 
 //
@@ -149,24 +160,33 @@ function updatePluginRepo(tmpDir, os, pluginRepoDir, sdkBranch) {
 // Create and compile app 
 //
 function createCompileApp(tmpDir, os, appType, templateRepoUrl, pluginRepoUrl) {
-    if (appType === APP_TYPE.native_swift && os === OS.android) return; // that app type doesn't exist for android
-
-    var isNative = appType.indexOf('native') >= 0;
-    var target = appType + ' app for ' + os;
-    var appName = appType + os + 'App';
+    var forceArgs = '';
+    var actualAppType = appType || getAppTypeFromTemplate(templateRepoUrl)
+    var isNative = actualAppType.indexOf('native') >= 0;
+    var isHybridRemote = actualAppType === APP_TYPE.hybrid_remote;
+    var target = actualAppType + ' app for ' + os + (templateRepoUrl ? ' based on template ' + getTemplateNameFromUrl(templateRepoUrl) : '');
+    var appName = actualAppType + os + 'App';
     var outputDir = path.join(tmpDir, appName);
     var forcePath = path.join(tmpDir, 'node_modules', '.bin', FORCE_CLI[os]);
 
-    var forceArgs = 'createWithConfig '
-        + ' --apptype=' + appType
+    if (appType != null) {
+        if (appType === APP_TYPE.native_swift && os === OS.android) return; // that app type doesn't exist for android
+
+        forceArgs = 'create '
+            + ' --apptype=' + appType;
+    }
+    else {
+        forceArgs = 'createWithTemplate '
+            + ' --templaterepourl=' + templateRepoUrl;
+    }
+
+    forceArgs += ''
         + ' --appname=' + appName
         + ' --packagename=com.mycompany'
         + ' --organization=MyCompany'
         + ' --outputdir=' + outputDir
-        + (isNative ? '' : ' --startpage=/apex/testPage')
-        + ' --templaterepourl=' + templateRepoUrl
-        + ' --templatepath' 
-        + ' --pluginrepourl=' + pluginRepoUrl
+        + (isHybridRemote ? ' --startpage=/apex/testPage' : '')
+        + (isNative ? '' : ' --pluginrepourl=' + pluginRepoUrl);
 
     // Generation
     var generationSucceeded = utils.runProcessCatchError(forcePath + ' ' + forceArgs, 'GENERATING ' + target);
@@ -176,7 +196,8 @@ function createCompileApp(tmpDir, os, appType, templateRepoUrl, pluginRepoUrl) {
     }
 
     // App dir
-    var appDir = appType === APP_TYPE.react_native ? path.join(outputDir, os) : outputDir;
+
+    var appDir = actualAppType === APP_TYPE.react_native ? path.join(outputDir, os) : outputDir;
 
     // Compilation
     if (isNative) {
@@ -184,13 +205,13 @@ function createCompileApp(tmpDir, os, appType, templateRepoUrl, pluginRepoUrl) {
             // IOS - Native
             var workspacePath = path.join(appDir, appName + '.xcworkspace');
             utils.runProcessCatchError('xcodebuild -workspace ' + workspacePath 
-                                 + ' -scheme ' + appName
-                                 + ' clean build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO', 
-                                 'COMPILING ' + target); 
+                                       + ' -scheme ' + appName
+                                       + ' clean build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO', 
+                                       'COMPILING ' + target); 
         }
         else {
             // Android - Native
-            var appDir = appType === APP_TYPE.react_native ? path.join(outputDir, os) : outputDir;
+            var appDir = actualAppType === APP_TYPE.react_native ? path.join(outputDir, os) : outputDir;
             var gradle = isWindows() ? '.\\gradlew.bat' : './gradlew';
             utils.runProcessCatchError(gradle + ' assembleDebug', 'COMPILING ' + target, appDir);
         }
@@ -212,24 +233,35 @@ function createCompileApp(tmpDir, os, appType, templateRepoUrl, pluginRepoUrl) {
 // Helper to validate operating systems
 //
 function validateOperatingSystems(chosenOperatingSystems) {
+    if (chosenOperatingSystems.length == 0) {
+        utils.log('You need to specify at least one os\n', COLOR.red);
+        usage(1);
+    }
     for (var i=0; i<chosenOperatingSystems.length; i++) {
         var os = chosenOperatingSystems[i];
         if (!OS.hasOwnProperty(os) || (isWindows() && os === OS.ios)) {
-            log('Invalid os: ' + os, COLOR.red);
-            process.exit(1);
+            utils.log('Invalid os: ' + os + '\n', COLOR.red);
+            usage(1);
         }
     }
 }
 
 // 
-// Helper to validate app types
+// Helper to validate app types / template repo url
 //
-function validateAppTypes(chosenAppTypes) {
+function validateAppTypesTemplateRepoUrl(chosenAppTypes, templateRepoUrl) {
+    console.log("--> " + chosenAppTypes.length == 0);
+    console.log("--> " + templateRepoUrl === '');
+    if (!(chosenAppTypes.length == 0 ^ templateRepoUrl === '')) {
+        utils.log('You need to specify apptype or templaterepourl (but not both)\n', COLOR.red);
+        usage(1);
+    }
+    
     for (var i=0; i<chosenAppTypes.length; i++) {
         var appType = chosenAppTypes[i];
         if (!APP_TYPE.hasOwnProperty(appType)) {
-            utils.log('Invalid appType: ' + appType, COLOR.red);
-            process.exit(1);
+            utils.log('Invalid appType: ' + appType + '\n', COLOR.red);
+            usage(1);
         }
     }
 }
@@ -255,3 +287,32 @@ function cleanSplit(str, delimiter) {
 function isWindows() {
     return /^win/.test(process.platform);
 }
+
+//
+// Get template name from url
+//
+function getTemplateNameFromUrl(templateRepoUrl) {
+    var parts = templateRepoUrl.split('/');
+    return parts[parts.length-1];
+}
+
+
+//
+// Get template apptype
+//
+function getAppTypeFromTemplate(templateRepoUrl) {
+    // Creating tmp dir for template clone
+    var tmpDir = utils.mkTmpDir();
+
+    // Cloning template repo
+    var repoDir = utils.cloneRepo(tmpDir, templateRepoUrl);
+
+    // Getting template
+    var appType = require(path.join(repoDir, 'template.js')).appType;
+    
+    // Cleanup
+    utils.removeFile(tmpDir);
+
+    // Done
+    return appType;
+}    
