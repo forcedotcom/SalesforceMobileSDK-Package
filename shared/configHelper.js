@@ -62,16 +62,15 @@ function usage(toolName, toolVersion, appTypes) {
     log('    --appname=<Application Name>', COLOR.magenta);
     log('    --packagename=<App Package Identifier> (e.g. com.mycompany.myapp)', COLOR.magenta);
     log('    --organization=<Organization Name> (Your company\'s/organization\'s name)', COLOR.magenta);
+    log('    --outputdir=<Output directory> (Leave empty for current directory)]', COLOR.magenta);
     log('    --startpage=<App Start Page> (The start page of your remote app. Only required for hybrid_remote)', COLOR.magenta);
-    log('    --outputdir=<Output directory> (Leave empty for current directory.)]', COLOR.magenta);
     log('\n OR \n', COLOR.cyan);
     log(toolName + ' createWithTemplate', COLOR.magenta);
     log('    --templaterepourl=<Template repo URL> (e.g. https://github.com/forcedotcom/SmartSyncExplorerReactNative)]', COLOR.magenta);
     log('    --appname=<Application Name>', COLOR.magenta);
     log('    --packagename=<App Package Identifier> (e.g. com.mycompany.myapp)', COLOR.magenta);
     log('    --organization=<Organization Name> (Your company\'s/organization\'s name)', COLOR.magenta);
-    log('    --startpage=<App Start Page> (The start page of your remote app. Only required for hybrid_remote)', COLOR.magenta);
-    log('    --outputdir=<Output directory> (Leave empty for current directory.)]', COLOR.magenta);
+    log('    --outputdir=<Output directory> (Leave empty for current directory)]', COLOR.magenta);
     log('\n OR \n', COLOR.cyan);
     log(toolName + ' version', COLOR.magenta);
 }
@@ -118,13 +117,11 @@ function createArgsProcessorList(appTypes, isCreateWithTemplate) {
 
     // Template Path - private param (not documented in usage, user is never prompted)
     addProcessorFor(argProcessorList, 'templatepath', null,
-                    'Invalid value for template path: \'$val\'.', /.*/, 
-                    function(argsMap) { return (argsMap['templaterepourl'] && argsMap['templaterepourl'].indexOf('SalesforceMobileSDK-Templates') == -1); });
+                    'Invalid value for template path: \'$val\'.', /.*/);
 
     // Plugin URL - private param (not documented in usage, user is never prompted)
     addProcessorFor(argProcessorList, 'pluginrepourl', null,
-                    'Invalid value for plugin repo url: \'$val\'.', /.*/, 
-                    function(argsMap) { return (argsMap['apptype'].indexOf('hybrid') >= 0); });
+                    'Invalid value for plugin repo url: \'$val\'.', /.*/);
     
     return argProcessorList;
 }

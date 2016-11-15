@@ -134,20 +134,24 @@ function printDetails(config) {
                         '',
                         '  in:                   ' + config.projectPath,
                         '',
-                        '  from template repo:   ' + config.templaterepourl,
-                        '       template path:   ' + config.templatepath
+                        '  from template repo:   ' + config.templaterepourl
                   ];
+
+    if (config.templatepath) {
+        details = details.concat(['       template path:   ' + config.templatepath]);
+    }
+            
 
     // Hybrid extra details
     if (config.apptype.indexOf('hybrid') >= 0) {
+        if (config.apptype === 'hybrid_remote') {
+            details = details.concat(['       start page:      ' + config.startpage]);
+        }
+
         details = details.concat([
             '       cordova version: ' + config.cordovaPlatformVersion,
             '       plugin repo:     ' + config.cordovaPluginRepoUrl
         ]);
-
-        if (config.apptype === 'hybrid_remote') {
-            details = details.concat(['       start page:      ' + config.startpage]);
-        }
     }
             
     utils.logParagraph(details);
