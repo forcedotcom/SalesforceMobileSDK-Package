@@ -74,8 +74,6 @@ function createHybridApp(config) {
     utils.runProcessThrowError('npm install shelljs@0.7.0', config.projectDir);
     utils.runProcessThrowError('cordova platform add ' + config.platform + '@' + config.cordovaPlatformVersion, config.projectDir);
     utils.runProcessThrowError('cordova plugin add ' + config.cordovaPluginRepoUrl, config.projectDir);
-    utils.runProcessThrowError('cordova prepare', config.projectDir);
-
 
     // Web directory - the home for the template
     var webDir = path.join(config.projectDir, 'www')    
@@ -88,6 +86,9 @@ function createHybridApp(config) {
 
     // Run prepare function of template
     var prepareResult = prepareTemplate(config, config.webDir);
+
+    // Run cordova prepare
+    utils.runProcessThrowError('cordova prepare ' + config.platform, config.projectDir);
 
     // Cleanup
     utils.removeFile(path.join(webDir, 'template.js'));
