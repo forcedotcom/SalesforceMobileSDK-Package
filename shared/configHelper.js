@@ -83,8 +83,8 @@ function createArgsProcessorList(appTypes, isCreateWithTemplate) {
 
     if (isCreateWithTemplate) {
         // Template Repo URL
-        addProcessorFor(argProcessorList, 'templaterepourl', 'Enter URL of repo containing template application (leave empty for default template):',
-                     'Invalid value for template repo url: \'$val\'.', /.*/);
+        addProcessorFor(argProcessorList, 'templaterepourl', 'Enter URL of repo containing template application:',
+                     'Invalid value for template repo url: \'$val\'.', /^\S+$/);
     }
     else {
         // App type
