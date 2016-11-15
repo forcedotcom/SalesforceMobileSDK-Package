@@ -51,7 +51,7 @@ function main(args) {
     var chosenOperatingSystems = cleanSplit(parsedArgs.os, ',');
     var appTypes = parsedArgs.apptype || '';
     var templateRepoUrl = parsedArgs.templaterepourl || '';
-    var pluginRepoUrl = parsedArgs.pluginrepourl;
+    var pluginRepoUrl = parsedArgs.pluginrepourl || SDK.cordova.pluginRepoUrl;
     var sdkBranch = parsedArgs.sdkbranch || defaultSdkBranch;
     var chosenAppTypes = cleanSplit(parsedArgs.apptype, ',');
 
@@ -86,9 +86,14 @@ function main(args) {
 
     // Get cordova plugin repo if any hybrid testing requested
     if (testingHybrid) {
-        var pluginRepoDir = utils.cloneRepo(tmpDir, pluginRepoUrl);
-        if (testingIOS) updatePluginRepo(tmpDir, OS.ios, pluginRepoDir, sdkBranch);
-        if (testingAndroid) updatePluginRepo(tmpDir, OS.android, pluginRepoDir, sdkBranch);
+        if (pluginRepoUrl.indexOf('//') >= 0) {
+            // Actual url - clone repo - run tools/update.sh
+            var pluginRepoDir = utils.cloneRepo(tmpDir, pluginRepoUrl);
+            if (testingIOS) updatePluginRepo(tmpDir, OS.ios, pluginRepoDir, sdkBranch);
+            if (testingAndroid) updatePluginRepo(tmpDir, OS.android, pluginRepoDir, sdkBranch);
+            // Use local updated clone of plugin
+            pluginRepoUrl = pluginRepoDir;
+        }
     }
     
     // Test all the platforms / app types requested
