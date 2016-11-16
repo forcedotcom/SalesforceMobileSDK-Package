@@ -57,7 +57,36 @@ function getVersionNumberFromString(versionString) {
 		var combinedVersion = (1000 * majorVersion) + minorVersion;
 		return combinedVersion;
 	}
-};
+}
+
+/**
+ * Checks the the version of a tool by running the given command
+ * 
+ * @param {String} cmd Command to run to get the tool version
+ * @param {String} minVersionRequired Minimum version required
+ *
+ * @throws {Error} if tool not found or version too low
+ */
+function checkToolVersion(cmd, minVersionRequired) {
+    var toolName = cmd.split(' ')[0];
+    var toolVersion;
+    try {
+	    var result = runProcessThrowError(cmd, null, true /* return output */);
+        toolVersion = result.replace(/\r?\n|\r/, '');
+    }
+    catch (error) {
+        throw new Error(toolName + ' is required but could not be found. Please install ' + toolName + '.');
+    }
+
+    var toolVersionNum = getVersionNumberFromString(toolVersion);
+    var minVersionRequiredNum = getVersionNumberFromString(minVersionRequired);
+
+    if (toolVersionNum < minVersionRequiredNum) {
+        throw new Error('Installed ' + toolName + 'version (' + toolVersion + ') is less than the minimum required version ('
+                        + minVersionRequired + ').  Please update your version of ' + toolName + '.');
+    }
+}
+
 
 /** 
  * Replaces text in a file
@@ -292,6 +321,7 @@ function log(msg, color) {
 }
 
 module.exports = {
+    checkToolVersion,
     cloneRepo,
     copyFile,
     failIfExists,
