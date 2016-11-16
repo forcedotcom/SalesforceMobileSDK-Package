@@ -84,11 +84,11 @@ function createHybridApp(config) {
     // Run prepare function of template
     var prepareResult = prepareTemplate(config, webDir);
 
-    // Run cordova prepare
-    utils.runProcessThrowError('cordova prepare ' + config.platform, config.projectDir);
-
     // Cleanup
     utils.removeFile(path.join(webDir, 'template.js'));
+
+    // Run cordova prepare
+    utils.runProcessThrowError('cordova prepare ' + config.platform, config.projectDir);
 
     // Done
     return prepareResult;
