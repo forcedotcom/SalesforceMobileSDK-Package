@@ -176,20 +176,11 @@ function runFunctionThrowError(func, dir) {
  */
 
 function mkTmpDir() {
-    var tmpDir = path.resolve('tmp' + random(1000));
+    var d = new Date();
+    var tmpDir = path.resolve('tmp' + d.getTime());
     log('Making temp dir:' + tmpDir);
     shelljs.mkdir('-p', tmpDir);
     return tmpDir;
-}
-
-/**
- * Generates random number.
- *
- * @param {Number} n
- * @return {Number} a random number between n/10 and n.
- */
-function random(n) {
-    return (n/10)+Math.floor(Math.random()*(9*n/10));
 }
 
 /**
