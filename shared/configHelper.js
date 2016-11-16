@@ -28,7 +28,7 @@
 // Dependencies
 var COLOR = require('./outputColors'),
     commandLineUtils = require('./commandLineUtils'),
-    log = require('./utils').log;
+    logInfo = require('./utils').logInfo;
 
 function readConfig(args, toolName, toolVersion, appTypes, handler) {
     var commandLineArgs = args.slice(2, args.length);
@@ -38,7 +38,7 @@ function readConfig(args, toolName, toolVersion, appTypes, handler) {
 
     switch (command || '') {
     case 'version':
-        console.log(toolName + ' version ' + toolVersion);
+        logInfo(toolName + ' version ' + toolVersion);
         process.exit(0);
         break;
     case 'create': 
@@ -56,23 +56,23 @@ function readConfig(args, toolName, toolVersion, appTypes, handler) {
 }
 
 function usage(toolName, toolVersion, appTypes) {
-    log('Usage:\n', COLOR.cyan);
-    log(toolName + ' create', COLOR.magenta);
-    log('    --apptype=<Application Type> (' + appTypes.join(', ') + ')', COLOR.magenta);
-    log('    --appname=<Application Name>', COLOR.magenta);
-    log('    --packagename=<App Package Identifier> (e.g. com.mycompany.myapp)', COLOR.magenta);
-    log('    --organization=<Organization Name> (Your company\'s/organization\'s name)', COLOR.magenta);
-    log('    --outputdir=<Output directory> (Leave empty for current directory)]', COLOR.magenta);
-    log('    --startpage=<App Start Page> (The start page of your remote app. Only required for hybrid_remote)', COLOR.magenta);
-    log('\n OR \n', COLOR.cyan);
-    log(toolName + ' createWithTemplate', COLOR.magenta);
-    log('    --templaterepourl=<Template repo URL> (e.g. https://github.com/forcedotcom/SmartSyncExplorerReactNative)]', COLOR.magenta);
-    log('    --appname=<Application Name>', COLOR.magenta);
-    log('    --packagename=<App Package Identifier> (e.g. com.mycompany.myapp)', COLOR.magenta);
-    log('    --organization=<Organization Name> (Your company\'s/organization\'s name)', COLOR.magenta);
-    log('    --outputdir=<Output directory> (Leave empty for current directory)]', COLOR.magenta);
-    log('\n OR \n', COLOR.cyan);
-    log(toolName + ' version', COLOR.magenta);
+    logInfo('Usage:\n', COLOR.cyan);
+    logInfo(toolName + ' create', COLOR.magenta);
+    logInfo('    --apptype=<Application Type> (' + appTypes.join(', ') + ')', COLOR.magenta);
+    logInfo('    --appname=<Application Name>', COLOR.magenta);
+    logInfo('    --packagename=<App Package Identifier> (e.g. com.mycompany.myapp)', COLOR.magenta);
+    logInfo('    --organization=<Organization Name> (Your company\'s/organization\'s name)', COLOR.magenta);
+    logInfo('    --outputdir=<Output directory> (Leave empty for current directory)]', COLOR.magenta);
+    logInfo('    --startpage=<App Start Page> (The start page of your remote app. Only required for hybrid_remote)', COLOR.magenta);
+    logInfo('\n OR \n', COLOR.cyan);
+    logInfo(toolName + ' createWithTemplate', COLOR.magenta);
+    logInfo('    --templaterepourl=<Template repo URL> (e.g. https://github.com/forcedotcom/SmartSyncExplorerReactNative)]', COLOR.magenta);
+    logInfo('    --appname=<Application Name>', COLOR.magenta);
+    logInfo('    --packagename=<App Package Identifier> (e.g. com.mycompany.myapp)', COLOR.magenta);
+    logInfo('    --organization=<Organization Name> (Your company\'s/organization\'s name)', COLOR.magenta);
+    logInfo('    --outputdir=<Output directory> (Leave empty for current directory)]', COLOR.magenta);
+    logInfo('\n OR \n', COLOR.cyan);
+    logInfo(toolName + ' version', COLOR.magenta);
 }
 
 //
@@ -122,6 +122,10 @@ function createArgsProcessorList(appTypes, isCreateWithTemplate) {
     // Plugin URL - private param (not documented in usage, user is never prompted)
     addProcessorFor(argProcessorList, 'pluginrepourl', null,
                     'Invalid value for plugin repo url: \'$val\'.', /.*/);
+
+    // Verbose  - private param (not documented in usage, user is never prompted)
+    addProcessorFor(argProcessorList, 'verbose', null,
+                    'Invalid value for verbose: \'$val\'.', /.*/);
     
     return argProcessorList;
 }
@@ -140,15 +144,15 @@ function addProcessorFor(argProcessorList, argName, prompt, error, validation, p
     argProcessorList.addArgProcessor(argName, prompt, function(val) {
         val = val.trim();
 
-        // validation is either a function or a regexp
-        if (typeof validation === 'function' && validation(val)
-            || typeof validation === 'object' && typeof validation.test === 'function' && validation.test(val))
-        {
-            return new commandLineUtils.ArgProcessorOutput(true, typeof postprocessor === 'function' ? postprocessor(val) : val);
-        }
-        else {
-            return new commandLineUtils.ArgProcessorOutput(false, error.replace('$val', val));
-        }
+        // validation is either a function or a regexp 
+            if (typeof validation === 'function' && validation(val)
+                || typeof validation === 'object' && typeof validation.test === 'function' && validation.test(val))
+            {
+                return new commandLineUtils.ArgProcessorOutput(true, typeof postprocessor === 'function' ? postprocessor(val) : val);
+            }
+            else {
+                return new commandLineUtils.ArgProcessorOutput(false, error.replace('$val', val));
+            }
 
     }, preprocessor);
 }

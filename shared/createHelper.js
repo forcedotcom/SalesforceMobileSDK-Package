@@ -152,6 +152,13 @@ function printNextSteps(devToolName, projectPath, result) {
 // Helper for 'create' command
 //
 function createApp(config, platform, devToolName) {
+    // Setting log level
+    if (config.verbose) {
+        utils.setLogLevel(utils.LOG_LEVELS.DEBUG);
+    }
+    else {
+        utils.setLogLevel(utils.LOG_LEVELS.INFO);
+    }
 
     // Computing projectDir
     config.projectDir = config.outputdir ? path.resolve(config.outputdir) : path.join(process.cwd(),config.appname)
