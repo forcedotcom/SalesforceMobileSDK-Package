@@ -26,7 +26,9 @@
  */
 
 // Dependencies
-var COLOR = require('./outputColors'),
+var path = require('path'),
+    shelljs = require('shelljs'),
+    COLOR = require('./outputColors'),
     commandLineUtils = require('./commandLineUtils'),
     logInfo = require('./utils').logInfo;
 
@@ -111,8 +113,9 @@ function createArgsProcessorList(appTypes, isCreateWithTemplate) {
                     function(argsMap) { return (argsMap['apptype'] === 'hybrid_remote'); });
 
     // Output dir
-    addProcessorFor(argProcessorList, 'outputdir', 'Enter the output directory for your app (leave empty for the current directory):',
-                    'Invalid value for output directory: \'$val\'.', /.*/); 
+    addProcessorFor(argProcessorList, 'outputdir', 'Enter output directory for your app (leave empty for the current directory):',
+                    'Invalid value for output directory (directory must not already exist): \'$val\'.',
+                    function(val) { return val === '' || !shelljs.test('-e', path.resolve(val)); });
 
 
     // Template Path - private param (not documented in usage, user is never prompted)

@@ -164,9 +164,6 @@ function createApp(config, platform, devToolName) {
     config.projectDir = config.outputdir ? path.resolve(config.outputdir) : path.join(process.cwd(),config.appname)
     config.projectPath = path.relative(process.cwd(), config.projectDir);
 
-    // Checking if directory exists
-    utils.failIfExists(config.projectDir);
-
     // Adding platform
     config.platform = platform;
     
