@@ -34,13 +34,13 @@ var path = require('path'),
 //
 // Helper to prepare template
 // 
-function prepareTemplate(config, dir) {
+function prepareTemplate(config, templateDir) {
+    var template = require(path.join(templateDir, 'template.js'));
     return utils.runFunctionThrowError(
         function() {
-            return config.template.prepare(config, utils.replaceInFiles, utils.moveFile, utils.removeFile);
+            return template.prepare(config, utils.replaceInFiles, utils.moveFile, utils.removeFile);
         },
-        dir
-    );
+        templateDir);
 }
 
 //
@@ -66,16 +66,11 @@ function createNativeApp(config) {
 //
 function createHybridApp(config) {
 
-    // Check cordova cli
-    checkCordovaCliVersion(config.minimumCordovaCliVersion);
-
     // Create app with cordova
     utils.runProcessThrowError('cordova create "' + config.projectDir + '" ' + config.packagename + ' ' + config.appname);
     utils.runProcessThrowError('npm install shelljs@0.7.0', config.projectDir);
-    utils.runProcessThrowError('cordova platform add ' + config.platform + '@' + config.cordovaPlatformVersion, config.projectDir);
+    utils.runProcessThrowError('cordova platform add ' + config.platform + '@' + SDK.cordova.platformVersion[config.platform], config.projectDir);
     utils.runProcessThrowError('cordova plugin add ' + config.cordovaPluginRepoUrl, config.projectDir);
-    utils.runProcessThrowError('cordova prepare', config.projectDir);
-
 
     // Web directory - the home for the template
     var webDir = path.join(config.projectDir, 'www')    
@@ -87,40 +82,18 @@ function createHybridApp(config) {
     utils.copyFile(config.templateLocalPath, webDir);
 
     // Run prepare function of template
-    var prepareResult = prepareTemplate(config, config.webDir);
+    var prepareResult = prepareTemplate(config, webDir);
 
     // Cleanup
     utils.removeFile(path.join(webDir, 'template.js'));
+
+    // Run cordova prepare
+    utils.runProcessThrowError('cordova prepare ' + config.platform, config.projectDir);
 
     // Done
     return prepareResult;
 
 }
-
-/**
- * Checks the the version of the currently installed cordova CLI tool.
- * 
- * @param {String} minimumCordovaCliVersion Minimum cordova cli version required
- *
- * @throws {Error} if cordova cli not found or version too low
- */
-function checkCordovaCliVersion(minimumCordovaCliVersion) {
-    var cordovaCliVersion;
-    try {
-	    var cordovaVersionResult = utils.runProcessThrowError('cordova -v', null, true /* return output */);
-        cordovaCliVersion = cordovaVersionResult.replace(/\r?\n|\r/, '');
-    }
-    catch (error) {
-        throw new Error('cordova command line tool could not be found.  Make sure you install the cordova CLI from https://www.npmjs.org/package/cordova.');
-    }
-
-    var minimumCordovaCliVersionNum = utils.getVersionNumberFromString(minimumCordovaCliVersion);
-    var cordovaCliVersionNum = utils.getVersionNumberFromString(cordovaCliVersion);
-
-    if (cordovaCliVersionNum < minimumCordovaCliVersionNum) {
-        throw new Error('Installed cordova command line tool version (' + cordovaCliVersion + ') is less than the minimum required version (' + minimumCordovaCliVersion + ').  Please update your version of Cordova.');
-    }
-};
 
 //
 // Print details
@@ -179,6 +152,13 @@ function printNextSteps(devToolName, projectPath, result) {
 // Helper for 'create' command
 //
 function createApp(config, platform, devToolName) {
+    // Setting log level
+    if (config.verbose) {
+        utils.setLogLevel(utils.LOG_LEVELS.DEBUG);
+    }
+    else {
+        utils.setLogLevel(utils.LOG_LEVELS.INFO);
+    }
 
     // Computing projectDir
     config.projectDir = config.outputdir ? path.resolve(config.outputdir) : path.join(process.cwd(),config.appname)
@@ -201,19 +181,28 @@ function createApp(config, platform, devToolName) {
     var repoDir = utils.cloneRepo(tmpDir, config.templaterepourl);
     config.templateLocalPath = path.join(repoDir, config.templatepath);
 
-    // Getting template
-    config.template = require(path.join(repoDir, config.templatepath, 'template.js'));
-                              
     // Getting apptype from template
-    config.apptype = config.template.appType;
+    config.apptype = require(path.join(config.templateLocalPath, 'template.js')).appType;
 
     var isNative = config.apptype.indexOf('native') >= 0;
 
     // Adding hybrid only config
     if (!isNative) {
-        config.minimumCordovaCliVersion = SDK.cordova.minimumCliVersion;
-        config.cordovaPlatformVersion = SDK.cordova.platformVersion[platform];
         config.cordovaPluginRepoUrl = config.pluginrepourl || SDK.cordova.pluginRepoUrl;
+    }
+
+
+    // Check npm version
+    utils.checkToolVersion('npm -v', SDK.tools.npmMinVersion);
+
+    // Check pod version
+    if (config.platform === 'ios') {
+        utils.checkToolVersion('pod --version', SDK.tools.podMinVersion);
+    }
+
+    // Check cordova cli
+    if (!isNative) {
+        utils.checkToolVersion('cordova -v', SDK.cordova.minimumCliVersion);
     }
 
     // Print details

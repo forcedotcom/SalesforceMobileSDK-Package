@@ -51,7 +51,7 @@ function main(args) {
     var chosenOperatingSystems = cleanSplit(parsedArgs.os, ',');
     var appTypes = parsedArgs.apptype || '';
     var templateRepoUrl = parsedArgs.templaterepourl || '';
-    var pluginRepoUrl = parsedArgs.pluginrepourl;
+    var pluginRepoUrl = parsedArgs.pluginrepourl || SDK.cordova.pluginRepoUrl;
     var sdkBranch = parsedArgs.sdkbranch || defaultSdkBranch;
     var chosenAppTypes = cleanSplit(parsedArgs.apptype, ',');
 
@@ -86,9 +86,14 @@ function main(args) {
 
     // Get cordova plugin repo if any hybrid testing requested
     if (testingHybrid) {
-        var pluginRepoDir = utils.cloneRepo(tmpDir, pluginRepoUrl);
-        if (testingIOS) updatePluginRepo(tmpDir, OS.ios, pluginRepoDir, sdkBranch);
-        if (testingAndroid) updatePluginRepo(tmpDir, OS.android, pluginRepoDir, sdkBranch);
+        if (pluginRepoUrl.indexOf('//') >= 0) {
+            // Actual url - clone repo - run tools/update.sh
+            var pluginRepoDir = utils.cloneRepo(tmpDir, pluginRepoUrl);
+            if (testingIOS) updatePluginRepo(tmpDir, OS.ios, pluginRepoDir, sdkBranch);
+            if (testingAndroid) updatePluginRepo(tmpDir, OS.android, pluginRepoDir, sdkBranch);
+            // Use local updated clone of plugin
+            pluginRepoUrl = pluginRepoDir;
+        }
     }
     
     // Test all the platforms / app types requested
@@ -110,31 +115,31 @@ function main(args) {
 // Usage
 //
 function usage(exitCode) {
-    utils.log('Usage:\n',  COLOR.cyan);
-    utils.log('  test_force.js --usage', COLOR.magenta);
-    utils.log('\n OR \n', COLOR.cyan);
-    utils.log('  test_force.js', COLOR.magenta);
-    utils.log('    --os=os1,os2,etc', COLOR.magenta);
-    utils.log('    --apptype=appType1,appType2,etc OR --templaterepourl=TEMPLATE_REPO_URL', COLOR.magenta);
-    utils.log('    [--pluginrepourl=PLUGIN_REPO_URL (Defaults to url in shared/constants.js)]', COLOR.magenta);
-    utils.log('    [--sdkbranch=SDK_BRANCH (Defaults to unstable)]', COLOR.magenta);
-    utils.log('', COLOR.cyan);
-    utils.log('  Where:', COLOR.cyan);
-    utils.log('  - osX is : ios or android', COLOR.cyan);
-    utils.log('  - appTypeX is: native, native_swift, react_native, hybrid_local or hybrid_remote', COLOR.cyan);
-    utils.log('  - templaterepourl is a template repo url e.g. https://github.com/forcedotcom/SmartSyncExplorerReactNative#unstable', COLOR.cyan);
-    utils.log('', COLOR.cyan);
-    utils.log('  If hybrid is targeted, the following are first done:', COLOR.cyan);
-    utils.log('  - clones PLUGIN_REPO_URL ', COLOR.cyan);
-    utils.log('  - runs ./tools/update.sh -b SDK_BRANCH to update clone of plugin repo', COLOR.cyan);
-    utils.log('', COLOR.cyan);
-    utils.log('  If ios is targeted:', COLOR.cyan);
-    utils.log('  - generates forceios package and deploys it to a temporary directory', COLOR.cyan);
-    utils.log('  - creates and compile the application types using specified template and plugin', COLOR.cyan);
-    utils.log('', COLOR.cyan);
-    utils.log('  If android is targeted:', COLOR.cyan);
-    utils.log('  - generates forcedroid package and deploys it to a temporary directory', COLOR.cyan);
-    utils.log('  - creates and compile the application types using specified template and plugin', COLOR.cyan);
+    utils.logInfo('Usage:\n',  COLOR.cyan);
+    utils.logInfo('  test_force.js --usage', COLOR.magenta);
+    utils.logInfo('\n OR \n', COLOR.cyan);
+    utils.logInfo('  test_force.js', COLOR.magenta);
+    utils.logInfo('    --os=os1,os2,etc', COLOR.magenta);
+    utils.logInfo('    --apptype=appType1,appType2,etc OR --templaterepourl=TEMPLATE_REPO_URL', COLOR.magenta);
+    utils.logInfo('    [--pluginrepourl=PLUGIN_REPO_URL (Defaults to url in shared/constants.js)]', COLOR.magenta);
+    utils.logInfo('    [--sdkbranch=SDK_BRANCH (Defaults to unstable)]', COLOR.magenta);
+    utils.logInfo('', COLOR.cyan);
+    utils.logInfo('  Where:', COLOR.cyan);
+    utils.logInfo('  - osX is : ios or android', COLOR.cyan);
+    utils.logInfo('  - appTypeX is: native, native_swift, react_native, hybrid_local or hybrid_remote', COLOR.cyan);
+    utils.logInfo('  - templaterepourl is a template repo url e.g. https://github.com/forcedotcom/SmartSyncExplorerReactNative#unstable', COLOR.cyan);
+    utils.logInfo('', COLOR.cyan);
+    utils.logInfo('  If hybrid is targeted, the following are first done:', COLOR.cyan);
+    utils.logInfo('  - clones PLUGIN_REPO_URL ', COLOR.cyan);
+    utils.logInfo('  - runs ./tools/update.sh -b SDK_BRANCH to update clone of plugin repo', COLOR.cyan);
+    utils.logInfo('', COLOR.cyan);
+    utils.logInfo('  If ios is targeted:', COLOR.cyan);
+    utils.logInfo('  - generates forceios package and deploys it to a temporary directory', COLOR.cyan);
+    utils.logInfo('  - creates and compile the application types using specified template and plugin', COLOR.cyan);
+    utils.logInfo('', COLOR.cyan);
+    utils.logInfo('  If android is targeted:', COLOR.cyan);
+    utils.logInfo('  - generates forcedroid package and deploys it to a temporary directory', COLOR.cyan);
+    utils.logInfo('  - creates and compile the application types using specified template and plugin', COLOR.cyan);
 
     process.exit(exitCode);
 }
@@ -152,7 +157,7 @@ function createDeployForcePackage(tmpDir, os) {
 // Update cordova plugin repo
 //
 function updatePluginRepo(tmpDir, os, pluginRepoDir, sdkBranch) {
-    utils.log('Updating cordova plugin at ' + sdkBranch);
+    utils.logInfo('Updating cordova plugin at ' + sdkBranch);
     utils.runProcessThrowError(path.join('tools', 'update.sh') + ' -b ' + sdkBranch + ' -o ' + os, pluginRepoDir);
 }
 
@@ -185,6 +190,7 @@ function createCompileApp(tmpDir, os, appType, templateRepoUrl, pluginRepoUrl) {
         + ' --packagename=com.mycompany'
         + ' --organization=MyCompany'
         + ' --outputdir=' + outputDir
+        + ' --verbose'
         + (isHybridRemote ? ' --startpage=/apex/testPage' : '')
         + (isNative ? '' : ' --pluginrepourl=' + pluginRepoUrl);
 
@@ -234,13 +240,13 @@ function createCompileApp(tmpDir, os, appType, templateRepoUrl, pluginRepoUrl) {
 //
 function validateOperatingSystems(chosenOperatingSystems) {
     if (chosenOperatingSystems.length == 0) {
-        utils.log('You need to specify at least one os\n', COLOR.red);
+        utils.logError('You need to specify at least one os\n');
         usage(1);
     }
     for (var i=0; i<chosenOperatingSystems.length; i++) {
         var os = chosenOperatingSystems[i];
         if (!OS.hasOwnProperty(os) || (isWindows() && os === OS.ios)) {
-            utils.log('Invalid os: ' + os + '\n', COLOR.red);
+            utils.logError('Invalid os: ' + os + '\n');
             usage(1);
         }
     }
@@ -250,17 +256,15 @@ function validateOperatingSystems(chosenOperatingSystems) {
 // Helper to validate app types / template repo url
 //
 function validateAppTypesTemplateRepoUrl(chosenAppTypes, templateRepoUrl) {
-    console.log("--> " + chosenAppTypes.length == 0);
-    console.log("--> " + templateRepoUrl === '');
     if (!(chosenAppTypes.length == 0 ^ templateRepoUrl === '')) {
-        utils.log('You need to specify apptype or templaterepourl (but not both)\n', COLOR.red);
+        utils.logError('You need to specify apptype or templaterepourl (but not both)\n');
         usage(1);
     }
     
     for (var i=0; i<chosenAppTypes.length; i++) {
         var appType = chosenAppTypes[i];
         if (!APP_TYPE.hasOwnProperty(appType)) {
-            utils.log('Invalid appType: ' + appType + '\n', COLOR.red);
+            utils.logError('Invalid appType: ' + appType + '\n');
             usage(1);
         }
     }

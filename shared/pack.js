@@ -49,7 +49,7 @@ function main(args) {
 function pack(os) {
     var packageName = 'force' + (os === 'ios' ? os : 'droid') + '-' + SDK.version + '.tgz';
 
-    utils.log('Creating ' + packageName, COLOR.green);
+    utils.logInfo('Creating ' + packageName, COLOR.green);
     
     // Packing
     var packageRepoDir = path.join(__dirname, '..');
@@ -84,10 +84,10 @@ function cleanSplit(str, delimiter) {
 // Usage
 //
 function usage() {
-    utils.log('Usage:',  COLOR.cyan);
-    utils.log('  pack.js --usage', COLOR.magenta);
-    utils.log('OR', COLOR.magenta);
-    utils.log('  pack.js', COLOR.magenta);
-    utils.log('    --os=os1,os2', COLOR.magenta);
-    utils.log('      where osN are : ios, android', COLOR.magenta);
+    utils.logInfo('Usage:',  COLOR.cyan);
+    utils.logInfo('  pack.js --usage', COLOR.magenta);
+    utils.logInfo('OR', COLOR.magenta);
+    utils.logInfo('  pack.js', COLOR.magenta);
+    utils.logInfo('    --os=os1,os2', COLOR.magenta);
+    utils.logInfo('      where osN are : ios, android', COLOR.magenta);
 }

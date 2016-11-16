@@ -31,6 +31,28 @@ var shelljs = require('shelljs'),
     path = require('path'),
     COLOR = require('./outputColors');
 
+var LOG_LEVELS = {
+    OFF: 0,
+    FATAL: 100,
+    ERROR: 200,
+    WARN: 300,
+    INFO: 400,
+    DEBUG: 500,
+    TRACE: 600,
+    ALL: Number.MAX_SAFE_INTEGER
+};
+
+var LOG_LEVEL = LOG_LEVELS.ALL;
+
+/**
+ * Set log level
+ *
+ * @param {int} logLevel
+ */
+function setLogLevel(logLevel) {
+    LOG_LEVEL = logLevel;
+}
+
 /**
  * Creates a comparable version number from a version string in the format x[.y[.ignored]].
  * Currently only looks for major and minor version numbers.
@@ -49,7 +71,7 @@ function getVersionNumberFromString(versionString) {
 	var versionRegex = /^(\d+)(\.(\d+))?.*$/;
 	var matchArray = versionString.match(versionRegex);
 	if (matchArray === null) {
-		console.log('Invalid version string "' + versionString + '". Should be in the format x[.y[.ignored]]');
+		log(LOG_LEVELS.WARN, 'Invalid version string "' + versionString + '". Should be in the format x[.y[.ignored]]');
 		return 0;
 	} else {
 		var majorVersion = parseInt(matchArray[1]);
@@ -57,7 +79,36 @@ function getVersionNumberFromString(versionString) {
 		var combinedVersion = (1000 * majorVersion) + minorVersion;
 		return combinedVersion;
 	}
-};
+}
+
+/**
+ * Checks the the version of a tool by running the given command
+ * 
+ * @param {String} cmd Command to run to get the tool version
+ * @param {String} minVersionRequired Minimum version required
+ *
+ * @throws {Error} if tool not found or version too low
+ */
+function checkToolVersion(cmd, minVersionRequired) {
+    var toolName = cmd.split(' ')[0];
+    var toolVersion;
+    try {
+	    var result = runProcessThrowError(cmd, null, true /* return output */);
+        toolVersion = result.replace(/\r?\n|\r/, '');
+    }
+    catch (error) {
+        throw new Error(toolName + ' is required but could not be found. Please install ' + toolName + '.');
+    }
+
+    var toolVersionNum = getVersionNumberFromString(toolVersion);
+    var minVersionRequiredNum = getVersionNumberFromString(minVersionRequired);
+
+    if (toolVersionNum < minVersionRequiredNum) {
+        throw new Error('Installed ' + toolName + 'version (' + toolVersion + ') is less than the minimum required version ('
+                        + minVersionRequired + ').  Please update your version of ' + toolName + '.');
+    }
+}
+
 
 /** 
  * Replaces text in a file
@@ -70,7 +121,7 @@ function replaceTextInFile(fileName, textInFile, replacementText) {
     var contents = fs.readFileSync(fileName, 'utf8');
     var lines = contents.split(/\r*\n/);
     var result = lines.map(function (line) {
-      return line.replace(textInFile, replacementText);
+        return line.replace(textInFile, replacementText);
     }).join('\n');
 
     fs.writeFileSync(fileName, result, 'utf8'); 
@@ -85,14 +136,22 @@ function replaceTextInFile(fileName, textInFile, replacementText) {
  * @param {Boolean} returnOutput. If true, returns output as string. If false, pipes output through.
  */
 function runProcessThrowError(cmd, dir, returnOutput) {
-    log('Running: ' + cmd);
+    logDebug('Running: ' + cmd); 
     if (dir) shelljs.pushd(dir);
     try {
         if (returnOutput) {
             return execSync(cmd).toString();
         }
         else {
-            execSync(cmd, {stdio:[0,1,2]});
+            var stdio = [];
+            if (LOG_LEVEL >= LOG_LEVELS.DEBUG) {
+                stdio = [0,1,2]
+            }
+            else if (LOG_LEVEL >= LOG_LEVELS.ERROR) {
+                stdio = [0,2]
+            }
+            
+            execSync(cmd, {stdio: stdio});
         }
     }
     finally {
@@ -111,10 +170,10 @@ function runProcessThrowError(cmd, dir, returnOutput) {
  */
 function runProcessCatchError(cmd, msg, dir) {
     var success = false;
-    log('Running: ' + cmd);
+    logDebug('Running: ' + cmd);
     try {
         runProcessThrowError(cmd, dir);
-        if (msg) log('!SUCCESS! ' + msg, COLOR.green);
+        if (msg) logInfo('!SUCCESS! ' + msg, COLOR.green);
         success = true;
     } catch (err) {
         logError(msg ? '!FAILURE! ' + msg : '', err);
@@ -147,20 +206,11 @@ function runFunctionThrowError(func, dir) {
  */
 
 function mkTmpDir() {
-    var tmpDir = path.resolve('tmp' + random(1000));
-    log('Making temp dir:' + tmpDir);
+    var timestamp = (new Date()).toLocaleTimeString().replace(/[^0-9]/g,'');
+    var tmpDir = path.resolve('tmp' + timestamp);
+    logDebug('Making temp dir:' + tmpDir);
     shelljs.mkdir('-p', tmpDir);
     return tmpDir;
-}
-
-/**
- * Generates random number.
- *
- * @param {Number} n
- * @return {Number} a random number between n/10 and n.
- */
-function random(n) {
-    return (n/10)+Math.floor(Math.random()*(9*n/10));
 }
 
 /**
@@ -173,7 +223,7 @@ function random(n) {
 function replaceInFiles(from, to, files) {
     var fromRegexp = typeof(from) === 'string' ? new RegExp(from, 'g') : from;
     for (var i=0; i<files.length; i++) {
-        log('Replacing ' + from + ' with ' + to + ' in: ' + files[i]);
+        logDebug('Replacing ' + from + ' with ' + to + ' in: ' + files[i]);
         replaceTextInFile(files[i], fromRegexp, to);
     }
 }
@@ -185,7 +235,7 @@ function replaceInFiles(from, to, files) {
  * @param {String} to New path for file or directory.
  */
 function moveFile(from, to) {
-    log('Moving: ' + from + ' to ' + to);
+    logDebug('Moving: ' + from + ' to ' + to);
     var targetDir = path.parse(to).dir;
     if (targetDir && !shelljs.test('-e', targetDir)) {
         shelljs.mkdir('-p', targetDir);
@@ -200,7 +250,7 @@ function moveFile(from, to) {
  * @param {String} to New path for file or directory.
  */
 function copyFile(from, to) {
-    log('Copying: ' + from + ' to ' + to);
+    logDebug('Copying: ' + from + ' to ' + to);
     shelljs.cp('-R', from, to);
 }
 
@@ -211,7 +261,7 @@ function copyFile(from, to) {
  * @param {String} path Path of file or directory to remove.
  */
 function removeFile(path) {
-    log('Removing: ' + path);
+    logDebug('Removing: ' + path);
     shelljs.rm('-rf', path);
 }
 
@@ -254,53 +304,85 @@ function cloneRepo(tmpDir, repoUrlWithBranch) {
  * @param {String} lines
  */
 function logParagraph(lines) {
-    log("");
-    log("********************************************************************************", COLOR.green);
-    log("*", COLOR.green);
+    logInfo("");
+    logInfo("********************************************************************************", COLOR.green);
+    logInfo("*", COLOR.green);
     for (var i=0; i<lines.length; i++) {
-        log("*   " + lines[i], COLOR.green);
+        logInfo("*   " + lines[i], COLOR.green);
     }
-    log("*", COLOR.green);
-    log("********************************************************************************", COLOR.green);
-    log("");
+    logInfo("*", COLOR.green);
+    logInfo("********************************************************************************", COLOR.green);
+    logInfo("");
 }
 
 /**
  * Log error
  *
+ * @param {String} context
  * @param {Error} error
  */
 function logError(context, error) {
-    log(context, COLOR.red)
-    log(error.message, COLOR.red);
-    log(error.stack);
+    log(LOG_LEVELS.ERROR, context, COLOR.red)
+    if (error) {
+        log(LOG_LEVELS.ERROR, error.message, COLOR.red);
+        logDebug(error.stack);
+    }
 }
+
+/**
+ * Log info
+ *
+ * @param {String} msg Message to log.
+ * @param {String} color Color to use.
+ */
+function logInfo(msg, color) {
+    log(LOG_LEVELS.INFO, msg, color);
+}
+
+/**
+ * Log debug
+ *
+ * @param {String} msg Message to log.
+ * @param {String} color Color to use.
+ */
+function logDebug(msg, color) {
+    log(LOG_LEVELS.DEBUG, msg, color);
+}
+
 
 /**
  * Log in color.
  * 
+ * @param {integer} logLevel Max LOG_LEVEL for which the message should be logged
  * @param {String} msg Message to log.
  * @param {String} color Color to use.
  */
-function log(msg, color) {
-    if (color) {
-        console.log(color + msg + COLOR.reset);
-    }
-    else {
-        console.log(msg);
+function log(logLevel, msg, color) {
+    if (logLevel <= LOG_LEVEL) {
+        if (color) {
+            console.log(color + msg + COLOR.reset);
+        }
+        else {
+            console.log(msg);
+        }
     }
 }
 
 module.exports = {
+    LOG_LEVELS,
+    checkToolVersion,
     cloneRepo,
     copyFile,
     failIfExists,
     getVersionNumberFromString,
     log,
+    logDebug,
     logError,
+    logInfo,
     logParagraph,
     mkTmpDir,
     moveFile,
+    setLogLevel,
     removeFile,
     replaceInFiles,
     runFunctionThrowError,
