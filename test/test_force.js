@@ -48,7 +48,7 @@ function main(args) {
 
     // Args extraction
     var usageRequested = parsedArgs.hasOwnProperty('usage');
-    var chosenOperatingSystems = cleanSplit(parsedArgs.os, ',');
+    var chosenOperatingSystems = cleanSplit(parsedArgs.os, ',').map(function(s) { return s.toLowerCase(); });
     var appTypes = parsedArgs.apptype || '';
     var templateRepoUrl = parsedArgs.templaterepourl || '';
     var pluginRepoUrl = parsedArgs.pluginrepourl || SDK.cordova.pluginRepoUrl;
