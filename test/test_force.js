@@ -48,7 +48,7 @@ function main(args) {
 
     // Args extraction
     var usageRequested = parsedArgs.hasOwnProperty('usage');
-    var chosenOperatingSystems = cleanSplit(parsedArgs.os, ',');
+    var chosenOperatingSystems = cleanSplit(parsedArgs.os, ',').map(function(s) { return s.toLowerCase(); });
     var appTypes = parsedArgs.apptype || '';
     var templateRepoUrl = parsedArgs.templaterepourl || '';
     var pluginRepoUrl = parsedArgs.pluginrepourl || SDK.cordova.pluginRepoUrl;
@@ -148,7 +148,7 @@ function usage(exitCode) {
 // Create and deploy forceios/forcedroid
 //
 function createDeployForcePackage(tmpDir, os) {
-    var packJs = path.join(__dirname, '..', 'shared', 'pack.js');
+    var packJs = path.join(__dirname, '..', 'pack', 'pack.js');
     utils.runProcessThrowError('node ' + packJs + ' --os=' + os);
     utils.runProcessThrowError('npm install --prefix ' + tmpDir + ' ' + FORCE_CLI[os] + '-' + SDK.version + '.tgz');
 }

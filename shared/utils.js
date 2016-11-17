@@ -266,17 +266,6 @@ function removeFile(path) {
 }
 
 /**
- * Throw error if file/directory exists.
- * 
- * @param {String} path Path of file or directory to check.
- */
-function failIfExists(path) {
-    if (shelljs.test('-e', path)) {
-        throw new Error(path + ' already exists.');
-    }
-}
-
-/**
  * Clone repo.
  *
  * @param {String} tmpDir Parent dir for clone
@@ -373,7 +362,6 @@ module.exports = {
     checkToolVersion,
     cloneRepo,
     copyFile,
-    failIfExists,
     getVersionNumberFromString,
     log,
     logDebug,

@@ -3,10 +3,10 @@
 // Dependencies
 var path = require('path'),
     shelljs = require('shelljs'),
-    utils = require('./utils.js'),
-    commandLineUtils = require('./commandLineUtils'),
-    COLOR = require('./outputColors'),
-    SDK = require('./constants')
+    utils = require('../shared/utils.js'),
+    commandLineUtils = require('../shared/commandLineUtils'),
+    COLOR = require('../shared/outputColors'),
+    SDK = require('../shared/constants')
 ;
 
 // Calling main
