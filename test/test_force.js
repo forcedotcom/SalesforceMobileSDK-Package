@@ -148,7 +148,7 @@ function usage(exitCode) {
 // Create and deploy forceios/forcedroid
 //
 function createDeployForcePackage(tmpDir, os) {
-    var packJs = path.join(__dirname, '..', 'shared', 'pack.js');
+    var packJs = path.join(__dirname, '..', 'pack', 'pack.js');
     utils.runProcessThrowError('node ' + packJs + ' --os=' + os);
     utils.runProcessThrowError('npm install --prefix ' + tmpDir + ' ' + FORCE_CLI[os] + '-' + SDK.version + '.tgz');
 }
