@@ -121,10 +121,7 @@ function printDetails(config) {
             details = details.concat(['       start page:      ' + config.startpage]);
         }
 
-        details = details.concat([
-            '       cordova version: ' + config.cordovaPlatformVersion,
-            '       plugin repo:     ' + config.cordovaPluginRepoUrl
-        ]);
+        details = details.concat(['       plugin repo:     ' + config.cordovaPluginRepoUrl]);
     }
             
     utils.logParagraph(details);
