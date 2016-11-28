@@ -70,7 +70,7 @@ function createHybridApp(config) {
     utils.runProcessThrowError('cordova create "' + config.projectDir + '" ' + config.packagename + ' ' + config.appname);
     utils.runProcessThrowError('npm install shelljs@0.7.0', config.projectDir);
     utils.runProcessThrowError('cordova platform add ' + config.platform + '@' + SDK.cordova.platformVersion[config.platform], config.projectDir);
-    utils.runProcessThrowError('cordova plugin add ' + config.cordovaPluginRepoUrl, config.projectDir);
+    utils.runProcessThrowError('cordova plugin add ' + config.cordovaPluginRepoUri, config.projectDir);
 
     // Web directory - the home for the template
     var webDir = path.join(config.projectDir, 'www')    
@@ -107,7 +107,7 @@ function printDetails(config) {
                         '',
                         '  in:                   ' + config.projectPath,
                         '',
-                        '  from template repo:   ' + config.templaterepourl
+                        '  from template repo:   ' + config.templaterepouri
                   ];
 
     if (config.templatepath) {
@@ -121,7 +121,7 @@ function printDetails(config) {
             details = details.concat(['       start page:      ' + config.startpage]);
         }
 
-        details = details.concat(['       plugin repo:     ' + config.cordovaPluginRepoUrl]);
+        details = details.concat(['       plugin repo:     ' + config.cordovaPluginRepoUri]);
     }
             
     utils.logParagraph(details);
@@ -161,18 +161,19 @@ function createApp(config, platform, devToolName) {
     config.projectDir = config.outputdir ? path.resolve(config.outputdir) : path.join(process.cwd(),config.appname)
     config.projectPath = path.relative(process.cwd(), config.projectDir);
 
-    // Adding platform
+    // Adding platform and version
     config.platform = platform;
+    config.version = SDK.version;
     
-    // Adding template repo url and path if none provided
-    config.templaterepourl = config.templaterepourl || SDK.templates.repoUrl;
-    config.templatepath = config.templatepath || (config.templaterepourl.indexOf('SalesforceMobileSDK-Templates') >= 0 ? SDK.templates.appTypesToPath[platform][config.apptype] : '');
+    // Adding template repo uri and path if none provided
+    config.templaterepouri = config.templaterepouri || SDK.templates.repoUri;
+    config.templatepath = config.templatepath || (config.templaterepouri.indexOf('SalesforceMobileSDK-Templates') >= 0 ? SDK.templates.appTypesToPath[platform][config.apptype] : '');
 
     // Creating tmp dir for template clone
     var tmpDir = utils.mkTmpDir();
 
     // Cloning template repo
-    var repoDir = utils.cloneRepo(tmpDir, config.templaterepourl);
+    var repoDir = utils.cloneRepo(tmpDir, config.templaterepouri);
     config.templateLocalPath = path.join(repoDir, config.templatepath);
 
     // Getting apptype from template
@@ -182,7 +183,7 @@ function createApp(config, platform, devToolName) {
 
     // Adding hybrid only config
     if (!isNative) {
-        config.cordovaPluginRepoUrl = config.pluginrepourl || SDK.cordova.pluginRepoUrl;
+        config.cordovaPluginRepoUri = config.pluginrepouri || SDK.cordova.pluginRepoUri;
     }
 
 
