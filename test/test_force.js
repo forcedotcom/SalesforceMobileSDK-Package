@@ -125,7 +125,7 @@ function usage(exitCode) {
     utils.logInfo('  Where:', COLOR.cyan);
     utils.logInfo('  - osX is : ios or android', COLOR.cyan);
     utils.logInfo('  - appTypeX is: native, native_swift, react_native, hybrid_local or hybrid_remote', COLOR.cyan);
-    utils.logInfo('  - templaterepouri is a template repo uri e.g. https://github.com/forcedotcom/SmartSyncExplorerReactNative#unstable', COLOR.cyan);
+    utils.logInfo('  - templaterepouri is a template repo uri e.g. https://github.com/forcedotcom/SmartSyncExplorerReactNative', COLOR.cyan);
     utils.logInfo('', COLOR.cyan);
     utils.logInfo('  If hybrid is targeted, the following are first done:', COLOR.cyan);
     utils.logInfo('  - clones PLUGIN_REPO_URI ', COLOR.cyan);
