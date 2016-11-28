@@ -64,17 +64,19 @@ function usage(toolName, toolVersion, appTypes) {
     logInfo('    --appname=<Application Name>', COLOR.magenta);
     logInfo('    --packagename=<App Package Identifier> (e.g. com.mycompany.myapp)', COLOR.magenta);
     logInfo('    --organization=<Organization Name> (Your company\'s/organization\'s name)', COLOR.magenta);
-    logInfo('    --outputdir=<Output directory> (Leave empty for current directory)]', COLOR.magenta);
     logInfo('    --startpage=<App Start Page> (The start page of your remote app. Only required for hybrid_remote)', COLOR.magenta);
+    logInfo('    [--outputdir=<Output directory> (Leave empty for current directory)]', COLOR.magenta);
     logInfo('\n OR \n', COLOR.cyan);
     logInfo(toolName + ' createWithTemplate', COLOR.magenta);
-    logInfo('    --templaterepourl=<Template repo URL> (e.g. https://github.com/forcedotcom/SmartSyncExplorerReactNative)]', COLOR.magenta);
+    logInfo('    --templaterepouri=<Template repo URI> (e.g. https://github.com/forcedotcom/SmartSyncExplorerReactNative)]', COLOR.magenta);
     logInfo('    --appname=<Application Name>', COLOR.magenta);
     logInfo('    --packagename=<App Package Identifier> (e.g. com.mycompany.myapp)', COLOR.magenta);
     logInfo('    --organization=<Organization Name> (Your company\'s/organization\'s name)', COLOR.magenta);
-    logInfo('    --outputdir=<Output directory> (Leave empty for current directory)]', COLOR.magenta);
+    logInfo('    [--outputdir=<Output directory> (Leave empty for current directory)]', COLOR.magenta);
     logInfo('\n OR \n', COLOR.cyan);
     logInfo(toolName + ' version', COLOR.magenta);
+    logInfo('\n OR \n', COLOR.cyan);
+    logInfo(toolName, COLOR.magenta);
 }
 
 //
@@ -84,9 +86,9 @@ function createArgsProcessorList(appTypes, isCreateWithTemplate) {
     var argProcessorList = new commandLineUtils.ArgProcessorList();
 
     if (isCreateWithTemplate) {
-        // Template Repo URL
-        addProcessorFor(argProcessorList, 'templaterepourl', 'Enter URL of repo containing template application:',
-                     'Invalid value for template repo url: \'$val\'.', /^\S+$/);
+        // Template Repo URI
+        addProcessorFor(argProcessorList, 'templaterepouri', 'Enter URI of repo containing template application:',
+                     'Invalid value for template repo uri: \'$val\'.', /^\S+$/);
     }
     else {
         // App type
@@ -122,9 +124,9 @@ function createArgsProcessorList(appTypes, isCreateWithTemplate) {
     addProcessorFor(argProcessorList, 'templatepath', null,
                     'Invalid value for template path: \'$val\'.', /.*/);
 
-    // Plugin URL - private param (not documented in usage, user is never prompted)
-    addProcessorFor(argProcessorList, 'pluginrepourl', null,
-                    'Invalid value for plugin repo url: \'$val\'.', /.*/);
+    // Plugin URI - private param (not documented in usage, user is never prompted)
+    addProcessorFor(argProcessorList, 'pluginrepouri', null,
+                    'Invalid value for plugin repo uri: \'$val\'.', /.*/);
 
     // Verbose  - private param (not documented in usage, user is never prompted)
     addProcessorFor(argProcessorList, 'verbose', null,

@@ -1,8 +1,6 @@
 #!/usr/bin/env node
 
 // Defaults
-var defaultTemplateRepoUrl = ''; // let constants.js drive
-var defaultPluginRepoUrl = '';   // let constants.js drive
 var defaultSdkBranch = 'unstable';
 
 // Dependencies
@@ -50,21 +48,21 @@ function main(args) {
     var usageRequested = parsedArgs.hasOwnProperty('usage');
     var chosenOperatingSystems = cleanSplit(parsedArgs.os, ',').map(function(s) { return s.toLowerCase(); });
     var appTypes = parsedArgs.apptype || '';
-    var templateRepoUrl = parsedArgs.templaterepourl || '';
-    var pluginRepoUrl = parsedArgs.pluginrepourl || SDK.cordova.pluginRepoUrl;
+    var templateRepoUri = parsedArgs.templaterepouri || '';
+    var pluginRepoUri = parsedArgs.pluginrepouri || SDK.cordova.pluginRepoUri;
     var sdkBranch = parsedArgs.sdkbranch || defaultSdkBranch;
     var chosenAppTypes = cleanSplit(parsedArgs.apptype, ',');
 
     
     var testingWithAppType = chosenAppTypes.length > 0;
-    var testingWithTemplate = templateRepoUrl != '';
+    var testingWithTemplate = templateRepoUri != '';
     var testingIOS = chosenOperatingSystems.indexOf(OS.ios) >= 0;
     var testingAndroid = chosenOperatingSystems.indexOf(OS.android) >= 0;
     var testingHybrid = chosenAppTypes.indexOf(APP_TYPE.hybrid_local) >= 0 || chosenAppTypes.indexOf(APP_TYPE.hybrid_remote) >= 0;
 
     // Validation
     validateOperatingSystems(chosenOperatingSystems);
-    validateAppTypesTemplateRepoUrl(chosenAppTypes, templateRepoUrl);
+    validateAppTypesTemplateRepoUri(chosenAppTypes, templateRepoUri);
 
     // Usage
     if (usageRequested) {
@@ -86,13 +84,13 @@ function main(args) {
 
     // Get cordova plugin repo if any hybrid testing requested
     if (testingHybrid) {
-        if (pluginRepoUrl.indexOf('//') >= 0) {
-            // Actual url - clone repo - run tools/update.sh
-            var pluginRepoDir = utils.cloneRepo(tmpDir, pluginRepoUrl);
+        if (pluginRepoUri.indexOf('//') >= 0) {
+            // Actual uri - clone repo - run tools/update.sh
+            var pluginRepoDir = utils.cloneRepo(tmpDir, pluginRepoUri);
             if (testingIOS) updatePluginRepo(tmpDir, OS.ios, pluginRepoDir, sdkBranch);
             if (testingAndroid) updatePluginRepo(tmpDir, OS.android, pluginRepoDir, sdkBranch);
             // Use local updated clone of plugin
-            pluginRepoUrl = pluginRepoDir;
+            pluginRepoUri = pluginRepoDir;
         }
     }
     
@@ -102,11 +100,11 @@ function main(args) {
         if (testingWithAppType) {
             for (var j=0; j<chosenAppTypes.length; j++) {
                 var appType = chosenAppTypes[j];
-                createCompileApp(tmpDir, os, appType, null, pluginRepoUrl);
+                createCompileApp(tmpDir, os, appType, null, pluginRepoUri);
             }
         }
         if (testingWithTemplate) {
-            createCompileApp(tmpDir, os, null, templateRepoUrl, null);
+            createCompileApp(tmpDir, os, null, templateRepoUri, null);
         }
     }
 }
@@ -120,17 +118,17 @@ function usage(exitCode) {
     utils.logInfo('\n OR \n', COLOR.cyan);
     utils.logInfo('  test_force.js', COLOR.magenta);
     utils.logInfo('    --os=os1,os2,etc', COLOR.magenta);
-    utils.logInfo('    --apptype=appType1,appType2,etc OR --templaterepourl=TEMPLATE_REPO_URL', COLOR.magenta);
-    utils.logInfo('    [--pluginrepourl=PLUGIN_REPO_URL (Defaults to url in shared/constants.js)]', COLOR.magenta);
+    utils.logInfo('    --apptype=appType1,appType2,etc OR --templaterepouri=TEMPLATE_REPO_URI', COLOR.magenta);
+    utils.logInfo('    [--pluginrepouri=PLUGIN_REPO_URI (Defaults to uri in shared/constants.js)]', COLOR.magenta);
     utils.logInfo('    [--sdkbranch=SDK_BRANCH (Defaults to unstable)]', COLOR.magenta);
     utils.logInfo('', COLOR.cyan);
     utils.logInfo('  Where:', COLOR.cyan);
     utils.logInfo('  - osX is : ios or android', COLOR.cyan);
     utils.logInfo('  - appTypeX is: native, native_swift, react_native, hybrid_local or hybrid_remote', COLOR.cyan);
-    utils.logInfo('  - templaterepourl is a template repo url e.g. https://github.com/forcedotcom/SmartSyncExplorerReactNative#unstable', COLOR.cyan);
+    utils.logInfo('  - templaterepouri is a template repo uri e.g. https://github.com/forcedotcom/SmartSyncExplorerReactNative#unstable', COLOR.cyan);
     utils.logInfo('', COLOR.cyan);
     utils.logInfo('  If hybrid is targeted, the following are first done:', COLOR.cyan);
-    utils.logInfo('  - clones PLUGIN_REPO_URL ', COLOR.cyan);
+    utils.logInfo('  - clones PLUGIN_REPO_URI ', COLOR.cyan);
     utils.logInfo('  - runs ./tools/update.sh -b SDK_BRANCH to update clone of plugin repo', COLOR.cyan);
     utils.logInfo('', COLOR.cyan);
     utils.logInfo('  If ios is targeted:', COLOR.cyan);
@@ -164,12 +162,12 @@ function updatePluginRepo(tmpDir, os, pluginRepoDir, sdkBranch) {
 //
 // Create and compile app 
 //
-function createCompileApp(tmpDir, os, appType, templateRepoUrl, pluginRepoUrl) {
+function createCompileApp(tmpDir, os, appType, templateRepoUri, pluginRepoUri) {
     var forceArgs = '';
-    var actualAppType = appType || getAppTypeFromTemplate(templateRepoUrl)
+    var actualAppType = appType || getAppTypeFromTemplate(templateRepoUri)
     var isNative = actualAppType.indexOf('native') >= 0;
     var isHybridRemote = actualAppType === APP_TYPE.hybrid_remote;
-    var target = actualAppType + ' app for ' + os + (templateRepoUrl ? ' based on template ' + getTemplateNameFromUrl(templateRepoUrl) : '');
+    var target = actualAppType + ' app for ' + os + (templateRepoUri ? ' based on template ' + getTemplateNameFromUri(templateRepoUri) : '');
     var appName = actualAppType + os + 'App';
     var outputDir = path.join(tmpDir, appName);
     var forcePath = path.join(tmpDir, 'node_modules', '.bin', FORCE_CLI[os]);
@@ -182,7 +180,7 @@ function createCompileApp(tmpDir, os, appType, templateRepoUrl, pluginRepoUrl) {
     }
     else {
         forceArgs = 'createWithTemplate '
-            + ' --templaterepourl=' + templateRepoUrl;
+            + ' --templaterepouri=' + templateRepoUri;
     }
 
     forceArgs += ''
@@ -192,7 +190,7 @@ function createCompileApp(tmpDir, os, appType, templateRepoUrl, pluginRepoUrl) {
         + ' --outputdir=' + outputDir
         + ' --verbose'
         + (isHybridRemote ? ' --startpage=/apex/testPage' : '')
-        + (isNative ? '' : ' --pluginrepourl=' + pluginRepoUrl);
+        + (isNative ? '' : ' --pluginrepouri=' + pluginRepoUri);
 
     // Generation
     var generationSucceeded = utils.runProcessCatchError(forcePath + ' ' + forceArgs, 'GENERATING ' + target);
@@ -253,11 +251,11 @@ function validateOperatingSystems(chosenOperatingSystems) {
 }
 
 // 
-// Helper to validate app types / template repo url
+// Helper to validate app types / template repo uri
 //
-function validateAppTypesTemplateRepoUrl(chosenAppTypes, templateRepoUrl) {
-    if (!(chosenAppTypes.length == 0 ^ templateRepoUrl === '')) {
-        utils.logError('You need to specify apptype or templaterepourl (but not both)\n');
+function validateAppTypesTemplateRepoUri(chosenAppTypes, templateRepoUri) {
+    if (!(chosenAppTypes.length == 0 ^ templateRepoUri === '')) {
+        utils.logError('You need to specify apptype or templaterepouri (but not both)\n');
         usage(1);
     }
     
@@ -293,10 +291,10 @@ function isWindows() {
 }
 
 //
-// Get template name from url
+// Get template name from uri
 //
-function getTemplateNameFromUrl(templateRepoUrl) {
-    var parts = templateRepoUrl.split('/');
+function getTemplateNameFromUri(templateRepoUri) {
+    var parts = templateRepoUri.split('/');
     return parts[parts.length-1];
 }
 
@@ -304,12 +302,12 @@ function getTemplateNameFromUrl(templateRepoUrl) {
 //
 // Get template apptype
 //
-function getAppTypeFromTemplate(templateRepoUrl) {
+function getAppTypeFromTemplate(templateRepoUri) {
     // Creating tmp dir for template clone
     var tmpDir = utils.mkTmpDir();
 
     // Cloning template repo
-    var repoDir = utils.cloneRepo(tmpDir, templateRepoUrl);
+    var repoDir = utils.cloneRepo(tmpDir, templateRepoUri);
 
     // Getting template
     var appType = require(path.join(repoDir, 'template.js')).appType;
