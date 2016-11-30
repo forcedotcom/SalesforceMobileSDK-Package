@@ -87,8 +87,9 @@ function main(args) {
         if (pluginRepoUri.indexOf('//') >= 0) {
             // Actual uri - clone repo - run tools/update.sh
             var pluginRepoDir = utils.cloneRepo(tmpDir, pluginRepoUri);
-            if (testingIOS) updatePluginRepo(tmpDir, OS.ios, pluginRepoDir, sdkBranch);
-            if (testingAndroid) updatePluginRepo(tmpDir, OS.android, pluginRepoDir, sdkBranch);
+            if (testingIOS && testingAndroid) updatePluginRepo(tmpDir, 'all', pluginRepoDir, sdkBranch);
+            if (testingIOS && !testingAndroid) updatePluginRepo(tmpDir, OS.ios, pluginRepoDir, sdkBranch);
+            if (testingAndroid && !testingIOS) updatePluginRepo(tmpDir, OS.android, pluginRepoDir, sdkBranch);
             // Use local updated clone of plugin
             pluginRepoUri = pluginRepoDir;
         }
