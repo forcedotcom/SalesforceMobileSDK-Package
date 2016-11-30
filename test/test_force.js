@@ -156,7 +156,7 @@ function createDeployForcePackage(tmpDir, os) {
 //
 function updatePluginRepo(tmpDir, os, pluginRepoDir, sdkBranch) {
     utils.logInfo('Updating cordova plugin at ' + sdkBranch);
-    utils.runProcessThrowError(path.join('tools', 'update.sh') + ' -b ' + sdkBranch + ' -o ' + os, pluginRepoDir);
+    utils.runProcessThrowError(path.join('tools', 'update.sh') + ' -b ' + sdkBranch + ' -o all', pluginRepoDir);
 }
 
 //
