@@ -104,7 +104,7 @@ function checkToolVersion(cmd, minVersionRequired) {
     var minVersionRequiredNum = getVersionNumberFromString(minVersionRequired);
 
     if (toolVersionNum < minVersionRequiredNum) {
-        throw new Error('Installed ' + toolName + 'version (' + toolVersion + ') is less than the minimum required version ('
+        throw new Error('Installed ' + toolName + ' version (' + toolVersion + ') is less than the minimum required version ('
                         + minVersionRequired + ').  Please update your version of ' + toolName + '.');
     }
 }
