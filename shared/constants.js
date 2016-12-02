@@ -41,7 +41,7 @@ module.exports = {
         minimumCliVersion: '6.4.0',
         platformVersion: {
             ios: '4.3.0',
-            android: '5.0.0'
+            android: '5.2.2'
         }
     },
 
