@@ -70,7 +70,7 @@ function createHybridApp(config) {
     utils.runProcessThrowError('cordova create "' + config.projectDir + '" ' + config.packagename + ' ' + config.appname);
     utils.runProcessThrowError('npm install shelljs@0.7.0', config.projectDir);
     utils.runProcessThrowError('cordova platform add ' + config.platform + '@' + SDK.cordova.platformVersion[config.platform], config.projectDir);
-    utils.runProcessThrowError('cordova plugin add ' + config.cordovaPluginRepoUri, config.projectDir);
+    utils.runProcessThrowError('cordova plugin add ' + config.cordovaPluginRepoUri + ' --force', config.projectDir);
 
     // Web directory - the home for the template
     var webDir = path.join(config.projectDir, 'www')    
