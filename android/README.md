@@ -62,18 +62,19 @@ Once the creation script completes, you'll have a fully functioning basic applic
 **App Type:** The type of application you wish to develop:
 
 - **native** — A fully native Android application
-- **hybrid\_remote** — A hybrid application, based on the [Cordova](http://cordova.apache.org/) framework, that runs in a native container.  The app contents live in the cloud as a [Visualforce](http://wiki.developerforce.com/page/An_Introduction_to_Visualforce) application
+- **react\_native** — An application built on ReactNative
 - **hybrid\_local** — A hybrid application, based on the Cordova framework, that runs in a native container.  The app contents are developed locally in the Eclipse project, and are deployed to the device itself when the app is built
+- **hybrid\_remote** — A hybrid application, based on the [Cordova](http://cordova.apache.org/) framework, that runs in a native container.  The app contents live in the cloud as a [Visualforce](http://wiki.developerforce.com/page/An_Introduction_to_Visualforce) application
 
 **App Name:** The name of your application
 
-**Target App Folder:** The folder where you want your app to be created.  Your app will be contained in a folder underneath this folder, alongside a `forcedroid` folder containing the Mobile SDK libraries that your app is linked to.
-
 **App Package Identifier:** The Java package identifier for your app (e.g. `com.acme.mobile_apps`).  **Note:** Your package name must be formatted as a [valid Java package name](http://docs.oracle.com/javase/tutorial/java/package/namingpkgs.html), or you will receive an error.
 
-**Start Page:** \( *Required for hybrid\_remote apps only* \) The starting page of your application on salesforce.com.  This is the entry point of your remote application, though it's only the path, not the server portion of the URL.  For instance, `/apex/MyVisualforceStartPage`.
+**Organization:** The name of your company or organization.  For example, `Acme Widgets, Inc.`
 
-**Use SmartStore:** \( *optional* \) Whether to use SmartStore in your app.  The value is `false` by default.  Set this value to `true` if you intend to use SmartStore in your app.
+**App Start Page:** \( *Required for hybrid\_remote apps only* \) The starting page of your application on salesforce.com.  This is the entry point of your remote application, though it's only the path, not the server portion of the URL.  For instance, `/apex/MyVisualforceStartPage`.
+
+**Output Directory:** \( *Optional* \) The folder where you want your app to be created.
 
 ## More information
 

@@ -61,23 +61,21 @@ Once the creation script completes, you'll have a fully functioning basic applic
 
 **App Type:** The type of application you wish to develop:
 
-- **native** — A fully native iOS application
+- **native** — A fully native iOS application built on Objective C
+- **native\_swift** — A fully native iOS application built on Swift
+- **react\_native** — An application built on ReactNative
 - **hybrid\_remote** — A hybrid application, based on the [Cordova](http://cordova.apache.org/) framework, that runs in a native container.  The app contents live in the cloud as a [Visualforce](http://wiki.developerforce.com/page/An_Introduction_to_Visualforce) application
 - **hybrid\_local** — A hybrid application, based on the Cordova framework, that runs in a native container.  The app contents are developed locally in the Xcode project, and are deployed to the device itself when the app is built
 
 **App Name:** The name of your application
 
-**Company ID:** An identifier for your company, similar to a Java package (e.g. `com.acme.MobileApps`).  This concatenates with the app name to form the unique identifier for your app in the App Store.
+**App Package Identifier:** An identifier for your company, similar to a Java package (e.g. `com.acme.MobileApps`).  This concatenates with the app name to form the unique identifier for your app in the App Store.
 
 **Organization:** The name of your company or organization.  For example, `Acme Widgets, Inc.`
 
 **Start Page:** \( *Required for hybrid\_remote apps only* \) The starting page of your application on salesforce.com.  This is the entry point of your remote application, though it's only the path, not the server portion of the URL.  For instance, `/apex/MyVisualforceStartPage`.
 
-**Output Directory:** \( *optional* \) The directory where you want your app to be created.  If not specified, it will be created in your current working directory.
-
-**App ID:** \( *optional* \) The Connected App Consumer Key that identifies your app in the cloud.  This argument defaults to a sample key to allow you to test your app.  However, **you _must_ specify your own Consumer Key before you submit your app to the App Store**.
-
-**Callback URI:** \( *optional* \) The Callback URL associated with your Connected App.  As with the App ID, this argument defaults to a value for a sample app.  **You _must_ specify your own Callback URL before you submit your app to the App Store**.
+**Output Directory:** \( *Optional* \) The folder where you want your app to be created.
 
 ## More information
 
