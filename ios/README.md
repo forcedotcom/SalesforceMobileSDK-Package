@@ -26,21 +26,32 @@ For the rest of this document, we'll assume that `forceios` is on your path.
 
 Typing `forceios` with no arguments gives you a breakdown of the usage:
 
-        $ forceios
+        forceios
         Usage:
         forceios create
-            --apptype=<Application Type> (native, hybrid_remote, hybrid_local)
+            --apptype=<Application Type> (native, native_swift, react_native, hybrid_local, hybrid_remote)
             --appname=<Application Name>
-            --companyid=<Company Identifier> (com.myCompany.myApp)
-            --organization=<Organization Name> (Your company's/organization's name)
+            --packagename=<App Package Identifier> (com.mycompany.myapp)
+            --organization=<Organization Name> (Your company\'s/organization\'s name)
             --startpage=<App Start Page> (The start page of your remote app. Only required for hybrid_remote)
-            [--outputdir=<Output directory> (Defaults to the current working directory)]
-            [--appid=<Salesforce App Identifier> (The Consumer Key for your app. Defaults to the sample app.)]
-            [--callbackuri=<Salesforce App Callback URL (The Callback URL for your app. Defaults to the sample app.)]
+            [--outputdir=<Output directory> (Leave empty for current directory)]
 
-        OR 
+        OR
+
+        forceios createWithTemplate
+            --templaterepouri=<Template repo URI> (e.g. https://github.com/forcedotcom/SmartSyncExplorerReactNative)
+            --appname=<Application Name>
+            --packagename=<App Package Identifier> (com.mycompany.myapp)
+            --organization=<Organization Name> (Your company\'s/organization\'s name)
+            [--outputdir=<Output directory> (Leave empty for current directory)]
+
+        OR
 
         forceios version
+
+        OR
+
+        forceios
 
 **Note:** You can specify any or all of the arguments as command line options as specified in the usage.  If you run `forceios create` with missing arguments, it prompts you for each missing option interactively.
 
