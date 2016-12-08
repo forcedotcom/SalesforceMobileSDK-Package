@@ -3,14 +3,15 @@ system("npm install -g cordova@6.4.0")
 system("cordova telemetry off")
 
 $os = "ios,android"
-$jenkins = ENV["JENKINS_URL"]
-unless $jenkins.nil?
-	if $jenkins.include?"Android-Package"
+$jobUrl = ENV["JOB_URL"]
+unless $jobUrl.nil?
+	if $jobUrl.include?"Android-Package"
 		$os = "android"
-  elsif $jenkins.include?"iOS-Package"
+  elsif $jobUrl.include?"iOS-Package"
 		$os = "ios"
 	end
 end
+puts "OS is set to #$os"
 
 lane :all do
 	system("set -o pipefail && node ../test/test_force.js --os=#$os --apptype=native,native_swift,react_native,hybrid_remote,hybrid_local")
