@@ -1,4 +1,4 @@
-system("npm install shelljs@0.7.0")
+system("cd .. && npm install shelljs@0.7.0")
 system("npm install -g cordova@6.4.0")
 system("cordova telemetry off")
 
@@ -14,7 +14,7 @@ end
 
 lane :all do
 	system("set -o pipefail && node ../test/test_force.js --os=#$os --apptype=native,native_swift,react_native,hybrid_remote,hybrid_local")
-	system("set -o pipefail && node test_force.js --os=#$os --templaterepouri=https://github.com/forcedotcom/SmartSyncExplorerReactNative#master")
+	system("set -o pipefail && node ../test_force.js --os=#$os --templaterepouri=https://github.com/forcedotcom/SmartSyncExplorerReactNative#master")
 end
 
 lane :native do
