@@ -1,6 +1,6 @@
 system("npm install shelljs@0.7.0")
-system("npm install -g cordova")
-system("cordova telemetry on")
+system("npm install -g cordova@6.4.0")
+system("cordova telemetry off")
 
 $os = "ios,android"
 $jenkins = ENV["JENKINS_URL"]
