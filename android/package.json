@@ -1,0 +1,24 @@
+{
+	"name": "forcedroid",
+	"version": "5.0.0",
+	"description": "Utilities for creating mobile apps based on the Salesforce Mobile SDK for Android",
+	"keywords": [ "mobilesdk", "android", "salesforce", "mobile", "sdk" ],
+	"homepage": "https://github.com/forcedotcom/SalesforceMobileSDK-Android",
+	"bugs": "https://github.com/forcedotcom/SalesforceMobileSDK-Android/issues",
+	"licenses" : [
+	    { "type": "Salesforce.com Mobile SDK License", "url": "https://github.com/forcedotcom/SalesforceMobileSDK-Android/blob/master/LICENSE.md" }
+	],
+	"bin" : { "forcedroid" : "forcedroid.js" },
+    "dependencies": {
+        "shelljs": "~0.7.0"
+    },
+	"repository": {
+		"type" : "git",
+		"url" : "https://github.com/forcedotcom/SalesforceMobileSDK-Package.git"
+	},
+	"author": { "name": "Kevin Hawkins", "email": "khawkins@salesforce.com" },
+	"contributors": [
+        { "name": "Wolfgang Mathurin", "email": "wmathurin@salesforce.com" },
+        { "name": "Bharath Hariharan", "email": "bhariharan@salesforce.com" }
+    ]
+}
