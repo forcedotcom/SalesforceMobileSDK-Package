@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 // Defaults
-var defaultSdkBranch = 'unstable';
+var defaultSdkBranch = 'dev';
 
 // Dependencies
 var execSync = require('child_process').execSync,
@@ -121,7 +121,7 @@ function usage(exitCode) {
     utils.logInfo('    --os=os1,os2,etc', COLOR.magenta);
     utils.logInfo('    --apptype=appType1,appType2,etc OR --templaterepouri=TEMPLATE_REPO_URI', COLOR.magenta);
     utils.logInfo('    [--pluginrepouri=PLUGIN_REPO_URI (Defaults to uri in shared/constants.js)]', COLOR.magenta);
-    utils.logInfo('    [--sdkbranch=SDK_BRANCH (Defaults to unstable)]', COLOR.magenta);
+    utils.logInfo('    [--sdkbranch=SDK_BRANCH (Defaults to dev)]', COLOR.magenta);
     utils.logInfo('', COLOR.cyan);
     utils.logInfo('  Where:', COLOR.cyan);
     utils.logInfo('  - osX is : ios or android', COLOR.cyan);
