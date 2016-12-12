@@ -36,7 +36,7 @@ module.exports = {
     },
     
     cordova: {
-        pluginRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-CordovaPlugin#unstable',    // unstable
+        pluginRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-CordovaPlugin#dev',    // dev
 //        pluginRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-CordovaPlugin#v' + VERSION, // GA
         minimumCliVersion: '6.4.0',
         platformVersion: {
@@ -51,7 +51,7 @@ module.exports = {
     },
 
     templates: {
-        repoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-Templates#unstable',    // unstable
+        repoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-Templates#dev',    // dev
 //        repoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-Templates#v' + VERSION, // GA
         appTypesToPath: {
             ios: {
