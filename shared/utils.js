@@ -83,7 +83,7 @@ function getVersionNumberFromString(versionString) {
 
 /**
  * Checks the the version of a tool by running the given command
- * 
+ *
  * @param {String} cmd Command to run to get the tool version
  * @param {String} minVersionRequired Minimum version required
  *
@@ -110,7 +110,7 @@ function checkToolVersion(cmd, minVersionRequired) {
 }
 
 
-/** 
+/**
  * Replaces text in a file
  *
  * @param {String} fileName The file in which the text needs to be replaced.
@@ -124,7 +124,7 @@ function replaceTextInFile(fileName, textInFile, replacementText) {
         return line.replace(textInFile, replacementText);
     }).join('\n');
 
-    fs.writeFileSync(fileName, result, 'utf8'); 
+    fs.writeFileSync(fileName, result, 'utf8');
 }
 
 
@@ -136,7 +136,7 @@ function replaceTextInFile(fileName, textInFile, replacementText) {
  * @param {Boolean} returnOutput. If true, returns output as string. If false, pipes output through.
  */
 function runProcessThrowError(cmd, dir, returnOutput) {
-    logDebug('Running: ' + cmd); 
+    logDebug('Running: ' + cmd);
     if (dir) shelljs.pushd(dir);
     try {
         if (returnOutput) {
@@ -150,7 +150,7 @@ function runProcessThrowError(cmd, dir, returnOutput) {
             else if (LOG_LEVEL >= LOG_LEVELS.ERROR) {
                 stdio = [0,2]
             }
-            
+
             execSync(cmd, {stdio: stdio});
         }
     }
@@ -215,7 +215,7 @@ function mkTmpDir() {
 
 /**
  * Replace string in files.
- * 
+ *
  * @param {String or RegExp} from String to match.
  * @param {String} to Replacement string.
  * @param {Array} files List of files to do the replacements in.
@@ -230,7 +230,7 @@ function replaceInFiles(from, to, files) {
 
 /**
  * Move file or directory.
- * 
+ *
  * @param {String} from Path of file or directory to move.
  * @param {String} to New path for file or directory.
  */
@@ -245,7 +245,7 @@ function moveFile(from, to) {
 
 /**
  * Copy recursively.
- * 
+ *
  * @param {String} from Path of file or directory to move.
  * @param {String} to New path for file or directory.
  */
@@ -257,7 +257,7 @@ function copyFile(from, to) {
 
 /**
  * Remove file or directory.
- * 
+ *
  * @param {String} path Path of file or directory to remove.
  */
 function removeFile(path) {
@@ -283,7 +283,7 @@ function cloneRepo(tmpDir, repoUrlWithBranch) {
     var repoDir = path.join(tmpDir, repoName);
 
     shelljs.mkdir('-p', repoDir);
-    runProcessThrowError('git clone --branch ' + branch + ' --single-branch --depth 1 --recurse-submodules ' + repoUrl + ' ' + repoDir);
+    runProcessThrowError('git clone --branch ' + branch + ' --single-branch --depth 1 --recurse-submodules ' + repoUrl + ' ' + '"' + repoDir + '"');
     return repoDir;
 }
 
@@ -341,7 +341,7 @@ function logDebug(msg, color) {
 
 /**
  * Log in color.
- * 
+ *
  * @param {integer} logLevel Max LOG_LEVEL for which the message should be logged
  * @param {String} msg Message to log.
  * @param {String} color Color to use.
