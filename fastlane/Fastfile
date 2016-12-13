@@ -13,7 +13,7 @@ unless $jobUrl.nil?
 end
 puts "OS is set to #$os"
 
-$branch = ENV["sha1"]
+$branch = ENV["branch"]
 if $branch.nil?
 	$branch = "dev"
 end
