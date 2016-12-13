@@ -33,7 +33,7 @@ var FORCE_CLI = {
     android: 'forcedroid'
 };
 
-var defaultRemoteUrl = '/apex/testPage'
+var defaultStartPage = '/apex/testPage';
 
 // Calling main
 main(process.argv);
@@ -191,7 +191,7 @@ function createCompileApp(tmpDir, os, appType, templateRepoUri, pluginRepoUri) {
         + ' --organization=MyCompany'
         + ' --outputdir=' + outputDir
         + ' --verbose'
-        + (isHybridRemote ? ' --startpage=' + defaultRemoteUrl : '')
+        + (isHybridRemote ? ' --startpage=' + defaultStartPage : '')
         + (isNative ? '' : ' --pluginrepouri=' + pluginRepoUri);
 
     // Generation
@@ -224,7 +224,7 @@ function createCompileApp(tmpDir, os, appType, templateRepoUri, pluginRepoUri) {
     }
     else {
         if (isHybridRemote) {
-            utils.runProcessCatchError("grep '\"startPage\": \"" + defaultRemoteUrl + "\"' "  + appDir + '/www/bootconfig.json',  "bootconfig.json should be updated to reflect user input remote url.");
+            utils.runProcessCatchError("grep '\"startPage\": \"" + defaultStartPage + "\"' "  + appDir + '/www/bootconfig.json',  "bootconfig.json should be updated to reflect user input remote url.");
         }
         if (os == OS.ios) {
             // IOS - Hybrid
