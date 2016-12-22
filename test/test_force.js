@@ -33,13 +33,14 @@ var FORCE_CLI = {
     android: 'forcedroid'
 };
 
+var defaultStartPage = '/apex/testPage';
 
 // Calling main
 main(process.argv);
 
-// 
+//
 // Main function
-// 
+//
 function main(args) {
     var commandLineArgs = process.argv.slice(2, args.length);
     var parsedArgs = commandLineUtils.parseArgs(commandLineArgs);
@@ -53,7 +54,7 @@ function main(args) {
     var sdkBranch = parsedArgs.sdkbranch || defaultSdkBranch;
     var chosenAppTypes = cleanSplit(parsedArgs.apptype, ',');
 
-    
+
     var testingWithAppType = chosenAppTypes.length > 0;
     var testingWithTemplate = templateRepoUri != '';
     var testingIOS = chosenOperatingSystems.indexOf(OS.ios) >= 0;
@@ -94,7 +95,7 @@ function main(args) {
             pluginRepoUri = pluginRepoDir;
         }
     }
-    
+
     // Test all the platforms / app types requested
     for (var i=0; i<chosenOperatingSystems.length; i++) {
         var os = chosenOperatingSystems[i];
@@ -161,7 +162,7 @@ function updatePluginRepo(tmpDir, os, pluginRepoDir, sdkBranch) {
 }
 
 //
-// Create and compile app 
+// Create and compile app
 //
 function createCompileApp(tmpDir, os, appType, templateRepoUri, pluginRepoUri) {
     var forceArgs = '';
@@ -190,7 +191,7 @@ function createCompileApp(tmpDir, os, appType, templateRepoUri, pluginRepoUri) {
         + ' --organization=MyCompany'
         + ' --outputdir=' + outputDir
         + ' --verbose'
-        + (isHybridRemote ? ' --startpage=/apex/testPage' : '')
+        + (isHybridRemote ? ' --startpage=' + defaultStartPage : '')
         + (isNative ? '' : ' --pluginrepouri=' + pluginRepoUri);
 
     // Generation
@@ -209,10 +210,10 @@ function createCompileApp(tmpDir, os, appType, templateRepoUri, pluginRepoUri) {
         if (os == OS.ios) {
             // IOS - Native
             var workspacePath = path.join(appDir, appName + '.xcworkspace');
-            utils.runProcessCatchError('xcodebuild -workspace ' + workspacePath 
+            utils.runProcessCatchError('xcodebuild -workspace ' + workspacePath
                                        + ' -scheme ' + appName
-                                       + ' clean build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO', 
-                                       'COMPILING ' + target); 
+                                       + ' clean build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO',
+                                       'COMPILING ' + target);
         }
         else {
             // Android - Native
@@ -222,9 +223,12 @@ function createCompileApp(tmpDir, os, appType, templateRepoUri, pluginRepoUri) {
         }
     }
     else {
+        if (isHybridRemote) {
+            utils.runProcessCatchError("grep '\"startPage\": \"" + defaultStartPage + "\"' "  + appDir + '/www/bootconfig.json',  "bootconfig.json should be updated to reflect user input remote url.");
+        }
         if (os == OS.ios) {
             // IOS - Hybrid
-            utils.runProcessCatchError('cordova build', 'COMPILING ' + target, appDir);    
+            utils.runProcessCatchError('cordova build', 'COMPILING ' + target, appDir);
         }
         else {
             // Android - Hybrid
@@ -251,7 +255,7 @@ function validateOperatingSystems(chosenOperatingSystems) {
     }
 }
 
-// 
+//
 // Helper to validate app types / template repo uri
 //
 function validateAppTypesTemplateRepoUri(chosenAppTypes, templateRepoUri) {
@@ -259,7 +263,7 @@ function validateAppTypesTemplateRepoUri(chosenAppTypes, templateRepoUri) {
         utils.logError('You need to specify apptype or templaterepouri (but not both)\n');
         usage(1);
     }
-    
+
     for (var i=0; i<chosenAppTypes.length; i++) {
         var appType = chosenAppTypes[i];
         if (!APP_TYPE.hasOwnProperty(appType)) {
@@ -270,7 +274,7 @@ function validateAppTypesTemplateRepoUri(chosenAppTypes, templateRepoUri) {
 }
 
 
-// 
+//
 // Like split, but splitting null returns [] instead of throwing an error
 //                 splitting '' returns [] instead of ['']
 //
@@ -312,10 +316,10 @@ function getAppTypeFromTemplate(templateRepoUri) {
 
     // Getting template
     var appType = require(path.join(repoDir, 'template.js')).appType;
-    
+
     // Cleanup
     utils.removeFile(tmpDir);
 
     // Done
     return appType;
-}    
+}
