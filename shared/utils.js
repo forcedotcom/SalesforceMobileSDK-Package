@@ -42,7 +42,7 @@ var LOG_LEVELS = {
     ALL: Number.MAX_SAFE_INTEGER
 };
 
-var LOG_LEVEL = LOG_LEVELS.ALL;
+var LOG_LEVEL = LOG_LEVELS.INFO;
 
 /**
  * Set log level

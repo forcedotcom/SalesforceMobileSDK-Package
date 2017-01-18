@@ -146,6 +146,33 @@ function printNextSteps(devToolName, projectPath, result) {
 };    
 
 //
+// Check tools
+//
+function checkTools(platform, appType) {
+    try {
+        utils.log("Checking tools");
+        var isNative = appType.indexOf('native') >= 0;
+
+        // Check npm version
+        utils.checkToolVersion('npm -v', SDK.tools.npmMinVersion);
+
+        // Check pod version
+        if (platform === 'ios') {
+            utils.checkToolVersion('pod --version', SDK.tools.podMinVersion);
+        }
+
+        // Check cordova cli
+        if (!isNative) {
+            utils.checkToolVersion('cordova -v', SDK.cordova.minimumCliVersion);
+        }
+    }
+    catch (error) {
+        utils.logError('Missing tools\n', error);
+        process.exit(1);
+    }
+}
+
+//
 // Helper for 'create' command
 //
 function createApp(config, platform, devToolName) {
@@ -186,20 +213,9 @@ function createApp(config, platform, devToolName) {
         config.cordovaPluginRepoUri = config.pluginrepouri || SDK.cordova.pluginRepoUri;
     }
 
-
-    // Check npm version
-    utils.checkToolVersion('npm -v', SDK.tools.npmMinVersion);
-
-    // Check pod version
-    if (config.platform === 'ios') {
-        utils.checkToolVersion('pod --version', SDK.tools.podMinVersion);
-    }
-
-    // Check cordova cli
-    if (!isNative) {
-        utils.checkToolVersion('cordova -v', SDK.cordova.minimumCliVersion);
-    }
-
+    // Check tools
+    checkTools(config.platform, config.apptype);
+    
     // Print details
     printDetails(config);
 
@@ -215,5 +231,6 @@ function createApp(config, platform, devToolName) {
 
 
 module.exports = {
-    createApp
+    createApp,
+    checkTools
 };
