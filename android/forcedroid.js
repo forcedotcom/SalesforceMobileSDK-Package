@@ -34,7 +34,14 @@ var SDK = require('./shared/constants'),
     utils = require('./shared/utils');
 
 // Reading parameters from command line
-configHelper.readConfig(process.argv, 'forcedroid', SDK.version, SDK.appTypes.android, createApp);
+configHelper.readConfig(process.argv, 'forcedroid', SDK.version, SDK.appTypes.android, toolsChecker, createApp);
+
+//
+// Tools checker
+//
+function toolsChecker(appType) {
+    createHelper.checkTools('android', appType);
+}
 
 //
 // Helper for 'create' command
@@ -46,10 +53,9 @@ function createApp(config) {
 
         // Creating application
         createHelper.createApp(config, 'android', 'Android Studio');
-
     }
     catch (error) {
-        utils.logError('forcedroid create failed\n', error);
+        utils.logError('forcedroid failed\n', error);
         process.exit(1);
     }
 }
