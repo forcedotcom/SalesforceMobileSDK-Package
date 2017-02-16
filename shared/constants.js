@@ -25,7 +25,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-var VERSION = '5.0.0';
+var VERSION = '5.0.1';
 
 module.exports = {
     version: VERSION,
