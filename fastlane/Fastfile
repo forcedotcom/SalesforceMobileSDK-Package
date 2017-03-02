@@ -21,7 +21,7 @@ puts "Branch is set to #$branch"
 
 lane :all do
 	system("node ../test/test_force.js --#$branch --os=#$os --apptype=native,native_swift,react_native,hybrid_remote,hybrid_local")
-	system("node ../test_force.js --os=#$os --templaterepouri=https://github.com/forcedotcom/SmartSyncExplorerReactNative#master")
+	system("node ../test_force.js --os=#$os --templaterepouri=https://github.com/forcedotcom/SmartSyncExplorerReactNative#$branch")
 end
 
 lane :native do
@@ -34,7 +34,7 @@ end
 
 lane :react_native do
 	system("node ../test/test_force.js --#$branch --os=#$os --apptype=react_native")
-	system("node ../test/test_force.js --#$branch --os=#$os --templaterepouri=https://github.com/forcedotcom/SmartSyncExplorerReactNative#master")
+	system("node ../test/test_force.js --#$branch --os=#$os --templaterepouri=https://github.com/forcedotcom/SmartSyncExplorerReactNative#$branch")
 end
 
 lane :hybrid do
