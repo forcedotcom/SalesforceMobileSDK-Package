@@ -153,6 +153,9 @@ function checkTools(platform, appType) {
         utils.log("Checking tools");
         var isNative = appType.indexOf('native') >= 0;
 
+        // Check git version
+        utils.checkToolVersion('git --version', SDK.tools.gitMinVersion);
+
         // Check npm version
         utils.checkToolVersion('npm -v', SDK.tools.npmMinVersion);
 
