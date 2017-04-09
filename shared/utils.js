@@ -94,7 +94,7 @@ function checkToolVersion(cmd, minVersionRequired) {
     var toolVersion;
     try {
 	    var result = runProcessThrowError(cmd, null, true /* return output */);
-        toolVersion = result.replace(/\r?\n|\r/, '');
+        toolVersion = result.replace(/\r?\n|\r/, '').replace(/[^0-9\.]*/, '');
     }
     catch (error) {
         throw new Error(toolName + ' is required but could not be found. Please install ' + toolName + '.');
