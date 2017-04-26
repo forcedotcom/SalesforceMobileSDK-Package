@@ -25,7 +25,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-var VERSION = '5.1.0';
+var VERSION = '5.2.0';
 
 module.exports = {
     version: VERSION,
@@ -38,7 +38,7 @@ module.exports = {
     
     cordova: {
         pluginRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-CordovaPlugin#dev',    // dev
-//        pluginRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-CordovaPlugin#v' + VERSION, // GA
+        //pluginRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-CordovaPlugin#v' + VERSION, // GA
         minimumCliVersion: '6.4.0',
         platformVersion: {
             ios: '4.3.0',
@@ -53,7 +53,7 @@ module.exports = {
 
     templates: {
         repoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-Templates#dev',    // dev
-//        repoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-Templates#v' + VERSION, // GA
+        //repoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-Templates#v' + VERSION, // GA
         appTypesToPath: {
             ios: {
                 'native': 'iOSNativeTemplate',
