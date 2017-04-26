@@ -32,7 +32,7 @@ var path = require('path'),
     commandLineUtils = require('./commandLineUtils'),
     logInfo = require('./utils').logInfo;
 
-function readConfig(args, toolName, toolVersion, appTypes, handler) {
+function readConfig(args, toolName, toolVersion, appTypes, toolsChecker, handler) {
     var commandLineArgs = args.slice(2, args.length);
     var command = commandLineArgs.shift();
 
@@ -44,7 +44,7 @@ function readConfig(args, toolName, toolVersion, appTypes, handler) {
         process.exit(0);
         break;
     case 'create': 
-        processorList = createArgsProcessorList(appTypes); 
+        processorList = createArgsProcessorList(appTypes, false, toolsChecker); 
         break;
     case 'createWithTemplate': 
         processorList = createArgsProcessorList(appTypes, true); 
@@ -82,7 +82,7 @@ function usage(toolName, toolVersion, appTypes) {
 //
 // Processor list for 'create' command
 //
-function createArgsProcessorList(appTypes, isCreateWithTemplate) {
+function createArgsProcessorList(appTypes, isCreateWithTemplate, toolsChecker) {
     var argProcessorList = new commandLineUtils.ArgProcessorList();
 
     if (isCreateWithTemplate) {
@@ -94,7 +94,9 @@ function createArgsProcessorList(appTypes, isCreateWithTemplate) {
         // App type
         addProcessorFor(argProcessorList, 'apptype', 'Enter your application type (' + appTypes.join(', ') + '):',
                         'App type must be ' + appTypes.join(', ') + '.', 
-                        function(val) { return appTypes.indexOf(val) >= 0; });
+                        function(val) { return appTypes.indexOf(val) >= 0; },
+                        undefined,
+                        toolsChecker);
     }
 
     // App name
