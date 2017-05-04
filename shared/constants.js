@@ -39,9 +39,9 @@ module.exports = {
     cordova: {
         pluginRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-CordovaPlugin#dev',    // dev
         //pluginRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-CordovaPlugin#v' + VERSION, // GA
-        minimumCliVersion: '6.4.0',
+        minimumCliVersion: '7.0.0',
         platformVersion: {
-            ios: '4.3.0',
+            ios: '4.4.0',
             android: '6.1.2'
         }
     },
