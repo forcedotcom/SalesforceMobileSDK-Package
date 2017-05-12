@@ -42,7 +42,7 @@ module.exports = {
         minimumCliVersion: '7.0.0',
         platformVersion: {
             ios: '4.4.0',
-            android: '6.1.2'
+            android: '6.2.3'
         }
     },
 
