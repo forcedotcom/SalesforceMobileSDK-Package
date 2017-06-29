@@ -33,7 +33,7 @@ module.exports = {
     tools: {
         gitMinVersion: '2.10',
         npmMinVersion: '3.10',
-        podMinVersion: '1.1'
+        podMinVersion: '1.2'
     },
     
     cordova: {
