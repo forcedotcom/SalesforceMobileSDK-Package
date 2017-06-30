@@ -31,7 +31,7 @@ module.exports = {
     version: VERSION,
 
     tools: {
-        gitMinVersion: '2.10',
+        gitMinVersion: '2.13',
         npmMinVersion: '3.10',
         podMinVersion: '1.2'
     },
