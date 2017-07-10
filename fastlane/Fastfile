@@ -1,5 +1,5 @@
 system("cd .. && npm install shelljs@0.7.0")
-system("npm install -g cordova@6.4.0")
+system("npm install -g cordova@7.0.0")
 system("cordova telemetry off")
 
 $os = "ios,android"

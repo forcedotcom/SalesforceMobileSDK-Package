@@ -25,24 +25,24 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-var VERSION = '5.1.0';
+var VERSION = '5.2.0';
 
 module.exports = {
     version: VERSION,
 
     tools: {
-        gitMinVersion: '2.10',
+        gitMinVersion: '2.13',
         npmMinVersion: '3.10',
-        podMinVersion: '1.1'
+        podMinVersion: '1.2'
     },
     
     cordova: {
         //pluginRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-CordovaPlugin#dev',    // dev
         pluginRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-CordovaPlugin#v' + VERSION, // GA
-        minimumCliVersion: '6.4.0',
+        minimumCliVersion: '7.0.0',
         platformVersion: {
-            ios: '4.3.0',
-            android: '6.1.2'
+            ios: '4.4.0',
+            android: '6.2.3'
         }
     },
 
