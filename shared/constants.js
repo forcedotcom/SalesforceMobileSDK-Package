@@ -48,7 +48,7 @@ module.exports = {
 
     appTypes: {
         ios: ['native', 'native_swift', 'react_native', 'hybrid_local', 'hybrid_remote'],
-        android: ['native', 'react_native', 'hybrid_local', 'hybrid_remote']
+        android: ['native', 'native_kotlin', 'react_native', 'hybrid_local', 'hybrid_remote']
     },
 
     templates: {
@@ -64,6 +64,7 @@ module.exports = {
             },
             android: {
                 'native': 'AndroidNativeTemplate',
+                'native_kotlin': 'AndroidNativeKotlinTemplate',
                 'react_native': 'ReactNativeTemplate',
                 'hybrid_local': 'HybridLocalTemplate',
                 'hybrid_remote': 'HybridRemoteTemplate'
