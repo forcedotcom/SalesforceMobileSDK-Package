@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 /*
  * Copyright (c) 2016-present, salesforce.com, inc.
  * All rights reserved.
@@ -25,51 +27,37 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-var VERSION = '6.0.0';
+// Dependencies
+var SDK = require('./shared/constants'),
+    configHelper = require('./shared/configHelper'),
+    createHelper = require('./shared/createHelper'),
+    utils = require('./shared/utils');
 
-module.exports = {
-    version: VERSION,
+// Reading parameters from command line
+configHelper.readConfig(process.argv, 'forcehybrid', SDK.version, SDK.appTypes.hybrid, toolsChecker, createApp);
 
-    tools: {
-        gitMinVersion: '2.13',
-        npmMinVersion: '3.10',
-        podMinVersion: '1.2'
-    },
-    
-    cordova: {
-        pluginRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-CordovaPlugin#dev',    // dev
-        //pluginRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-CordovaPlugin#v' + VERSION, // GA
-        minimumCliVersion: '7.0.0',
-        platformVersion: {
-            ios: '4.4.0',
-            android: '6.2.3'
-        }
-    },
+//
+// Tools checker
+//
+function toolsChecker(appType) {
+    createHelper.checkTools('ios', appType);
+}
 
-    appTypes: {
-        ios: ['native', 'native_swift', 'react_native'],
-        android: ['native', 'native_kotlin', 'react_native'],
-        hybrid: ['hybrid_local', 'hybrid_remote']
-    },
+//
+// Helper for 'create' command
+//
+function createApp(config) {
+    try {
+        // Adding platform
+        config.platform = 'ios';
 
-    templates: {
-        repoUri: 'https://github.com/wmathurin/SalesforceMobileSDK-Templates#dev',    // dev
-        //repoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-Templates#v' + VERSION, // GA
-        appTypesToPath: {
-            ios: {
-                'native': 'iOSNativeTemplate',
-                'native_swift': 'iOSNativeSwiftTemplate',
-                'react_native': 'ReactNativeTemplate'
-            },
-            android: {
-                'native': 'AndroidNativeTemplate',
-                'native_kotlin': 'AndroidNativeKotlinTemplate',
-                'react_native': 'ReactNativeTemplate'
-            },
-            hybrid: {
-                'hybrid_local': 'HybridLocalTemplate',
-                'hybrid_remote': 'HybridRemoteTemplate'
-            }
-        }
+        // Creating application
+        createHelper.createApp(config, 'ios', 'XCode');
     }
-};
+    catch (error) {
+        utils.logError('forceios failed\n', error);
+        process.exit(1);
+    }
+}
+
+
