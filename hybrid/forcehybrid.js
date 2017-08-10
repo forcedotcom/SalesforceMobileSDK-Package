@@ -34,13 +34,15 @@ var SDK = require('./shared/constants'),
     utils = require('./shared/utils');
 
 // Reading parameters from command line
-configHelper.readConfig(process.argv, 'forcehybrid', SDK.version, SDK.appTypes.hybrid, toolsChecker, createApp);
+configHelper.readConfig(process.argv, 'forcehybrid', SDK.version, SDK.appTypes.hybrid, Object.keys(SDK.platforms), toolsChecker, createApp);
 
 //
 // Tools checker
 //
-function toolsChecker(appType) {
-    createHelper.checkTools('ios', appType);
+function toolsChecker(platforms) {
+    var tools = [SDK.tools.git, SDK.tools.npm, SDK.tools.cordova];
+    if (platforms.split(',').indexOf('ios') >= 0) { tools.push(SDK.tools.pod); }
+    createHelper.checkTools(tools);
 }
 
 //

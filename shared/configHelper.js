@@ -32,7 +32,7 @@ var path = require('path'),
     commandLineUtils = require('./commandLineUtils'),
     logInfo = require('./utils').logInfo;
 
-function readConfig(args, toolName, toolVersion, appTypes, toolsChecker, handler) {
+function readConfig(args, toolName, toolVersion, appTypes, platforms,toolsChecker, handler) {
     var commandLineArgs = args.slice(2, args.length);
     var command = commandLineArgs.shift();
 
@@ -44,23 +44,26 @@ function readConfig(args, toolName, toolVersion, appTypes, toolsChecker, handler
         process.exit(0);
         break;
     case 'create': 
-        processorList = createArgsProcessorList(appTypes, false, toolsChecker); 
+        processorList = createArgsProcessorList(appTypes, platforms, false, toolsChecker); 
         break;
     case 'createWithTemplate': 
-        processorList = createArgsProcessorList(appTypes, true); 
+        processorList = createArgsProcessorList(appTypes, platforms, true); 
         break;
     default:
-        usage(toolName, toolVersion, appTypes);
+        usage(toolName, toolVersion, appTypes, platforms);
         process.exit(1);
     };
 
     commandLineUtils.processArgsInteractive(commandLineArgs, processorList, handler);
 }
 
-function usage(toolName, toolVersion, appTypes) {
+function usage(toolName, toolVersion, appTypes, platforms) {
     logInfo('Usage:\n', COLOR.cyan);
     logInfo(toolName + ' create', COLOR.magenta);
     logInfo('    --apptype=<Application Type> (' + appTypes.join(', ') + ')', COLOR.magenta);
+    if (platforms.length > 1) {
+        logInfo('    --os=<platform(s)> (' + platforms.join(', ') + ' separated with commas)', COLOR.magenta);
+    }
     logInfo('    --appname=<Application Name>', COLOR.magenta);
     logInfo('    --packagename=<App Package Identifier> (e.g. com.mycompany.myapp)', COLOR.magenta);
     logInfo('    --organization=<Organization Name> (Your company\'s/organization\'s name)', COLOR.magenta);
@@ -68,6 +71,9 @@ function usage(toolName, toolVersion, appTypes) {
     logInfo('    [--outputdir=<Output directory> (Leave empty for current directory)]', COLOR.magenta);
     logInfo('\n OR \n', COLOR.cyan);
     logInfo(toolName + ' createWithTemplate', COLOR.magenta);
+    if (platforms.length > 1) {
+        logInfo('    --os=<Comma separated plaforms> (' + platforms.join(', ') + ')', COLOR.magenta);
+    }
     logInfo('    --templaterepouri=<Template repo URI> (e.g. https://github.com/forcedotcom/SmartSyncExplorerReactNative)]', COLOR.magenta);
     logInfo('    --appname=<Application Name>', COLOR.magenta);
     logInfo('    --packagename=<App Package Identifier> (e.g. com.mycompany.myapp)', COLOR.magenta);
@@ -82,8 +88,20 @@ function usage(toolName, toolVersion, appTypes) {
 //
 // Processor list for 'create' command
 //
-function createArgsProcessorList(appTypes, isCreateWithTemplate, toolsChecker) {
+function createArgsProcessorList(appTypes, platforms, isCreateWithTemplate, toolsChecker) {
     var argProcessorList = new commandLineUtils.ArgProcessorList();
+
+    if (platforms.length > 1) {
+        // Platform
+        addProcessorFor(argProcessorList, 'platform', 'Enter the target platform(s) separated by commas (' + platforms.join(', ') + '):',
+                        'Platform(s) must be in ' + platforms.join(', ') + '.', 
+                        function(val) { return val.split(",").filter(p=>platforms.indexOf(p) == -1).length == 0; },
+                        undefined,
+                        toolsChecker);
+    }
+    else {
+        toolsChecker();
+    }
 
     if (isCreateWithTemplate) {
         // Template Repo URI
@@ -94,9 +112,7 @@ function createArgsProcessorList(appTypes, isCreateWithTemplate, toolsChecker) {
         // App type
         addProcessorFor(argProcessorList, 'apptype', 'Enter your application type (' + appTypes.join(', ') + '):',
                         'App type must be ' + appTypes.join(', ') + '.', 
-                        function(val) { return appTypes.indexOf(val) >= 0; },
-                        undefined,
-                        toolsChecker);
+                        function(val) { return appTypes.indexOf(val) >= 0; });
     }
 
     // App name

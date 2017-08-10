@@ -30,16 +30,21 @@ var VERSION = '6.0.0';
 module.exports = {
     version: VERSION,
 
+    platforms: {
+        ios: 'ios',
+        android: 'android'
+    },
+
     tools: {
-        gitMinVersion: '2.13',
-        npmMinVersion: '3.10',
-        podMinVersion: '1.2'
+        git: {checkCmd: 'git --version', minVersion: '2.13'},
+        npm: {checkCmd: 'npm -v', minVersion: '3.10'},
+        pod: {checkCmd: 'pod --version', minVersion: '1.2'},
+        cordova: {checkCmd: 'cordova -v', minVersion: '7.0.0'}
     },
     
     cordova: {
         pluginRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-CordovaPlugin#dev',    // dev
         //pluginRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-CordovaPlugin#v' + VERSION, // GA
-        minimumCliVersion: '7.0.0',
         platformVersion: {
             ios: '4.4.0',
             android: '6.2.3'

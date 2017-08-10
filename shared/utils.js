@@ -90,6 +90,7 @@ function getVersionNumberFromString(versionString) {
  * @throws {Error} if tool not found or version too low
  */
 function checkToolVersion(cmd, minVersionRequired) {
+    console.log("Checking with " + cmd);
     var toolName = cmd.split(' ')[0];
     var toolVersion;
     try {

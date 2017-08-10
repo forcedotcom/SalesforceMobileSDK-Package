@@ -148,25 +148,11 @@ function printNextSteps(devToolName, projectPath, result) {
 //
 // Check tools
 //
-function checkTools(platform, appType) {
+function checkTools(tools) {
     try {
         utils.log("Checking tools");
-        var isNative = appType.indexOf('native') >= 0;
-
-        // Check git version
-        utils.checkToolVersion('git --version', SDK.tools.gitMinVersion);
-
-        // Check npm version
-        utils.checkToolVersion('npm -v', SDK.tools.npmMinVersion);
-
-        // Check pod version
-        if (platform === 'ios') {
-            utils.checkToolVersion('pod --version', SDK.tools.podMinVersion);
-        }
-
-        // Check cordova cli
-        if (!isNative) {
-            utils.checkToolVersion('cordova -v', SDK.cordova.minimumCliVersion);
+        for (var tool of tools) {
+            utils.checkToolVersion(tool.checkCmd, tool.minVersion);
         }
     }
     catch (error) {
