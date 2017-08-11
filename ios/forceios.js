@@ -33,15 +33,11 @@ var SDK = require('./shared/constants'),
     createHelper = require('./shared/createHelper'),
     utils = require('./shared/utils');
 
-// Reading parameters from command line
-configHelper.readConfig(process.argv, 'forceios', SDK.version, SDK.appTypes.ios, [SDK.platforms.ios], toolsChecker, createApp);
+// Check tools
+createHelper.checkTools(SDK.forceclis.forceios.toolNames);
 
-//
-// Tools checker
-//
-function toolsChecker() {
-    createHelper.checkTools([SDK.tools.git, SDK.tools.npm, SDK.tools.pod]);
-}
+// Reading parameters from command line
+configHelper.readConfig(process.argv, SDK.forceclis.forceios, createApp);
 
 //
 // Helper for 'create' command
@@ -49,10 +45,10 @@ function toolsChecker() {
 function createApp(config) {
     try {
         // Adding platform
-        config.platform = SDK.platforms.ios;
+        config.platform = 'ios';
 
         // Creating application
-        createHelper.createApp(config, SDK.platforms.ios, 'XCode');
+        createHelper.createApp(config, 'ios', 'XCode');
     }
     catch (error) {
         utils.logError('forceios failed\n', error);

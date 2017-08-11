@@ -69,7 +69,7 @@ function createHybridApp(config) {
     // Create app with cordova
     utils.runProcessThrowError('cordova create "' + config.projectDir + '" ' + config.packagename + ' ' + config.appname);
     utils.runProcessThrowError('npm install shelljs@0.7.0', config.projectDir);
-    utils.runProcessThrowError('cordova platform add ' + config.platform + '@' + SDK.cordova.platformVersion[config.platform], config.projectDir);
+    utils.runProcessThrowError('cordova platform add ' + config.platform + '@' + SDK.tools.cordova.platformVersion[config.platform], config.projectDir);
     utils.runProcessThrowError('cordova plugin add ' + config.cordovaPluginRepoUri + ' --force', config.projectDir);
 
     // Web directory - the home for the template
@@ -148,11 +148,11 @@ function printNextSteps(devToolName, projectPath, result) {
 //
 // Check tools
 //
-function checkTools(tools) {
+function checkTools(toolNames) {
     try {
         utils.log("Checking tools");
-        for (var tool of tools) {
-            utils.checkToolVersion(tool.checkCmd, tool.minVersion);
+        for (var toolName of toolNames) {
+            utils.checkToolVersion(SDK.tools[toolName].checkCmd, SDK.tools[toolName].minVersion);
         }
     }
     catch (error) {
@@ -199,7 +199,7 @@ function createApp(config, platform, devToolName) {
 
     // Adding hybrid only config
     if (!isNative) {
-        config.cordovaPluginRepoUri = config.pluginrepouri || SDK.cordova.pluginRepoUri;
+        config.cordovaPluginRepoUri = config.pluginrepouri || SDK.tools.cordova.pluginRepoUri;
     }
 
     // Check tools

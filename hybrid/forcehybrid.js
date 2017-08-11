@@ -33,17 +33,12 @@ var SDK = require('./shared/constants'),
     createHelper = require('./shared/createHelper'),
     utils = require('./shared/utils');
 
-// Reading parameters from command line
-configHelper.readConfig(process.argv, 'forcehybrid', SDK.version, SDK.appTypes.hybrid, Object.keys(SDK.platforms), toolsChecker, createApp);
+// Check tools
+createHelper.checkTools(SDK.forceclis.forcehybrid.toolNames);
 
-//
-// Tools checker
-//
-function toolsChecker(platforms) {
-    var tools = [SDK.tools.git, SDK.tools.npm, SDK.tools.cordova];
-    if (platforms.split(',').indexOf('ios') >= 0) { tools.push(SDK.tools.pod); }
-    createHelper.checkTools(tools);
-}
+// Reading parameters from command line
+configHelper.readConfig(process.argv, SDK.forceclis.forcehybrid, createApp);
+
 
 //
 // Helper for 'create' command

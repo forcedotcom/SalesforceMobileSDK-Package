@@ -28,11 +28,12 @@
 // Dependencies
 var path = require('path'),
     shelljs = require('shelljs'),
+    SDK = require('./constants'),
     COLOR = require('./outputColors'),
     commandLineUtils = require('./commandLineUtils'),
     logInfo = require('./utils').logInfo;
 
-function readConfig(args, toolName, toolVersion, appTypes, platforms,toolsChecker, handler) {
+function readConfig(args, forcecli, handler) {
     var commandLineArgs = args.slice(2, args.length);
     var command = commandLineArgs.shift();
 
@@ -40,29 +41,34 @@ function readConfig(args, toolName, toolVersion, appTypes, platforms,toolsChecke
 
     switch (command || '') {
     case 'version':
-        logInfo(toolName + ' version ' + toolVersion);
+        logInfo(forcecli.name + ' version ' + SDK.version);
         process.exit(0);
         break;
     case 'create': 
-        processorList = createArgsProcessorList(appTypes, platforms, false, toolsChecker); 
+        processorList = createArgsProcessorList(forceli, false); 
         break;
     case 'createWithTemplate': 
-        processorList = createArgsProcessorList(appTypes, platforms, true); 
+        processorList = createArgsProcessorList(forcecli, true); 
         break;
     default:
-        usage(toolName, toolVersion, appTypes, platforms);
+        usage(forcecli);
         process.exit(1);
     };
 
     commandLineUtils.processArgsInteractive(commandLineArgs, processorList, handler);
 }
 
-function usage(toolName, toolVersion, appTypes, platforms) {
+function usage(forcecli) {
+    var forcecliName = forcecli.name;
+    var forcecliVersion = SDK.version;
+    var appTypes = forcecli.appTypes;
+    var platforms = forcecli.platforms;
+    
     logInfo('Usage:\n', COLOR.cyan);
-    logInfo(toolName + ' create', COLOR.magenta);
+    logInfo(forcecliName + ' create', COLOR.magenta);
     logInfo('    --apptype=<Application Type> (' + appTypes.join(', ') + ')', COLOR.magenta);
     if (platforms.length > 1) {
-        logInfo('    --os=<platform(s)> (' + platforms.join(', ') + ' separated with commas)', COLOR.magenta);
+        logInfo('    --os=<Comma separated plaforms> (' + platforms.join(', ') + ')', COLOR.magenta);
     }
     logInfo('    --appname=<Application Name>', COLOR.magenta);
     logInfo('    --packagename=<App Package Identifier> (e.g. com.mycompany.myapp)', COLOR.magenta);
@@ -70,7 +76,7 @@ function usage(toolName, toolVersion, appTypes, platforms) {
     logInfo('    --startpage=<App Start Page> (The start page of your remote app. Only required for hybrid_remote)', COLOR.magenta);
     logInfo('    [--outputdir=<Output directory> (Leave empty for current directory)]', COLOR.magenta);
     logInfo('\n OR \n', COLOR.cyan);
-    logInfo(toolName + ' createWithTemplate', COLOR.magenta);
+    logInfo(forcecliName + ' createWithTemplate', COLOR.magenta);
     if (platforms.length > 1) {
         logInfo('    --os=<Comma separated plaforms> (' + platforms.join(', ') + ')', COLOR.magenta);
     }
@@ -80,27 +86,25 @@ function usage(toolName, toolVersion, appTypes, platforms) {
     logInfo('    --organization=<Organization Name> (Your company\'s/organization\'s name)', COLOR.magenta);
     logInfo('    [--outputdir=<Output directory> (Leave empty for current directory)]', COLOR.magenta);
     logInfo('\n OR \n', COLOR.cyan);
-    logInfo(toolName + ' version', COLOR.magenta);
+    logInfo(forcecliName + ' version', COLOR.magenta);
     logInfo('\n OR \n', COLOR.cyan);
-    logInfo(toolName, COLOR.magenta);
+    logInfo(forcecliName, COLOR.magenta);
 }
 
 //
 // Processor list for 'create' command
 //
-function createArgsProcessorList(appTypes, platforms, isCreateWithTemplate, toolsChecker) {
+function createArgsProcessorList(forcecli, isCreateWithTemplate) {
+    var appTypes = forcecli.appTypes;
+    var platforms = forcecli.platforms;
     var argProcessorList = new commandLineUtils.ArgProcessorList();
 
+    
     if (platforms.length > 1) {
         // Platform
         addProcessorFor(argProcessorList, 'platform', 'Enter the target platform(s) separated by commas (' + platforms.join(', ') + '):',
                         'Platform(s) must be in ' + platforms.join(', ') + '.', 
-                        function(val) { return val.split(",").filter(p=>platforms.indexOf(p) == -1).length == 0; },
-                        undefined,
-                        toolsChecker);
-    }
-    else {
-        toolsChecker();
+                        function(val) { return val.split(",").filter(p=>platforms.indexOf(p) == -1).length == 0; });
     }
 
     if (isCreateWithTemplate) {

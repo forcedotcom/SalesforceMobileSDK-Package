@@ -50,7 +50,7 @@ function main(args) {
     var chosenOperatingSystems = cleanSplit(parsedArgs.os, ',').map(function(s) { return s.toLowerCase(); });
     var appTypes = parsedArgs.apptype || '';
     var templateRepoUri = parsedArgs.templaterepouri || '';
-    var pluginRepoUri = parsedArgs.pluginrepouri || SDK.cordova.pluginRepoUri;
+    var pluginRepoUri = parsedArgs.pluginrepouri || SDK.tools.cordova.pluginRepoUri;
     var sdkBranch = parsedArgs.sdkbranch || defaultSdkBranch;
     var chosenAppTypes = cleanSplit(parsedArgs.apptype, ',');
 

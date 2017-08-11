@@ -30,33 +30,52 @@ var VERSION = '6.0.0';
 module.exports = {
     version: VERSION,
 
-    platforms: {
-        ios: 'ios',
-        android: 'android'
-    },
-
-    tools: {
-        git: {checkCmd: 'git --version', minVersion: '2.13'},
-        npm: {checkCmd: 'npm -v', minVersion: '3.10'},
-        pod: {checkCmd: 'pod --version', minVersion: '1.2'},
-        cordova: {checkCmd: 'cordova -v', minVersion: '7.0.0'}
-    },
-    
-    cordova: {
-        pluginRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-CordovaPlugin#dev',    // dev
-        //pluginRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-CordovaPlugin#v' + VERSION, // GA
-        platformVersion: {
-            ios: '4.4.0',
-            android: '6.2.3'
+    forceclis: {
+        forceios: {
+            name: 'forceios',
+            platforms: ['ios'],
+            appTypes: ['native', 'native_swift', 'react_native'],
+            toolNames: ['git', 'npm', 'pod']
+        },
+        forcedroid: {
+            name: 'forcedroid',
+            platforms: ['android'],
+            appTypes: ['native', 'native_kotlin', 'react_native'],
+            toolNames: ['git', 'npm']
+        },
+        forcehybrid: {
+            name: 'forcehybrid',
+            platforms: ['ios', 'android'],
+            appTypes: ['hybrid_local', 'hybrid_remote'],
+            toolNames: ['git', 'npm', 'cordova']
         }
     },
 
-    appTypes: {
-        ios: ['native', 'native_swift', 'react_native'],
-        android: ['native', 'native_kotlin', 'react_native'],
-        hybrid: ['hybrid_local', 'hybrid_remote']
+    tools: {
+        git: {
+            checkCmd: 'git --version',
+            minVersion: '2.13'
+        },
+        npm: {
+            checkCmd: 'npm -v',
+            minVersion: '3.10'
+        },
+        pod: {
+            checkCmd: 'pod --version',
+            minVersion: '1.2'
+        },
+        cordova: {
+            checkCmd: 'cordova -v',
+            minVersion: '7.0.0',
+            pluginRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-CordovaPlugin#dev',    // dev
+            //pluginRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-CordovaPlugin#v' + VERSION, // GA
+            platformVersion: {
+                ios: '4.4.0',
+                android: '6.2.3'
+            }
+        }
     },
-
+    
     templates: {
         repoUri: 'https://github.com/wmathurin/SalesforceMobileSDK-Templates#dev',    // dev
         //repoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-Templates#v' + VERSION, // GA

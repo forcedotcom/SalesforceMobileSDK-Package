@@ -33,15 +33,11 @@ var SDK = require('./shared/constants'),
     createHelper = require('./shared/createHelper'),
     utils = require('./shared/utils');
 
-// Reading parameters from command line
-configHelper.readConfig(process.argv, 'forcedroid', SDK.version, SDK.appTypes.android, [SDK.platforms.android], toolsChecker, createApp);
+// Check tools
+createHelper.checkTools(SDK.forceclis.forcedroid.toolNames);
 
-//
-// Tools checker
-//
-function toolsChecker() {
-    createHelper.checkTools([SDK.tools.git, SDK.tools.npm]);
-}
+// Reading parameters from command line
+configHelper.readConfig(process.argv, SDK.forceclis.forcedroid, createApp);
 
 //
 // Helper for 'create' command
@@ -49,10 +45,10 @@ function toolsChecker() {
 function createApp(config) {
     try {
         // Adding platform
-        config.platform = SDK.platforms.android;
+        config.platform = 'android';
 
         // Creating application
-        createHelper.createApp(config, SDK.platforms.android, 'Android Studio');
+        createHelper.createApp(config, 'android', 'Android Studio');
     }
     catch (error) {
         utils.logError('forcedroid failed\n', error);
