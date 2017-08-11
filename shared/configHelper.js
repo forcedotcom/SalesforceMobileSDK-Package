@@ -45,7 +45,7 @@ function readConfig(args, forcecli, handler) {
         process.exit(0);
         break;
     case 'create': 
-        processorList = createArgsProcessorList(forceli, false); 
+        processorList = createArgsProcessorList(forcecli, false); 
         break;
     case 'createWithTemplate': 
         processorList = createArgsProcessorList(forcecli, true); 

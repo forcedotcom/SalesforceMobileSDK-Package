@@ -29,32 +29,10 @@
 
 // Dependencies
 var SDK = require('./shared/constants'),
-    configHelper = require('./shared/configHelper'),
-    createHelper = require('./shared/createHelper'),
-    utils = require('./shared/utils');
-
-// Check tools
-createHelper.checkTools(SDK.forceclis.forcehybrid.toolNames);
-
-// Reading parameters from command line
-configHelper.readConfig(process.argv, SDK.forceclis.forcehybrid, createApp);
+    createHelper = require('./shared/createHelper');
 
 
-//
-// Helper for 'create' command
-//
-function createApp(config) {
-    try {
-        // Adding platform
-        config.platform = 'ios';
-
-        // Creating application
-        createHelper.createApp(config, 'ios', 'XCode');
-    }
-    catch (error) {
-        utils.logError('forceios failed\n', error);
-        process.exit(1);
-    }
-}
+// Do everything
+createHelper.createApp(SDK.forceclis.forcehybrid);
 
 

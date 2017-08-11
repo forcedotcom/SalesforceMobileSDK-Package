@@ -30,24 +30,44 @@ var VERSION = '6.0.0';
 module.exports = {
     version: VERSION,
 
+    templatesRepoUri: 'https://github.com/wmathurin/SalesforceMobileSDK-Templates#dev',    // dev
+    //templatesRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-Templates#v' + VERSION, // GA
+
     forceclis: {
         forceios: {
             name: 'forceios',
             platforms: ['ios'],
+            toolNames: ['git', 'npm', 'pod'],
+            ide: 'XCode',
             appTypes: ['native', 'native_swift', 'react_native'],
-            toolNames: ['git', 'npm', 'pod']
+            appTypesToPath: {
+                'native': 'iOSNativeTemplate',
+                'native_swift': 'iOSNativeSwiftTemplate',
+                'react_native': 'ReactNativeTemplate'
+            }
         },
         forcedroid: {
             name: 'forcedroid',
             platforms: ['android'],
+            toolNames: ['git', 'npm'],
+            ide: 'Android Studio',
             appTypes: ['native', 'native_kotlin', 'react_native'],
-            toolNames: ['git', 'npm']
+            appTypesToPath: {
+                'native': 'AndroidNativeTemplate',
+                'native_kotlin': 'AndroidNativeKotlinTemplate',
+                'react_native': 'ReactNativeTemplate'
+            }
         },
         forcehybrid: {
             name: 'forcehybrid',
             platforms: ['ios', 'android'],
+            toolNames: ['git', 'npm', 'cordova'],
+            ide: 'XCode and/or Android Studio',
             appTypes: ['hybrid_local', 'hybrid_remote'],
-            toolNames: ['git', 'npm', 'cordova']
+            appTypesToPath: {
+                'hybrid_local': 'HybridLocalTemplate',
+                'hybrid_remote': 'HybridRemoteTemplate'
+            }
         }
     },
 
@@ -72,27 +92,6 @@ module.exports = {
             platformVersion: {
                 ios: '4.4.0',
                 android: '6.2.3'
-            }
-        }
-    },
-    
-    templates: {
-        repoUri: 'https://github.com/wmathurin/SalesforceMobileSDK-Templates#dev',    // dev
-        //repoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-Templates#v' + VERSION, // GA
-        appTypesToPath: {
-            ios: {
-                'native': 'iOSNativeTemplate',
-                'native_swift': 'iOSNativeSwiftTemplate',
-                'react_native': 'ReactNativeTemplate'
-            },
-            android: {
-                'native': 'AndroidNativeTemplate',
-                'native_kotlin': 'AndroidNativeKotlinTemplate',
-                'react_native': 'ReactNativeTemplate'
-            },
-            hybrid: {
-                'hybrid_local': 'HybridLocalTemplate',
-                'hybrid_remote': 'HybridRemoteTemplate'
             }
         }
     }
