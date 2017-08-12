@@ -36,6 +36,7 @@ module.exports = {
     forceclis: {
         forceios: {
             name: 'forceios',
+            dir: 'ios',
             platforms: ['ios'],
             toolNames: ['git', 'npm', 'pod'],
             ide: 'XCode',
@@ -48,6 +49,7 @@ module.exports = {
         },
         forcedroid: {
             name: 'forcedroid',
+            dir: 'android',
             platforms: ['android'],
             toolNames: ['git', 'npm'],
             ide: 'Android Studio',
@@ -60,6 +62,7 @@ module.exports = {
         },
         forcehybrid: {
             name: 'forcehybrid',
+            dir: 'hybrid',
             platforms: ['ios', 'android'],
             toolNames: ['git', 'npm', 'cordova'],
             ide: 'XCode and/or Android Studio',

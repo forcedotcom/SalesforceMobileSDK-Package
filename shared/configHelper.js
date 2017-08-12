@@ -68,7 +68,7 @@ function usage(forcecli) {
     logInfo(forcecliName + ' create', COLOR.magenta);
     logInfo('    --apptype=<Application Type> (' + appTypes.join(', ') + ')', COLOR.magenta);
     if (platforms.length > 1) {
-        logInfo('    --os=<Comma separated plaforms> (' + platforms.join(', ') + ')', COLOR.magenta);
+        logInfo('    --platform=<Comma separated plaforms> (' + platforms.join(', ') + ')', COLOR.magenta);
     }
     logInfo('    --appname=<Application Name>', COLOR.magenta);
     logInfo('    --packagename=<App Package Identifier> (e.g. com.mycompany.myapp)', COLOR.magenta);
@@ -78,7 +78,7 @@ function usage(forcecli) {
     logInfo('\n OR \n', COLOR.cyan);
     logInfo(forcecliName + ' createWithTemplate', COLOR.magenta);
     if (platforms.length > 1) {
-        logInfo('    --os=<Comma separated plaforms> (' + platforms.join(', ') + ')', COLOR.magenta);
+        logInfo('    --platform=<Comma separated plaforms> (' + platforms.join(', ') + ')', COLOR.magenta);
     }
     logInfo('    --templaterepouri=<Template repo URI> (e.g. https://github.com/forcedotcom/SmartSyncExplorerReactNative)]', COLOR.magenta);
     logInfo('    --appname=<Application Name>', COLOR.magenta);
@@ -104,7 +104,7 @@ function createArgsProcessorList(forcecli, isCreateWithTemplate) {
         // Platform
         addProcessorFor(argProcessorList, 'platform', 'Enter the target platform(s) separated by commas (' + platforms.join(', ') + '):',
                         'Platform(s) must be in ' + platforms.join(', ') + '.', 
-                        function(val) { return val.split(",").filter(p=>platforms.indexOf(p) == -1).length == 0; });
+                        function(val) { return !val.split(",").some(p=>platforms.indexOf(p) == -1); });
     }
 
     if (isCreateWithTemplate) {
