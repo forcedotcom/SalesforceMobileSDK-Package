@@ -30,7 +30,7 @@ var VERSION = '6.0.0';
 module.exports = {
     version: VERSION,
 
-    templatesRepoUri: 'https://github.com/wmathurin/SalesforceMobileSDK-Templates#dev',    // dev
+    templatesRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-Templates#dev',    // dev
     //templatesRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-Templates#v' + VERSION, // GA
 
     forceclis: {
