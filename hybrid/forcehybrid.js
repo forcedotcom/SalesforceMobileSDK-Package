@@ -33,4 +33,6 @@ var SDK = require('./shared/constants'),
 
 
 // Do everything
-createHelper.createApp(SDK.forceclis.forcedroid);
+createHelper.createApp(SDK.forceclis.forcehybrid);
+
+
