@@ -104,7 +104,7 @@ function createHybridApp(config) {
 //
 function printDetails(config) {
     // Printing out details
-    var details = ['Creating ' + config.platform + ' ' + config.apptype + ' application using Salesforce Mobile SDK',
+    var details = ['Creating ' + config.platform.replace(',', ' and ') + ' ' + config.apptype + ' application using Salesforce Mobile SDK',
                         '  with app name:        ' + config.appname,
                         '       package name:    ' + config.packagename,
                         '       organization:    ' + config.organization,
@@ -139,7 +139,7 @@ function printNextSteps(ide, projectPath, result) {
     var bootconfigFile =  path.join(projectPath, result.bootconfigFile);
     
     // Printing out next steps
-    utils.logParagraph(['Next steps:',
+    utils.logParagraph(['Next steps' + (result.platform ? ' for ' + result.platform : '') + ':',
                         '',
                         'Your application project is ready in ' + projectPath + '.',
                         'To use your new application in ' + ide + ', do the following:', 
@@ -194,6 +194,11 @@ function actuallyCreateApp(forcecli, config) {
         config.platform = forcecli.platforms[0];
     }
 
+    // Adding app type
+    if (forcecli.appTypes.length == 1) {
+        config.apptype = forcecli.appTypes[0];
+    }
+
     // Setting log level
     if (config.verbose) {
         utils.setLogLevel(utils.LOG_LEVELS.DEBUG);
@@ -234,13 +239,17 @@ function actuallyCreateApp(forcecli, config) {
     printDetails(config);
 
     // Creating application
-    var result = isNative ? createNativeApp(config) : createHybridApp(config);
+    var results = isNative ? createNativeApp(config) : createHybridApp(config);
 
     // Cleanup
     utils.removeFile(tmpDir);
     
     // Printing next steps
-    printNextSteps(forcecli.ide, config.projectPath, result);
+    if (!(results instanceof Array)) { results = [results] };
+    for (var result of results) {
+        var ide = SDK.ides[result.platform || config.platform.split(',')[0]];
+        printNextSteps(ide, config.projectPath, result);
+    }
 }
 
 

@@ -82,5 +82,5 @@ function usage() {
     utils.logInfo('OR', COLOR.magenta);
     utils.logInfo('  pack.js', COLOR.magenta);
     utils.logInfo('    --cli=cli1,cli2', COLOR.magenta);
-    utils.logInfo('      where cliN is among: ' + Object.keys(SDK.forceclis).join(', '), COLOR.magenta);
+    utils.logInfo('      where cliN is one of: ' + Object.keys(SDK.forceclis).join(', '), COLOR.magenta);
 }
