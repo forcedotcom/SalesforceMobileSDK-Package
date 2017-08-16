@@ -18,7 +18,7 @@ You're of course welcome to install it locally as well:
 
         npm install forcereact
 
-In this case, you can access the forcedroid app at `[Install Directory]/node_modules/.bin/forcereact`.
+In this case, you can access the forcereact app at `[Install Directory]/node_modules/.bin/forcereact`.
 
 ## Using forcereact
 
@@ -53,7 +53,7 @@ Typing `forcedroid` with no arguments gives you a breakdown of the usage:
 
 **Note:** You can specify any or all of the arguments as command line options as specified in the usage.  If you run `forcereact create` with missing arguments, it prompts you for each missing option interactively.
 
-Once the creation script completes, you'll have a fully functioning basic application of the type you specified.  The new application will be configured as an Eclipse project in your target directory, alongside the Mobile SDK libraries it consumes.
+Once the creation script completes, you'll have a fully functioning basic application of the type you specified.  The new application has an Android Studio and/or a XCode workspace that you can peruse, run, and debug.
 
 ### forcedroid create options
 

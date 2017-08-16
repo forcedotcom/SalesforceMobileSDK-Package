@@ -44,7 +44,7 @@ Typing `forcehybrid` with no arguments gives you a breakdown of the usage:
 
 **Note:** You can specify any or all of the arguments as command line options as specified in the usage.  If you run `forcehybrid create` with missing arguments, it prompts you for each missing option interactively.
 
-Once the creation script completes, you'll have a fully functioning basic application of the type you specified.  The new application is an Xcode project that you can peruse, run, and debug.
+Once the creation script completes, you'll have a fully functioning basic application of the type you specified.  The new application has an Android Studio and/or a XCode workspace that you can peruse, run, and debug.
 
 ### forcehybrid create options
 
