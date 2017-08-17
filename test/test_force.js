@@ -50,7 +50,7 @@ function main(args) {
     var sdkBranch = parsedArgs.sdkbranch || defaultSdkBranch;
     var chosenAppTypes = cleanSplit(parsedArgs.apptype, ',');
 
-    var testingWithAppType = chosenAppTypes.length > 0;
+    var testingWithAppType = chosenAppTypes.length > 0 && templateRepoUri == '';
     var testingWithTemplate = templateRepoUri != '';
     var testingIOS = chosenOperatingSystems.indexOf(OS.ios) >= 0;
     var testingAndroid = chosenOperatingSystems.indexOf(OS.android) >= 0;
@@ -67,6 +67,11 @@ function main(args) {
 
     // Actual testing
     var tmpDir = utils.mkTmpDir();
+
+    // Getting appType if template specified
+    if (testingWithTemplate) {
+        chosenAppTypes = [getAppTypeFromTemplate(templateRepoUri)];
+    }
 
     // Create forcexxx packages needed
     for (var cli of Object.values(SDK.forceclis)) {
@@ -101,7 +106,8 @@ function main(args) {
             }
         }
         if (testingWithTemplate) {
-            createCompileApp(tmpDir, os, null, templateRepoUri, null);
+            // NB: chosenAppTypes[0] is getAppTypeFromTemplate(templateRepoUri)
+            createCompileApp(tmpDir, os, chosenAppTypes[0], templateRepoUri, null);
         }
     }
 }
