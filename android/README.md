@@ -29,17 +29,16 @@ Typing `forcedroid` with no arguments gives you a breakdown of the usage:
         $ forcedroid
         Usage:
         forcedroid create
-            --apptype=<Application Type> (native, react_native, hybrid_local, hybrid_remote)
+            --apptype=<Application Type> (native, native_kotlin)
             --appname=<Application Name>
             --packagename=<App Package Identifier> (com.mycompany.myapp)
             --organization=<Organization Name> (Your company\'s/organization\'s name)
-            --startpage=<App Start Page> (The start page of your remote app. Only required for hybrid_remote)
             [--outputdir=<Output directory> (Leave empty for current directory)]
 
         OR
 
         forcedroid createWithTemplate
-            --templaterepouri=<Template repo URI> (e.g. https://github.com/forcedotcom/SmartSyncExplorerReactNative)
+            --templaterepouri=<Template repo URI>
             --appname=<Application Name>
             --packagename=<App Package Identifier> (com.mycompany.myapp)
             --organization=<Organization Name> (Your company\'s/organization\'s name)
@@ -55,16 +54,14 @@ Typing `forcedroid` with no arguments gives you a breakdown of the usage:
 
 **Note:** You can specify any or all of the arguments as command line options as specified in the usage.  If you run `forcedroid create` with missing arguments, it prompts you for each missing option interactively.
 
-Once the creation script completes, you'll have a fully functioning basic application of the type you specified.  The new application will be configured as an Eclipse project in your target directory, alongside the Mobile SDK libraries it consumes.
+Once the creation script completes, you'll have a fully functioning basic application of the type you specified.  The new application has an Android Studio workspace that you can peruse, run, and debug.
 
 ### forcedroid create options
 
 **App Type:** The type of application you wish to develop:
 
 - **native** — A fully native Android application
-- **react\_native** — An application built on ReactNative
-- **hybrid\_local** — A hybrid application, based on the Cordova framework, that runs in a native container.  The app contents are developed locally in the Eclipse project, and are deployed to the device itself when the app is built
-- **hybrid\_remote** — A hybrid application, based on the [Cordova](http://cordova.apache.org/) framework, that runs in a native container.  The app contents live in the cloud as a [Visualforce](http://wiki.developerforce.com/page/An_Introduction_to_Visualforce) application
+- **native\_kotlin** — A fully native Android application written in Kotlin
 
 **App Name:** The name of your application
 
@@ -72,17 +69,21 @@ Once the creation script completes, you'll have a fully functioning basic applic
 
 **Organization:** The name of your company or organization.  For example, `Acme Widgets, Inc.`
 
-**App Start Page:** \( *Required for hybrid\_remote apps only* \) The starting page of your application on salesforce.com.  This is the entry point of your remote application, though it's only the path, not the server portion of the URL.  For instance, `/apex/MyVisualforceStartPage`.
-
 **Output Directory:** \( *Optional* \) The folder where you want your app to be created.
 
 ## More information
 
-- After your app has been created, you will see some on-screen instructions for next steps, such as building and running your app, importing the project into an Eclipse workspace, and changing the default Connected App (sample) configuration values to match your own Connected App.  Note that if you intend to work with your app in Eclipse, you are not required to go through the steps to build and run your app from the command line, and vice versa.
+- After your app has been created, you will see some on-screen instructions for next steps, such as building and running your app, importing the project into Android Studio, and changing the default Connected App (sample) configuration values to match your own Connected App.
 
 - You can find the `forceios` npm package [here](https://npmjs.org/package/forceios), to develop Mobile SDK apps for iOS.
 
+- You can find the `forcehybrid` npm package [here](https://npmjs.org/package/forcehybrid), to develop Mobile SDK hybrid apps for iOS and Android.
+
+- You can find the `forcereact` npm package [here](https://npmjs.org/package/forcereact), to develop Mobile SDK react native apps for iOS and Android.
+
 - The Salesforce Mobile SDK for iOS source repository lives [here](https://github.com/forcedotcom/SalesforceMobileSDK-iOS).
+
+- The Salesforce Mobile SDK for Android source repository lives [here](https://github.com/forcedotcom/SalesforceMobileSDK-Android).
 
 - See [our developerforce site](http://wiki.developerforce.com/page/Mobile_SDK) for more information about how you can leverage the Salesforce Mobile SDK with the force.com platform.
 
