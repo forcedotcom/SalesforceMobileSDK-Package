@@ -44,14 +44,14 @@ Typing `forcehybrid` with no arguments gives you a breakdown of the usage:
 
 **Note:** You can specify any or all of the arguments as command line options as specified in the usage.  If you run `forcehybrid create` with missing arguments, it prompts you for each missing option interactively.
 
-Once the creation script completes, you'll have a fully functioning basic application of the type you specified.  The new application has an Android Studio and/or a XCode workspace that you can peruse, run, and debug.
+Once the creation script completes, you'll have a fully functioning basic application of the type you specified.  The new application is an Xcode project that you can peruse, run, and debug.
 
 ### forcehybrid create options
 
 **App Type:** The type of application you wish to develop:
 
-- **hybrid\_local** — A hybrid application, based on the Cordova framework, that runs in a native container.  The app contents are developed locally in the Xcode project, and are deployed to the device itself when the app is built
 - **hybrid\_remote** — A hybrid application, based on the [Cordova](http://cordova.apache.org/) framework, that runs in a native container.  The app contents live in the cloud as a [Visualforce](http://wiki.developerforce.com/page/An_Introduction_to_Visualforce) application
+- **hybrid\_local** — A hybrid application, based on the Cordova framework, that runs in a native container.  The app contents are developed locally in the Xcode project, and are deployed to the device itself when the app is built
 
 **App Name:** The name of your application
 
@@ -65,18 +65,8 @@ Once the creation script completes, you'll have a fully functioning basic applic
 
 ## More information
 
-- After your app has been created, you will see some on-screen instructions for next steps, such as building and running your app, importing the project into XCode or Android Studio, and changing the default Connected App (sample) configuration values to match your own Connected App.
-
-- You can find the `forceios` npm package [here](https://npmjs.org/package/forcedroid), to develop Mobile SDK apps for iOS.
-
-- You can find the `forcedroid` npm package [here](https://npmjs.org/package/forcedroid), to develop Mobile SDK apps for Android.
-
-- You can find the `forcereact` npm package [here](https://npmjs.org/package/forcereact), to develop Mobile SDK react native apps for iOS and Android.
-
 - The Salesforce Mobile SDK for iOS source repository lives [here](https://github.com/forcedotcom/SalesforceMobileSDK-iOS).
 
 - The Salesforce Mobile SDK for Android source repository lives [here](https://github.com/forcedotcom/SalesforceMobileSDK-Android).
 
 - See [our developerforce site](http://wiki.developerforce.com/page/Mobile_SDK) for more information about how you can leverage the Salesforce Mobile SDK with the force.com platform.
-
-- If you would like to make suggestions, have questions, or encounter any issues, we'd love to hear from you.  Post any feedback you have on our [Google+ Community](https://plus.google.com/communities/114225252149514546445).

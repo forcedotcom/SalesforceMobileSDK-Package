@@ -33,53 +33,43 @@ module.exports = {
     templatesRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-Templates#dev',    // dev
     //templatesRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-Templates#v' + VERSION, // GA
 
-
     forceclis: {
         forceios: {
             name: 'forceios',
-            description: 'command line utility for building iOS native mobile applications using Salesforce Mobile SDK',
             dir: 'ios',
             platforms: ['ios'],
             toolNames: ['git', 'npm', 'pod'],
-            appTypes: ['native', 'native_swift'],
+            ide: 'XCode',
+            appTypes: ['native', 'native_swift', 'react_native'],
             appTypesToPath: {
                 'native': 'iOSNativeTemplate',
-                'native_swift': 'iOSNativeSwiftTemplate'
+                'native_swift': 'iOSNativeSwiftTemplate',
+                'react_native': 'ReactNativeTemplate'
             }
         },
         forcedroid: {
             name: 'forcedroid',
-            description: 'command line utility for building Android native mobile applications using Salesforce Mobile SDK',
             dir: 'android',
             platforms: ['android'],
             toolNames: ['git', 'npm'],
-            appTypes: ['native', 'native_kotlin'],
+            ide: 'Android Studio',
+            appTypes: ['native', 'native_kotlin', 'react_native'],
             appTypesToPath: {
                 'native': 'AndroidNativeTemplate',
-                'native_kotlin': 'AndroidNativeKotlinTemplate'
+                'native_kotlin': 'AndroidNativeKotlinTemplate',
+                'react_native': 'ReactNativeTemplate'
             }
         },
         forcehybrid: {
             name: 'forcehybrid',
-            description: 'command line utility for building hybrid mobile applications using Salesforce Mobile SDK',
             dir: 'hybrid',
             platforms: ['ios', 'android'],
             toolNames: ['git', 'npm', 'cordova'],
+            ide: 'XCode and/or Android Studio',
             appTypes: ['hybrid_local', 'hybrid_remote'],
             appTypesToPath: {
                 'hybrid_local': 'HybridLocalTemplate',
                 'hybrid_remote': 'HybridRemoteTemplate'
-            }
-        },
-        forcereact: {
-            name: 'forcereact',
-            description: 'command line utility for building react native mobile applications using Salesforce Mobile SDK',
-            dir: 'react',
-            platforms: ['ios', 'android'],
-            toolNames: ['git', 'npm', 'pod'],
-            appTypes: ['react_native'],
-            appTypesToPath: {
-                'react_native': 'ReactNativeTemplate'
             }
         }
     },
@@ -107,10 +97,5 @@ module.exports = {
                 android: '6.2.3'
             }
         }
-    },
-
-    ides: {
-        ios: 'XCode',
-        android: 'Android Studio'
     }
 };

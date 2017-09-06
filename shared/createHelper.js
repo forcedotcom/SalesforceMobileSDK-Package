@@ -104,7 +104,7 @@ function createHybridApp(config) {
 //
 function printDetails(config) {
     // Printing out details
-    var details = ['Creating ' + config.platform.replace(',', ' and ') + ' ' + config.apptype + ' application using Salesforce Mobile SDK',
+    var details = ['Creating ' + config.platform + ' ' + config.apptype + ' application using Salesforce Mobile SDK',
                         '  with app name:        ' + config.appname,
                         '       package name:    ' + config.packagename,
                         '       organization:    ' + config.organization,
@@ -139,7 +139,7 @@ function printNextSteps(ide, projectPath, result) {
     var bootconfigFile =  path.join(projectPath, result.bootconfigFile);
     
     // Printing out next steps
-    utils.logParagraph(['Next steps' + (result.platform ? ' for ' + result.platform : '') + ':',
+    utils.logParagraph(['Next steps:',
                         '',
                         'Your application project is ready in ' + projectPath + '.',
                         'To use your new application in ' + ide + ', do the following:', 
@@ -170,17 +170,6 @@ function checkTools(toolNames) {
 //
 function createApp(forcecli) {
 
-    // Can't target ios or run pod if not on a mac
-    if (process.platform != 'darwin') {
-        forcecli.platforms = forcecli.platforms.filter(p=>p!='ios');
-        forcecli.toolNames = forcecli.toolNames.filter(t=>t!='pod');
-
-        if (forcecli.platforms.length == 0) {
-            utils.logError('You can only run ' + forcecli.name + ' on a Mac');
-            process.exit(1);
-        }
-    }
-
     // Check tools
     checkTools(forcecli.toolNames);
 
@@ -203,11 +192,6 @@ function actuallyCreateApp(forcecli, config) {
     // Adding platform
     if (forcecli.platforms.length == 1) {
         config.platform = forcecli.platforms[0];
-    }
-
-    // Adding app type
-    if (forcecli.appTypes.length == 1) {
-        config.apptype = forcecli.appTypes[0];
     }
 
     // Setting log level
@@ -250,17 +234,13 @@ function actuallyCreateApp(forcecli, config) {
     printDetails(config);
 
     // Creating application
-    var results = isNative ? createNativeApp(config) : createHybridApp(config);
+    var result = isNative ? createNativeApp(config) : createHybridApp(config);
 
     // Cleanup
     utils.removeFile(tmpDir);
     
     // Printing next steps
-    if (!(results instanceof Array)) { results = [results] };
-    for (var result of results) {
-        var ide = SDK.ides[result.platform || config.platform.split(',')[0]];
-        printNextSteps(ide, config.projectPath, result);
-    }
+    printNextSteps(forcecli.ide, config.projectPath, result);
 }
 
 

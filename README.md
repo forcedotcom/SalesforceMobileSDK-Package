@@ -15,11 +15,8 @@ node ./install.js
 ## To run forcehybrid do
 ./android/forcehybrid.js
 
-## To run forcereact do
-./android/forcereact.js
-
-## To test forceios, forcedroid, forcehybrid or forcereact do
+## To test forceios, forcedroid and forcehybrid do
 ./test/test_force.js
 
-## To npm pack forceios, forcedroid, forcehybrid or forcereact  do
+## To npm pack forceios, forcedroid and forcehybrid do
 ./pack/pack.js

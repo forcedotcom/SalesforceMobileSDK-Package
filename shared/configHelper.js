@@ -64,21 +64,16 @@ function usage(forcecli) {
     var appTypes = forcecli.appTypes;
     var platforms = forcecli.platforms;
     
-    logInfo('\n' + forcecliName + ': ' + forcecli.description, COLOR.cyan);
-    logInfo('\nUsage:\n', COLOR.cyan);
+    logInfo('Usage:\n', COLOR.cyan);
     logInfo(forcecliName + ' create', COLOR.magenta);
-    if (appTypes.length > 1) {
-        logInfo('    --apptype=<Application Type> (' + appTypes.join(', ') + ')', COLOR.magenta);
-    }
+    logInfo('    --apptype=<Application Type> (' + appTypes.join(', ') + ')', COLOR.magenta);
     if (platforms.length > 1) {
         logInfo('    --platform=<Comma separated plaforms> (' + platforms.join(', ') + ')', COLOR.magenta);
     }
     logInfo('    --appname=<Application Name>', COLOR.magenta);
     logInfo('    --packagename=<App Package Identifier> (e.g. com.mycompany.myapp)', COLOR.magenta);
     logInfo('    --organization=<Organization Name> (Your company\'s/organization\'s name)', COLOR.magenta);
-    if (appTypes.indexOf('hybrid_remote') >= 0) {
-        logInfo('    --startpage=<App Start Page> (The start page of your remote app. Only required for hybrid_remote)', COLOR.magenta);
-    }
+    logInfo('    --startpage=<App Start Page> (The start page of your remote app. Only required for hybrid_remote)', COLOR.magenta);
     logInfo('    [--outputdir=<Output directory> (Leave empty for current directory)]', COLOR.magenta);
     logInfo('\n OR \n', COLOR.cyan);
     logInfo(forcecliName + ' createWithTemplate', COLOR.magenta);
@@ -94,13 +89,6 @@ function usage(forcecli) {
     logInfo(forcecliName + ' version', COLOR.magenta);
     logInfo('\n OR \n', COLOR.cyan);
     logInfo(forcecliName, COLOR.magenta);
-    logInfo('\nWe also offer:', COLOR.cyan);
-    for (var cli of Object.values(SDK.forceclis)) {
-        if (cli.name != forcecli.name) {
-            logInfo('- ' + cli.name + ': ' + cli.description, COLOR.cyan);
-        }
-    }
-    logInfo('\n');
 }
 
 //
@@ -113,7 +101,7 @@ function createArgsProcessorList(forcecli, isCreateWithTemplate) {
 
     
     if (platforms.length > 1) {
-        // Platforms
+        // Platform
         addProcessorFor(argProcessorList, 'platform', 'Enter the target platform(s) separated by commas (' + platforms.join(', ') + '):',
                         'Platform(s) must be in ' + platforms.join(', ') + '.', 
                         function(val) { return !val.split(",").some(p=>platforms.indexOf(p) == -1); });
@@ -125,12 +113,10 @@ function createArgsProcessorList(forcecli, isCreateWithTemplate) {
                      'Invalid value for template repo uri: \'$val\'.', /^\S+$/);
     }
     else {
-        if (appTypes.length > 1) {
-            // App type
-            addProcessorFor(argProcessorList, 'apptype', 'Enter your application type (' + appTypes.join(', ') + '):',
-                            'App type must be ' + appTypes.join(', ') + '.', 
-                            function(val) { return appTypes.indexOf(val) >= 0; });
-        }
+        // App type
+        addProcessorFor(argProcessorList, 'apptype', 'Enter your application type (' + appTypes.join(', ') + '):',
+                        'App type must be ' + appTypes.join(', ') + '.', 
+                        function(val) { return appTypes.indexOf(val) >= 0; });
     }
 
     // App name
