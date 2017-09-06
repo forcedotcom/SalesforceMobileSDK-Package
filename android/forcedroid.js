@@ -29,8 +29,35 @@
 
 // Dependencies
 var SDK = require('./shared/constants'),
-    createHelper = require('./shared/createHelper');
+    configHelper = require('./shared/configHelper'),
+    createHelper = require('./shared/createHelper'),
+    utils = require('./shared/utils');
+
+// Reading parameters from command line
+configHelper.readConfig(process.argv, 'forcedroid', SDK.version, SDK.appTypes.android, toolsChecker, createApp);
+
+//
+// Tools checker
+//
+function toolsChecker(appType) {
+    createHelper.checkTools('android', appType);
+}
+
+//
+// Helper for 'create' command
+//
+function createApp(config) {
+    try {
+        // Adding platform
+        config.platform = 'android';
+
+        // Creating application
+        createHelper.createApp(config, 'android', 'Android Studio');
+    }
+    catch (error) {
+        utils.logError('forcedroid failed\n', error);
+        process.exit(1);
+    }
+}
 
 
-// Do everything
-createHelper.createApp(SDK.forceclis.forcedroid);
