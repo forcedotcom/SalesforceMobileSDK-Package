@@ -1,5 +1,5 @@
 # SalesforceMobileSDK-Package
-Repo for forceios/forcedroid/forcehybrid.
+Repo for forceios/forcedroid.
 
 ## To get started do the following from the root directory
 ``` shell
@@ -12,14 +12,8 @@ node ./install.js
 ## To run forcedroid do
 ./android/forcedroid.js
 
-## To run forcehybrid do
-./android/forcehybrid.js
-
-## To run forcereact do
-./android/forcereact.js
-
-## To test forceios, forcedroid, forcehybrid or forcereact do
+## To test forceios or forcedroid do
 ./test/test_force.js
 
-## To npm pack forceios, forcedroid, forcehybrid or forcereact  do
+## To npm pack forceios or forcedroid do
 ./pack/pack.js
