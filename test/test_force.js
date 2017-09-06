@@ -28,6 +28,11 @@ var APP_TYPE = {
     hybrid_remote: 'hybrid_remote'
 };
 
+var FORCE_CLI = {
+    ios: 'forceios',
+    android: 'forcedroid'
+};
+
 var defaultStartPage = '/apex/testPage';
 
 // Calling main
@@ -45,16 +50,16 @@ function main(args) {
     var chosenOperatingSystems = cleanSplit(parsedArgs.os, ',').map(function(s) { return s.toLowerCase(); });
     var appTypes = parsedArgs.apptype || '';
     var templateRepoUri = parsedArgs.templaterepouri || '';
-    var pluginRepoUri = parsedArgs.pluginrepouri || SDK.tools.cordova.pluginRepoUri;
+    var pluginRepoUri = parsedArgs.pluginrepouri || SDK.cordova.pluginRepoUri;
     var sdkBranch = parsedArgs.sdkbranch || defaultSdkBranch;
     var chosenAppTypes = cleanSplit(parsedArgs.apptype, ',');
+
 
     var testingWithAppType = chosenAppTypes.length > 0;
     var testingWithTemplate = templateRepoUri != '';
     var testingIOS = chosenOperatingSystems.indexOf(OS.ios) >= 0;
     var testingAndroid = chosenOperatingSystems.indexOf(OS.android) >= 0;
-    var testingHybrid = chosenAppTypes.some(t=>t.indexOf("hybrid") >= 0);
-    var testingNative = chosenAppTypes.some(t=>t.indexOf("native") >= 0);
+    var testingHybrid = chosenAppTypes.indexOf(APP_TYPE.hybrid_local) >= 0 || chosenAppTypes.indexOf(APP_TYPE.hybrid_remote) >= 0;
 
     // Validation
     validateOperatingSystems(chosenOperatingSystems);
@@ -69,18 +74,13 @@ function main(args) {
     var tmpDir = utils.mkTmpDir();
 
     // forceios
-    if (testingIOS && testingNative) {
-        createDeployForcePackage(tmpDir, SDK.forceclis.forceios);
+    if (testingIOS) {
+        createDeployForcePackage(tmpDir, OS.ios);
     }
 
     // forcedroid
-    if (testingAndroid && testingNative) {
-        createDeployForcePackage(tmpDir, SDK.forceclis.forcedroid);
-    }
-
-    // forcehybrid
-    if (testingHybrid) {
-        createDeployForcePackage(tmpDir, SDK.forceclis.forcehybrid);
+    if (testingAndroid) {
+        createDeployForcePackage(tmpDir, OS.android);
     }
 
     // Get cordova plugin repo if any hybrid testing requested
@@ -129,19 +129,17 @@ function usage(exitCode) {
     utils.logInfo('  - appTypeX is: native, native_swift, react_native, hybrid_local or hybrid_remote', COLOR.cyan);
     utils.logInfo('  - templaterepouri is a template repo uri e.g. https://github.com/forcedotcom/SmartSyncExplorerReactNative', COLOR.cyan);
     utils.logInfo('', COLOR.cyan);
-    utils.logInfo('  If hybrid is targeted:', COLOR.cyan);
+    utils.logInfo('  If hybrid is targeted, the following are first done:', COLOR.cyan);
     utils.logInfo('  - clones PLUGIN_REPO_URI ', COLOR.cyan);
     utils.logInfo('  - runs ./tools/update.sh -b SDK_BRANCH to update clone of plugin repo', COLOR.cyan);
-    utils.logInfo('  - generates forcehybrid package and deploys it to a temporary directory', COLOR.cyan);
+    utils.logInfo('', COLOR.cyan);
+    utils.logInfo('  If ios is targeted:', COLOR.cyan);
+    utils.logInfo('  - generates forceios package and deploys it to a temporary directory', COLOR.cyan);
     utils.logInfo('  - creates and compile the application types using specified template and plugin', COLOR.cyan);
     utils.logInfo('', COLOR.cyan);
-    utils.logInfo('  If ios is targeted (and apptype is a native type):', COLOR.cyan);
-    utils.logInfo('  - generates forceios package and deploys it to a temporary directory', COLOR.cyan);
-    utils.logInfo('  - creates and compile the application types using specified template', COLOR.cyan);
-    utils.logInfo('', COLOR.cyan);
-    utils.logInfo('  If android is targeted (and apptype is a native type):', COLOR.cyan);
+    utils.logInfo('  If android is targeted:', COLOR.cyan);
     utils.logInfo('  - generates forcedroid package and deploys it to a temporary directory', COLOR.cyan);
-    utils.logInfo('  - creates and compile the application types using specified template', COLOR.cyan);
+    utils.logInfo('  - creates and compile the application types using specified template and plugin', COLOR.cyan);
 
     process.exit(exitCode);
 }
@@ -149,10 +147,10 @@ function usage(exitCode) {
 //
 // Create and deploy forceios/forcedroid
 //
-function createDeployForcePackage(tmpDir, forcecli) {
+function createDeployForcePackage(tmpDir, os) {
     var packJs = path.join(__dirname, '..', 'pack', 'pack.js');
-    utils.runProcessThrowError('node ' + packJs + ' --cli=' + forcecli.name);
-    utils.runProcessThrowError('npm install --prefix ' + tmpDir + ' ' + forcecli.name + '-' + SDK.version + '.tgz');
+    utils.runProcessThrowError('node ' + packJs + ' --os=' + os);
+    utils.runProcessThrowError('npm install --prefix ' + tmpDir + ' ' + FORCE_CLI[os] + '-' + SDK.version + '.tgz');
 }
 
 //
@@ -174,8 +172,7 @@ function createCompileApp(tmpDir, os, appType, templateRepoUri, pluginRepoUri) {
     var target = actualAppType + ' app for ' + os + (templateRepoUri ? ' based on template ' + getTemplateNameFromUri(templateRepoUri) : '');
     var appName = actualAppType + os + 'App';
     var outputDir = path.join(tmpDir, appName);
-    var forcecliName = isNative ? (os == 'ios' ? SDK.forceclis.forceios.name : SDK.forceclis.forcedroid.name) : SDK.forceclis.forcehybrid.name;
-    var forcePath = path.join(tmpDir, 'node_modules', '.bin', forcecliName);
+    var forcePath = path.join(tmpDir, 'node_modules', '.bin', FORCE_CLI[os]);
 
     if (appType != null) {
         if (appType === APP_TYPE.native_swift && os === OS.android) return; // that app type doesn't exist for android
@@ -186,10 +183,6 @@ function createCompileApp(tmpDir, os, appType, templateRepoUri, pluginRepoUri) {
     else {
         forceArgs = 'createWithTemplate '
             + ' --templaterepouri=' + templateRepoUri;
-    }
-
-    if (forcecliName == SDK.forceclis.forcehybrid.name) {
-        forceArgs += ' --platform=' + os;
     }
 
     forceArgs += ''
@@ -209,6 +202,7 @@ function createCompileApp(tmpDir, os, appType, templateRepoUri, pluginRepoUri) {
     }
 
     // App dir
+
     var appDir = actualAppType === APP_TYPE.react_native ? path.join(outputDir, os) : outputDir;
 
     // Compilation

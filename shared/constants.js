@@ -30,71 +30,44 @@ var VERSION = '6.0.0';
 module.exports = {
     version: VERSION,
 
-    templatesRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-Templates#dev',    // dev
-    //templatesRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-Templates#v' + VERSION, // GA
-
-    forceclis: {
-        forceios: {
-            name: 'forceios',
-            dir: 'ios',
-            platforms: ['ios'],
-            toolNames: ['git', 'npm', 'pod'],
-            ide: 'XCode',
-            appTypes: ['native', 'native_swift', 'react_native'],
-            appTypesToPath: {
-                'native': 'iOSNativeTemplate',
-                'native_swift': 'iOSNativeSwiftTemplate',
-                'react_native': 'ReactNativeTemplate'
-            }
-        },
-        forcedroid: {
-            name: 'forcedroid',
-            dir: 'android',
-            platforms: ['android'],
-            toolNames: ['git', 'npm'],
-            ide: 'Android Studio',
-            appTypes: ['native', 'native_kotlin', 'react_native'],
-            appTypesToPath: {
-                'native': 'AndroidNativeTemplate',
-                'native_kotlin': 'AndroidNativeKotlinTemplate',
-                'react_native': 'ReactNativeTemplate'
-            }
-        },
-        forcehybrid: {
-            name: 'forcehybrid',
-            dir: 'hybrid',
-            platforms: ['ios', 'android'],
-            toolNames: ['git', 'npm', 'cordova'],
-            ide: 'XCode and/or Android Studio',
-            appTypes: ['hybrid_local', 'hybrid_remote'],
-            appTypesToPath: {
-                'hybrid_local': 'HybridLocalTemplate',
-                'hybrid_remote': 'HybridRemoteTemplate'
-            }
+    tools: {
+        gitMinVersion: '2.13',
+        npmMinVersion: '3.10',
+        podMinVersion: '1.2'
+    },
+    
+    cordova: {
+        pluginRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-CordovaPlugin#dev',    // dev
+        //pluginRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-CordovaPlugin#v' + VERSION, // GA
+        minimumCliVersion: '7.0.0',
+        platformVersion: {
+            ios: '4.4.0',
+            android: '6.2.3'
         }
     },
 
-    tools: {
-        git: {
-            checkCmd: 'git --version',
-            minVersion: '2.13'
-        },
-        npm: {
-            checkCmd: 'npm -v',
-            minVersion: '3.10'
-        },
-        pod: {
-            checkCmd: 'pod --version',
-            minVersion: '1.2'
-        },
-        cordova: {
-            checkCmd: 'cordova -v',
-            minVersion: '7.0.0',
-            pluginRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-CordovaPlugin#dev',    // dev
-            //pluginRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-CordovaPlugin#v' + VERSION, // GA
-            platformVersion: {
-                ios: '4.4.0',
-                android: '6.2.3'
+    appTypes: {
+        ios: ['native', 'native_swift', 'react_native', 'hybrid_local', 'hybrid_remote'],
+        android: ['native', 'native_kotlin', 'react_native', 'hybrid_local', 'hybrid_remote']
+    },
+
+    templates: {
+        repoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-Templates#dev',    // dev
+        //repoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-Templates#v' + VERSION, // GA
+        appTypesToPath: {
+            ios: {
+                'native': 'iOSNativeTemplate',
+                'native_swift': 'iOSNativeSwiftTemplate',
+                'react_native': 'ReactNativeTemplate',
+                'hybrid_local': 'HybridLocalTemplate',
+                'hybrid_remote': 'HybridRemoteTemplate'
+            },
+            android: {
+                'native': 'AndroidNativeTemplate',
+                'native_kotlin': 'AndroidNativeKotlinTemplate',
+                'react_native': 'ReactNativeTemplate',
+                'hybrid_local': 'HybridLocalTemplate',
+                'hybrid_remote': 'HybridRemoteTemplate'
             }
         }
     }

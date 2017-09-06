@@ -29,8 +29,35 @@
 
 // Dependencies
 var SDK = require('./shared/constants'),
-    createHelper = require('./shared/createHelper');
+    configHelper = require('./shared/configHelper'),
+    createHelper = require('./shared/createHelper'),
+    utils = require('./shared/utils');
+
+// Reading parameters from command line
+configHelper.readConfig(process.argv, 'forceios', SDK.version, SDK.appTypes.ios, toolsChecker, createApp);
+
+//
+// Tools checker
+//
+function toolsChecker(appType) {
+    createHelper.checkTools('ios', appType);
+}
+
+//
+// Helper for 'create' command
+//
+function createApp(config) {
+    try {
+        // Adding platform
+        config.platform = 'ios';
+
+        // Creating application
+        createHelper.createApp(config, 'ios', 'XCode');
+    }
+    catch (error) {
+        utils.logError('forceios failed\n', error);
+        process.exit(1);
+    }
+}
 
 
-// Do everything
-createHelper.createApp(SDK.forceclis.forceios);
