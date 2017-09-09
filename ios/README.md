@@ -29,10 +29,11 @@ Typing `forceios` with no arguments gives you a breakdown of the usage:
         forceios
         Usage:
         forceios create
-            --apptype=<Application Type> (native, native_swift)
+            --apptype=<Application Type> (native, native_swift, hybrid_local, hybrid_remote)
             --appname=<Application Name>
             --packagename=<App Package Identifier> (com.mycompany.myapp)
             --organization=<Organization Name> (Your company\'s/organization\'s name)
+            --startpage=<App Start Page> (The start page of your remote app. Only required for hybrid_remote)            
             [--outputdir=<Output directory> (Leave empty for current directory)]
 
         OR
@@ -62,12 +63,16 @@ Once the creation script completes, you'll have a fully functioning basic applic
 
 - **native** — A fully native iOS application written in Objective C
 - **native\_swift** — A fully native iOS application written in Swift
+- **hybrid\_local** — A hybrid application, based on the Cordova framework, that runs in a native container.  The app contents are developed locally in the Xcode project, and are deployed to the device itself when the app is built
+- **hybrid\_remote** — A hybrid application, based on the [Cordova](http://cordova.apache.org/) framework, that runs in a native container.  The app contents live in the cloud as a [Visualforce](http://wiki.developerforce.com/page/An_Introduction_to_Visualforce) application
 
 **App Name:** The name of your application
 
 **App Package Identifier:** An identifier for your company, similar to a Java package (e.g. `com.acme.MobileApps`).  This concatenates with the app name to form the unique identifier for your app in the App Store.
 
 **Organization:** The name of your company or organization.  For example, `Acme Widgets, Inc.`
+
+**Start Page:** \( *Required for hybrid\_remote apps only* \) The starting page of your application on salesforce.com.  This is the entry point of your remote application, though it's only the path, not the server portion of the URL.  For instance, `/apex/MyVisualforceStartPage`.
 
 **Output Directory:** \( *Optional* \) The folder where you want your app to be created.
 
@@ -76,10 +81,6 @@ Once the creation script completes, you'll have a fully functioning basic applic
 - After your app has been created, you will see some on-screen instructions for next steps, such as building and running your app, importing the project into XCode, and changing the default Connected App (sample) configuration values to match your own Connected App.
 
 - You can find the `forcedroid` npm package [here](https://npmjs.org/package/forcedroid), to develop Mobile SDK apps for Android.
-
-- You can find the `forcehybrid` npm package [here](https://npmjs.org/package/forcehybrid), to develop Mobile SDK hybrid apps for iOS and Android.
-
-- You can find the `forcereact` npm package [here](https://npmjs.org/package/forcereact), to develop Mobile SDK react native apps for iOS and Android.
 
 - The Salesforce Mobile SDK for iOS source repository lives [here](https://github.com/forcedotcom/SalesforceMobileSDK-iOS).
 
