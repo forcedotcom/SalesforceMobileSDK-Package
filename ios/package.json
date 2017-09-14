@@ -9,6 +9,9 @@
 	    { "type": "Salesforce.com Mobile SDK License", "url": "https://github.com/forcedotcom/SalesforceMobileSDK-iOS/blob/master/LICENSE.md" }
 	],
 	"os" : [ "darwin" ],
+    "engines": {
+        "node": ">=7.0.0"
+    },
 	"bin" : { "forceios" : "forceios.js" },
     "dependencies": {
         "shelljs": "~0.7.0"
