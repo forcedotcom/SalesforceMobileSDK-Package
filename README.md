@@ -12,8 +12,8 @@ node ./install.js
 ## To run forcedroid do
 ./android/forcedroid.js
 
-## To test forceios and forcedroid do
+## To test forceios or forcedroid do
 ./test/test_force.js
 
-## To npm pack forceios and forcedroid do
+## To npm pack forceios or forcedroid do
 ./pack/pack.js

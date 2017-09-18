@@ -21,50 +21,43 @@ function main(args) {
 
     // Args extraction
     var usageRequested = parsedArgs.hasOwnProperty('usage');
-    var chosenOperatingSystems = cleanSplit(parsedArgs.os, ',');
-    var buildingiOS = chosenOperatingSystems.indexOf('ios') >= 0;
-    var buildingAndroid = chosenOperatingSystems.indexOf('android') >= 0;
+    var chosenClis = cleanSplit(parsedArgs.cli, ',');
 
     // Usage
-    if (usageRequested || (!buildingiOS && !buildingAndroid)) {
+    if (usageRequested || !chosenClis.some(cli=>Object.keys(SDK.forceclis).indexOf(cli) >= 0)) {
         usage();
         process.exit(1);
     }
-
     // Pack
-    if (buildingiOS) {
-        pack('ios');
+    for (var cli of Object.values(SDK.forceclis)) {
+        if (chosenClis.indexOf(cli.name) >= 0) {
+            pack(cli);
+        }
     }
-
-    if (buildingAndroid) {
-        pack('android');
-    }
-
-
 }
 
 //
 // Create forceios/droid-xxx.tgz package for given os
 // 
-function pack(os) {
-    var packageName = 'force' + (os === 'ios' ? os : 'droid') + '-' + SDK.version + '.tgz';
+function pack(cli) {
+    var packageName = cli.name + '-' + SDK.version + '.tgz';
 
     utils.logInfo('Creating ' + packageName, COLOR.green);
     
     // Packing
     var packageRepoDir = path.join(__dirname, '..');
-    var osDir = path.join(packageRepoDir, os);
-    var osSharedDir = path.join(osDir, 'shared');
+    var cliDir = path.join(packageRepoDir, cli.dir);
+    var cliSharedDir = path.join(cliDir, 'shared');
 
     // npm pack doesn't following links
-    utils.removeFile(osSharedDir);
-    shelljs.cp('-R', path.join(packageRepoDir, 'shared'), osDir);
-    utils.runProcessThrowError('npm pack', osDir);
-    utils.removeFile(osSharedDir);
-    shelljs.ln('-s', path.join('..', 'shared'), osSharedDir);
+    utils.removeFile(cliSharedDir);
+    shelljs.cp('-R', path.join(packageRepoDir, 'shared'), cliDir);
+    utils.runProcessThrowError('npm pack', cliDir);
+    utils.removeFile(cliSharedDir);
+    shelljs.ln('-s', path.join('..', 'shared'), cliSharedDir);
 
     // Moving package to current directory
-    utils.moveFile(path.join(osDir, packageName), packageName);
+    utils.moveFile(path.join(cliDir, packageName), packageName);
 }
 
 // 
@@ -88,6 +81,6 @@ function usage() {
     utils.logInfo('  pack.js --usage', COLOR.magenta);
     utils.logInfo('OR', COLOR.magenta);
     utils.logInfo('  pack.js', COLOR.magenta);
-    utils.logInfo('    --os=os1,os2', COLOR.magenta);
-    utils.logInfo('      where osN are : ios, android', COLOR.magenta);
+    utils.logInfo('    --cli=cli1,cli2', COLOR.magenta);
+    utils.logInfo('      where cliN is one of: ' + Object.keys(SDK.forceclis).join(', '), COLOR.magenta);
 }

@@ -29,6 +29,7 @@
 var path = require('path'),
     SDK = require('./constants'),
     utils = require('./utils'),
+    configHelper = require('./configHelper'),
     COLOR = require('./outputColors');
 
 //
@@ -69,7 +70,10 @@ function createHybridApp(config) {
     // Create app with cordova
     utils.runProcessThrowError('cordova create "' + config.projectDir + '" ' + config.packagename + ' ' + config.appname);
     utils.runProcessThrowError('npm install shelljs@0.7.0', config.projectDir);
-    utils.runProcessThrowError('cordova platform add ' + config.platform + '@' + SDK.cordova.platformVersion[config.platform], config.projectDir);
+
+    for (var platform of config.platform.split(',')) {
+        utils.runProcessThrowError('cordova platform add ' + platform + '@' + SDK.tools.cordova.platformVersion[platform], config.projectDir);
+    }
     utils.runProcessThrowError('cordova plugin add ' + config.cordovaPluginRepoUri + ' --force', config.projectDir);
 
     // Web directory - the home for the template
@@ -88,7 +92,7 @@ function createHybridApp(config) {
     utils.removeFile(path.join(webDir, 'template.js'));
 
     // Run cordova prepare
-    utils.runProcessThrowError('cordova prepare ' + config.platform, config.projectDir);
+    utils.runProcessThrowError('cordova prepare', config.projectDir);
 
     // Done
     return prepareResult;
@@ -100,7 +104,7 @@ function createHybridApp(config) {
 //
 function printDetails(config) {
     // Printing out details
-    var details = ['Creating ' + config.platform + ' ' + config.apptype + ' application using Salesforce Mobile SDK',
+    var details = ['Creating ' + config.platform.replace(',', ' and ') + ' ' + config.apptype + ' application using Salesforce Mobile SDK',
                         '  with app name:        ' + config.appname,
                         '       package name:    ' + config.packagename,
                         '       organization:    ' + config.organization,
@@ -130,16 +134,16 @@ function printDetails(config) {
 //
 // Print next steps
 //
-function printNextSteps(devToolName, projectPath, result) {
+function printNextSteps(ide, projectPath, result) {
     var workspacePath = path.join(projectPath, result.workspacePath);
     var bootconfigFile =  path.join(projectPath, result.bootconfigFile);
     
     // Printing out next steps
-    utils.logParagraph(['Next steps:',
+    utils.logParagraph(['Next steps' + (result.platform ? ' for ' + result.platform : '') + ':',
                         '',
                         'Your application project is ready in ' + projectPath + '.',
-                        'To use your new application in ' + devToolName + ', do the following:', 
-                        '   - open ' + workspacePath + ' in ' + devToolName, 
+                        'To use your new application in ' + ide + ', do the following:', 
+                        '   - open ' + workspacePath + ' in ' + ide, 
                         '   - build and run', 
                         'Before you ship, make sure to plug your OAuth Client ID and Callback URI, and OAuth Scopes into ' + bootconfigFile
                        ]);
@@ -148,25 +152,11 @@ function printNextSteps(devToolName, projectPath, result) {
 //
 // Check tools
 //
-function checkTools(platform, appType) {
+function checkTools(toolNames) {
     try {
         utils.log("Checking tools");
-        var isNative = appType.indexOf('native') >= 0;
-
-        // Check git version
-        utils.checkToolVersion('git --version', SDK.tools.gitMinVersion);
-
-        // Check npm version
-        utils.checkToolVersion('npm -v', SDK.tools.npmMinVersion);
-
-        // Check pod version
-        if (platform === 'ios') {
-            utils.checkToolVersion('pod --version', SDK.tools.podMinVersion);
-        }
-
-        // Check cordova cli
-        if (!isNative) {
-            utils.checkToolVersion('cordova -v', SDK.cordova.minimumCliVersion);
+        for (var toolName of toolNames) {
+            utils.checkToolVersion(SDK.tools[toolName].checkCmd, SDK.tools[toolName].minVersion);
         }
     }
     catch (error) {
@@ -176,9 +166,50 @@ function checkTools(platform, appType) {
 }
 
 //
-// Helper for 'create' command
+// Create app - check tools, read config then actually create app
 //
-function createApp(config, platform, devToolName) {
+function createApp(forcecli) {
+
+    // Can't target ios or run pod if not on a mac
+    if (process.platform != 'darwin') {
+        forcecli.platforms = forcecli.platforms.filter(p=>p!='ios');
+        forcecli.toolNames = forcecli.toolNames.filter(t=>t!='pod');
+
+        if (forcecli.platforms.length == 0) {
+            utils.logError('You can only run ' + forcecli.name + ' on a Mac');
+            process.exit(1);
+        }
+    }
+
+    // Check tools
+    checkTools(forcecli.toolNames);
+
+    // Read parameters from command line
+    configHelper.readConfig(process.argv, forcecli, function(config) {
+        try {
+            actuallyCreateApp(forcecli, config);
+        }
+        catch (error) {
+            utils.logError(forcecli.name + ' failed\n', error);
+            process.exit(1);
+        }
+    });
+}
+
+//
+// Actually create app
+//
+function actuallyCreateApp(forcecli, config) {
+    // Adding platform
+    if (forcecli.platforms.length == 1) {
+        config.platform = forcecli.platforms[0];
+    }
+
+    // Adding app type
+    if (forcecli.appTypes.length == 1) {
+        config.apptype = forcecli.appTypes[0];
+    }
+
     // Setting log level
     if (config.verbose) {
         utils.setLogLevel(utils.LOG_LEVELS.DEBUG);
@@ -191,13 +222,12 @@ function createApp(config, platform, devToolName) {
     config.projectDir = config.outputdir ? path.resolve(config.outputdir) : path.join(process.cwd(),config.appname)
     config.projectPath = path.relative(process.cwd(), config.projectDir);
 
-    // Adding platform and version
-    config.platform = platform;
+    // Adding version
     config.version = SDK.version;
     
     // Adding template repo uri and path if none provided
-    config.templaterepouri = config.templaterepouri || SDK.templates.repoUri;
-    config.templatepath = config.templatepath || (config.templaterepouri.indexOf('SalesforceMobileSDK-Templates') >= 0 ? SDK.templates.appTypesToPath[platform][config.apptype] : '');
+    config.templaterepouri = config.templaterepouri || SDK.templatesRepoUri;
+    config.templatepath = config.templatepath || (config.templaterepouri == SDK.templatesRepoUri ? forcecli.appTypesToPath[config.apptype] : '');
 
     // Creating tmp dir for template clone
     var tmpDir = utils.mkTmpDir();
@@ -213,27 +243,27 @@ function createApp(config, platform, devToolName) {
 
     // Adding hybrid only config
     if (!isNative) {
-        config.cordovaPluginRepoUri = config.pluginrepouri || SDK.cordova.pluginRepoUri;
+        config.cordovaPluginRepoUri = config.pluginrepouri || SDK.tools.cordova.pluginRepoUri;
     }
 
-    // Check tools
-    checkTools(config.platform, config.apptype);
-    
     // Print details
     printDetails(config);
 
     // Creating application
-    var result = isNative ? createNativeApp(config) : createHybridApp(config);
+    var results = isNative ? createNativeApp(config) : createHybridApp(config);
 
     // Cleanup
     utils.removeFile(tmpDir);
     
     // Printing next steps
-    printNextSteps(devToolName, config.projectPath, result);
+    if (!(results instanceof Array)) { results = [results] };
+    for (var result of results) {
+        var ide = SDK.ides[result.platform || config.platform.split(',')[0]];
+        printNextSteps(ide, config.projectPath, result);
+    }
 }
 
 
 module.exports = {
-    createApp,
-    checkTools
+    createApp
 };

@@ -23,14 +23,10 @@ var OS = {
 var APP_TYPE = {
     native: 'native',
     native_swift: 'native_swift',
+    native_kotlin: 'native_kotlin',
     react_native: 'react_native',
     hybrid_local: 'hybrid_local',
     hybrid_remote: 'hybrid_remote'
-};
-
-var FORCE_CLI = {
-    ios: 'forceios',
-    android: 'forcedroid'
 };
 
 var defaultStartPage = '/apex/testPage';
@@ -50,16 +46,15 @@ function main(args) {
     var chosenOperatingSystems = cleanSplit(parsedArgs.os, ',').map(function(s) { return s.toLowerCase(); });
     var appTypes = parsedArgs.apptype || '';
     var templateRepoUri = parsedArgs.templaterepouri || '';
-    var pluginRepoUri = parsedArgs.pluginrepouri || SDK.cordova.pluginRepoUri;
+    var pluginRepoUri = parsedArgs.pluginrepouri || SDK.tools.cordova.pluginRepoUri;
     var sdkBranch = parsedArgs.sdkbranch || defaultSdkBranch;
     var chosenAppTypes = cleanSplit(parsedArgs.apptype, ',');
 
-
-    var testingWithAppType = chosenAppTypes.length > 0;
+    var testingWithAppType = chosenAppTypes.length > 0 && templateRepoUri == '';
     var testingWithTemplate = templateRepoUri != '';
     var testingIOS = chosenOperatingSystems.indexOf(OS.ios) >= 0;
     var testingAndroid = chosenOperatingSystems.indexOf(OS.android) >= 0;
-    var testingHybrid = chosenAppTypes.indexOf(APP_TYPE.hybrid_local) >= 0 || chosenAppTypes.indexOf(APP_TYPE.hybrid_remote) >= 0;
+    var testingHybrid = chosenAppTypes.some(t=>t.indexOf("hybrid") >= 0);
 
     // Validation
     validateOperatingSystems(chosenOperatingSystems);
@@ -73,14 +68,19 @@ function main(args) {
     // Actual testing
     var tmpDir = utils.mkTmpDir();
 
-    // forceios
-    if (testingIOS) {
-        createDeployForcePackage(tmpDir, OS.ios);
+    // Getting appType if template specified
+    if (testingWithTemplate) {
+        chosenAppTypes = [getAppTypeFromTemplate(templateRepoUri)];
     }
 
-    // forcedroid
-    if (testingAndroid) {
-        createDeployForcePackage(tmpDir, OS.android);
+    // Create forcexxx packages needed
+    for (var cli of Object.values(SDK.forceclis)) {
+        if (cli.platforms.some(p=>chosenOperatingSystems.indexOf(p)>=0)
+            && cli.appTypes.some(a=>chosenAppTypes.indexOf(a)>=0)) {
+
+            createDeployForcePackage(tmpDir, cli);
+
+        }
     }
 
     // Get cordova plugin repo if any hybrid testing requested
@@ -106,7 +106,8 @@ function main(args) {
             }
         }
         if (testingWithTemplate) {
-            createCompileApp(tmpDir, os, null, templateRepoUri, null);
+            // NB: chosenAppTypes[0] is getAppTypeFromTemplate(templateRepoUri)
+            createCompileApp(tmpDir, os, chosenAppTypes[0], templateRepoUri, null);
         }
     }
 }
@@ -126,20 +127,20 @@ function usage(exitCode) {
     utils.logInfo('', COLOR.cyan);
     utils.logInfo('  Where:', COLOR.cyan);
     utils.logInfo('  - osX is : ios or android', COLOR.cyan);
-    utils.logInfo('  - appTypeX is: native, native_swift, react_native, hybrid_local or hybrid_remote', COLOR.cyan);
+    utils.logInfo('  - appTypeX is: native, native_swift, native_kotlin, react_native, hybrid_local or hybrid_remote', COLOR.cyan);
     utils.logInfo('  - templaterepouri is a template repo uri e.g. https://github.com/forcedotcom/SmartSyncExplorerReactNative', COLOR.cyan);
     utils.logInfo('', COLOR.cyan);
-    utils.logInfo('  If hybrid is targeted, the following are first done:', COLOR.cyan);
+    utils.logInfo('  If hybrid is targeted:', COLOR.cyan);
     utils.logInfo('  - clones PLUGIN_REPO_URI ', COLOR.cyan);
     utils.logInfo('  - runs ./tools/update.sh -b SDK_BRANCH to update clone of plugin repo', COLOR.cyan);
     utils.logInfo('', COLOR.cyan);
     utils.logInfo('  If ios is targeted:', COLOR.cyan);
     utils.logInfo('  - generates forceios package and deploys it to a temporary directory', COLOR.cyan);
-    utils.logInfo('  - creates and compile the application types using specified template and plugin', COLOR.cyan);
+    utils.logInfo('  - creates and compiles applications for the specified os and template', COLOR.cyan);
     utils.logInfo('', COLOR.cyan);
     utils.logInfo('  If android is targeted:', COLOR.cyan);
     utils.logInfo('  - generates forcedroid package and deploys it to a temporary directory', COLOR.cyan);
-    utils.logInfo('  - creates and compile the application types using specified template and plugin', COLOR.cyan);
+    utils.logInfo('  - creates and compiles applications for the specified os and template', COLOR.cyan);
 
     process.exit(exitCode);
 }
@@ -147,10 +148,10 @@ function usage(exitCode) {
 //
 // Create and deploy forceios/forcedroid
 //
-function createDeployForcePackage(tmpDir, os) {
+function createDeployForcePackage(tmpDir, forcecli) {
     var packJs = path.join(__dirname, '..', 'pack', 'pack.js');
-    utils.runProcessThrowError('node ' + packJs + ' --os=' + os);
-    utils.runProcessThrowError('npm install --prefix ' + tmpDir + ' ' + FORCE_CLI[os] + '-' + SDK.version + '.tgz');
+    utils.runProcessThrowError('node ' + packJs + ' --cli=' + forcecli.name);
+    utils.runProcessThrowError('npm install --prefix ' + tmpDir + ' ' + forcecli.name + '-' + SDK.version + '.tgz');
 }
 
 //
@@ -164,25 +165,36 @@ function updatePluginRepo(tmpDir, os, pluginRepoDir, sdkBranch) {
 //
 // Create and compile app
 //
-function createCompileApp(tmpDir, os, appType, templateRepoUri, pluginRepoUri) {
+function createCompileApp(tmpDir, os, actualAppType, templateRepoUri, pluginRepoUri) {
     var forceArgs = '';
-    var actualAppType = appType || getAppTypeFromTemplate(templateRepoUri)
-    var isNative = actualAppType.indexOf('native') >= 0;
+    var isNative = actualAppType.indexOf('native') == 0;
+    var isReactNative = actualAppType === APP_TYPE.react_native;
+    var isHybrid = actualAppType.indexOf('hybrid') == 0;
     var isHybridRemote = actualAppType === APP_TYPE.hybrid_remote;
     var target = actualAppType + ' app for ' + os + (templateRepoUri ? ' based on template ' + getTemplateNameFromUri(templateRepoUri) : '');
     var appName = actualAppType + os + 'App';
     var outputDir = path.join(tmpDir, appName);
-    var forcePath = path.join(tmpDir, 'node_modules', '.bin', FORCE_CLI[os]);
+    var forcecli = (os == OS.ios
+                    ? SDK.forceclis.forceios
+                    : SDK.forceclis.forcedroid
+                   );
 
-    if (appType != null) {
-        if (appType === APP_TYPE.native_swift && os === OS.android) return; // that app type doesn't exist for android
+    var forcePath = path.join(tmpDir, 'node_modules', '.bin', forcecli.name);
+
+    if (!templateRepoUri) {
+        if (actualAppType === APP_TYPE.native_swift && os === OS.android) return; // that app type doesn't exist for android
+        if (actualAppType === APP_TYPE.native_kotlin && os === OS.ios) return; // that app type doesn't exist for ios
 
         forceArgs = 'create '
-            + ' --apptype=' + appType;
+            + ' --apptype=' + actualAppType;
     }
     else {
         forceArgs = 'createWithTemplate '
             + ' --templaterepouri=' + templateRepoUri;
+    }
+
+    if (forcecli.platforms.length > 0) {
+        forceArgs += ' --platform=' + os;
     }
 
     forceArgs += ''
@@ -192,7 +204,7 @@ function createCompileApp(tmpDir, os, appType, templateRepoUri, pluginRepoUri) {
         + ' --outputdir=' + outputDir
         + ' --verbose'
         + (isHybridRemote ? ' --startpage=' + defaultStartPage : '')
-        + (isNative ? '' : ' --pluginrepouri=' + pluginRepoUri);
+        + (isHybrid ? ' --pluginrepouri=' + pluginRepoUri : '');
 
     // Generation
     var generationSucceeded = utils.runProcessCatchError(forcePath + ' ' + forceArgs, 'GENERATING ' + target);
@@ -202,11 +214,10 @@ function createCompileApp(tmpDir, os, appType, templateRepoUri, pluginRepoUri) {
     }
 
     // App dir
-
     var appDir = actualAppType === APP_TYPE.react_native ? path.join(outputDir, os) : outputDir;
 
     // Compilation
-    if (isNative) {
+    if (isNative || isReactNative) {
         if (os == OS.ios) {
             // IOS - Native
             var workspacePath = path.join(appDir, appName + '.xcworkspace');

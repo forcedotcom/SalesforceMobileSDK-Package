@@ -25,49 +25,75 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-var VERSION = '5.2.0';
+var VERSION = '5.3.0';
 
 module.exports = {
     version: VERSION,
 
-    tools: {
-        gitMinVersion: '2.13',
-        npmMinVersion: '3.10',
-        podMinVersion: '1.2'
-    },
-    
-    cordova: {
-        //pluginRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-CordovaPlugin#dev',    // dev
-        pluginRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-CordovaPlugin#v' + VERSION, // GA
-        minimumCliVersion: '7.0.0',
-        platformVersion: {
-            ios: '4.4.0',
-            android: '6.2.3'
-        }
-    },
+    //templatesRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-Templates#dev53',    // dev
+    templatesRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-Templates#v' + VERSION, // GA
 
-    appTypes: {
-        ios: ['native', 'native_swift', 'react_native', 'hybrid_local', 'hybrid_remote'],
-        android: ['native', 'react_native', 'hybrid_local', 'hybrid_remote']
-    },
 
-    templates: {
-        //repoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-Templates#dev',    // dev
-        repoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-Templates#v' + VERSION, // GA
-        appTypesToPath: {
-            ios: {
+    forceclis: {
+        forceios: {
+            name: 'forceios',
+            description: 'command line utility for building iOS mobile applications using Salesforce Mobile SDK',
+            dir: 'ios',
+            platforms: ['ios'],
+            toolNames: ['git', 'npm', 'pod'],
+            appTypes: ['native', 'native_swift', 'react_native', 'hybrid_local', 'hybrid_remote'],
+            appTypesToPath: {
                 'native': 'iOSNativeTemplate',
                 'native_swift': 'iOSNativeSwiftTemplate',
                 'react_native': 'ReactNativeTemplate',
                 'hybrid_local': 'HybridLocalTemplate',
                 'hybrid_remote': 'HybridRemoteTemplate'
-            },
-            android: {
+            }
+        },
+        forcedroid: {
+            name: 'forcedroid',
+            description: 'command line utility for building Android mobile applications using Salesforce Mobile SDK',
+            dir: 'android',
+            platforms: ['android'],
+            toolNames: ['git', 'npm'],
+            appTypes: ['native', 'native_kotlin', 'react_native', 'hybrid_local', 'hybrid_remote'],
+            appTypesToPath: {
                 'native': 'AndroidNativeTemplate',
+                'native_kotlin': 'AndroidNativeKotlinTemplate',
                 'react_native': 'ReactNativeTemplate',
                 'hybrid_local': 'HybridLocalTemplate',
                 'hybrid_remote': 'HybridRemoteTemplate'
             }
         }
+    },
+
+    tools: {
+        git: {
+            checkCmd: 'git --version',
+            minVersion: '2.13'
+        },
+        npm: {
+            checkCmd: 'npm -v',
+            minVersion: '3.10'
+        },
+        pod: {
+            checkCmd: 'pod --version',
+            minVersion: '1.2'
+        },
+        cordova: {
+            checkCmd: 'cordova -v',
+            minVersion: '7.0.0',
+            //pluginRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-CordovaPlugin#dev53',    // dev
+            pluginRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-CordovaPlugin#v' + VERSION, // GA
+            platformVersion: {
+                ios: '4.4.0',
+                android: '6.2.3'
+            }
+        }
+    },
+
+    ides: {
+        ios: 'XCode',
+        android: 'Android Studio'
     }
 };
