@@ -30,8 +30,8 @@ var VERSION = '5.3.0';
 module.exports = {
     version: VERSION,
 
-    templatesRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-Templates#dev53',    // dev
-    //templatesRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-Templates#v' + VERSION, // GA
+    //templatesRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-Templates#dev53',    // dev
+    templatesRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-Templates#v' + VERSION, // GA
 
 
     forceclis: {
@@ -83,8 +83,8 @@ module.exports = {
         cordova: {
             checkCmd: 'cordova -v',
             minVersion: '7.0.0',
-            pluginRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-CordovaPlugin#dev53',    // dev
-            //pluginRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-CordovaPlugin#v' + VERSION, // GA
+            //pluginRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-CordovaPlugin#dev53',    // dev
+            pluginRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-CordovaPlugin#v' + VERSION, // GA
             platformVersion: {
                 ios: '4.4.0',
                 android: '6.2.3'
