@@ -133,12 +133,18 @@ function usage(exitCode) {
     utils.logInfo('  If hybrid is targeted:', COLOR.cyan);
     utils.logInfo('  - clones PLUGIN_REPO_URI ', COLOR.cyan);
     utils.logInfo('  - runs ./tools/update.sh -b SDK_BRANCH to update clone of plugin repo', COLOR.cyan);
+    utils.logInfo('  - generates forcehybrid package and deploys it to a temporary directory', COLOR.cyan);
+    utils.logInfo('  - creates and compiles applications for the specified os, template and plugin', COLOR.cyan);
     utils.logInfo('', COLOR.cyan);
-    utils.logInfo('  If ios is targeted:', COLOR.cyan);
+    utils.logInfo('  If apptype is react_native:', COLOR.cyan);
+    utils.logInfo('  - generates forcereact package and deploys it to a temporary directory', COLOR.cyan);
+    utils.logInfo('  - creates and compiles applications for the specified os and template', COLOR.cyan);
+    utils.logInfo('', COLOR.cyan);
+    utils.logInfo('  If ios is targeted (and apptype is a native type):', COLOR.cyan);
     utils.logInfo('  - generates forceios package and deploys it to a temporary directory', COLOR.cyan);
     utils.logInfo('  - creates and compiles applications for the specified os and template', COLOR.cyan);
     utils.logInfo('', COLOR.cyan);
-    utils.logInfo('  If android is targeted:', COLOR.cyan);
+    utils.logInfo('  If android is targeted (and apptype is a native type):', COLOR.cyan);
     utils.logInfo('  - generates forcedroid package and deploys it to a temporary directory', COLOR.cyan);
     utils.logInfo('  - creates and compiles applications for the specified os and template', COLOR.cyan);
 
@@ -174,9 +180,15 @@ function createCompileApp(tmpDir, os, actualAppType, templateRepoUri, pluginRepo
     var target = actualAppType + ' app for ' + os + (templateRepoUri ? ' based on template ' + getTemplateNameFromUri(templateRepoUri) : '');
     var appName = actualAppType + os + 'App';
     var outputDir = path.join(tmpDir, appName);
-    var forcecli = (os == OS.ios
-                    ? SDK.forceclis.forceios
-                    : SDK.forceclis.forcedroid
+    var forcecli = (isReactNative
+                    ? SDK.forceclis.forcereact
+                    : (isHybrid
+                       ? SDK.forceclis.forcehybrid
+                       : (os == OS.ios
+                          ? SDK.forceclis.forceios
+                          : SDK.forceclis.forcedroid
+                         )
+                      )
                    );
 
     var forcePath = path.join(tmpDir, 'node_modules', '.bin', forcecli.name);
