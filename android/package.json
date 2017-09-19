@@ -9,6 +9,9 @@
 	    { "type": "Salesforce.com Mobile SDK License", "url": "https://github.com/forcedotcom/SalesforceMobileSDK-Android/blob/master/LICENSE.md" }
 	],
 	"bin" : { "forcedroid" : "forcedroid.js" },
+    "engines": {
+        "node": ">=7.0.0"
+    },
     "dependencies": {
         "shelljs": "~0.7.0"
     },

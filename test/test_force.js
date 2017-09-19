@@ -171,9 +171,8 @@ function updatePluginRepo(tmpDir, os, pluginRepoDir, sdkBranch) {
 //
 // Create and compile app
 //
-function createCompileApp(tmpDir, os, appType, templateRepoUri, pluginRepoUri) {
+function createCompileApp(tmpDir, os, actualAppType, templateRepoUri, pluginRepoUri) {
     var forceArgs = '';
-    var actualAppType = appType || getAppTypeFromTemplate(templateRepoUri)
     var isNative = actualAppType.indexOf('native') == 0;
     var isReactNative = actualAppType === APP_TYPE.react_native;
     var isHybrid = actualAppType.indexOf('hybrid') == 0;
@@ -194,12 +193,12 @@ function createCompileApp(tmpDir, os, appType, templateRepoUri, pluginRepoUri) {
 
     var forcePath = path.join(tmpDir, 'node_modules', '.bin', forcecli.name);
 
-    if (appType != null) {
-        if (appType === APP_TYPE.native_swift && os === OS.android) return; // that app type doesn't exist for android
-        if (appType === APP_TYPE.native_kotlin && os === OS.ios) return; // that app type doesn't exist for ios
+    if (!templateRepoUri) {
+        if (actualAppType === APP_TYPE.native_swift && os === OS.android) return; // that app type doesn't exist for android
+        if (actualAppType === APP_TYPE.native_kotlin && os === OS.ios) return; // that app type doesn't exist for ios
 
         forceArgs = 'create '
-            + ' --apptype=' + appType;
+            + ' --apptype=' + actualAppType;
     }
     else {
         forceArgs = 'createWithTemplate '
