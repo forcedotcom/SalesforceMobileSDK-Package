@@ -38,6 +38,8 @@ module.exports = {
         forceios: {
             name: 'forceios',
             description: 'command line utility for building iOS native mobile applications using Salesforce Mobile SDK',
+            sfdx_topic: 'ios',
+            sfdx_description: 'command for building an iOS native mobile application using Saleforce Mobile SDK',
             dir: 'ios',
             platforms: ['ios'],
             toolNames: ['git', 'npm', 'pod'],
@@ -50,6 +52,8 @@ module.exports = {
         forcedroid: {
             name: 'forcedroid',
             description: 'command line utility for building Android native mobile applications using Salesforce Mobile SDK',
+            sfdx_topic: 'android',
+            sfdx_description: 'command for building a Android native mobile application using Saleforce Mobile SDK',
             dir: 'android',
             platforms: ['android'],
             toolNames: ['git', 'npm'],
@@ -62,6 +66,8 @@ module.exports = {
         forcehybrid: {
             name: 'forcehybrid',
             description: 'command line utility for building hybrid mobile applications using Salesforce Mobile SDK',
+            sfdx_topic: 'hybrid',
+            sfdx_description: 'command for building an hybrid mobile application using Saleforce Mobile SDK',
             dir: 'hybrid',
             platforms: ['ios', 'android'],
             toolNames: ['git', 'npm', 'cordova'],
@@ -74,6 +80,8 @@ module.exports = {
         forcereact: {
             name: 'forcereact',
             description: 'command line utility for building react native mobile applications using Salesforce Mobile SDK',
+            sfdx_topic: 'reactnative',
+            sfdx_description: 'command for building a React Native mobile application using Saleforce Mobile SDK',
             dir: 'react',
             platforms: ['ios', 'android'],
             toolNames: ['git', 'npm', 'pod'],
