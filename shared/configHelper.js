@@ -33,6 +33,56 @@ var path = require('path'),
     commandLineUtils = require('./commandLineUtils'),
     logInfo = require('./utils').logInfo;
 
+
+function getCommandArgs(forcecli, command) {
+    var appTypes = forcecli.appTypes;
+    var platforms = forcecli.platforms;
+
+    var args = [];
+
+    var addCommonArgs = function() {
+        if (platforms.length > 1) {
+            args.push({name:'platform', 'char':'p', description:'Comma separated platforms (' + platforms.join(', ') + ')'});
+        }
+        args.push({name:'appname', 'char':'n', description:'Application Name'});
+        args.push({name:'packagename', 'char':'p', description: 'App Package Identifier (e.g. com.mycompany.myapp)'})
+        args.push({name:'organization', 'char':'o', description: 'Organization Name (Your company\'s/organization\'s name)'});
+        args.push({name:'outputdir', 'char':'d', description:'Output Directory (Leave empty for current directory)', optional:true});
+    };
+
+    switch (command) {
+    case SDK.commands.version:
+        break;
+    case SDK.commands.create:
+        if (appTypes.length > 1) {
+            args.push({name:'apptype', 'char':'t',  description:'Application Type (' + appTypes.join(', ') + ')'});
+        }
+        addCommonArgs();
+        if (appTypes.indexOf('hybrid_remote') >= 0) {
+            args.push({name:'startpage', 'char':'s', description:'App Start Page (The start page of your remote app. Only required for hybrid_remote)'});
+        }
+        break;
+        
+    case SDK.commands.createWithTemplate:
+        args.push({name:'templaterepouri', 'char': 'r', description:'Template repo URI'});
+        addCommonArgs();
+        break;
+    }
+
+    return args;
+}
+
+function getCommandDescription(forcecli, command) {
+    switch (command) {
+    case SDK.commands.version:
+        return 'print version of Mobile SDK';
+    case SDK.commands.create:
+        return 'create ' + forcecli.platforms.join('/') + ' ' + forcecli.appTypes.join(' or ') + ' mobile application';
+    case SDK.commands.createWithTemplate:
+        return 'create ' + forcecli.platforms.join('/') + ' mobile application from a template';
+    }
+}
+
 function readConfig(args, forcecli, handler) {
     var commandLineArgs = args.slice(2, args.length);
     var command = commandLineArgs.shift();
@@ -40,15 +90,15 @@ function readConfig(args, forcecli, handler) {
     var processorList = null;
 
     switch (command || '') {
-    case 'version':
-        logInfo(forcecli.name + ' version ' + SDK.version);
+    case SDK.commands.version:
+        printVersion(forcecli);
         process.exit(0);
         break;
-    case 'create': 
-        processorList = createArgsProcessorList(forcecli, false); 
+    case SDK.commands.create: 
+        processorList = createArgsProcessorList(forcecli, command); 
         break;
-    case 'createWithTemplate': 
-        processorList = createArgsProcessorList(forcecli, true); 
+    case SDK.commands.createWithTemplate: 
+        processorList = createArgsProcessorList(forcecli, command); 
         break;
     default:
         usage(forcecli);
@@ -58,6 +108,16 @@ function readConfig(args, forcecli, handler) {
     commandLineUtils.processArgsInteractive(commandLineArgs, processorList, handler);
 }
 
+function printVersion(forcecli) {
+    logInfo(forcecli.name + ' version ' + SDK.version);
+}
+
+function printArgs(forcecli, command) {
+    for (var arg of getCommandArgs(forcecli, command)) {
+        logInfo('    ' + (arg.optional  ? '[' : '') + '--' + arg.name + '=' + arg.description + (arg.optional ? ']' : ''), COLOR.magenta);
+    }
+}    
+
 function usage(forcecli) {
     var forcecliName = forcecli.name;
     var forcecliVersion = SDK.version;
@@ -66,32 +126,15 @@ function usage(forcecli) {
     
     logInfo('\n' + forcecliName + ': ' + forcecli.description, COLOR.cyan);
     logInfo('\nUsage:\n', COLOR.cyan);
-    logInfo(forcecliName + ' create', COLOR.magenta);
-    if (appTypes.length > 1) {
-        logInfo('    --apptype=<Application Type> (' + appTypes.join(', ') + ')', COLOR.magenta);
+    for (var i=0; i<forcecli.commands.length; i++) {
+        if (i>0) {
+            logInfo('\n OR \n', COLOR.cyan);
+        }
+        var command = forcecli.commands[i];
+        logInfo('# ' + getCommandDescription(forcecli, command), COLOR.magenta);
+        logInfo(forcecliName + ' ' + command, COLOR.magenta);
+        printArgs(forcecli, command);
     }
-    if (platforms.length > 1) {
-        logInfo('    --platform=<Comma separated plaforms> (' + platforms.join(', ') + ')', COLOR.magenta);
-    }
-    logInfo('    --appname=<Application Name>', COLOR.magenta);
-    logInfo('    --packagename=<App Package Identifier> (e.g. com.mycompany.myapp)', COLOR.magenta);
-    logInfo('    --organization=<Organization Name> (Your company\'s/organization\'s name)', COLOR.magenta);
-    if (appTypes.indexOf('hybrid_remote') >= 0) {
-        logInfo('    --startpage=<App Start Page> (The start page of your remote app. Only required for hybrid_remote)', COLOR.magenta);
-    }
-    logInfo('    [--outputdir=<Output directory> (Leave empty for current directory)]', COLOR.magenta);
-    logInfo('\n OR \n', COLOR.cyan);
-    logInfo(forcecliName + ' createWithTemplate', COLOR.magenta);
-    if (platforms.length > 1) {
-        logInfo('    --platform=<Comma separated plaforms> (' + platforms.join(', ') + ')', COLOR.magenta);
-    }
-    logInfo('    --templaterepouri=<Template repo URI> (e.g. https://github.com/forcedotcom/SmartSyncExplorerReactNative)]', COLOR.magenta);
-    logInfo('    --appname=<Application Name>', COLOR.magenta);
-    logInfo('    --packagename=<App Package Identifier> (e.g. com.mycompany.myapp)', COLOR.magenta);
-    logInfo('    --organization=<Organization Name> (Your company\'s/organization\'s name)', COLOR.magenta);
-    logInfo('    [--outputdir=<Output directory> (Leave empty for current directory)]', COLOR.magenta);
-    logInfo('\n OR \n', COLOR.cyan);
-    logInfo(forcecliName + ' version', COLOR.magenta);
     logInfo('\n OR \n', COLOR.cyan);
     logInfo(forcecliName, COLOR.magenta);
     logInfo('\nWe also offer:', COLOR.cyan);
@@ -104,9 +147,9 @@ function usage(forcecli) {
 }
 
 //
-// Processor list for 'create' command
+// Processor list
 //
-function createArgsProcessorList(forcecli, isCreateWithTemplate) {
+function createArgsProcessorList(forcecli, command) {
     var appTypes = forcecli.appTypes;
     var platforms = forcecli.platforms;
     var argProcessorList = new commandLineUtils.ArgProcessorList();
@@ -119,7 +162,7 @@ function createArgsProcessorList(forcecli, isCreateWithTemplate) {
                         function(val) { return !val.split(",").some(p=>platforms.indexOf(p) == -1); });
     }
 
-    if (isCreateWithTemplate) {
+    if (command == SDK.commands.createWithTemplate) {
         // Template Repo URI
         addProcessorFor(argProcessorList, 'templaterepouri', 'Enter URI of repo containing template application:',
                      'Invalid value for template repo uri: \'$val\'.', /^\S+$/);
@@ -198,4 +241,9 @@ function addProcessorFor(argProcessorList, argName, prompt, error, validation, p
     }, preprocessor);
 }
 
-module.exports.readConfig = readConfig;
+module.exports = {
+    readConfig: readConfig,
+    printVersion: printVersion,
+    getCommandArgs: getCommandArgs,
+    getCommandDescription: getCommandDescription,
+};

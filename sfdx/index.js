@@ -26,68 +26,73 @@
  */
 
 var SDK = require('./shared/constants'),
-    createHelper = require('./shared/createHelper');
+    createHelper = require('./shared/createHelper'),
+    configHelper = require('./shared/configHelper');
 
+// Flags
+function getFlags(cli, command) {
+    var flags = configHelper.getCommandArgs(cli, command);
+    for (var flag of flags) {
+        flag.required = !flag.optional;
+        flag.hasValue = true;
+    }
+    return flags;
+}
 
-// Possible flags
-var appNameFlag = {
-    name: 'appname',
-    description: 'application name',
-    hasValue: true,
-    required: true
-};
-
-var platformFlag = {
-    name: 'platform',
-    description: 'target platform(s) separated by commas',
-    hasValue: true,
-    required: true
-};
-
+// Run command
+function runCommand(cli, command, args) {
+    switch(command) {
+    case SDK.commands.create:
+        createHelper.createApp(cli, args);
+        break;
+    case SDK.commands.createWithTemplate:
+        createHelper.createApp(cli, args);
+        break;
+    case SDK.commands.version:
+        configHelper.printVersion(cli);
+        break;
+    }
+}
 
 // Topics
-var topics = [];
-for (var cliName in SDK.forceclis) {
-    var cli = SDK.forceclis[cliName];
-    topics.push({
-        name: cli.sfx_topic,
-        description:cli.sfdx_description
-    });
+function getTopics() {
+    var topics = [];
+    for (var cliName in SDK.forceclis) {
+        var cli = SDK.forceclis[cliName];
+        topics.push({
+            name: cli.sfx_topic,
+            description:cli.sfdx_description
+        });
+    }
+    return topics;
 }
 
 // Commands
-var commands = [];
-for (var cliName in SDK.forceclis) {
-    var cli = SDK.forceclis[cliName];
-    commands.push({
-        topic: cli.sfdx_topic,
-        command: 'create',
-        description: 'create ' + cli.appTypes.join(' or ') + ' mobile application for ' + cli.platforms.join(' or ') ,
-        help: 'TBD',
-        flags: [appNameFlag],
-        run(context) {
-            createHelper.createApp(cli, context.args)
+function getCommands() {
+    var commands = [];
+    for (var cliName in SDK.forceclis) {
+        var cli = SDK.forceclis[cliName];
+        for (var command of cli.commands) {
+            commands.push({
+                cli: cli,
+                topic: cli.sfdx_topic,
+                command: command,
+                description: configHelper.getCommandDescription(cli, command),
+                flags: getFlags(cli, command),
+                run(context) {
+                    runCommand(this.cli, this.command, context.flags);
+                }
+            });
         }
-    });
-    commands.push({
-        topic: cli.sfdx_topic,
-        command: 'createWithTemplate',
-        description: 'create ' + cli.appTypes.join(' or ') + ' mobile application for ' + cli.platforms.join(' or ')  + ' based on a template',
-        help: 'TBD',
-        flags: [appNameFlag],
-        run(context) {
-            createHelper.createApp(cli, context.args)
-        }
-    });
+    }
+    return commands;
 }
-
-console.log("commands-->" + JSON.stringify(commands, null, 2));
 
 module.exports = {
     namespace: {
         name:'mobilesdk',
-        description: 'commands for creating mobile apps based on the Salesforce Mobile SDK'
+        description: 'create mobile apps based on the Salesforce Mobile SDK'
     },
-    topics: topics,
-    commands: commands
+    topics: getTopics(),
+    commands: getCommands()
 };

@@ -47,7 +47,8 @@ module.exports = {
             appTypesToPath: {
                 'native': 'iOSNativeTemplate',
                 'native_swift': 'iOSNativeSwiftTemplate'
-            }
+            },
+            commands: ['create', 'createWithTemplate', 'version']            
         },
         forcedroid: {
             name: 'forcedroid',
@@ -61,7 +62,8 @@ module.exports = {
             appTypesToPath: {
                 'native': 'AndroidNativeTemplate',
                 'native_kotlin': 'AndroidNativeKotlinTemplate'
-            }
+            },
+            commands: ['create', 'createWithTemplate', 'version']            
         },
         forcehybrid: {
             name: 'forcehybrid',
@@ -75,7 +77,8 @@ module.exports = {
             appTypesToPath: {
                 'hybrid_local': 'HybridLocalTemplate',
                 'hybrid_remote': 'HybridRemoteTemplate'
-            }
+            },
+            commands: ['create', 'version']            
         },
         forcereact: {
             name: 'forcereact',
@@ -88,8 +91,15 @@ module.exports = {
             appTypes: ['react_native'],
             appTypesToPath: {
                 'react_native': 'ReactNativeTemplate'
-            }
+            },
+            commands: ['create', 'createWithTemplate', 'version']
         }
+    },
+
+    commands: {
+        create: 'create',
+        createWithTemplate: 'createWithTemplate',
+        version: 'version'
     },
 
     tools: {
