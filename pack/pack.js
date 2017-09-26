@@ -21,43 +21,51 @@ function main(args) {
 
     // Args extraction
     var usageRequested = parsedArgs.hasOwnProperty('usage');
+    var sfdxPluginRequested = parsedArgs.hasOwnProperty('sfdx-plugin');
     var chosenClis = cleanSplit(parsedArgs.cli, ',');
+    var cliPackingRequested = chosenClis.some(cli=>Object.keys(SDK.forceclis).indexOf(cli) >= 0);
 
     // Usage
-    if (usageRequested || !chosenClis.some(cli=>Object.keys(SDK.forceclis).indexOf(cli) >= 0)) {
+    if (usageRequested || (!sfdxPluginRequested && !cliPackingRequested)) {
         usage();
         process.exit(1);
     }
-    // Pack
-    for (var cli of Object.values(SDK.forceclis)) {
-        if (chosenClis.indexOf(cli.name) >= 0) {
-            pack(cli);
+    // Sfdx plugin packing
+    else if (sfdxPluginRequested) {
+        pack('sfdx-mobilesdk-plugin', 'sfdx');
+    }
+    // CLI packing
+    else {
+        for (var cli of Object.values(SDK.forceclis)) {
+            if (chosenClis.indexOf(cli.name) >= 0) {
+                pack(cli.name, cli.dir);
+            }
         }
     }
 }
 
 //
-// Create forceios/droid-xxx.tgz package for given os
+// Create package with name from dir
 // 
-function pack(cli) {
-    var packageName = cli.name + '-' + SDK.version + '.tgz';
+function pack(name, relativeDir) {
+    var packageName = name + '-' + SDK.version + '.tgz';
 
     utils.logInfo('Creating ' + packageName, COLOR.green);
     
     // Packing
     var packageRepoDir = path.join(__dirname, '..');
-    var cliDir = path.join(packageRepoDir, cli.dir);
-    var cliSharedDir = path.join(cliDir, 'shared');
+    var dir = path.join(packageRepoDir, relativeDir);
+    var sharedDir = path.join(dir, 'shared');
 
     // npm pack doesn't following links
-    utils.removeFile(cliSharedDir);
-    shelljs.cp('-R', path.join(packageRepoDir, 'shared'), cliDir);
-    utils.runProcessThrowError('npm pack', cliDir);
-    utils.removeFile(cliSharedDir);
-    shelljs.ln('-s', path.join('..', 'shared'), cliSharedDir);
+    utils.removeFile(sharedDir);
+    shelljs.cp('-R', path.join(packageRepoDir, 'shared'), dir);
+    utils.runProcessThrowError('npm pack', dir);
+    utils.removeFile(sharedDir);
+    shelljs.ln('-s', path.join('..', 'shared'), sharedDir);
 
     // Moving package to current directory
-    utils.moveFile(path.join(cliDir, packageName), packageName);
+    utils.moveFile(path.join(dir, packageName), packageName);
 }
 
 // 
@@ -83,4 +91,6 @@ function usage() {
     utils.logInfo('  pack.js', COLOR.magenta);
     utils.logInfo('    --cli=cli1,cli2', COLOR.magenta);
     utils.logInfo('      where cliN is one of: ' + Object.keys(SDK.forceclis).join(', '), COLOR.magenta);
+    utils.logInfo('    OR', COLOR.magenta);
+    utils.logInfo('    --sfdx-plugin', COLOR.magenta);
 }
