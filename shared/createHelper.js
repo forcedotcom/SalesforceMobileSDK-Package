@@ -170,6 +170,17 @@ function checkTools(toolNames) {
 //
 function createApp(forcecli, config) {
 
+    // Can't target ios or run pod if not on a mac
+    if (process.platform != 'darwin') {
+        forcecli.platforms = forcecli.platforms.filter(p=>p!='ios');
+        forcecli.toolNames = forcecli.toolNames.filter(t=>t!='pod');
+
+        if (forcecli.platforms.length == 0) {
+            utils.logError('You can only run ' + forcecli.name + ' on a Mac');
+            process.exit(1);
+        }
+    }
+
     // Check tools
     checkTools(forcecli.toolNames);
 
