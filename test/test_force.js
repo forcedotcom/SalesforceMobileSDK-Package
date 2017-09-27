@@ -43,6 +43,7 @@ function main(args) {
 
     // Args extraction
     var usageRequested = parsedArgs.hasOwnProperty('usage');
+    var useSfdxRequested = parsedArgs.hasOwnProperty('use-sfdx');
     var chosenOperatingSystems = cleanSplit(parsedArgs.os, ',').map(function(s) { return s.toLowerCase(); });
     var appTypes = parsedArgs.apptype || '';
     var templateRepoUri = parsedArgs.templaterepouri || '';
@@ -73,13 +74,19 @@ function main(args) {
         chosenAppTypes = [getAppTypeFromTemplate(templateRepoUri)];
     }
 
-    // Create forcexxx packages needed
-    for (var cli of Object.values(SDK.forceclis)) {
-        if (cli.platforms.some(p=>chosenOperatingSystems.indexOf(p)>=0)
-            && cli.appTypes.some(a=>chosenAppTypes.indexOf(a)>=0)) {
+    if (useSfdxRequested) {
+        // Create sfdx plugin
+        createDeploySfdxPluginPackage(tmpDir);
+    }
+    else {
+        // Create forcexxx packages needed
+        for (var cli of Object.values(SDK.forceclis)) {
+            if (cli.platforms.some(p=>chosenOperatingSystems.indexOf(p)>=0)
+                && cli.appTypes.some(a=>chosenAppTypes.indexOf(a)>=0)) {
 
-            createDeployForcePackage(tmpDir, cli);
+                createDeployForcePackage(tmpDir, cli);
 
+            }
         }
     }
 
@@ -102,12 +109,12 @@ function main(args) {
         if (testingWithAppType) {
             for (var j=0; j<chosenAppTypes.length; j++) {
                 var appType = chosenAppTypes[j];
-                createCompileApp(tmpDir, os, appType, null, pluginRepoUri);
+                createCompileApp(tmpDir, os, appType, null, pluginRepoUri, useSfdxRequested);
             }
         }
         if (testingWithTemplate) {
             // NB: chosenAppTypes[0] is getAppTypeFromTemplate(templateRepoUri)
-            createCompileApp(tmpDir, os, chosenAppTypes[0], templateRepoUri, null);
+            createCompileApp(tmpDir, os, chosenAppTypes[0], templateRepoUri, null, useSfdxRequested);
         }
     }
 }
@@ -122,6 +129,7 @@ function usage(exitCode) {
     utils.logInfo('  test_force.js', COLOR.magenta);
     utils.logInfo('    --os=os1,os2,etc', COLOR.magenta);
     utils.logInfo('    --apptype=appType1,appType2,etc OR --templaterepouri=TEMPLATE_REPO_URI', COLOR.magenta);
+    utils.logInfo('    [--use-sfdx]', COLOR.magenta);
     utils.logInfo('    [--pluginrepouri=PLUGIN_REPO_URI (Defaults to uri in shared/constants.js)]', COLOR.magenta);
     utils.logInfo('    [--sdkbranch=SDK_BRANCH (Defaults to dev)]', COLOR.magenta);
     utils.logInfo('', COLOR.cyan);
@@ -147,6 +155,8 @@ function usage(exitCode) {
     utils.logInfo('  If android is targeted (and apptype is a native type):', COLOR.cyan);
     utils.logInfo('  - generates forcedroid package and deploys it to a temporary directory', COLOR.cyan);
     utils.logInfo('  - creates and compiles applications for the specified os and template', COLOR.cyan);
+    utils.logInfo('', COLOR.cyan);
+    utils.logInfo('  If use-sfdx is specified, then the sfdx-mobilesdk-plugin package is generated and used through sfdx for creating the applications', COLOR.cyan);
 
     process.exit(exitCode);
 }
@@ -161,6 +171,17 @@ function createDeployForcePackage(tmpDir, forcecli) {
 }
 
 //
+// Create and deploy sfdx plugin
+//
+function createDeploySfdxPluginPackage(tmpDir) {
+    var packJs = path.join(__dirname, '..', 'pack', 'pack.js');
+    utils.runProcessThrowError('node ' + packJs + ' --sfdx-plugin');
+    utils.runProcessThrowError('npm install --prefix ' + tmpDir + ' ' + 'sfdx-mobilesdk-plugin-' + SDK.version + '.tgz');
+    utils.runProcessThrowError('sfdx plugins:link ' + tmpDir + '/node_modules/sfdx-mobilesdk-plugin');
+}
+
+
+//
 // Update cordova plugin repo
 //
 function updatePluginRepo(tmpDir, os, pluginRepoDir, sdkBranch) {
@@ -171,8 +192,8 @@ function updatePluginRepo(tmpDir, os, pluginRepoDir, sdkBranch) {
 //
 // Create and compile app
 //
-function createCompileApp(tmpDir, os, actualAppType, templateRepoUri, pluginRepoUri) {
-    var forceArgs = '';
+function createCompileApp(tmpDir, os, actualAppType, templateRepoUri, pluginRepoUri, useSfdxRequested) {
+    var execArgs = '';
     var isNative = actualAppType.indexOf('native') == 0;
     var isReactNative = actualAppType === APP_TYPE.react_native;
     var isHybrid = actualAppType.indexOf('hybrid') == 0;
@@ -191,25 +212,27 @@ function createCompileApp(tmpDir, os, actualAppType, templateRepoUri, pluginRepo
                       )
                    );
 
-    var forcePath = path.join(tmpDir, 'node_modules', '.bin', forcecli.name);
+    var execPath = useSfdxRequested
+        ? 'sfdx mobilesdk:' + forcecli.sfdx_topic + ':'
+        : path.join(tmpDir, 'node_modules', '.bin', forcecli.name) + ' ';
 
     if (!templateRepoUri) {
         if (actualAppType === APP_TYPE.native_swift && os === OS.android) return; // that app type doesn't exist for android
         if (actualAppType === APP_TYPE.native_kotlin && os === OS.ios) return; // that app type doesn't exist for ios
 
-        forceArgs = 'create '
+        execArgs = 'create '
             + ' --apptype=' + actualAppType;
     }
     else {
-        forceArgs = 'createWithTemplate '
+        execArgs = 'createWithTemplate '
             + ' --templaterepouri=' + templateRepoUri;
     }
 
-    if (forcecli.platforms.length > 0) {
-        forceArgs += ' --platform=' + os;
+    if (forcecli.platforms.length > 1) {
+        execArgs += ' --platform=' + os;
     }
 
-    forceArgs += ''
+    execArgs += ''
         + ' --appname=' + appName
         + ' --packagename=com.mycompany'
         + ' --organization=MyCompany'
@@ -219,7 +242,7 @@ function createCompileApp(tmpDir, os, actualAppType, templateRepoUri, pluginRepo
         + (isHybrid ? ' --pluginrepouri=' + pluginRepoUri : '');
 
     // Generation
-    var generationSucceeded = utils.runProcessCatchError(forcePath + ' ' + forceArgs, 'GENERATING ' + target);
+    var generationSucceeded = utils.runProcessCatchError(execPath + execArgs, 'GENERATING ' + target);
 
     if (!generationSucceeded) {
         return; // no point continuing
