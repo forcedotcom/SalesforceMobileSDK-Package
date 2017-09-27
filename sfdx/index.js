@@ -34,7 +34,7 @@ function getFlags(cli, command) {
     var flags = configHelper.getCommandArgs(cli, command);
     for (var flag of flags) {
         flag.required = !flag.optional;
-        flag.hasValue = true;
+        flag.hasValue = flag.hasValue === undefined ? true : flag.hasValue;
     }
     return flags;
 }
