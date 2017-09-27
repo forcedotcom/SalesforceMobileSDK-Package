@@ -27,7 +27,7 @@
 
 var VERSION = '6.0.0';
 
-module.exports = {
+var SDK = {
     version: VERSION,
 
     templatesRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-Templates#dev',    // dev
@@ -132,3 +132,19 @@ module.exports = {
         android: 'Android Studio'
     }
 };
+
+// Can't target ios or run pod if not on a mac
+for (var cliName in SDK.forceclis) {
+    var forcecli = SDK.forceclis[cliName];
+
+    if (process.platform != 'darwin') {
+        forcecli.toolNames = forcecli.toolNames.filter(t=>t!='pod');
+        forcecli.platforms = forcecli.platforms.filter(p=>p!='ios');
+    }
+
+    if (forcecli.platforms.length == 0) {
+        delete SDK.forceclis[forcecli.name];
+    }
+}
+
+module.exports = SDK;
