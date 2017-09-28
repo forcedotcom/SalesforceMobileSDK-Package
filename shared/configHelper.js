@@ -47,8 +47,8 @@ function getCommandArgs(forcecli, command) {
         args.push({name:'appname', 'char':'n', description:'Application Name'});
         args.push({name:'packagename', 'char':'p', description: 'App Package Identifier (e.g. com.mycompany.myapp)'})
         args.push({name:'organization', 'char':'o', description: 'Organization Name (Your company\'s/organization\'s name)'});
-        args.push({name:'outputdir', 'char':'d', description:'Output Directory (Leave empty for current directory)', optional:true});
-        args.push({name:'verbose', 'char':'v', hiddren:true, hasValue:false, optional:true});
+        args.push({name:'outputdir', 'char':'d', description:'Output Directory (Leave empty for current directory)', required:false});
+        args.push({name:'verbose', 'char':'v', description:'Emit additional command output', hasValue:false, required:false});
     };
 
     switch (command) {

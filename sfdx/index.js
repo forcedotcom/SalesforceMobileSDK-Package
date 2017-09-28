@@ -33,7 +33,7 @@ var SDK = require('./shared/constants'),
 function getFlags(cli, command) {
     var flags = configHelper.getCommandArgs(cli, command);
     for (var flag of flags) {
-        flag.required = !flag.optional;
+        flag.required = flag.required === undefined ? true : flag.required;
         flag.hasValue = flag.hasValue === undefined ? true : flag.hasValue;
     }
     return flags;
@@ -91,7 +91,8 @@ function getCommands() {
 module.exports = {
     namespace: {
         name:'mobilesdk',
-        description: 'create mobile apps based on the Salesforce Mobile SDK'
+        description: 'create mobile apps based on the Salesforce Mobile SDK',
+        
     },
     topics: getTopics(),
     commands: getCommands()

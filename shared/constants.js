@@ -102,6 +102,40 @@ module.exports = {
         version: 'version'
     },
 
+//        create: {
+//            name: 'create',
+//            args: [],
+//            description: 'create $platforms $appTypes mobile application'
+//        },
+//        createWithTemplate: {
+//            name: 'createWithTemplate',
+//            args: [],
+//            description: 'create $platforms $appTypes mobile application from a template'
+//        },
+//        version: {
+//            name: 'version',
+//            args: [],
+//            description: 'print version of Mobile SDK'
+//        }
+//    },
+
+    args: {
+        platform: {
+            name: 'platform',
+            'char': 'p',
+            description: 'Comma separated platforms ($platforms)',
+            prompt: 'Enter the target platform(s) separated by commas ($platforms)',
+            error: 'Platform(s) must be in $platforms.',
+            validate: (cli,val) => !val.split(",").some(p=>cli.platforms.indexOf(p) == -1)
+        },
+        appnName: {
+            name: 'appname',
+            'char': 'n',
+            description: 'Application Name',
+            prompt: 'Enter your application name:'
+        }
+    },
+
     tools: {
         git: {
             checkCmd: 'git --version',
