@@ -80,7 +80,8 @@ function main(args) {
     }
     else {
         // Create forcexxx packages needed
-        for (var cli of Object.values(SDK.forceclis)) {
+        for (var cliName in SDK.forceclis) {
+            var cli = SDK.forceclis[cliName];
             if (cli.platforms.some(p=>chosenOperatingSystems.indexOf(p)>=0)
                 && cli.appTypes.some(a=>chosenAppTypes.indexOf(a)>=0)) {
 

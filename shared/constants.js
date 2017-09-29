@@ -33,6 +33,36 @@ var VERSION = '6.0.0';
 module.exports = {
     version: VERSION,
 
+    tools: {
+        git: {
+            checkCmd: 'git --version',
+            minVersion: '2.13'
+        },
+        npm: {
+            checkCmd: 'npm -v',
+            minVersion: '3.10'
+        },
+        pod: {
+            checkCmd: 'pod --version',
+            minVersion: '1.2'
+        },
+        cordova: {
+            checkCmd: 'cordova -v',
+            minVersion: '7.0.0',
+            pluginRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-CordovaPlugin#dev',    // dev
+            //pluginRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-CordovaPlugin#v' + VERSION, // GA
+            platformVersion: {
+                ios: '4.4.0',
+                android: '6.2.3'
+            }
+        }
+    },
+
+    ides: {
+        ios: 'XCode',
+        android: 'Android Studio'
+    },
+
     templatesRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-Templates#dev',    // dev
     //templatesRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-Templates#v' + VERSION, // GA
 
@@ -40,7 +70,7 @@ module.exports = {
     forceclis: {
         forceios: {
             name: 'forceios',
-            description: 'command line utility for building iOS native mobile applications using Salesforce Mobile SDK',
+            description: 'tool for building iOS native mobile applications using Salesforce Mobile SDK',
             sfdx_topic: 'ios',
             sfdx_description: 'command for building an iOS native mobile application using Saleforce Mobile SDK',
             dir: 'ios',
@@ -55,7 +85,7 @@ module.exports = {
         },
         forcedroid: {
             name: 'forcedroid',
-            description: 'command line utility for building Android native mobile applications using Salesforce Mobile SDK',
+            description: 'tool for building Android native mobile applications using Salesforce Mobile SDK',
             sfdx_topic: 'android',
             sfdx_description: 'command for building a Android native mobile application using Saleforce Mobile SDK',
             dir: 'android',
@@ -70,7 +100,7 @@ module.exports = {
         },
         forcehybrid: {
             name: 'forcehybrid',
-            description: 'command line utility for building hybrid mobile applications using Salesforce Mobile SDK',
+            description: 'tool for building hybrid mobile applications using Salesforce Mobile SDK',
             sfdx_topic: 'hybrid',
             sfdx_description: 'command for building an hybrid mobile application using Saleforce Mobile SDK',
             dir: 'hybrid',
@@ -81,11 +111,11 @@ module.exports = {
                 'hybrid_local': 'HybridLocalTemplate',
                 'hybrid_remote': 'HybridRemoteTemplate'
             },
-            commands: ['create', 'version']            
+            commands: ['create', 'createWithTemplate', 'version']            
         },
         forcereact: {
             name: 'forcereact',
-            description: 'command line utility for building react native mobile applications using Salesforce Mobile SDK',
+            description: 'tool for building react native mobile applications using Salesforce Mobile SDK',
             sfdx_topic: 'reactnative',
             sfdx_description: 'command for building a React Native mobile application using Saleforce Mobile SDK',
             dir: 'react',
@@ -104,57 +134,57 @@ module.exports = {
             name: 'platform',
             'char': 'p',
             description: cli => 'Comma separated platforms (' + cli.platforms.join(', ') + ')',
-            prompt: cli => 'Enter the target platform(s) separated by commas (' + cli.platforms.join(', ') + ')',
-            error: (val, cli) => 'Platform(s) must be in ' + cli.platforms.join(', '),
-            validate: (val, cli) => !val.split(",").some(p=>cli.platforms.indexOf(p) == -1)
+            prompt: cli => 'Enter the target platform(s) separated by commas (' + cli.platforms.join(', ') + '):',
+            error: cli => val => 'Platform(s) must be in ' + cli.platforms.join(', '),
+            validate: cli => val => !val.split(",").some(p=>cli.platforms.indexOf(p) == -1)
         },
         appType: {
             name:'apptype',
             'char':'t',
             description: cli => 'Application Type (' + cli.appTypes.join(', ') + ')',
             prompt: cli => 'Enter your application type (' + cli.appTypes.join(', ') + '):',
-            error: (val, cli) => 'App type must be ' + cli.appTypes.join(' or ') + '.',
-            validate: (val, cli) => cli.appTypes.indexOf(val) >=0
+            error: cli => val => 'App type must be ' + cli.appTypes.join(' or ') + '.',
+            validate: cli => val => cli.appTypes.indexOf(val) >=0
         },
         templateRepoUri: {
             name:'templaterepouri',
             'char': 'r',
             description:'Template repo URI',
             prompt: 'Enter URI of repo containing template application:',
-            error: (val, cli) => 'Invalid value for template repo uri: \'' + val + '\'.',
-            validate: (val, cli) => /^\S+$/.test(val)
+            error: cli => val => 'Invalid value for template repo uri: \'' + val + '\'.',
+            validate: cli => val => /^\S+$/.test(val)
         },
         appName: {
             name: 'appname',
             'char': 'n',
             description: 'Application Name',
             prompt: 'Enter your application name:',
-            error: (val, cli) => 'Invalid value for application name: \'' + val + '\'.',
-            validate: (val, cli) => /^\S+$/.test(val)
+            error: cli => val => 'Invalid value for application name: \'' + val + '\'.',
+            validate: cli => val => /^\S+$/.test(val)
         },
         packageName: {
             name: 'packagename',
             'char': 'p',
             description: 'App Package Identifier (e.g. com.mycompany.myapp)',
             prompt: 'Enter your package name:',
-            error: (val, cli) => '\'' + val + '\' is not a valid package name.',
-            validate: (val, cli) => /^[a-z]+[a-z0-9_]*(\.[a-z]+[a-z0-9_]*)*$/.test(val),
+            error: cli => val => '\'' + val + '\' is not a valid package name.',
+            validate: cli => val => /^[a-z]+[a-z0-9_]*(\.[a-z]+[a-z0-9_]*)*$/.test(val),
         },
         organization: {
             name: 'organization',
             'char': 'o',
             description: 'Organization Name (Your company\'s/organization\'s name)',
             prompt: 'Enter your organization name (Acme, Inc.):',
-            error: (val, cli) => 'Invalid value for organization: \'' + val + '\'.',
-            validate: (val, cli) => /\S+/.test(val)
+            error: cli => val => 'Invalid value for organization: \'' + val + '\'.',
+            validate: cli => val => /\S+/.test(val)
         },
         outputDir: {
             name:'outputdir',
             'char':'d',
             description:'Output Directory (Leave empty for current directory)',
             prompt: 'Enter output directory for your app (leave empty for the current directory):',
-            error: (val, cli) => 'Invalid value for output directory (directory must not already exist): \'' + val + '\'.',
-            validate: (val, cli) => val === undefined || val === '' || !shelljs.test('-e', path.resolve(val)),
+            error: cli => val => 'Invalid value for output directory (directory must not already exist): \'' + val + '\'.',
+            validate: cli => val => val === undefined || val === '' || !shelljs.test('-e', path.resolve(val)),
             required:false
         },
         startPage: {
@@ -162,9 +192,10 @@ module.exports = {
             'char':'s',
             description:'App Start Page (The start page of your remote app. Only required for hybrid_remote)',
             prompt: 'Enter the start page for your app:',
-            error: (val, cli) => 'Invalid value for start page: \'' + val + '\'.',
-            validate: (val, cli) => /\S+/.test(val),
-            required: false
+            error: cli => val => 'Invalid value for start page: \'' + val + '\'.',
+            validate: cli => val => /\S+/.test(val),
+            required: false,
+            promptIf: otherArgs => otherArgs.apptype === 'hybrid_remote'
         },
         // Private args
         verbose: {
@@ -176,15 +207,15 @@ module.exports = {
         templatePath: {
             name:'templatePath',
             'char':'v',
-            error: (val, cli) => 'Invalid value for template path: \'' + val + '\'.',
-            validate: (val, cli) => /.*/.test(val),
+            error: cli => val => 'Invalid value for template path: \'' + val + '\'.',
+            validate: cli => val => /.*/.test(val),
             required:false
         },            
         pluginRepoUri: {
             name:'pluginrepouri',
             'char':'v',
-            error: (val, cli) => 'Invalid value for plugin repo uri: \'' + val + '\'.',
-            validate: (val, cli) => /.*/.test(val),
+            error: cli => val => 'Invalid value for plugin repo uri: \'' + val + '\'.',
+            validate: cli => val => /.*/.test(val),
             required:false
         }  
     },
@@ -222,35 +253,5 @@ module.exports = {
             args: [],
             description: 'print version of Mobile SDK'
         }
-    },
-
-    tools: {
-        git: {
-            checkCmd: 'git --version',
-            minVersion: '2.13'
-        },
-        npm: {
-            checkCmd: 'npm -v',
-            minVersion: '3.10'
-        },
-        pod: {
-            checkCmd: 'pod --version',
-            minVersion: '1.2'
-        },
-        cordova: {
-            checkCmd: 'cordova -v',
-            minVersion: '7.0.0',
-            pluginRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-CordovaPlugin#dev',    // dev
-            //pluginRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-CordovaPlugin#v' + VERSION, // GA
-            platformVersion: {
-                ios: '4.4.0',
-                android: '6.2.3'
-            }
-        }
-    },
-
-    ides: {
-        ios: 'XCode',
-        android: 'Android Studio'
     }
 };

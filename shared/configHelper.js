@@ -33,11 +33,39 @@ var path = require('path'),
     commandLineUtils = require('./commandLineUtils'),
     logInfo = require('./utils').logInfo;
 
+function applyCli(f, cli) {
+    return typeof f === 'function' ? f(cli): f;
+}
 
-function getArgs(cli, commandName) {
-    var argNames = SDK.commands[commandName].args;
-    argNames = typeof argNames === 'function' ? argNames(cli) : argNames;
-    return argNames.map(argName => SDK.args[argName]);
+function getArgsExpanded(cli, commandName) {
+    var argNames = applyCli(SDK.commands[commandName].args, cli);
+    return argNames
+        .map(argName => SDK.args[argName])
+        .map(arg =>
+             ({
+                 name: arg.name,
+                 'char': arg.char,
+                 description: applyCli(arg.description, cli),
+                 prompt: applyCli(arg.prompt, cli),
+                 error: applyCli(arg.error, cli),
+                 validate: applyCli(arg.validate, cli),
+                 promptIf: arg.promptIf,
+                 required: arg.required === undefined ? true : arg.required,
+                 required: arg.required === undefined ? true : arg.required,
+                 hasValue: arg.hasValue === undefined ? true : arg.hasValue,
+                 hidden: arg.description == null
+             })
+            );
+    
+}
+
+function getCommandExpanded(cli, commandName) {
+    var command = SDK.commands[commandName];
+    return {
+        name: command.name,
+        args: getArgsExpanded(cli, commandName),
+        description: applyCli(command.description, cli)
+    };
 }
 
 function readConfig(args, cli, handler) {
@@ -68,13 +96,9 @@ function printVersion(cli) {
 }
 
 function printArgs(cli, commandName) {
-    for(var arg of getArgs(cli, commandName)) {
-        var required = arg.required === undefined ? true : arg.required;
-        var description = typeof arg.description === 'function' ? arg.description(cli) : arg.description;
-        if (description != null) {
-            logInfo('    ' + (!required  ? '[' : '') + '--' + arg.name + '=' + description + (!required ? ']' : ''), COLOR.magenta);
-        }
-    }
+    getArgsExpanded(cli, commandName)
+        .filter(arg => !arg.hidden)
+        .forEach(arg => logInfo('    ' + (!arg.required  ? '[' : '') + '--' + arg.name + '=' + arg.description + (!arg.required ? ']' : ''), COLOR.magenta));
 }    
 
 function usage(cli) {
@@ -90,16 +114,16 @@ function usage(cli) {
             logInfo('\n OR \n', COLOR.cyan);
         }
         var commandName = cli.commands[i];
-        var command = SDK.commands[commandName];
-        var description = typeof command.description === 'function' ? command.description(cli) : command.description;
-        logInfo('# ' + description, COLOR.magenta);
+        var command = getCommandExpanded(cli, commandName);
+        logInfo('# ' + command.description, COLOR.magenta);
         logInfo(cliName + ' ' + commandName, COLOR.magenta);
         printArgs(cli, commandName);
     }
     logInfo('\n OR \n', COLOR.cyan);
     logInfo(cliName, COLOR.magenta);
     logInfo('\nWe also offer:', COLOR.cyan);
-    for (var otherCli of Object.values(SDK.forceclis)) {
+    for (var otherCliName in SDK.forceclis) {
+        var otherCli = SDK.forceclis[otherCliName];
         if (otherCli.name != cli.name) {
             logInfo('- ' + otherCli.name + ': ' + otherCli.description, COLOR.cyan);
         }
@@ -111,16 +135,10 @@ function usage(cli) {
 // Processor list
 //
 function createArgsProcessorList(cli, commandName) {
-    var appTypes = cli.appTypes;
-    var platforms = cli.platforms;
     var argProcessorList = new commandLineUtils.ArgProcessorList();
 
-    for (var arg of getArgs(cli, commandName)) {
-        var prompt = typeof arg.prompt === 'function' ? arg.prompt(cli) : arg.prompt;
-        var validation = typeof arg.validate === 'function' ? ((arg, cli) => (val => arg.validate(val, cli)))(arg, cli) : null; // curried closure !!
-        var error = typeof arg.error === 'function' ? ((arg, cli) => (val => arg.error(val, cli)))(arg, cli) : null; // curried closure !!
-        var preProcessor = arg.name == 'startpage' ? (argsMap => argsMap['apptype'] === 'hybrid_remote') : undefined; // XXX handle in constants.js
-        addProcessorFor(argProcessorList, arg.name, prompt, error, validation, preProcessor);
+    for (var arg of getArgsExpanded(cli, commandName)) {
+        addProcessorFor(argProcessorList, arg.name, arg.prompt, arg.error, arg.validate, arg.promptIf);
     }
 
     return argProcessorList;
@@ -134,15 +152,14 @@ function createArgsProcessorList(cli, commandName) {
 // * error: function 
 // * validation: function or null (no validation)
 // * preprocessor: function or null
-// * postprocessor: function or null
 // 
-function addProcessorFor(argProcessorList, argName, prompt, error, validation, preprocessor, postprocessor) {
+function addProcessorFor(argProcessorList, argName, prompt, error, validation, preprocessor) {
     argProcessorList.addArgProcessor(argName, prompt, function(val) {
         val = val.trim();
 
-        // validation is either a function or a regexp 
-        if (validation == null || (typeof validation === 'function' && validation(val))) {
-            return new commandLineUtils.ArgProcessorOutput(true, typeof postprocessor === 'function' ? postprocessor(val) : val);
+        // validation is either a function or null
+        if (validation == null || validation(val)) {
+            return new commandLineUtils.ArgProcessorOutput(true, val);
         }
         else {
             return new commandLineUtils.ArgProcessorOutput(false, error(val));
@@ -154,5 +171,6 @@ function addProcessorFor(argProcessorList, argName, prompt, error, validation, p
 module.exports = {
     readConfig: readConfig,
     printVersion: printVersion,
-    getArgs: getArgs
+    getArgsExpanded: getArgsExpanded,
+    getCommandExpanded: getCommandExpanded
 };

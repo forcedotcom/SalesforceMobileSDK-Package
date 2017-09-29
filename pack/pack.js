@@ -36,7 +36,8 @@ function main(args) {
     }
     // CLI packing
     else {
-        for (var cli of Object.values(SDK.forceclis)) {
+        for (var cliName in SDK.forceclis) {
+            var cli = SDK.forceclis[cliName];
             if (chosenClis.indexOf(cli.name) >= 0) {
                 pack(cli.name, cli.dir);
             }
