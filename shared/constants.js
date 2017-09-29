@@ -25,6 +25,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+var path = require('path'),
+    shelljs = require('shelljs');
+
 var VERSION = '6.0.0';
 
 module.exports = {
@@ -96,43 +99,128 @@ module.exports = {
         }
     },
 
-    commands: {
-        create: 'create',
-        createWithTemplate: 'createWithTemplate',
-        version: 'version'
-    },
-
-//        create: {
-//            name: 'create',
-//            args: [],
-//            description: 'create $platforms $appTypes mobile application'
-//        },
-//        createWithTemplate: {
-//            name: 'createWithTemplate',
-//            args: [],
-//            description: 'create $platforms $appTypes mobile application from a template'
-//        },
-//        version: {
-//            name: 'version',
-//            args: [],
-//            description: 'print version of Mobile SDK'
-//        }
-//    },
-
     args: {
         platform: {
             name: 'platform',
             'char': 'p',
-            description: 'Comma separated platforms ($platforms)',
-            prompt: 'Enter the target platform(s) separated by commas ($platforms)',
-            error: 'Platform(s) must be in $platforms.',
-            validate: (cli,val) => !val.split(",").some(p=>cli.platforms.indexOf(p) == -1)
+            description: cli => 'Comma separated platforms (' + cli.platforms.join(', ') + ')',
+            prompt: cli => 'Enter the target platform(s) separated by commas (' + cli.platforms.join(', ') + ')',
+            error: (val, cli) => 'Platform(s) must be in ' + cli.platforms.join(', '),
+            validate: (val, cli) => !val.split(",").some(p=>cli.platforms.indexOf(p) == -1)
         },
-        appnName: {
+        appType: {
+            name:'apptype',
+            'char':'t',
+            description: cli => 'Application Type (' + cli.appTypes.join(', ') + ')',
+            prompt: cli => 'Enter your application type (' + cli.appTypes.join(', ') + '):',
+            error: (val, cli) => 'App type must be ' + cli.appTypes.join(' or ') + '.',
+            validate: (val, cli) => cli.appTypes.indexOf(val) >=0
+        },
+        templateRepoUri: {
+            name:'templaterepouri',
+            'char': 'r',
+            description:'Template repo URI',
+            prompt: 'Enter URI of repo containing template application:',
+            error: (val, cli) => 'Invalid value for template repo uri: \'' + val + '\'.',
+            validate: (val, cli) => /^\S+$/.test(val)
+        },
+        appName: {
             name: 'appname',
             'char': 'n',
             description: 'Application Name',
-            prompt: 'Enter your application name:'
+            prompt: 'Enter your application name:',
+            error: (val, cli) => 'Invalid value for application name: \'' + val + '\'.',
+            validate: (val, cli) => /^\S+$/.test(val)
+        },
+        packageName: {
+            name: 'packagename',
+            'char': 'p',
+            description: 'App Package Identifier (e.g. com.mycompany.myapp)',
+            prompt: 'Enter your package name:',
+            error: (val, cli) => '\'' + val + '\' is not a valid package name.',
+            validate: (val, cli) => /^[a-z]+[a-z0-9_]*(\.[a-z]+[a-z0-9_]*)*$/.test(val),
+        },
+        organization: {
+            name: 'organization',
+            'char': 'o',
+            description: 'Organization Name (Your company\'s/organization\'s name)',
+            prompt: 'Enter your organization name (Acme, Inc.):',
+            error: (val, cli) => 'Invalid value for organization: \'' + val + '\'.',
+            validate: (val, cli) => /\S+/.test(val)
+        },
+        outputDir: {
+            name:'outputdir',
+            'char':'d',
+            description:'Output Directory (Leave empty for current directory)',
+            prompt: 'Enter output directory for your app (leave empty for the current directory):',
+            error: (val, cli) => 'Invalid value for output directory (directory must not already exist): \'' + val + '\'.',
+            validate: (val, cli) => val === undefined || val === '' || !shelljs.test('-e', path.resolve(val)),
+            required:false
+        },
+        startPage: {
+            name:'startpage',
+            'char':'s',
+            description:'App Start Page (The start page of your remote app. Only required for hybrid_remote)',
+            prompt: 'Enter the start page for your app:',
+            error: (val, cli) => 'Invalid value for start page: \'' + val + '\'.',
+            validate: (val, cli) => /\S+/.test(val),
+            required: false
+        },
+        // Private args
+        verbose: {
+            name:'verbose',
+            'char':'v',
+            hasValue:false,
+            required:false
+        },
+        templatePath: {
+            name:'templatePath',
+            'char':'v',
+            error: (val, cli) => 'Invalid value for template path: \'' + val + '\'.',
+            validate: (val, cli) => /.*/.test(val),
+            required:false
+        },            
+        pluginRepoUri: {
+            name:'pluginrepouri',
+            'char':'v',
+            error: (val, cli) => 'Invalid value for plugin repo uri: \'' + val + '\'.',
+            validate: (val, cli) => /.*/.test(val),
+            required:false
+        }  
+    },
+
+    commands: {
+        create: {
+            name: 'create',
+            args: cli => [cli.platforms.length > 1 ? 'platform' : null,
+                          cli.appTypes.length > 1 ? 'appType' : null,
+                          'appName',
+                          'packageName',
+                          'organization',
+                          cli.appTypes.indexOf('hybrid_remote') >=0 ? 'startPage' : null,
+                          'outputDir',
+                          'verbose',
+                          cli.name === 'forcehybrid' ? 'pluginRepoUri' : null
+                         ].filter(x=>x!=null),
+            description: cli => 'create ' + cli.platforms.join('/') + ' ' + cli.appTypes.join(' or ') + ' mobile application'
+        },
+        createWithTemplate: {
+            name: 'createWithTemplate',
+            args: cli => [cli.platforms.length > 1 ? 'platform' : null,
+                          'templateRepoUri',
+                          'appName',
+                          'packageName',
+                          'organization',
+                          'outputDir',
+                          'verbose',
+                          'templatePath'
+                         ].filter(x=>x!=null),
+            description: cli => 'create ' + cli.platforms.join('/') + ' ' + cli.appTypes.join(' or ') + ' mobile application from a template'
+        },
+        version: {
+            name: 'version',
+            args: [],
+            description: 'print version of Mobile SDK'
         }
     },
 

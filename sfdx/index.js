@@ -27,26 +27,41 @@
 
 var SDK = require('./shared/constants'),
     createHelper = require('./shared/createHelper'),
-    configHelper = require('./shared/configHelper');
+    configHelper = require('./shared/configHelper'),
+    logError = require('./shared/utils').logError;    
 
 // Flags
-function getFlags(cli, command) {
-    var flags = configHelper.getCommandArgs(cli, command);
-    for (var flag of flags) {
-        flag.required = flag.required === undefined ? true : flag.required;
-        flag.hasValue = flag.hasValue === undefined ? true : flag.hasValue;
+function getFlags(cli, commandName) {
+    return configHelper.getArgs(cli, commandName).map(arg => ({
+        name: arg.name,
+        'char': arg.char,
+        description: typeof arg.description === 'function' ? arg.description(cli) : arg.description,
+        required: arg.required === undefined ? true : arg.required,
+        hasValue: arg.hasValue === undefined ? true : arg.hasValue,
+        hidden: arg.description == null,
+    }));
+}
+
+// Validation
+function validateCommand(cli, commandName, vals) {
+    var success = true;
+    var args = configHelper.getArgs(cli, commandName);
+    for (var arg of args) {
+        var val = vals[arg.name];
+        if (typeof arg.validate === 'function' && !arg.validate(val, cli)) {
+            success = false;
+            logError(arg.error(val, cli));
+        }
     }
-    return flags;
+    return success;
 }
 
 // Run command
-function runCommand(cli, command, args) {
-    switch(command) {
+function runCommand(cli, commandName, vals) {
+    switch(commandName) {
     case SDK.commands.create:
-        createHelper.createApp(cli, args);
-        break;
     case SDK.commands.createWithTemplate:
-        createHelper.createApp(cli, args);
+        createHelper.createApp(cli, vals);
         break;
     case SDK.commands.version:
         configHelper.printVersion(cli);
@@ -72,15 +87,18 @@ function getCommands() {
     var commands = [];
     for (var cliName in SDK.forceclis) {
         var cli = SDK.forceclis[cliName];
-        for (var command of cli.commands) {
+        for (var commandName of cli.commands) {
+            var command = SDK.commands[commandName];
             commands.push({
                 cli: cli,
                 topic: cli.sfdx_topic,
-                command: command,
-                description: configHelper.getCommandDescription(cli, command),
-                flags: getFlags(cli, command),
+                command: commandName,
+                description: typeof command.description === 'function' ? command.description(cli) : command.description,
+                flags: getFlags(cli, commandName),
                 run(context) {
-                    runCommand(this.cli, this.command, context.flags);
+                    if (validateCommand(this.cli, this.command, context.flags)) {
+                        runCommand(this.cli, this.command, context.flags);
+                    }
                 }
             });
         }
