@@ -69,7 +69,7 @@ function getTopics() {
     for (var cliName in SDK.forceclis) {
         var cli = SDK.forceclis[cliName];
         topics.push({
-            name: cli.sfx_topic,
+            name: cli.sfdx_topic,
             description:cli.sfdx_description
         });
     }
@@ -103,8 +103,7 @@ function getCommands() {
 module.exports = {
     namespace: {
         name:'mobilesdk',
-        description: 'create mobile apps based on the Salesforce Mobile SDK',
-        
+        description: 'create mobile apps based on the Salesforce Mobile SDK'
     },
     topics: getTopics(),
     commands: getCommands()
