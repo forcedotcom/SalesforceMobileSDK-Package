@@ -7,28 +7,44 @@ node ./install.js
 ```
 
 ## To run forceios do
+```shell
 ./ios/forceios.js
+```
 
 ## To run forcedroid do
+```shell
 ./android/forcedroid.js
+```
 
 ## To run forcehybrid do
+```shell
 ./android/forcehybrid.js
+```
 
 ## To run forcereact do
+```shell
 ./android/forcereact.js
+```
 
 ## To load the sfdx plugin from source do
+```shell
 sfdx plugins:link sfdx
+```
 
 ## To run the sfdx plugin do
+```shell
 sfdx mobilesdk:ios --help 
 sfdx mobilesdk:android --help 
 sfdx mobilesdk:hybrid --help 
 sfdx mobilesdk:reactnative --help
+```
 
 ## To test forceios, forcedroid, forcehybrid, forcereact or the sfdx plugin do
+```shell
 ./test/test_force.js
+```
 
 ## To npm pack forceios, forcedroid, forcehybrid, forcereact or the sfx plugin do
+```shell
 ./pack/pack.js
+```
