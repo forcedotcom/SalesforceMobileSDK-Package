@@ -18,12 +18,12 @@ node ./install.js
 
 ## To run forcehybrid do
 ```shell
-./android/forcehybrid.js
+./hybrid/forcehybrid.js
 ```
 
 ## To run forcereact do
 ```shell
-./android/forcereact.js
+./react/forcereact.js
 ```
 
 ## To load the sfdx plugin from source do
