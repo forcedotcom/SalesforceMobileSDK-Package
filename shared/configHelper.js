@@ -33,141 +33,114 @@ var path = require('path'),
     commandLineUtils = require('./commandLineUtils'),
     logInfo = require('./utils').logInfo;
 
-function readConfig(args, forcecli, handler) {
+function applyCli(f, cli) {
+    return typeof f === 'function' ? f(cli): f;
+}
+
+function getArgsExpanded(cli, commandName) {
+    var argNames = applyCli(SDK.commands[commandName].args, cli);
+    return argNames
+        .map(argName => SDK.args[argName])
+        .map(arg =>
+             ({
+                 name: arg.name,
+                 'char': arg.char,
+                 description: applyCli(arg.description, cli),
+                 prompt: applyCli(arg.prompt, cli),
+                 error: applyCli(arg.error, cli),
+                 validate: applyCli(arg.validate, cli),
+                 promptIf: arg.promptIf,
+                 required: arg.required === undefined ? true : arg.required,
+                 required: arg.required === undefined ? true : arg.required,
+                 hasValue: arg.hasValue === undefined ? true : arg.hasValue,
+                 hidden: arg.description == null
+             })
+            );
+    
+}
+
+function getCommandExpanded(cli, commandName) {
+    var command = SDK.commands[commandName];
+    return {
+        name: command.name,
+        args: getArgsExpanded(cli, commandName),
+        description: applyCli(command.description, cli)
+    };
+}
+
+function readConfig(args, cli, handler) {
     var commandLineArgs = args.slice(2, args.length);
-    var command = commandLineArgs.shift();
+    var commandName = commandLineArgs.shift();
 
     var processorList = null;
 
-    switch (command || '') {
-    case 'version':
-        logInfo(forcecli.name + ' version ' + SDK.version);
+    switch (commandName || '') {
+    case SDK.commands.version.name:
+        printVersion(cli);
         process.exit(0);
         break;
-    case 'create': 
-        processorList = createArgsProcessorList(forcecli, false); 
-        break;
-    case 'createWithTemplate': 
-        processorList = createArgsProcessorList(forcecli, true); 
+    case SDK.commands.create.name: 
+    case SDK.commands.createWithTemplate.name: 
+        processorList = createArgsProcessorList(cli, commandName);
         break;
     default:
-        usage(forcecli);
+        usage(cli);
         process.exit(1);
     };
 
     commandLineUtils.processArgsInteractive(commandLineArgs, processorList, handler);
 }
 
-function usage(forcecli) {
-    var forcecliName = forcecli.name;
-    var forcecliVersion = SDK.version;
-    var appTypes = forcecli.appTypes;
-    var platforms = forcecli.platforms;
+function printVersion(cli) {
+    logInfo(cli.name + ' version ' + SDK.version);
+}
+
+function printArgs(cli, commandName) {
+    getArgsExpanded(cli, commandName)
+        .filter(arg => !arg.hidden)
+        .forEach(arg => logInfo('    ' + (!arg.required  ? '[' : '') + '--' + arg.name + '=' + arg.description + (!arg.required ? ']' : ''), COLOR.magenta));
+}    
+
+function usage(cli) {
+    var cliName = cli.name;
+    var cliVersion = SDK.version;
+    var appTypes = cli.appTypes;
+    var platforms = cli.platforms;
     
-    logInfo('\n' + forcecliName + ': ' + forcecli.description, COLOR.cyan);
+    logInfo('\n' + cliName + ': ' + cli.description, COLOR.cyan);
     logInfo('\nUsage:\n', COLOR.cyan);
-    logInfo(forcecliName + ' create', COLOR.magenta);
-    if (appTypes.length > 1) {
-        logInfo('    --apptype=<Application Type> (' + appTypes.join(', ') + ')', COLOR.magenta);
+    for (var i=0; i<cli.commands.length; i++) {
+        if (i>0) {
+            logInfo('\n OR \n', COLOR.cyan);
+        }
+        var commandName = cli.commands[i];
+        var command = getCommandExpanded(cli, commandName);
+        logInfo('# ' + command.description, COLOR.magenta);
+        logInfo(cliName + ' ' + commandName, COLOR.magenta);
+        printArgs(cli, commandName);
     }
-    if (platforms.length > 1) {
-        logInfo('    --platform=<Comma separated plaforms> (' + platforms.join(', ') + ')', COLOR.magenta);
-    }
-    logInfo('    --appname=<Application Name>', COLOR.magenta);
-    logInfo('    --packagename=<App Package Identifier> (e.g. com.mycompany.myapp)', COLOR.magenta);
-    logInfo('    --organization=<Organization Name> (Your company\'s/organization\'s name)', COLOR.magenta);
-    if (appTypes.indexOf('hybrid_remote') >= 0) {
-        logInfo('    --startpage=<App Start Page> (The start page of your remote app. Only required for hybrid_remote)', COLOR.magenta);
-    }
-    logInfo('    [--outputdir=<Output directory> (Leave empty for current directory)]', COLOR.magenta);
     logInfo('\n OR \n', COLOR.cyan);
-    logInfo(forcecliName + ' createWithTemplate', COLOR.magenta);
-    if (platforms.length > 1) {
-        logInfo('    --platform=<Comma separated plaforms> (' + platforms.join(', ') + ')', COLOR.magenta);
-    }
-    logInfo('    --templaterepouri=<Template repo URI> (e.g. https://github.com/forcedotcom/SmartSyncExplorerReactNative)]', COLOR.magenta);
-    logInfo('    --appname=<Application Name>', COLOR.magenta);
-    logInfo('    --packagename=<App Package Identifier> (e.g. com.mycompany.myapp)', COLOR.magenta);
-    logInfo('    --organization=<Organization Name> (Your company\'s/organization\'s name)', COLOR.magenta);
-    logInfo('    [--outputdir=<Output directory> (Leave empty for current directory)]', COLOR.magenta);
-    logInfo('\n OR \n', COLOR.cyan);
-    logInfo(forcecliName + ' version', COLOR.magenta);
-    logInfo('\n OR \n', COLOR.cyan);
-    logInfo(forcecliName, COLOR.magenta);
+    logInfo(cliName, COLOR.magenta);
     logInfo('\nWe also offer:', COLOR.cyan);
-    for (var cli of Object.values(SDK.forceclis)) {
-        if (cli.name != forcecli.name) {
-            logInfo('- ' + cli.name + ': ' + cli.description, COLOR.cyan);
+    for (var otherCliName in SDK.forceclis) {
+        var otherCli = SDK.forceclis[otherCliName];
+        if (otherCli.name != cli.name) {
+            logInfo('- ' + otherCli.name + ': ' + otherCli.description, COLOR.cyan);
         }
     }
     logInfo('\n');
 }
 
 //
-// Processor list for 'create' command
+// Processor list
 //
-function createArgsProcessorList(forcecli, isCreateWithTemplate) {
-    var appTypes = forcecli.appTypes;
-    var platforms = forcecli.platforms;
+function createArgsProcessorList(cli, commandName) {
     var argProcessorList = new commandLineUtils.ArgProcessorList();
 
-    
-    if (platforms.length > 1) {
-        // Platforms
-        addProcessorFor(argProcessorList, 'platform', 'Enter the target platform(s) separated by commas (' + platforms.join(', ') + '):',
-                        'Platform(s) must be in ' + platforms.join(', ') + '.', 
-                        function(val) { return !val.split(",").some(p=>platforms.indexOf(p) == -1); });
+    for (var arg of getArgsExpanded(cli, commandName)) {
+        addProcessorFor(argProcessorList, arg.name, arg.prompt, arg.error, arg.validate, arg.promptIf);
     }
 
-    if (isCreateWithTemplate) {
-        // Template Repo URI
-        addProcessorFor(argProcessorList, 'templaterepouri', 'Enter URI of repo containing template application:',
-                     'Invalid value for template repo uri: \'$val\'.', /^\S+$/);
-    }
-    else {
-        if (appTypes.length > 1) {
-            // App type
-            addProcessorFor(argProcessorList, 'apptype', 'Enter your application type (' + appTypes.join(', ') + '):',
-                            'App type must be ' + appTypes.join(', ') + '.', 
-                            function(val) { return appTypes.indexOf(val) >= 0; });
-        }
-    }
-
-    // App name
-    addProcessorFor(argProcessorList, 'appname', 'Enter your application name:',
-                    'Invalid value for application name: \'$val\'.', /^\S+$/);
-
-    // Package name
-    addProcessorFor(argProcessorList, 'packagename', 'Enter the package name for your app (com.mycompany.myapp):',
-                    '\'$val\' is not a valid package name.', /^[a-z]+[a-z0-9_]*(\.[a-z]+[a-z0-9_]*)*$/);
-
-    // Organization
-    addProcessorFor(argProcessorList, 'organization', 'Enter your organization name (Acme, Inc.):',
-                    'Invalid value for organization: \'$val\'.',  /\S+/);
-
-    // Start page
-    addProcessorFor(argProcessorList, 'startpage', 'Enter the start page for your app:',
-                    'Invalid value for start page: \'$val\'.', /\S+/, 
-                    function(argsMap) { return (argsMap['apptype'] === 'hybrid_remote'); });
-
-    // Output dir
-    addProcessorFor(argProcessorList, 'outputdir', 'Enter output directory for your app (leave empty for the current directory):',
-                    'Invalid value for output directory (directory must not already exist): \'$val\'.',
-                    function(val) { return val === '' || !shelljs.test('-e', path.resolve(val)); });
-
-
-    // Template Path - private param (not documented in usage, user is never prompted)
-    addProcessorFor(argProcessorList, 'templatepath', null,
-                    'Invalid value for template path: \'$val\'.', /.*/);
-
-    // Plugin URI - private param (not documented in usage, user is never prompted)
-    addProcessorFor(argProcessorList, 'pluginrepouri', null,
-                    'Invalid value for plugin repo uri: \'$val\'.', /.*/);
-
-    // Verbose  - private param (not documented in usage, user is never prompted)
-    addProcessorFor(argProcessorList, 'verbose', null,
-                    'Invalid value for verbose: \'$val\'.', /.*/);
-    
     return argProcessorList;
 }
 
@@ -176,26 +149,28 @@ function createArgsProcessorList(forcecli, isCreateWithTemplate) {
 // * argProcessorList: ArgProcessorList
 // * argName: string, name of argument
 // * prompt: string for prompt
-// * error: string for error (can contain $val to print the value typed by the user in the error message)
-// * validation: function or regexp or null (no validation)
+// * error: function 
+// * validation: function or null (no validation)
 // * preprocessor: function or null
-// * postprocessor: function or null
 // 
-function addProcessorFor(argProcessorList, argName, prompt, error, validation, preprocessor, postprocessor) {
+function addProcessorFor(argProcessorList, argName, prompt, error, validation, preprocessor) {
     argProcessorList.addArgProcessor(argName, prompt, function(val) {
         val = val.trim();
 
-        // validation is either a function or a regexp 
-            if (typeof validation === 'function' && validation(val)
-                || typeof validation === 'object' && typeof validation.test === 'function' && validation.test(val))
-            {
-                return new commandLineUtils.ArgProcessorOutput(true, typeof postprocessor === 'function' ? postprocessor(val) : val);
-            }
-            else {
-                return new commandLineUtils.ArgProcessorOutput(false, error.replace('$val', val));
-            }
+        // validation is either a function or null
+        if (validation == null || validation(val)) {
+            return new commandLineUtils.ArgProcessorOutput(true, val);
+        }
+        else {
+            return new commandLineUtils.ArgProcessorOutput(false, error(val));
+        }
 
     }, preprocessor);
 }
 
-module.exports.readConfig = readConfig;
+module.exports = {
+    readConfig: readConfig,
+    printVersion: printVersion,
+    getArgsExpanded: getArgsExpanded,
+    getCommandExpanded: getCommandExpanded
+};

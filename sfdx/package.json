@@ -1,0 +1,42 @@
+{
+				"name": "sfdx-mobilesdk-plugin",
+				"version": "6.0.0",
+				"description": "Sfdx plugin for creating mobile apps based on the Salesforce Mobile SDK",
+				"main": "index.js",
+				"keywords": [
+								"mobilesdk",
+								"salesforce",
+								"mobile",
+								"sdk",
+								"salesforcedx",
+								"salesforce-dx"
+				],
+				"homepage": "https://github.com/forcedotcom/SalesforceMobileSDK-Package",
+				"bugs": "https://github.com/forcedotcom/SalesforceMobileSDK-Package/issues",
+				"licenses": [
+								{
+												"type": "Salesforce.com Mobile SDK License",
+												"url": "https://github.com/forcedotcom/SalesforceMobileSDK-iOS/blob/master/LICENSE.md"
+								}
+				],
+				"engines": {
+								"node": ">=7.0.0"
+				},
+				"dependencies": {
+								"shelljs": "~0.7.0"
+				},
+				"repository": {
+								"type": "git",
+								"url": "https://github.com/forcedotcom/SalesforceMobileSDK-Package.git"
+				},
+				"author": {
+								"name": "Wolfgang Mathurin",
+								"email": "wmathurin@salesforce.com"
+				},
+				"contributors": [
+								{
+												"name": "Bharath Hariharan",
+												"email": "bhariharan@salesforce.com"
+								}
+				]
+}
