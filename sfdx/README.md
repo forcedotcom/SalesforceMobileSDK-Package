@@ -30,7 +30,9 @@ Commands for ios, type "sfdx help ios:COMMAND" for more details:
  sfdx mobilesdk:ios:create           # create ios native or native_swift mobile application
  sfdx mobilesdk:ios:createWithTemplate # create ios native or native_swift mobile application from a template
  sfdx mobilesdk:ios:version          # print version of Mobile SDK
+```
 
+```
 -> sfdx mobilesdk:ios:create --help
 Usage: sfdx mobilesdk:ios:create
 
@@ -41,7 +43,9 @@ create ios native or native_swift mobile application
  -o, --organization ORGANIZATION # Organization Name (Your company's/organization's name)
  -d, --outputdir OUTPUTDIR       # Output Directory (Leave empty for current directory)
  -p, --packagename PACKAGENAME   # App Package Identifier (e.g. com.mycompany.myapp)
+```
 
+```
 -> sfdx mobilesdk:ios:createWithTemplate --help
 Usage: sfdx mobilesdk:ios:createWithTemplate
 
@@ -65,7 +69,9 @@ Commands for android, type "sfdx help android:COMMAND" for more details:
  sfdx mobilesdk:android:create       # create android native or native_kotlin mobile application
  sfdx mobilesdk:android:createWithTemplate # create android native or native_kotlin mobile application from a template
  sfdx mobilesdk:android:version      # print version of Mobile SDK
+```
 
+```
 -> sfdx mobilesdk:android:create --help
 Parsing sfdx-mobilesdk-plugin... done
 Usage: sfdx mobilesdk:android:create
@@ -77,7 +83,9 @@ create android native or native_kotlin mobile application
  -o, --organization ORGANIZATION # Organization Name (Your company's/organization's name)
  -d, --outputdir OUTPUTDIR       # Output Directory (Leave empty for current directory)
  -p, --packagename PACKAGENAME   # App Package Identifier (e.g. com.mycompany.myapp)
+```
 
+```
 -> sfdx mobilesdk:android:createWithTemplate --help
 Parsing sfdx-mobilesdk-plugin... done
 Usage: sfdx mobilesdk:android:createWithTemplate
@@ -94,28 +102,6 @@ create android native or native_kotlin mobile application from a template
 
 ## Create an hybrid application 
 ```
--> sfdx mobilesdk:ios:create --help
-Usage: sfdx mobilesdk:ios:create
-
-create ios native or native_swift mobile application
-
- -n, --appname APPNAME           # Application Name
- -t, --apptype APPTYPE           # Application Type (native, native_swift)
- -o, --organization ORGANIZATION # Organization Name (Your company's/organization's name)
- -d, --outputdir OUTPUTDIR       # Output Directory (Leave empty for current directory)
- -p, --packagename PACKAGENAME   # App Package Identifier (e.g. com.mycompany.myapp)
-
--> sfdx mobilesdk:ios:createWithTemplate --help
-Usage: sfdx mobilesdk:ios:createWithTemplate
-
-create ios native or native_swift mobile application from a template
-
- -n, --appname APPNAME                 # Application Name
- -o, --organization ORGANIZATION       # Organization Name (Your company's/organization's name)
- -d, --outputdir OUTPUTDIR             # Output Directory (Leave empty for current directory)
- -p, --packagename PACKAGENAME         # App Package Identifier (e.g. com.mycompany.myapp)
- -r, --templaterepouri TEMPLATEREPOURI # Template repo URI
-
 -> sfdx mobilesdk:hybrid --help
 Parsing sfdx-mobilesdk-plugin... done
 Usage: sfdx hybrid:COMMAND [command-specific-options]
@@ -126,7 +112,9 @@ Commands for hybrid, type "sfdx help hybrid:COMMAND" for more details:
  sfdx mobilesdk:hybrid:create        # create ios/android hybrid_local or hybrid_remote mobile application
  sfdx mobilesdk:hybrid:createWithTemplate # create ios/android hybrid_local or hybrid_remote mobile application from a template
  sfdx mobilesdk:hybrid:version       # print version of Mobile SDK
+```
 
+```
 -> sfdx mobilesdk:hybrid:create --help
 Usage: sfdx mobilesdk:hybrid:create
 
@@ -139,7 +127,9 @@ create ios/android hybrid_local or hybrid_remote mobile application
  -p, --packagename PACKAGENAME     # App Package Identifier (e.g. com.mycompany.myapp)
  -p, --platform PLATFORM           # Comma separated platforms (ios, android)
  -s, --startpage STARTPAGE         # App Start Page (The start page of your remote app. Only required for hybrid_remote)
+```
 
+```
 -> sfdx mobilesdk:hybrid:createWithTemplate --help
 Usage: sfdx mobilesdk:hybrid:createWithTemplate
 
@@ -165,7 +155,9 @@ Commands for reactnative, type "sfdx help reactnative:COMMAND" for more details:
  sfdx mobilesdk:reactnative:create   # create ios/android react_native mobile application
  sfdx mobilesdk:reactnative:createWithTemplate # create ios/android react_native mobile application from a template
  sfdx mobilesdk:reactnative:version  # print version of Mobile SDK
+```
 
+```
 -> sfdx mobilesdk:reactnative:create --help
 Usage: sfdx mobilesdk:reactnative:create
 
@@ -176,7 +168,9 @@ create ios/android react_native mobile application
  -d, --outputdir OUTPUTDIR       # Output Directory (Leave empty for current directory)
  -p, --packagename PACKAGENAME   # App Package Identifier (e.g. com.mycompany.myapp)
  -p, --platform PLATFORM         # Comma separated platforms (ios, android)
+```
 
+```
 -> sfdx mobilesdk:reactnative:createWithTemplate --help
 Usage: sfdx mobilesdk:reactnative:createWithTemplate
 
