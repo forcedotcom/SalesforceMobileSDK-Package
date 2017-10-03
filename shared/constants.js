@@ -133,7 +133,7 @@ module.exports = {
         platform: {
             name: 'platform',
             'char': 'p',
-            description: cli => 'Comma separated platforms (' + cli.platforms.join(', ') + ')',
+            description: cli => 'Comma-separated list of platforms (' + cli.platforms.join(', ') + ')',
             prompt: cli => 'Enter the target platform(s) separated by commas (' + cli.platforms.join(', ') + '):',
             error: cli => val => 'Platform(s) must be in ' + cli.platforms.join(', '),
             validate: cli => val => !val.split(",").some(p=>cli.platforms.indexOf(p) == -1)

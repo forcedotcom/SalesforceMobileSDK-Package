@@ -1,12 +1,12 @@
 # sfdx-mobilesdk-plugin 
 
-A plugin for the Salesforce CLI to create mobile applications to interface with the [Salesforce Platform](http://www.salesforce.com/platform/overview/), leveraging the [Salesforce Mobile SDK for iOS](https://github.com/forcedotcom/SalesforceMobileSDK-iOS) and the [Salesforce Mobile SDK for Android](https://github.com/forcedotcom/SalesforceMobileSDK-Android).
+A plugin for the Salesforce CLI to create mobile applications to interface with the [Salesforce Platform](http://www.salesforce.com/platform/overview/), leveraging the [Salesforce Mobile SDK for iOS](https://github.com/forcedotcom/SalesforceMobileSDK-iOS) and the [Salesforce Mobile SDK for Android](https://github.com/forcedotcom/SalesforceMobileSDK-Android) repos.
 
 ## Setup
 
 ### Install from source
 
-1. Install the SDFX CLI.
+1. Install the SDFX CLI (https://developer.salesforce.com/tools/sfdxcli).
 
 2. Clone the repository: `git clone git@github.com:forcedotcom/SalesforceMobileSDK-Package`
 
@@ -142,7 +142,7 @@ create ios/android hybrid_local or hybrid_remote mobile application
  -o, --organization ORGANIZATION   # Organization Name (Your company's/organization's name)
  -d, --outputdir OUTPUTDIR         # Output Directory (Leave empty for current directory)
  -p, --packagename PACKAGENAME     # App Package Identifier (e.g. com.mycompany.myapp)
- -p, --platform PLATFORM           # Comma separated platforms (ios, android)
+ -p, --platform PLATFORM           # Comma-separated list of platforms (ios, android)
  -s, --startpage STARTPAGE         # App Start Page (The start page of your remote app. Only required for hybrid_remote)
 ```
 
@@ -158,7 +158,7 @@ create ios/android hybrid_local or hybrid_remote mobile application from a templ
  -o, --organization ORGANIZATION       # Organization Name (Your company's/organization's name)
  -d, --outputdir OUTPUTDIR             # Output Directory (Leave empty for current directory)
  -p, --packagename PACKAGENAME         # App Package Identifier (e.g. com.mycompany.myapp)
- -p, --platform PLATFORM               # Comma separated platforms (ios, android)
+ -p, --platform PLATFORM               # Comma-separated list of platforms (ios, android)
  -r, --templaterepouri TEMPLATEREPOURI # Template repo URI
 ```
 
@@ -187,7 +187,7 @@ create ios/android react_native mobile application
  -o, --organization ORGANIZATION # Organization Name (Your company's/organization's name)
  -d, --outputdir OUTPUTDIR       # Output Directory (Leave empty for current directory)
  -p, --packagename PACKAGENAME   # App Package Identifier (e.g. com.mycompany.myapp)
- -p, --platform PLATFORM         # Comma separated platforms (ios, android)
+ -p, --platform PLATFORM         # Comma-separated list of platforms (ios, android)
 ```
 
 ### Create React Native application from template
@@ -201,5 +201,5 @@ create ios/android react_native mobile application from a template
  -o, --organization ORGANIZATION       # Organization Name (Your company's/organization's name)
  -d, --outputdir OUTPUTDIR             # Output Directory (Leave empty for current directory)
  -p, --packagename PACKAGENAME         # App Package Identifier (e.g. com.mycompany.myapp)
- -p, --platform PLATFORM               # Comma separated platforms (ios, android)
+ -p, --platform PLATFORM               # Comma-separated list of platforms (ios, android)
 ```
