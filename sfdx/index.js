@@ -69,8 +69,8 @@ function getTopics() {
     for (var cliName in SDK.forceclis) {
         var cli = SDK.forceclis[cliName];
         topics.push({
-            name: cli.sfdx_topic,
-            description:cli.sfdx_description
+            name: cli.topic,
+            description:'Command for building ' + cli.purpose + ' using Salesforce Mobile SDK'
         });
     }
     return topics;
@@ -85,7 +85,7 @@ function getCommands() {
             var command = configHelper.getCommandExpanded(cli, commandName);
             commands.push({
                 cli: cli,
-                topic: cli.sfdx_topic,
+                topic: cli.topic,
                 command: commandName,
                 description: command.description,
                 flags: command.args,
@@ -103,7 +103,7 @@ function getCommands() {
 module.exports = {
     namespace: {
         name:'mobilesdk',
-        description: 'create mobile apps based on the Salesforce Mobile SDK'
+        description: 'Create mobile apps based on the Salesforce Mobile SDK'
     },
     topics: getTopics(),
     commands: getCommands()

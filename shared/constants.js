@@ -70,9 +70,8 @@ module.exports = {
     forceclis: {
         forceios: {
             name: 'forceios',
-            description: 'tool for building iOS native mobile applications using Salesforce Mobile SDK',
-            sfdx_topic: 'ios',
-            sfdx_description: 'command for building an iOS native mobile application using Saleforce Mobile SDK',
+            topic: 'ios',
+            purpose: 'an iOS native mobile application',
             dir: 'ios',
             platforms: ['ios'],
             toolNames: ['git', 'npm', 'pod'],
@@ -85,9 +84,8 @@ module.exports = {
         },
         forcedroid: {
             name: 'forcedroid',
-            description: 'tool for building Android native mobile applications using Salesforce Mobile SDK',
-            sfdx_topic: 'android',
-            sfdx_description: 'command for building a Android native mobile application using Saleforce Mobile SDK',
+            topic: 'android',
+            purpose: 'an Android native mobile application',
             dir: 'android',
             platforms: ['android'],
             toolNames: ['git', 'npm'],
@@ -100,9 +98,8 @@ module.exports = {
         },
         forcehybrid: {
             name: 'forcehybrid',
-            description: 'tool for building hybrid mobile applications using Salesforce Mobile SDK',
-            sfdx_topic: 'hybrid',
-            sfdx_description: 'command for building an hybrid mobile application using Saleforce Mobile SDK',
+            topic: 'hybrid',
+            purpose: 'an hybrid mobile application',
             dir: 'hybrid',
             platforms: ['ios', 'android'],
             toolNames: ['git', 'npm', 'cordova'],
@@ -115,9 +112,8 @@ module.exports = {
         },
         forcereact: {
             name: 'forcereact',
-            description: 'tool for building react native mobile applications using Salesforce Mobile SDK',
-            sfdx_topic: 'reactnative',
-            sfdx_description: 'command for building a React Native mobile application using Saleforce Mobile SDK',
+            topic: 'reactnative',
+            purpose: 'a React Native mobile application',
             dir: 'react',
             platforms: ['ios', 'android'],
             toolNames: ['git', 'npm', 'pod'],
@@ -233,7 +229,7 @@ module.exports = {
                           'verbose',
                           cli.name === 'forcehybrid' ? 'pluginRepoUri' : null
                          ].filter(x=>x!=null),
-            description: cli => 'create ' + cli.platforms.join('/') + ' ' + cli.appTypes.join(' or ') + ' mobile application'
+            description: cli => 'Create ' + cli.purpose
         },
         createWithTemplate: {
             name: 'createWithTemplate',
@@ -246,12 +242,12 @@ module.exports = {
                           'verbose',
                           'templatePath'
                          ].filter(x=>x!=null),
-            description: cli => 'create ' + cli.platforms.join('/') + ' ' + cli.appTypes.join(' or ') + ' mobile application from a template'
+            description: cli => 'Create ' + cli.purpose + ' from a template'
         },
         version: {
             name: 'version',
             args: [],
-            description: 'print version of Mobile SDK'
+            description: 'Print version of Mobile SDK'
         }
     }
 };
