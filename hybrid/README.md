@@ -29,11 +29,11 @@ Typing `forcehybrid` with no arguments gives you a breakdown of the usage:
 ```
 -> forcehybrid
 
-forcehybrid: Tool for building an hybrid mobile application using Salesforce Mobile SDK
+forcehybrid: Tool for building a hybrid mobile application using Salesforce Mobile SDK
 
 Usage:
 
-# Create an hybrid mobile application
+# Create a hybrid mobile application
 forcehybrid create
     --platform=Comma-separated list of platforms (ios, android)
     --apptype=Application Type (hybrid_local, hybrid_remote)
@@ -45,7 +45,7 @@ forcehybrid create
 
  OR 
 
-# Create an hybrid mobile application from a template
+# Create a hybrid mobile application from a template
 forcehybrid createWithTemplate
     --platform=Comma-separated list of platforms (ios, android)
     --templaterepouri=Template repo URI

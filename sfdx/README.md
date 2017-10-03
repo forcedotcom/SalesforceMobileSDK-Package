@@ -27,7 +27,7 @@ Help topics, type "sfdx help TOPIC" for more details:
 
   sfdx mobilesdk:ios         # Command for building an iOS native mobile application using Salesforce Mobile SDK
   sfdx mobilesdk:android     # Command for building an Android native mobile application using Salesforce Mobile SDK
-  sfdx mobilesdk:hybrid      # Command for building an hybrid mobile application using Salesforce Mobile SDK
+  sfdx mobilesdk:hybrid      # Command for building a hybrid mobile application using Salesforce Mobile SDK
   sfdx mobilesdk:reactnative # Command for building a React Native mobile application using Salesforce Mobile SDK
 
 ```
@@ -131,8 +131,8 @@ Usage: sfdx mobilesdk:hybrid:COMMAND [command-specific-options]
 
 Commands for mobilesdk:hybrid, type "sfdx help mobilesdk:hybrid:COMMAND" for more details:
 
- sfdx mobilesdk:hybrid:create        # Create an hybrid mobile application
- sfdx mobilesdk:hybrid:createWithTemplate # Create an hybrid mobile application from a template
+ sfdx mobilesdk:hybrid:create        # Create a hybrid mobile application
+ sfdx mobilesdk:hybrid:createWithTemplate # Create a hybrid mobile application from a template
  sfdx mobilesdk:hybrid:version       # Print version of Mobile SDK
 
 ```
@@ -142,7 +142,7 @@ Commands for mobilesdk:hybrid, type "sfdx help mobilesdk:hybrid:COMMAND" for mor
 -> sfdx mobilesdk:hybrid:create --help
 Usage: sfdx mobilesdk:hybrid:create
 
-Create an hybrid mobile application
+Create a hybrid mobile application
 
  -n, --appname APPNAME             # Application Name
  -t, --apptype APPTYPE             # Application Type (hybrid_local, hybrid_remote)
@@ -159,7 +159,7 @@ Create an hybrid mobile application
 -> sfdx mobilesdk:hybrid:createWithTemplate --help
 Usage: sfdx mobilesdk:hybrid:createWithTemplate
 
-Create an hybrid mobile application from a template
+Create a hybrid mobile application from a template
 
  -n, --appname APPNAME                 # Application Name
  -o, --organization ORGANIZATION       # Organization Name (Your company's/organization's name)

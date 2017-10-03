@@ -99,7 +99,7 @@ module.exports = {
         forcehybrid: {
             name: 'forcehybrid',
             topic: 'hybrid',
-            purpose: 'an hybrid mobile application',
+            purpose: 'a hybrid mobile application',
             dir: 'hybrid',
             platforms: ['ios', 'android'],
             toolNames: ['git', 'npm', 'cordova'],
