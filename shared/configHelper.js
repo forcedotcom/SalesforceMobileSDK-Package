@@ -107,7 +107,7 @@ function usage(cli) {
     var appTypes = cli.appTypes;
     var platforms = cli.platforms;
     
-    logInfo('\n' + cliName + ': ' + cli.description, COLOR.cyan);
+    logInfo('\n' + cliName + ': Tool for building ' + cli.purpose + ' using Salesforce Mobile SDK', COLOR.cyan);
     logInfo('\nUsage:\n', COLOR.cyan);
     for (var i=0; i<cli.commands.length; i++) {
         if (i>0) {
@@ -125,7 +125,7 @@ function usage(cli) {
     for (var otherCliName in SDK.forceclis) {
         var otherCli = SDK.forceclis[otherCliName];
         if (otherCli.name != cli.name) {
-            logInfo('- ' + otherCli.name + ': ' + otherCli.description, COLOR.cyan);
+            logInfo('- ' + otherCli.name + ': Tool for building ' + otherCli.purpose + ' using Salesforce Mobile SDK', COLOR.cyan);
         }
     }
     logInfo('\n');

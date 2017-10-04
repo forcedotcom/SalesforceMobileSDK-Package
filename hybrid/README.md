@@ -26,21 +26,43 @@ For the rest of this document, we'll assume that `forcehybrid` is on your path.
 
 Typing `forcehybrid` with no arguments gives you a breakdown of the usage:
 
-        forcehybrid
-        Usage:
-        forcehybrid create
-            --apptype=<Application Type> (hybrid_local, hybrid_remote)
-            --appname=<Application Name>
-            --packagename=<App Package Identifier> (com.mycompany.myapp)
-            --organization=<Organization Name> (Your company\'s/organization\'s name)
-            --startpage=<App Start Page> (The start page of your remote app. Only required for hybrid_remote)
-            [--outputdir=<Output directory> (Leave empty for current directory)]
+```
+-> forcehybrid
 
-        forcehybrid version
+forcehybrid: Tool for building a hybrid mobile application using Salesforce Mobile SDK
 
-        OR
+Usage:
 
-        forcehybrid
+# Create a hybrid mobile application
+forcehybrid create
+    --platform=Comma-separated list of platforms (ios, android)
+    --apptype=Application Type (hybrid_local, hybrid_remote)
+    --appname=Application Name
+    --packagename=App Package Identifier (e.g. com.mycompany.myapp)
+    --organization=Organization Name (Your company's/organization's name)
+    [--startpage=App Start Page (The start page of your remote app. Only required for hybrid_remote)]
+    [--outputdir=Output Directory (Leave empty for current directory)]
+
+ OR 
+
+# Create a hybrid mobile application from a template
+forcehybrid createWithTemplate
+    --platform=Comma-separated list of platforms (ios, android)
+    --templaterepouri=Template repo URI
+    --appname=Application Name
+    --packagename=App Package Identifier (e.g. com.mycompany.myapp)
+    --organization=Organization Name (Your company's/organization's name)
+    [--outputdir=Output Directory (Leave empty for current directory)]
+
+ OR 
+
+# Print version of Mobile SDK
+forcehybrid version
+
+ OR 
+
+forcehybrid
+```
 
 **Note:** You can specify any or all of the arguments as command line options as specified in the usage.  If you run `forcehybrid create` with missing arguments, it prompts you for each missing option interactively.
 
