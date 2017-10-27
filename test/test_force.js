@@ -225,7 +225,7 @@ function createCompileApp(tmpDir, os, actualAppType, templateRepoUri, pluginRepo
             + ' --apptype=' + actualAppType;
     }
     else {
-        execArgs = 'createWithTemplate '
+        execArgs = 'createwithtemplate '
             + ' --templaterepouri=' + templateRepoUri;
     }
 

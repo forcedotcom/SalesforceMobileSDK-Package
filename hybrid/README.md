@@ -46,7 +46,7 @@ forcehybrid create
  OR 
 
 # Create a hybrid mobile application from a template
-forcehybrid createWithTemplate
+forcehybrid createwithtemplate
     --platform=Comma-separated list of platforms (ios, android)
     --templaterepouri=Template repo URI
     --appname=Application Name

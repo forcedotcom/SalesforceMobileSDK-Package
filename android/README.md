@@ -43,7 +43,7 @@ forcedroid create
  OR 
 
 # Create an Android native mobile application from a template
-forcedroid createWithTemplate
+forcedroid createwithtemplate
     --templaterepouri=Template repo URI
     --appname=Application Name
     --packagename=App Package Identifier (e.g. com.mycompany.myapp)

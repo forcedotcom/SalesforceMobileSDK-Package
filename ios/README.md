@@ -43,7 +43,7 @@ forceios create
  OR 
 
 # Create an iOS native mobile application from a template
-forceios createWithTemplate
+forceios createwithtemplate
     --templaterepouri=Template repo URI
     --appname=Application Name
     --packagename=App Package Identifier (e.g. com.mycompany.myapp)

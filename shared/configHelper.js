@@ -71,6 +71,7 @@ function getCommandExpanded(cli, commandName) {
 function readConfig(args, cli, handler) {
     var commandLineArgs = args.slice(2, args.length);
     var commandName = commandLineArgs.shift();
+    commandName = commandName ? commandName.toLowerCase() : commandName; 
 
     var processorList = null;
 
@@ -80,7 +81,7 @@ function readConfig(args, cli, handler) {
         process.exit(0);
         break;
     case SDK.commands.create.name: 
-    case SDK.commands.createWithTemplate.name: 
+    case SDK.commands.createwithtemplate.name: 
         processorList = createArgsProcessorList(cli, commandName);
         break;
     default:

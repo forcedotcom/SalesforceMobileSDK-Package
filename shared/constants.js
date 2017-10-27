@@ -80,7 +80,7 @@ module.exports = {
                 'native': 'iOSNativeTemplate',
                 'native_swift': 'iOSNativeSwiftTemplate'
             },
-            commands: ['create', 'createWithTemplate', 'version']            
+            commands: ['create', 'createwithtemplate', 'version']            
         },
         forcedroid: {
             name: 'forcedroid',
@@ -94,7 +94,7 @@ module.exports = {
                 'native': 'AndroidNativeTemplate',
                 'native_kotlin': 'AndroidNativeKotlinTemplate'
             },
-            commands: ['create', 'createWithTemplate', 'version']            
+            commands: ['create', 'createwithtemplate', 'version']            
         },
         forcehybrid: {
             name: 'forcehybrid',
@@ -108,7 +108,7 @@ module.exports = {
                 'hybrid_local': 'HybridLocalTemplate',
                 'hybrid_remote': 'HybridRemoteTemplate'
             },
-            commands: ['create', 'createWithTemplate', 'version']            
+            commands: ['create', 'createwithtemplate', 'version']            
         },
         forcereact: {
             name: 'forcereact',
@@ -121,7 +121,7 @@ module.exports = {
             appTypesToPath: {
                 'react_native': 'ReactNativeTemplate'
             },
-            commands: ['create', 'createWithTemplate', 'version']
+            commands: ['create', 'createwithtemplate', 'version']
         }
     },
 
@@ -160,7 +160,7 @@ module.exports = {
         },
         packageName: {
             name: 'packagename',
-            'char': 'p',
+            'char': 'k',
             description: 'App Package Identifier (e.g. com.mycompany.myapp)',
             prompt: 'Enter your package name:',
             error: cli => val => '\'' + val + '\' is not a valid package name.',
@@ -231,8 +231,8 @@ module.exports = {
                          ].filter(x=>x!=null),
             description: cli => 'Create ' + cli.purpose
         },
-        createWithTemplate: {
-            name: 'createWithTemplate',
+        createwithtemplate: {
+            name: 'createwithtemplate',
             args: cli => [cli.platforms.length > 1 ? 'platform' : null,
                           'templateRepoUri',
                           'appName',
