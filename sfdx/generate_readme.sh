@@ -43,7 +43,7 @@ run 'sfdx mobilesdk:ios --help'
 print "### Create Objective-C (native) or Swift (native_swift) application"
 run 'sfdx mobilesdk:ios:create --help'
 print "### Create iOS application from template"
-run 'sfdx mobilesdk:ios:createWithTemplate --help'
+run 'sfdx mobilesdk:ios:createwithtemplate --help'
 
 print "## Create a native Android application "
 print "### Help for Android"
@@ -51,7 +51,7 @@ run 'sfdx mobilesdk:android --help'
 print "### Create Java (native) or Kotlin (native_kotlin) application"
 run 'sfdx mobilesdk:android:create --help'
 print "### Create Android application from template"
-run 'sfdx mobilesdk:android:createWithTemplate --help'
+run 'sfdx mobilesdk:android:createwithtemplate --help'
 
 print "## Create an hybrid application "
 print "### Help for hybrid"
@@ -59,7 +59,7 @@ run 'sfdx mobilesdk:hybrid --help'
 print "### Create hybrid application"
 run 'sfdx mobilesdk:hybrid:create --help'
 print "### Create hybrid application from template"
-run 'sfdx mobilesdk:hybrid:createWithTemplate --help'
+run 'sfdx mobilesdk:hybrid:createwithtemplate --help'
 
 print "## Create a React Native application"
 print "### Help for React Native"
@@ -67,5 +67,5 @@ run 'sfdx mobilesdk:reactnative --help'
 print "### Create React Native application"
 run 'sfdx mobilesdk:reactnative:create --help'
 print "### Create React Native application from template"
-run 'sfdx mobilesdk:reactnative:createWithTemplate --help'
+run 'sfdx mobilesdk:reactnative:createwithtemplate --help'
 

@@ -43,7 +43,7 @@ forcereact create
  OR 
 
 # Create a React Native mobile application from a template
-forcereact createWithTemplate
+forcereact createwithtemplate
     --platform=Comma-separated list of platforms (ios, android)
     --templaterepouri=Template repo URI
     --appname=Application Name

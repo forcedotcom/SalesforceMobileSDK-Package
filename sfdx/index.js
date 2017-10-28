@@ -54,7 +54,7 @@ function validateCommand(cli, commandName, vals) {
 function runCommand(cli, commandName, vals) {
     switch(commandName) {
     case SDK.commands.create.name:
-    case SDK.commands.createWithTemplate.name:
+    case SDK.commands.createwithtemplate.name:
         createHelper.createApp(cli, vals);
         break;
     case SDK.commands.version.name:
