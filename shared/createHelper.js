@@ -224,9 +224,16 @@ function actuallyCreateApp(forcecli, config) {
         // Adding version
         config.version = SDK.version;
         
-        // Adding template repo uri and path if none provided
-        config.templaterepouri = config.templaterepouri || SDK.templatesRepoUri;
-        config.templatepath = config.templatepath || (config.templaterepouri == SDK.templatesRepoUri ? forcecli.appTypesToPath[config.apptype] : '');
+        // Figuring out template repo uri and path
+        if (config.templaterepouri) {
+            var templateUriParsed = utils.separateRepoUrlPathBranch(config.templaterepouri);
+            config.templaterepouri = templateUriParsed.repo + '#' + templateUriParsed.branch;
+            config.templatepath = templateUriParsed.path;
+        }
+        else {
+            config.templaterepouri = SDK.templatesRepoUri;
+            config.templatepath = forcecli.appTypesToPath[config.apptype];
+        }
 
         // Creating tmp dir for template clone
         var tmpDir = utils.mkTmpDir();
