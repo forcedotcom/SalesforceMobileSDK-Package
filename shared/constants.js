@@ -200,13 +200,6 @@ module.exports = {
             hasValue:false,
             required:false
         },
-        templatePath: {
-            name:'templatePath',
-            'char':'v',
-            error: cli => val => 'Invalid value for template path: \'' + val + '\'.',
-            validate: cli => val => /.*/.test(val),
-            required:false
-        },            
         pluginRepoUri: {
             name:'pluginrepouri',
             'char':'v',
@@ -239,8 +232,7 @@ module.exports = {
                           'packageName',
                           'organization',
                           'outputDir',
-                          'verbose',
-                          'templatePath'
+                          'verbose'
                          ].filter(x=>x!=null),
             description: cli => 'Create ' + cli.purpose + ' from a template'
         },
