@@ -129,7 +129,8 @@ module.exports = {
         platform: {
             name: 'platform',
             'char': 'p',
-            description: cli => 'Comma-separated list of platforms (' + cli.platforms.join(', ') + ')',
+            description: cli => 'comma-separated list of platforms (' + cli.platforms.join(', ') + ')',
+            longDescription: cli => 'A comma-separated list of one or more platforms you support. The script creates a project for each platform you select. Available options are ' + cli.platforms.join(', ') + '.',
             prompt: cli => 'Enter the target platform(s) separated by commas (' + cli.platforms.join(', ') + '):',
             error: cli => val => 'Platform(s) must be in ' + cli.platforms.join(', '),
             validate: cli => val => !val.split(",").some(p=>cli.platforms.indexOf(p) == -1)
@@ -137,7 +138,8 @@ module.exports = {
         appType: {
             name:'apptype',
             'char':'t',
-            description: cli => 'Application Type (' + cli.appTypes.join(', ') + ')',
+            description: cli => 'application type (' + cli.appTypes.join(', ') + ')',
+            longDescription: cli => 'You can choose one of the following types of applications: ' + cli.appTypes.join(', ') + '.',
             prompt: cli => 'Enter your application type (' + cli.appTypes.join(', ') + '):',
             error: cli => val => 'App type must be ' + cli.appTypes.join(' or ') + '.',
             validate: cli => val => cli.appTypes.indexOf(val) >=0
@@ -145,7 +147,8 @@ module.exports = {
         templateRepoUri: {
             name:'templaterepouri',
             'char': 'r',
-            description:'Template repo URI',
+            description:'template repo URI',
+            longDescription: 'The URI of a repository that contains the template application to be used as the basis of your new app. See https://developer.salesforce.com/docs/atlas.en-us.mobile_sdk.meta/mobile_sdk/ios_new_project_template.htm for information on creating templates.',
             prompt: 'Enter URI of repo containing template application:',
             error: cli => val => 'Invalid value for template repo uri: \'' + val + '\'.',
             validate: cli => val => /^\S+$/.test(val)
@@ -153,7 +156,8 @@ module.exports = {
         appName: {
             name: 'appname',
             'char': 'n',
-            description: 'Application Name',
+            description: 'application name',
+            longDescription: 'A name for the app that conforms to the naming requirements for the platform.',
             prompt: 'Enter your application name:',
             error: cli => val => 'Invalid value for application name: \'' + val + '\'.',
             validate: cli => val => /^\S+$/.test(val)
@@ -161,7 +165,8 @@ module.exports = {
         packageName: {
             name: 'packagename',
             'char': 'k',
-            description: 'App Package Identifier (e.g. com.mycompany.myapp)',
+            description: 'app package identifier (e.g. com.mycompany.myapp)',
+            longDescription: 'A string in reverse internet domain format that identifies your app\'s package or bundle. For example, "com.mycompany.myapp".',
             prompt: 'Enter your package name:',
             error: cli => val => '\'' + val + '\' is not a valid package name.',
             validate: cli => val => /^[a-z]+[a-z0-9_]*(\.[a-z]+[a-z0-9_]*)*$/.test(val),
@@ -169,7 +174,8 @@ module.exports = {
         organization: {
             name: 'organization',
             'char': 'o',
-            description: 'Organization Name (Your company\'s/organization\'s name)',
+            description: 'organization name (your company\'s/organization\'s name)',
+            longDescription: 'The name of your company or organization. This string is user-defined and may contain spaces and punctuation.',
             prompt: 'Enter your organization name (Acme, Inc.):',
             error: cli => val => 'Invalid value for organization: \'' + val + '\'.',
             validate: cli => val => /\S+/.test(val)
@@ -177,7 +183,8 @@ module.exports = {
         outputDir: {
             name:'outputdir',
             'char':'d',
-            description:'Output Directory (Leave empty for current directory)',
+            description:'output directory (leave empty for current directory)',
+            longDescription: 'The local path for your new project. If this path points to an existing directory, that directory must be empty. If you don\'t specify a value, the script creates the app in the current directory.',
             prompt: 'Enter output directory for your app (leave empty for the current directory):',
             error: cli => val => 'Invalid value for output directory (directory must not already exist): \'' + val + '\'.',
             validate: cli => val => val === undefined || val === '' || !shelljs.test('-e', path.resolve(val)),
@@ -186,7 +193,8 @@ module.exports = {
         startPage: {
             name:'startpage',
             'char':'s',
-            description:'App Start Page (The start page of your remote app. Only required for hybrid_remote)',
+            description:'app start page (the start page of your remote app; required for hybrid_remote apps only)',
+            longDescription: 'For hybrid remote apps only, specify the relative server path to your Visualforce start page. This relative path always discards the Salesforce instance and domain name and starts with "apex/".',
             prompt: 'Enter the start page for your app:',
             error: cli => val => 'Invalid value for start page: \'' + val + '\'.',
             validate: cli => val => /\S+/.test(val),
@@ -222,7 +230,8 @@ module.exports = {
                           'verbose',
                           cli.name === 'forcehybrid' ? 'pluginRepoUri' : null
                          ].filter(x=>x!=null),
-            description: cli => 'Create ' + cli.purpose
+            description: cli => 'create ' + cli.purpose,
+            longDescription: 'This command initiates creation of a new app based on the standard Mobile SDK template.'
         },
         createwithtemplate: {
             name: 'createwithtemplate',
@@ -234,12 +243,14 @@ module.exports = {
                           'outputDir',
                           'verbose'
                          ].filter(x=>x!=null),
-            description: cli => 'Create ' + cli.purpose + ' from a template'
+            description: cli => 'create ' + cli.purpose + ' from a template',
+            longDescription: 'This command initiates creation of a new app based on the Mobile SDK template that you specify. The template can be a specialized app for your app type that Mobile SDK provides, or your own custom app that you\'ve configured to use as a template. See https://developer.salesforce.com/docs/atlas.en-us.mobile_sdk.meta/mobile_sdk/ios_new_project_template.htm for information on custom templates.'
         },
         version: {
             name: 'version',
             args: [],
-            description: 'Print version of Mobile SDK'
+            description: 'print version of Mobile SDK',
+            longDescription: 'This command displays to the console the version of Mobile SDK that the script uses to create apps.'
         }
     }
 };
