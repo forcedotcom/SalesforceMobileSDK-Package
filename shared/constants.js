@@ -231,7 +231,7 @@ module.exports = {
                           cli.name === 'forcehybrid' ? 'pluginRepoUri' : null
                          ].filter(x=>x!=null),
             description: cli => 'create ' + cli.purpose,
-            longDescription: 'This command initiates creation of a new app based on the standard Mobile SDK template.'
+            help: 'This command initiates creation of a new app based on the standard Mobile SDK template.'
         },
         createwithtemplate: {
             name: 'createwithtemplate',
@@ -244,13 +244,13 @@ module.exports = {
                           'verbose'
                          ].filter(x=>x!=null),
             description: cli => 'create ' + cli.purpose + ' from a template',
-            longDescription: 'This command initiates creation of a new app based on the Mobile SDK template that you specify. The template can be a specialized app for your app type that Mobile SDK provides, or your own custom app that you\'ve configured to use as a template. See https://developer.salesforce.com/docs/atlas.en-us.mobile_sdk.meta/mobile_sdk/ios_new_project_template.htm for information on custom templates.'
+            help: 'This command initiates creation of a new app based on the Mobile SDK template that you specify. The template can be a specialized app for your app type that Mobile SDK provides, or your own custom app that you\'ve configured to use as a template. See https://developer.salesforce.com/docs/atlas.en-us.mobile_sdk.meta/mobile_sdk/ios_new_project_template.htm for information on custom templates.'
         },
         version: {
             name: 'version',
             args: [],
             description: 'print version of Mobile SDK',
-            longDescription: 'This command displays to the console the version of Mobile SDK that the script uses to create apps.'
+            help: 'This command displays to the console the version of Mobile SDK that the script uses to create apps.'
         }
     }
 };
