@@ -65,6 +65,7 @@ function getCommandExpanded(cli, commandName) {
         name: command.name,
         args: getArgsExpanded(cli, commandName),
         description: applyCli(command.description, cli),
+        longDescription: applyCli(command.description, cli),
         help: applyCli(command.help, cli)
     };
 }
