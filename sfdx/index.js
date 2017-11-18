@@ -88,6 +88,7 @@ function getCommands() {
                 topic: cli.topic,
                 command: commandName,
                 description: command.description,
+                help: command.help,
                 flags: command.args,
                 run(context) {
                     if (validateCommand(this.cli, this.command, context.flags)) {

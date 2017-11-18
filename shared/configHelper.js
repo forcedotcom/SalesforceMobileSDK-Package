@@ -46,11 +46,11 @@ function getArgsExpanded(cli, commandName) {
                  name: arg.name,
                  'char': arg.char,
                  description: applyCli(arg.description, cli),
+                 longDescription: applyCli(arg.longDescription, cli),
                  prompt: applyCli(arg.prompt, cli),
                  error: applyCli(arg.error, cli),
                  validate: applyCli(arg.validate, cli),
                  promptIf: arg.promptIf,
-                 required: arg.required === undefined ? true : arg.required,
                  required: arg.required === undefined ? true : arg.required,
                  hasValue: arg.hasValue === undefined ? true : arg.hasValue,
                  hidden: arg.description == null
@@ -64,7 +64,8 @@ function getCommandExpanded(cli, commandName) {
     return {
         name: command.name,
         args: getArgsExpanded(cli, commandName),
-        description: applyCli(command.description, cli)
+        description: applyCli(command.description, cli),
+        help: applyCli(command.help, cli)
     };
 }
 
