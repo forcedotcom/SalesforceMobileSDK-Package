@@ -88,6 +88,7 @@ function getCommands() {
                 topic: cli.topic,
                 command: commandName,
                 description: command.description,
+                longDescription: command.longDescription,
                 help: command.help,
                 flags: command.args,
                 run(context) {
