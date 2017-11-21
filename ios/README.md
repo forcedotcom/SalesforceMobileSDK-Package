@@ -32,27 +32,27 @@ forceios: Tool for building an iOS native mobile application using Salesforce Mo
 
 Usage:
 
-# Create an iOS native mobile application
+# create an iOS native mobile application
 forceios create
-    --apptype=Application Type (native, native_swift)
-    --appname=Application Name
-    --packagename=App Package Identifier (e.g. com.mycompany.myapp)
-    --organization=Organization Name (Your company's/organization's name)
-    [--outputdir=Output Directory (Leave empty for current directory)]
+    --apptype=application type (native, native_swift)
+    --appname=application name
+    --packagename=app package identifier (e.g. com.mycompany.myapp)
+    --organization=organization name (your company's/organization's name)
+    [--outputdir=output directory (leave empty for current directory)]
 
  OR 
 
-# Create an iOS native mobile application from a template
+# create an iOS native mobile application from a template
 forceios createwithtemplate
-    --templaterepouri=Template repo URI
-    --appname=Application Name
-    --packagename=App Package Identifier (e.g. com.mycompany.myapp)
-    --organization=Organization Name (Your company's/organization's name)
-    [--outputdir=Output Directory (Leave empty for current directory)]
+    --templaterepouri=template repo URI
+    --appname=application name
+    --packagename=app package identifier (e.g. com.mycompany.myapp)
+    --organization=organization name (your company's/organization's name)
+    [--outputdir=output directory (leave empty for current directory)]
 
  OR 
 
-# Print version of Mobile SDK
+# show version of Mobile SDK
 forceios version
 
  OR 
