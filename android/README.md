@@ -32,27 +32,27 @@ forcedroid: Tool for building an Android native mobile application using Salesfo
 
 Usage:
 
-# Create an Android native mobile application
+# create an Android native mobile application
 forcedroid create
-    --apptype=Application Type (native, native_kotlin)
-    --appname=Application Name
-    --packagename=App Package Identifier (e.g. com.mycompany.myapp)
-    --organization=Organization Name (Your company's/organization's name)
-    [--outputdir=Output Directory (Leave empty for current directory)]
+    --apptype=application type (native, native_kotlin)
+    --appname=application name
+    --packagename=app package identifier (e.g. com.mycompany.myapp)
+    --organization=organization name (your company's/organization's name)
+    [--outputdir=output directory (leave empty for current directory)]
 
  OR 
 
-# Create an Android native mobile application from a template
+# create an Android native mobile application from a template
 forcedroid createwithtemplate
-    --templaterepouri=Template repo URI
-    --appname=Application Name
-    --packagename=App Package Identifier (e.g. com.mycompany.myapp)
-    --organization=Organization Name (Your company's/organization's name)
-    [--outputdir=Output Directory (Leave empty for current directory)]
+    --templaterepouri=template repo URI
+    --appname=application name
+    --packagename=app package identifier (e.g. com.mycompany.myapp)
+    --organization=organization name (your company's/organization's name)
+    [--outputdir=output directory (leave empty for current directory)]
 
  OR 
 
-# Print version of Mobile SDK
+# show version of Mobile SDK
 forcedroid version
 
  OR 

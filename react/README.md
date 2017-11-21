@@ -32,28 +32,28 @@ forcereact: Tool for building a React Native mobile application using Salesforce
 
 Usage:
 
-# Create a React Native mobile application
+# create a React Native mobile application
 forcereact create
-    --platform=Comma-separated list of platforms (ios, android)
-    --appname=Application Name
-    --packagename=App Package Identifier (e.g. com.mycompany.myapp)
-    --organization=Organization Name (Your company's/organization's name)
-    [--outputdir=Output Directory (Leave empty for current directory)]
+    --platform=comma-separated list of platforms (ios, android)
+    --appname=application name
+    --packagename=app package identifier (e.g. com.mycompany.myapp)
+    --organization=organization name (your company's/organization's name)
+    [--outputdir=output directory (leave empty for current directory)]
 
  OR 
 
-# Create a React Native mobile application from a template
+# create a React Native mobile application from a template
 forcereact createwithtemplate
-    --platform=Comma-separated list of platforms (ios, android)
-    --templaterepouri=Template repo URI
-    --appname=Application Name
-    --packagename=App Package Identifier (e.g. com.mycompany.myapp)
-    --organization=Organization Name (Your company's/organization's name)
-    [--outputdir=Output Directory (Leave empty for current directory)]
+    --platform=comma-separated list of platforms (ios, android)
+    --templaterepouri=template repo URI
+    --appname=application name
+    --packagename=app package identifier (e.g. com.mycompany.myapp)
+    --organization=organization name (your company's/organization's name)
+    [--outputdir=output directory (leave empty for current directory)]
 
  OR 
 
-# Print version of Mobile SDK
+# show version of Mobile SDK
 forcereact version
 
  OR 

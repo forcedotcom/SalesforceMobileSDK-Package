@@ -28,35 +28,34 @@ Typing `forcehybrid` with no arguments gives you a breakdown of the usage:
 
 ```
 -> forcehybrid
-
 forcehybrid: Tool for building a hybrid mobile application using Salesforce Mobile SDK
 
 Usage:
 
-# Create a hybrid mobile application
+# create a hybrid mobile application
 forcehybrid create
-    --platform=Comma-separated list of platforms (ios, android)
-    --apptype=Application Type (hybrid_local, hybrid_remote)
-    --appname=Application Name
-    --packagename=App Package Identifier (e.g. com.mycompany.myapp)
-    --organization=Organization Name (Your company's/organization's name)
-    [--startpage=App Start Page (The start page of your remote app. Only required for hybrid_remote)]
-    [--outputdir=Output Directory (Leave empty for current directory)]
+    --platform=comma-separated list of platforms (ios, android)
+    --apptype=application type (hybrid_local, hybrid_remote)
+    --appname=application name
+    --packagename=app package identifier (e.g. com.mycompany.myapp)
+    --organization=organization name (your company's/organization's name)
+    [--startpage=app start page (the start page of your remote app; required for hybrid_remote apps only)]
+    [--outputdir=output directory (leave empty for current directory)]
 
  OR 
 
-# Create a hybrid mobile application from a template
+# create a hybrid mobile application from a template
 forcehybrid createwithtemplate
-    --platform=Comma-separated list of platforms (ios, android)
-    --templaterepouri=Template repo URI
-    --appname=Application Name
-    --packagename=App Package Identifier (e.g. com.mycompany.myapp)
-    --organization=Organization Name (Your company's/organization's name)
-    [--outputdir=Output Directory (Leave empty for current directory)]
+    --platform=comma-separated list of platforms (ios, android)
+    --templaterepouri=template repo URI
+    --appname=application name
+    --packagename=app package identifier (e.g. com.mycompany.myapp)
+    --organization=organization name (your company's/organization's name)
+    [--outputdir=output directory (leave empty for current directory)]
 
  OR 
 
-# Print version of Mobile SDK
+# show version of Mobile SDK
 forcehybrid version
 
  OR 
