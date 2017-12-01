@@ -31,7 +31,7 @@ module.exports = {
     version: VERSION,
 
     //templatesRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-Templates#dev53',    // dev
-    templatesRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-Templates#v' + VERSION, // GA
+    templatesRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-Templates#v' + '5.3.1', // GA
 
 
     forceclis: {
