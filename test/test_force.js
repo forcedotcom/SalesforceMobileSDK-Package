@@ -354,7 +354,11 @@ function getTemplateNameFromUri(templateRepoUri) {
 //
 // Get template apptype
 //
-function getAppTypeFromTemplate(templateRepoUri) {
+function getAppTypeFromTemplate(templateRepoUriWithPossiblePath) {
+    var templateUriParsed = utils.separateRepoUrlPathBranch(templateRepoUriWithPossiblePath);
+    var templateRepoUri = templateUriParsed.repo + '#' + templateUriParsed.branch;
+    var templatePath = templateUriParsed.path;
+
     // Creating tmp dir for template clone
     var tmpDir = utils.mkTmpDir();
 
@@ -362,7 +366,7 @@ function getAppTypeFromTemplate(templateRepoUri) {
     var repoDir = utils.cloneRepo(tmpDir, templateRepoUri);
 
     // Getting template
-    var appType = require(path.join(repoDir, 'template.js')).appType;
+    var appType = require(path.join(repoDir, templatePath, 'template.js')).appType;
 
     // Cleanup
     utils.removeFile(tmpDir);
