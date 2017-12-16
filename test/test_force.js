@@ -214,7 +214,7 @@ function createCompileApp(tmpDir, os, actualAppType, templateRepoUri, pluginRepo
                    );
 
     var execPath = useSfdxRequested
-        ? 'sfdx mobilesdk:' + forcecli.sfdx_topic + ':'
+        ? 'sfdx mobilesdk:' + forcecli.topic + ':'
         : path.join(tmpDir, 'node_modules', '.bin', forcecli.name) + ' ';
 
     if (!templateRepoUri) {
