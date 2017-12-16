@@ -221,8 +221,10 @@ function createCompileApp(tmpDir, os, actualAppType, templateRepoUri, pluginRepo
         if (actualAppType === APP_TYPE.native_swift && os === OS.android) return; // that app type doesn't exist for android
         if (actualAppType === APP_TYPE.native_kotlin && os === OS.ios) return; // that app type doesn't exist for ios
 
-        execArgs = 'create '
-            + ' --apptype=' + actualAppType;
+        execArgs = 'create ';
+        if (forcecli.appTypes.length > 1) {
+            execArgs += ' --apptype=' + actualAppType;
+        }
     }
     else {
         execArgs = 'createwithtemplate '
