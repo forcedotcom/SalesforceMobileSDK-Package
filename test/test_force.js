@@ -214,15 +214,17 @@ function createCompileApp(tmpDir, os, actualAppType, templateRepoUri, pluginRepo
                    );
 
     var execPath = useSfdxRequested
-        ? 'sfdx mobilesdk:' + forcecli.sfdx_topic + ':'
+        ? 'sfdx mobilesdk:' + forcecli.topic + ':'
         : path.join(tmpDir, 'node_modules', '.bin', forcecli.name) + ' ';
 
     if (!templateRepoUri) {
         if (actualAppType === APP_TYPE.native_swift && os === OS.android) return; // that app type doesn't exist for android
         if (actualAppType === APP_TYPE.native_kotlin && os === OS.ios) return; // that app type doesn't exist for ios
 
-        execArgs = 'create '
-            + ' --apptype=' + actualAppType;
+        execArgs = 'create ';
+        if (forcecli.appTypes.length > 1) {
+            execArgs += ' --apptype=' + actualAppType;
+        }
     }
     else {
         execArgs = 'createwithtemplate '
