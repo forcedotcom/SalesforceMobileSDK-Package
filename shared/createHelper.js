@@ -168,7 +168,7 @@ function checkTools(toolNames) {
 //
 // Create app - check tools, read config then actually create app
 //
-function createApp(forcecli) {
+function createApp(forcecli, config) {
 
     // Can't target ios or run pod if not on a mac
     if (process.platform != 'darwin') {
@@ -184,82 +184,93 @@ function createApp(forcecli) {
     // Check tools
     checkTools(forcecli.toolNames);
 
-    // Read parameters from command line
-    configHelper.readConfig(process.argv, forcecli, function(config) {
-        try {
-            actuallyCreateApp(forcecli, config);
-        }
-        catch (error) {
-            utils.logError(forcecli.name + ' failed\n', error);
-            process.exit(1);
-        }
-    });
+    if (config === undefined) {
+        // Read parameters from command line
+        configHelper.readConfig(process.argv, forcecli, function(config) { actuallyCreateApp(forcecli, config); });
+    }
+    else {
+        // Use parameters passed through
+        actuallyCreateApp(forcecli, config);
+    }
 }
 
 //
 // Actually create app
 //
 function actuallyCreateApp(forcecli, config) {
-    // Adding platform
-    if (forcecli.platforms.length == 1) {
-        config.platform = forcecli.platforms[0];
+    try {
+        // Adding platform
+        if (forcecli.platforms.length == 1) {
+            config.platform = forcecli.platforms[0];
+        }
+
+        // Adding app type
+        if (forcecli.appTypes.length == 1) {
+            config.apptype = forcecli.appTypes[0];
+        }
+
+        // Setting log level
+        if (config.verbose) {
+            utils.setLogLevel(utils.LOG_LEVELS.DEBUG);
+        }
+        else {
+            utils.setLogLevel(utils.LOG_LEVELS.INFO);
+        }
+
+        // Computing projectDir
+        config.projectDir = config.outputdir ? path.resolve(config.outputdir) : path.join(process.cwd(),config.appname)
+        config.projectPath = path.relative(process.cwd(), config.projectDir);
+
+        // Adding version
+        config.version = SDK.version;
+        
+        // Figuring out template repo uri and path
+        if (config.templaterepouri) {
+            var templateUriParsed = utils.separateRepoUrlPathBranch(config.templaterepouri);
+            config.templaterepouri = templateUriParsed.repo + '#' + templateUriParsed.branch;
+            config.templatepath = templateUriParsed.path;
+        }
+        else {
+            config.templaterepouri = SDK.templatesRepoUri;
+            config.templatepath = forcecli.appTypesToPath[config.apptype];
+        }
+
+        // Creating tmp dir for template clone
+        var tmpDir = utils.mkTmpDir();
+
+        // Cloning template repo
+        var repoDir = utils.cloneRepo(tmpDir, config.templaterepouri);
+        config.templateLocalPath = path.join(repoDir, config.templatepath);
+
+        // Getting apptype from template
+        config.apptype = require(path.join(config.templateLocalPath, 'template.js')).appType;
+
+        var isNative = config.apptype.indexOf('native') >= 0;
+
+        // Adding hybrid only config
+        if (!isNative) {
+            config.cordovaPluginRepoUri = config.pluginrepouri || SDK.tools.cordova.pluginRepoUri;
+        }
+
+        // Print details
+        printDetails(config);
+
+        // Creating application
+        var results = isNative ? createNativeApp(config) : createHybridApp(config);
+
+        // Cleanup
+        utils.removeFile(tmpDir);
+        
+        // Printing next steps
+        if (!(results instanceof Array)) { results = [results] };
+        for (var result of results) {
+            var ide = SDK.ides[result.platform || config.platform.split(',')[0]];
+            printNextSteps(ide, config.projectPath, result);
+        }
     }
-
-    // Adding app type
-    if (forcecli.appTypes.length == 1) {
-        config.apptype = forcecli.appTypes[0];
-    }
-
-    // Setting log level
-    if (config.verbose) {
-        utils.setLogLevel(utils.LOG_LEVELS.DEBUG);
-    }
-    else {
-        utils.setLogLevel(utils.LOG_LEVELS.INFO);
-    }
-
-    // Computing projectDir
-    config.projectDir = config.outputdir ? path.resolve(config.outputdir) : path.join(process.cwd(),config.appname)
-    config.projectPath = path.relative(process.cwd(), config.projectDir);
-
-    // Adding version
-    config.version = SDK.version;
-    
-    // Adding template repo uri and path if none provided
-    config.templaterepouri = config.templaterepouri || SDK.templatesRepoUri;
-    config.templatepath = config.templatepath || (config.templaterepouri == SDK.templatesRepoUri ? forcecli.appTypesToPath[config.apptype] : '');
-
-    // Creating tmp dir for template clone
-    var tmpDir = utils.mkTmpDir();
-
-    // Cloning template repo
-    var repoDir = utils.cloneRepo(tmpDir, config.templaterepouri);
-    config.templateLocalPath = path.join(repoDir, config.templatepath);
-
-    // Getting apptype from template
-    config.apptype = require(path.join(config.templateLocalPath, 'template.js')).appType;
-
-    var isNative = config.apptype.indexOf('native') >= 0;
-
-    // Adding hybrid only config
-    if (!isNative) {
-        config.cordovaPluginRepoUri = config.pluginrepouri || SDK.tools.cordova.pluginRepoUri;
-    }
-
-    // Print details
-    printDetails(config);
-
-    // Creating application
-    var results = isNative ? createNativeApp(config) : createHybridApp(config);
-
-    // Cleanup
-    utils.removeFile(tmpDir);
-    
-    // Printing next steps
-    if (!(results instanceof Array)) { results = [results] };
-    for (var result of results) {
-        var ide = SDK.ides[result.platform || config.platform.split(',')[0]];
-        printNextSteps(ide, config.projectPath, result);
+    catch (error) {
+        utils.logError(forcecli.name + ' failed\n', error);
+        process.exit(1);
     }
 }
 

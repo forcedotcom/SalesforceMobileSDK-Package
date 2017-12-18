@@ -266,6 +266,20 @@ function removeFile(path) {
 }
 
 /**
+ * Separate repo url / path / branch from url of the form https://server/org/repo/path#branch or https://server/org/repo#branch or https://server/org/repo
+ * @param {String} Full url
+ * @return map with repo / path /branch {repo:https://server/org/repo, branch:branch, path:path}
+ */
+function separateRepoUrlPathBranch(fullUrl) {
+    var parts = fullUrl.split('#');
+    var repoWithPath = parts[0];
+    var branch = parts.length > 1 ? parts[1] : 'master';
+    var repo = repoWithPath.split('/').splice(0,5).join('/');
+    var path = repoWithPath.split('/').splice(5).join('/');
+    return {repo:repo, branch:branch, path:path};
+}
+
+/**
  * Clone repo.
  *
  * @param {String} tmpDir Parent dir for clone
@@ -375,5 +389,6 @@ module.exports = {
     replaceInFiles,
     runFunctionThrowError,
     runProcessCatchError,
-    runProcessThrowError
+    runProcessThrowError,
+    separateRepoUrlPathBranch
 };

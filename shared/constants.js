@@ -25,47 +25,13 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-var VERSION = '5.3.0';
+var path = require('path'),
+    shelljs = require('shelljs');
+
+var VERSION = '6.0.0';
 
 module.exports = {
     version: VERSION,
-
-    //templatesRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-Templates#dev53',    // dev
-    templatesRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-Templates#v' + '5.3.1', // GA
-
-
-    forceclis: {
-        forceios: {
-            name: 'forceios',
-            description: 'command line utility for building iOS mobile applications using Salesforce Mobile SDK',
-            dir: 'ios',
-            platforms: ['ios'],
-            toolNames: ['git', 'npm', 'pod'],
-            appTypes: ['native', 'native_swift', 'react_native', 'hybrid_local', 'hybrid_remote'],
-            appTypesToPath: {
-                'native': 'iOSNativeTemplate',
-                'native_swift': 'iOSNativeSwiftTemplate',
-                'react_native': 'ReactNativeTemplate',
-                'hybrid_local': 'HybridLocalTemplate',
-                'hybrid_remote': 'HybridRemoteTemplate'
-            }
-        },
-        forcedroid: {
-            name: 'forcedroid',
-            description: 'command line utility for building Android mobile applications using Salesforce Mobile SDK',
-            dir: 'android',
-            platforms: ['android'],
-            toolNames: ['git', 'npm'],
-            appTypes: ['native', 'native_kotlin', 'react_native', 'hybrid_local', 'hybrid_remote'],
-            appTypesToPath: {
-                'native': 'AndroidNativeTemplate',
-                'native_kotlin': 'AndroidNativeKotlinTemplate',
-                'react_native': 'ReactNativeTemplate',
-                'hybrid_local': 'HybridLocalTemplate',
-                'hybrid_remote': 'HybridRemoteTemplate'
-            }
-        }
-    },
 
     tools: {
         git: {
@@ -83,11 +49,11 @@ module.exports = {
         cordova: {
             checkCmd: 'cordova -v',
             minVersion: '7.0.0',
-            //pluginRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-CordovaPlugin#dev53',    // dev
+            //pluginRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-CordovaPlugin#dev',    // dev
             pluginRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-CordovaPlugin#v' + VERSION, // GA
             platformVersion: {
-                ios: '4.4.0',
-                android: '6.2.3'
+                ios: '4.5.4',
+                android: '7.0.0'
             }
         }
     },
@@ -95,5 +61,198 @@ module.exports = {
     ides: {
         ios: 'XCode',
         android: 'Android Studio'
+    },
+
+    //templatesRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-Templates#dev',    // dev
+    templatesRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-Templates#v' + VERSION, // GA
+
+    forceclis: {
+        forceios: {
+            name: 'forceios',
+            topic: 'ios',
+            purpose: 'an iOS native mobile application',
+            dir: 'ios',
+            platforms: ['ios'],
+            toolNames: ['git', 'npm', 'pod'],
+            appTypes: ['native', 'native_swift'],
+            appTypesToPath: {
+                'native': 'iOSNativeTemplate',
+                'native_swift': 'iOSNativeSwiftTemplate'
+            },
+            commands: ['create', 'createwithtemplate', 'version']            
+        },
+        forcedroid: {
+            name: 'forcedroid',
+            topic: 'android',
+            purpose: 'an Android native mobile application',
+            dir: 'android',
+            platforms: ['android'],
+            toolNames: ['git', 'npm'],
+            appTypes: ['native', 'native_kotlin'],
+            appTypesToPath: {
+                'native': 'AndroidNativeTemplate',
+                'native_kotlin': 'AndroidNativeKotlinTemplate'
+            },
+            commands: ['create', 'createwithtemplate', 'version']            
+        },
+        forcehybrid: {
+            name: 'forcehybrid',
+            topic: 'hybrid',
+            purpose: 'a hybrid mobile application',
+            dir: 'hybrid',
+            platforms: ['ios', 'android'],
+            toolNames: ['git', 'npm', 'cordova'],
+            appTypes: ['hybrid_local', 'hybrid_remote'],
+            appTypesToPath: {
+                'hybrid_local': 'HybridLocalTemplate',
+                'hybrid_remote': 'HybridRemoteTemplate'
+            },
+            commands: ['create', 'createwithtemplate', 'version']            
+        },
+        forcereact: {
+            name: 'forcereact',
+            topic: 'reactnative',
+            purpose: 'a React Native mobile application',
+            dir: 'react',
+            platforms: ['ios', 'android'],
+            toolNames: ['git', 'npm', 'pod'],
+            appTypes: ['react_native'],
+            appTypesToPath: {
+                'react_native': 'ReactNativeTemplate'
+            },
+            commands: ['create', 'createwithtemplate', 'version']
+        }
+    },
+
+    args: {
+        platform: {
+            name: 'platform',
+            'char': 'p',
+            description: cli => 'comma-separated list of platforms (' + cli.platforms.join(', ') + ')',
+            longDescription: cli => 'A comma-separated list of one or more platforms you support. The script creates a project for each platform you select. Available options are ' + cli.platforms.join(', ') + '.',
+            prompt: cli => 'Enter the target platform(s) separated by commas (' + cli.platforms.join(', ') + '):',
+            error: cli => val => 'Platform(s) must be in ' + cli.platforms.join(', '),
+            validate: cli => val => !val.split(",").some(p=>cli.platforms.indexOf(p) == -1)
+        },
+        appType: {
+            name:'apptype',
+            'char':'t',
+            description: cli => 'application type (' + cli.appTypes.join(', ') + ')',
+            longDescription: cli => 'You can choose one of the following types of applications: ' + cli.appTypes.join(', ') + '.',
+            prompt: cli => 'Enter your application type (' + cli.appTypes.join(', ') + '):',
+            error: cli => val => 'App type must be ' + cli.appTypes.join(' or ') + '.',
+            validate: cli => val => cli.appTypes.indexOf(val) >=0
+        },
+        templateRepoUri: {
+            name:'templaterepouri',
+            'char': 'r',
+            description:'template repo URI',
+            longDescription: 'The URI of a repository that contains the template application to be used as the basis of your new app. See https://developer.salesforce.com/docs/atlas.en-us.mobile_sdk.meta/mobile_sdk/ios_new_project_template.htm for information on creating templates.',
+            prompt: 'Enter URI of repo containing template application:',
+            error: cli => val => 'Invalid value for template repo uri: \'' + val + '\'.',
+            validate: cli => val => /^\S+$/.test(val)
+        },
+        appName: {
+            name: 'appname',
+            'char': 'n',
+            description: 'application name',
+            longDescription: 'A name for the app that conforms to the naming requirements for the platform.',
+            prompt: 'Enter your application name:',
+            error: cli => val => 'Invalid value for application name: \'' + val + '\'.',
+            validate: cli => val => /^\S+$/.test(val)
+        },
+        packageName: {
+            name: 'packagename',
+            'char': 'k',
+            description: 'app package identifier (e.g. com.mycompany.myapp)',
+            longDescription: 'A string in reverse internet domain format that identifies your app\'s package or bundle. For example, "com.mycompany.myapp".',
+            prompt: 'Enter your package name:',
+            error: cli => val => '\'' + val + '\' is not a valid package name.',
+            validate: cli => val => /^[a-z]+[a-z0-9_]*(\.[a-z]+[a-z0-9_]*)*$/.test(val),
+        },
+        organization: {
+            name: 'organization',
+            'char': 'o',
+            description: 'organization name (your company\'s/organization\'s name)',
+            longDescription: 'The name of your company or organization. This string is user-defined and may contain spaces and punctuation.',
+            prompt: 'Enter your organization name (Acme, Inc.):',
+            error: cli => val => 'Invalid value for organization: \'' + val + '\'.',
+            validate: cli => val => /\S+/.test(val)
+        },
+        outputDir: {
+            name:'outputdir',
+            'char':'d',
+            description:'output directory (leave empty for current directory)',
+            longDescription: 'The local path for your new project. If this path points to an existing directory, that directory must be empty. If you don\'t specify a value, the script creates the app in the current directory.',
+            prompt: 'Enter output directory for your app (leave empty for the current directory):',
+            error: cli => val => 'Invalid value for output directory (directory must not already exist): \'' + val + '\'.',
+            validate: cli => val => val === undefined || val === '' || !shelljs.test('-e', path.resolve(val)),
+            required:false
+        },
+        startPage: {
+            name:'startpage',
+            'char':'s',
+            description:'app start page (the start page of your remote app; required for hybrid_remote apps only)',
+            longDescription: 'For hybrid remote apps only, specify the relative server path to your Visualforce start page. This relative path always discards the Salesforce instance and domain name and starts with "apex/".',
+            prompt: 'Enter the start page for your app:',
+            error: cli => val => 'Invalid value for start page: \'' + val + '\'.',
+            validate: cli => val => /\S+/.test(val),
+            required: false,
+            promptIf: otherArgs => otherArgs.apptype === 'hybrid_remote'
+        },
+        // Private args
+        verbose: {
+            name:'verbose',
+            'char':'v',
+            hasValue:false,
+            required:false
+        },
+        pluginRepoUri: {
+            name:'pluginrepouri',
+            'char':'v',
+            error: cli => val => 'Invalid value for plugin repo uri: \'' + val + '\'.',
+            validate: cli => val => /.*/.test(val),
+            required:false
+        }  
+    },
+
+    commands: {
+        create: {
+            name: 'create',
+            args: cli => [cli.platforms.length > 1 ? 'platform' : null,
+                          cli.appTypes.length > 1 ? 'appType' : null,
+                          'appName',
+                          'packageName',
+                          'organization',
+                          cli.appTypes.indexOf('hybrid_remote') >=0 ? 'startPage' : null,
+                          'outputDir',
+                          'verbose',
+                          cli.name === 'forcehybrid' ? 'pluginRepoUri' : null
+                         ].filter(x=>x!=null),
+            description: cli => 'create ' + cli.purpose,
+            longDescription: cli => 'Create ' + cli.purpose + '.',
+            help: 'This command initiates creation of a new app based on the standard Mobile SDK template.'
+        },
+        createwithtemplate: {
+            name: 'createwithtemplate',
+            args: cli => [cli.platforms.length > 1 ? 'platform' : null,
+                          'templateRepoUri',
+                          'appName',
+                          'packageName',
+                          'organization',
+                          'outputDir',
+                          'verbose'
+                         ].filter(x=>x!=null),
+            description: cli => 'create ' + cli.purpose + ' from a template',
+            longDescription: cli => 'Create ' + cli.purpose + ' from a template.',
+            help: 'This command initiates creation of a new app based on the Mobile SDK template that you specify. The template can be a specialized app for your app type that Mobile SDK provides, or your own custom app that you\'ve configured to use as a template. See https://developer.salesforce.com/docs/atlas.en-us.mobile_sdk.meta/mobile_sdk/ios_new_project_template.htm for information on custom templates.'
+        },
+        version: {
+            name: 'version',
+            args: [],
+            description: 'show version of Mobile SDK',
+            longDescription: 'Show version of Mobile SDK.',
+            help: 'This command displays to the console the version of Mobile SDK that the script uses to create apps.'
+        }
     }
 };
