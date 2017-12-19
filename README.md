@@ -1,5 +1,5 @@
 # SalesforceMobileSDK-Package
-Repo for forceios/forcedroid/forcehybrid and the sfdx plugin.
+Repo for forceios/forcedroid/forcehybrid/forcereact and the sfdx plugin.
 
 ## To get started do the following from the root directory
 ``` shell
