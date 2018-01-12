@@ -79,6 +79,10 @@ jobs:
       - run: *upgrade-git
       - run: *setup
       - run:
+          name: Install SFDX
+          command: sudo npm install sfdx-cli
+          when: always
+      - run:
           name: Build Native Java App
           command: ./test/test_force.js --os=android --apptype=native --use-sfdx
           when: always
