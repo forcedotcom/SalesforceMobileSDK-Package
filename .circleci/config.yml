@@ -77,8 +77,7 @@ jobs:
     steps:
       - checkout
       - run: *upgrade-git
-      - run:
-          name: *setup
+      - run: *setup
       - run:
           name: Build Native Java App
           command: ./test/test_force.js --os=android --apptype=native --use-sfdx
