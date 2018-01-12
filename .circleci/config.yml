@@ -28,6 +28,19 @@ jobs:
           name: Update Git
           command:  |
             git --version
+            su -
+            apt-get install \
+                build-essential flex bison \
+                libreadline6-dev zlib1g-dev \
+                libnl1 libssl-dev libnl-dev \
+                libssl-dev \
+                libcurl4-gnutls-dev \
+                libexpat1-dev \
+                tcl tk \
+                tcl-dev gettext \
+                asciidoc \
+                docbook2x
+                
             wget https://www.kernel.org/pub/software/scm/git/git-2.13.0.tar.gz
             tar -xvzf git-2.13.0.tar.gz
             cd git-2.13.0
