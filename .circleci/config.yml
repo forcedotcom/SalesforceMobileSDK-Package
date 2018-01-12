@@ -26,23 +26,23 @@ jobs:
           when: always
       - run:
           name: Build Native Java App
-          command: ./SalesforceMobileSDK-Package/test/test_force.js --os=android --apptype=native
+          command: ./test/test_force.js --os=android --apptype=native
           when: always
       - run:
           name: Build Native Kotlin App
-          command: ./SalesforceMobileSDK-Package/test/test_force.js --os=android --apptype=native_kotlin
+          command: ./test/test_force.js --os=android --apptype=native_kotlin
           when: always
       - run:
           name: Build Hybrid Local App
-          command: ./SalesforceMobileSDK-Package/test/test_force.js --os=android --apptype=hybrid_local
+          command: ./test/test_force.js --os=android --apptype=hybrid_local
           when: always
       - run:
           name: Build Hyrbid Remote App
-          command: ./SalesforceMobileSDK-Package/test/test_force.js --os=android --apptype=hybrid_remote
+          command: ./test/test_force.js --os=android --apptype=hybrid_remote
           when: always
       - run:
           name: Build React Native App
-          command: ./SalesforceMobileSDK-Package/test/test_force.js --os=android --apptype=react_native
+          command: ./test/test_force.js --os=android --apptype=react_native
           when: always
 
     build-sfdx:
@@ -55,23 +55,23 @@ jobs:
             when: always
         - run:
             name: Build Native Java App
-            command: ./SalesforceMobileSDK-Package/test/test_force.js --os=android --apptype=native --use-sfdx
+            command: ./test/test_force.js --os=android --apptype=native --use-sfdx
             when: always
         - run:
             name: Build Native Kotlin App
-            command: ./SalesforceMobileSDK-Package/test/test_force.js --os=android --apptype=native_kotlin --use-sfdx
+            command: ./test/test_force.js --os=android --apptype=native_kotlin --use-sfdx
             when: always
         - run:
             name: Build Hybrid Local App
-            command: ./SalesforceMobileSDK-Package/test/test_force.js --os=android --apptype=hybrid_local --use-sfdx
+            command: ./test/test_force.js --os=android --apptype=hybrid_local --use-sfdx
             when: always
         - run:
             name: Build Hyrbid Remote App
-            command: ./SalesforceMobileSDK-Package/test/test_force.js --os=android --apptype=hybrid_remote --use-sfdx
+            command: ./test/test_force.js --os=android --apptype=hybrid_remote --use-sfdx
             when: always
         - run:
             name: Build React Native App
-            command: ./SalesforceMobileSDK-Package/test/test_force.js --os=android --apptype=react_native --use-sfdx
+            command: ./test/test_force.js --os=android --apptype=react_native --use-sfdx
             when: always
 
 workflows:
