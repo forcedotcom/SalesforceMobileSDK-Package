@@ -30,30 +30,29 @@ jobs:
             git --version
             wget https://www.kernel.org/pub/software/scm/git/git-2.13.0.tar.gz
             tar -xvzf git-2.13.0.tar.gz
-            ls
-            echo ls
-            cd git-2.13.0 && ./configure
-            cd git-2.13.0 && make && make install
+            cd git-2.13.0
+            sudo ./configure
+            sudo make && sudo make install
             git --version
-      - run:
-          name: Build Native Java App
-          command: ./test/test_force.js --os=android --apptype=native
+ #     - run:
+ #        name: Build Native Java App
+  #        command: ./test/test_force.js --os=android --apptype=native
     #      when: always
-      - run:
-          name: Build Native Kotlin App
-          command: ./test/test_force.js --os=android --apptype=native_kotlin
+   #   - run:
+   #       name: Build Native Kotlin App
+   #       command: ./test/test_force.js --os=android --apptype=native_kotlin
      #     when: always
-      - run:
-          name: Build Hybrid Local App
-          command: ./test/test_force.js --os=android --apptype=hybrid_local
+    #  - run:
+    #      name: Build Hybrid Local App
+    #      command: ./test/test_force.js --os=android --apptype=hybrid_local
       #    when: always
-      - run:
-          name: Build Hyrbid Remote App
-          command: ./test/test_force.js --os=android --apptype=hybrid_remote
+    #  - run:
+    #      name: Build Hyrbid Remote App
+    #      command: ./test/test_force.js --os=android --apptype=hybrid_remote
        #   when: always
-      - run:
-          name: Build React Native App
-          command: ./test/test_force.js --os=android --apptype=react_native
+   #   - run:
+   #       name: Build React Native App
+   #       command: ./test/test_force.js --os=android --apptype=react_native
         #  when: always
 
     build-sfdx:
