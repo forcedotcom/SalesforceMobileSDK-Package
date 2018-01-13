@@ -64,7 +64,7 @@ jobs:
           command: ./test/test_force.js --os=android --apptype=hybrid_local
           when: always
       - run:
-          name: Build Hyrbid Remote App
+          name: Build Hybrid Remote App
           command: ./test/test_force.js --os=android --apptype=hybrid_remote
           when: always
       - run:
@@ -95,7 +95,7 @@ jobs:
           command: ./test/test_force.js --os=android --apptype=hybrid_local --use-sfdx
           when: always
       - run:
-          name: Build Hyrbid Remote App
+          name: Build Hybrid Remote App
           command: ./test/test_force.js --os=android --apptype=hybrid_remote --use-sfdx
           when: always
       - run:
