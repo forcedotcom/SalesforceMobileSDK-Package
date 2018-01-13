@@ -1,0 +1,112 @@
+aliases:
+  - &upgrade-git
+    name: Update Git
+    command:  |
+      sudo apt-get install \
+        build-essential flex bison \
+        libreadline6-dev zlib1g-dev \
+        libssl-dev \
+        libcurl4-gnutls-dev \
+        libexpat1-dev \
+        tcl tk \
+        tcl-dev gettext \
+        asciidoc \
+        docbook2x
+
+      wget https://www.kernel.org/pub/software/scm/git/git-2.13.0.tar.gz
+      tar -xvzf git-2.13.0.tar.gz
+      cd git-2.13.0
+      sudo ./configure
+      sudo make && sudo make install
+
+  - &setup
+    name: Setup
+    command:  |
+      node ./install.js
+      sudo npm install -g cordova@7.0.0
+      cordova telemetry off
+    when: always
+
+defaults: &defaults
+  working_directory: ~/SalesforceMobileSDK-Android
+  docker:
+    - image: circleci/android:api-27-node8-alpha
+  environment:
+    - TERM: "dumb"
+    - ADB_INSTALL_TIMEOUT: 15
+    - _JAVA_OPTIONS: "-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
+    - GRADLE_OPTS: '-Dorg.gradle.daemon=false -Dorg.gradle.jvmargs="-XX:+HeapDumpOnOutOfMemoryError"'
+    - ANDROID_NDK: '/opt/ndk/android-ndk-r10e'
+    - BUILD_THREADS: 2
+
+  attach_workspace: &attach_workspace
+    attach_workspace:
+      at: ~/SalesforceMobileSDK-Package
+
+version: 2
+jobs:
+  build-forcedroid:
+    <<: *defaults
+    steps:
+      - checkout
+      - run: *upgrade-git
+      - run: *setup
+      - run:
+          name: Build Native Java App
+          command: ./test/test_force.js --os=android --apptype=native
+          when: always
+      - run:
+          name: Build Native Kotlin App
+          command: ./test/test_force.js --os=android --apptype=native_kotlin
+          when: always
+      - run:
+          name: Build Hybrid Local App
+          command: ./test/test_force.js --os=android --apptype=hybrid_local
+          when: always
+      - run:
+          name: Build Hybrid Remote App
+          command: ./test/test_force.js --os=android --apptype=hybrid_remote
+          when: always
+      - run:
+          name: Build React Native App
+          command: ./test/test_force.js --os=android --apptype=react_native
+          when: always
+
+  build-sfdx:
+    <<: *defaults
+    steps:
+      - checkout
+      - run: *upgrade-git
+      - run: *setup
+      - run:
+          name: Install SFDX
+          command: sudo npm install -g sfdx-cli
+          when: always
+      - run:
+          name: Build Native Java App
+          command: ./test/test_force.js --os=android --apptype=native --use-sfdx
+          when: always
+      - run:
+          name: Build Native Kotlin App
+          command: ./test/test_force.js --os=android --apptype=native_kotlin --use-sfdx
+          when: always
+      - run:
+          name: Build Hybrid Local App
+          command: ./test/test_force.js --os=android --apptype=hybrid_local --use-sfdx
+          when: always
+      - run:
+          name: Build Hybrid Remote App
+          command: ./test/test_force.js --os=android --apptype=hybrid_remote --use-sfdx
+          when: always
+      - run:
+          name: Build React Native App
+          command: ./test/test_force.js --os=android --apptype=react_native --use-sfdx
+          when: always
+
+workflows:
+  version: 2
+
+  build-all-apps:
+    jobs:
+      - build-forcedroid
+      - build-sfdx
