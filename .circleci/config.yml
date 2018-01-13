@@ -80,7 +80,7 @@ jobs:
       - run: *setup
       - run:
           name: Install SFDX
-          command: sudo npm install sfdx-cli
+          command: sudo npm install -g sfdx-cli
           when: always
       - run:
           name: Build Native Java App
