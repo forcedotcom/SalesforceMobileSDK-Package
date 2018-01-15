@@ -106,7 +106,21 @@ jobs:
 workflows:
   version: 2
 
-  build-all-apps:
+  pr-build-all-apps:
+    jobs:
+      - build-forcedroid
+      - build-sfdx
+
+  # Cron are on a timezone 8 hours ahead of PST
+  # Build everything at ~11:30pm Wednesday Nights
+  weekly-build-all-apps:
+    triggers:
+      - schedule:
+          cron: "30 7 * * 3"
+          filters:
+            branches:
+              only:
+                - dev
     jobs:
       - build-forcedroid
       - build-sfdx

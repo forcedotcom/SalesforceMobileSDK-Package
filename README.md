@@ -1,3 +1,5 @@
+[![CircleCI](https://circleci.com/gh/forcedotcom/SalesforceMobileSDK-Package/tree/dev.svg?style=svg)](https://circleci.com/gh/forcedotcom/SalesforceMobileSDK-Package/tree/dev)
+
 # SalesforceMobileSDK-Package
 Repo for forceios/forcedroid/forcehybrid/forcereact and the sfdx plugin.
 
