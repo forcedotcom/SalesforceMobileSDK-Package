@@ -27,8 +27,8 @@ aliases:
       cordova telemetry off
     when: always
 
-defaults: &defaults
-  working_directory: ~/SalesforceMobileSDK-Android
+linux: &linux
+  working_directory: ~/SalesforceMobileSDK-Package
   docker:
     - image: circleci/android:api-27-node8-alpha
   environment:
@@ -43,10 +43,16 @@ defaults: &defaults
     attach_workspace:
       at: ~/SalesforceMobileSDK-Package
 
+mac: &mac
+  working_directory: ~/SalesforceMobileSDK-Package
+  macos:
+    xcode: "9.2.0"
+  shell: /bin/bash --login -eo pipefail
+
 version: 2
 jobs:
   build-forcedroid:
-    <<: *defaults
+    <<: *linux
     steps:
       - checkout
       - run: *upgrade-git
@@ -72,8 +78,8 @@ jobs:
           command: ./test/test_force.js --os=android --apptype=react_native
           when: always
 
-  build-sfdx:
-    <<: *defaults
+  build-forcedroid-sfdx:
+    <<: *linux
     steps:
       - checkout
       - run: *upgrade-git
@@ -103,6 +109,60 @@ jobs:
           command: ./test/test_force.js --os=android --apptype=react_native --use-sfdx
           when: always
 
+  build-forceios:
+      <<: *mac
+      steps:
+        - checkout
+        - run: git --version
+        - run: *setup
+        - run:
+            name: Build Native Objective-C App
+            command: ./test/test_force.js --os=ios --apptype=native
+            when: always
+        - run:
+            name: Build Native Swift App
+            command: ./test/test_force.js --os=ios --apptype=native_swift
+            when: always
+        - run:
+            name: Build Hybrid Local App
+            command: ./test/test_force.js --os=ios --apptype=hybrid_local
+            when: always
+        - run:
+            name: Build Hybrid Remote App
+            command: ./test/test_force.js --os=ios --apptype=hybrid_remote
+            when: always
+        - run:
+            name: Build React Native App
+            command: ./test/test_force.js --os=ios --apptype=react_native
+            when: always
+
+  build-forceios-sfdx:
+      <<: *mac
+      steps:
+        - checkout
+        - run: git --version
+        - run: *setup
+        - run:
+            name: Build Native Objective-C App
+            command: ./test/test_force.js --os=ios --apptype=native --use-sfdx
+            when: always
+        - run:
+            name: Build Native Swift App
+            command: ./test/test_force.js --os=ios --apptype=native_swift --use-sfdx
+            when: always
+        - run:
+            name: Build Hybrid Local App
+            command: ./test/test_force.js --os=ios --apptype=hybrid_local --use-sfdx
+            when: always
+        - run:
+            name: Build Hybrid Remote App
+            command: ./test/test_force.js --os=ios --apptype=hybrid_remote --use-sfdx
+            when: always
+        - run:
+            name: Build React Native App
+            command: ./test/test_force.js --os=ios --apptype=react_native --use-sfdx
+            when: always
+
 workflows:
   version: 2
 
@@ -110,6 +170,8 @@ workflows:
     jobs:
       - build-forcedroid
       - build-sfdx
+      - build-forceios
+      - build-forceios-sfdx
 
   # Cron are on a timezone 8 hours ahead of PST
   # Build everything at ~11:30pm Wednesday Nights
@@ -120,7 +182,9 @@ workflows:
           filters:
             branches:
               only:
-                - dev
+                - test_ios
     jobs:
       - build-forcedroid
-      - build-sfdx
+      - build-forcedroid-sfdx
+      - build-forceios
+      - build-forceios-sfdx
