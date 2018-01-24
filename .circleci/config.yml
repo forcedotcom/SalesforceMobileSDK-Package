@@ -2,6 +2,7 @@ aliases:
   - &upgrade-git
     name: Update Git
     command:  |
+      git --version
       sudo apt-get install \
         build-essential flex bison \
         libreadline6-dev zlib1g-dev \
@@ -18,6 +19,7 @@ aliases:
       cd git-2.13.0
       sudo ./configure
       sudo make && sudo make install
+      git --version
 
   - &setup
     name: Setup
@@ -26,6 +28,10 @@ aliases:
       sudo npm install -g cordova@7.0.0
       cordova telemetry off
     when: always
+
+  - &install-ant
+    name: Install Ant
+    command: brew install ant
 
 linux: &linux
   working_directory: ~/SalesforceMobileSDK-Package
@@ -113,8 +119,8 @@ jobs:
       <<: *mac
       steps:
         - checkout
-        - run: git --version
         - run: *setup
+        - run: *install-ant
         - run:
             name: Build Native Objective-C App
             command: ./test/test_force.js --os=ios --apptype=native
@@ -140,8 +146,13 @@ jobs:
       <<: *mac
       steps:
         - checkout
-        - run: git --version
         - run: *setup
+        - run: *install-ant
+        - run:
+            name: Install SFDX
+            command: sudo npm install -g sfdx-cli
+            when: always
+        - run:
         - run:
             name: Build Native Objective-C App
             command: ./test/test_force.js --os=ios --apptype=native --use-sfdx
@@ -169,7 +180,7 @@ workflows:
   pr-build-all-apps:
     jobs:
       - build-forcedroid
-      - build-sfdx
+      - build-forcedroid-sfdx
       - build-forceios
       - build-forceios-sfdx
 
