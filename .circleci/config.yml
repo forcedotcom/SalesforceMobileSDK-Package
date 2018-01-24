@@ -140,6 +140,7 @@ jobs:
         - run:
             name: Build React Native App
             command: ./test/test_force.js --os=ios --apptype=react_native
+            no_output_timeout: 20m
             when: always
 
   build-forceios-sfdx:
@@ -171,6 +172,7 @@ jobs:
         - run:
             name: Build React Native App
             command: ./test/test_force.js --os=ios --apptype=react_native --use-sfdx
+            no_output_timeout: 20m
             when: always
 
 workflows:
@@ -184,11 +186,11 @@ workflows:
       - build-forceios-sfdx
 
   # Cron are on a timezone 8 hours ahead of PST
-  # Build everything at ~11:30pm Wednesday Nights
+  # Build everything at ~11:30pm Mon/Wed/Fri Nights
   weekly-build-all-apps:
     triggers:
       - schedule:
-          cron: "30 7 * * 3"
+          cron: "30 7 * * 2,4,6"
           filters:
             branches:
               only:
