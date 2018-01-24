@@ -194,7 +194,7 @@ workflows:
           filters:
             branches:
               only:
-                - test_ios
+                - dev
     jobs:
       - build-forcedroid
       - build-forcedroid-sfdx
