@@ -237,8 +237,10 @@ function createCompileApp(tmpDir, os, actualAppType, templateRepoUri, pluginRepo
     var isHybrid = actualAppType.indexOf('hybrid') == 0;
     var isHybridRemote = actualAppType === APP_TYPE.hybrid_remote;
     var target = actualAppType + ' app for ' + os + (templateRepoUri ? ' based on template ' + getTemplateNameFromUri(templateRepoUri) : '');
-    var appName = actualAppType + os + 'App';
-    var packageName = (actualAppType == 'native') ? 'com.salesforce.' + actualAppType + '_java' : 'com.salesforce.' + actualAppType;
+    var appName = actualAppType + '_' + os + 'App';
+    var packageName = 'com.salesforce' + ((os === OS.ios)
+                                          ? ((isHybrid) ? '.' + actualAppType : '')
+                                          : '.' + ((actualAppType === 'native') ? 'native_java' : actualAppType));
     var outputDir = path.join(tmpDir, appName);
     var forcecli = (isReactNative
                     ? SDK.forceclis.forcereact
