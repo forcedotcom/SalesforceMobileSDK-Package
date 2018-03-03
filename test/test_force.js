@@ -241,7 +241,7 @@ function createCompileApp(tmpDir, os, actualAppType, templateRepoUri, pluginRepo
     // Add app type unless the app is native or react native iOS
     var packageSuffix = (os === OS.ios && !isHybrid) ? '' : '.' + actualAppType
     // "native" is an illegal word for android package
-    packageSuffix.replace('native', 'native_java')
+    packageSuffix = packageSuffix.replace('native', 'native_java')
     var packageName = 'com.salesforce' + packageSuffix
     var outputDir = path.join(tmpDir, appName);
     var forcecli = (isReactNative
