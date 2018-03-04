@@ -239,7 +239,7 @@ function createCompileApp(tmpDir, os, actualAppType, templateRepoUri, pluginRepo
     var target = actualAppType + ' app for ' + os + (templateRepoUri ? ' based on template ' + getTemplateNameFromUri(templateRepoUri) : '');
     var appName = actualAppType + '_' + os + 'App';
     // Add app type unless the app is native or react native iOS
-    var packageSuffix = (os === OS.ios && !isHybrid) ? '' : '.' + actualAppType
+    var packageSuffix = (os === OS.ios && !isHybrid) ? '' : '.' + actualAppType;
     // "native" is an illegal word for android package
     if (actualAppType === APP_TYPE.native) {
         packageSuffix = packageSuffix.replace('native', 'native_java');
