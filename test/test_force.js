@@ -237,8 +237,14 @@ function createCompileApp(tmpDir, os, actualAppType, templateRepoUri, pluginRepo
     var isHybrid = actualAppType.indexOf('hybrid') == 0;
     var isHybridRemote = actualAppType === APP_TYPE.hybrid_remote;
     var target = actualAppType + ' app for ' + os + (templateRepoUri ? ' based on template ' + getTemplateNameFromUri(templateRepoUri) : '');
-    var appName = actualAppType + os + 'App';
-    var packageName = (actualAppType == 'native') ? 'com.salesforce.' + actualAppType + '_java' : 'com.salesforce.' + actualAppType;
+    var appName = actualAppType + '_' + os + 'App';
+    // Add app type unless the app is native or react native iOS
+    var packageSuffix = (os === OS.ios && !isHybrid) ? '' : '.' + actualAppType;
+    // "native" is an illegal word for android package
+    if (actualAppType === APP_TYPE.native) {
+        packageSuffix = packageSuffix.replace('native', 'native_java');
+    }
+    var packageName = 'com.salesforce' + packageSuffix;
     var outputDir = path.join(tmpDir, appName);
     var forcecli = (isReactNative
                     ? SDK.forceclis.forcereact
