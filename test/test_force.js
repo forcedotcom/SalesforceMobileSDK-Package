@@ -4,7 +4,7 @@
 var defaultSdkBranch = 'dev';
 
 // Dependencies
-var execSync = require('child_process').execSync,
+var spawnSync = require('child_process').spawnSync,
     path = require('path'),
     shelljs = require('shelljs'),
     commandLineUtils = require('../shared/commandLineUtils'),
@@ -43,11 +43,12 @@ function main(args) {
 
     // Args extraction
     var usageRequested = parsedArgs.hasOwnProperty('usage');
+    var testProduction = parsedArgs.hasOwnProperty('test-production');
     var useSfdxRequested = parsedArgs.hasOwnProperty('use-sfdx');
     var chosenOperatingSystems = cleanSplit(parsedArgs.os, ',').map(function(s) { return s.toLowerCase(); });
     var appTypes = parsedArgs.apptype || '';
     var templateRepoUri = parsedArgs.templaterepouri || '';
-    var pluginRepoUri = parsedArgs.pluginrepouri || SDK.tools.cordova.pluginRepoUri;
+    var pluginRepoUri = !testProduction ? (parsedArgs.pluginrepouri || SDK.tools.cordova.pluginRepoUri) : '';
     var sdkBranch = parsedArgs.sdkbranch || defaultSdkBranch;
     var chosenAppTypes = cleanSplit(parsedArgs.apptype, ',');
 
@@ -75,17 +76,29 @@ function main(args) {
     }
 
     if (useSfdxRequested) {
-        // Create sfdx plugin
-        createDeploySfdxPluginPackage(tmpDir);
+        if (testProduction) {
+            // Install publised sfdx plugin
+            installPublishedSfdxPlugin(tmpDir);
+        }
+        else {
+            // Create sfdx plugin
+            createDeploySfdxPluginPackage(tmpDir);
+        }
     }
     else {
-        // Create forcexxx packages needed
         for (var cliName in SDK.forceclis) {
             var cli = SDK.forceclis[cliName];
             if (cli.platforms.some(p=>chosenOperatingSystems.indexOf(p)>=0)
                 && cli.appTypes.some(a=>chosenAppTypes.indexOf(a)>=0)) {
 
-                createDeployForcePackage(tmpDir, cli);
+                if (testProduction) {
+                    // Install forcexxx package
+                    installPublishedForceCli(tmpDir, cli);
+                }
+                else {
+                    // Create forcexxx packages needed
+                    createDeployForcePackage(tmpDir, cli);
+                }
 
             }
         }
@@ -93,7 +106,7 @@ function main(args) {
 
     // Get cordova plugin repo if any hybrid testing requested
     if (testingHybrid) {
-        if (pluginRepoUri.indexOf('//') >= 0) {
+        if (!testProduction && pluginRepoUri.indexOf('//') >= 0) {
             // Actual uri - clone repo - run tools/update.sh
             var pluginRepoDir = utils.cloneRepo(tmpDir, pluginRepoUri);
             if (testingIOS && testingAndroid) updatePluginRepo(tmpDir, 'all', pluginRepoDir, sdkBranch);
@@ -131,6 +144,7 @@ function usage(exitCode) {
     utils.logInfo('    --os=os1,os2,etc', COLOR.magenta);
     utils.logInfo('    --apptype=appType1,appType2,etc OR --templaterepouri=TEMPLATE_REPO_URI', COLOR.magenta);
     utils.logInfo('    [--use-sfdx]', COLOR.magenta);
+    utils.logInfo('    [--test-production]', COLOR.magenta);
     utils.logInfo('    [--pluginrepouri=PLUGIN_REPO_URI (Defaults to uri in shared/constants.js)]', COLOR.magenta);
     utils.logInfo('    [--sdkbranch=SDK_BRANCH (Defaults to dev)]', COLOR.magenta);
     utils.logInfo('', COLOR.cyan);
@@ -158,17 +172,28 @@ function usage(exitCode) {
     utils.logInfo('  - creates and compiles applications for the specified os and template', COLOR.cyan);
     utils.logInfo('', COLOR.cyan);
     utils.logInfo('  If use-sfdx is specified, then the sfdx-mobilesdk-plugin package is generated and used through sfdx for creating the applications', COLOR.cyan);
+    utils.logInfo('  If test-production is specified, then the published forceios/forcedroid/forcehybrid/forcereact/sfdx-mobilesdk-plugin are used', COLOR.cyan);
+
 
     process.exit(exitCode);
 }
 
 //
-// Create and deploy forceios/forcedroid
+// Create and deploy forceios/forcedroid/forcehybrid/forcereact
 //
 function createDeployForcePackage(tmpDir, forcecli) {
     var packJs = path.join(__dirname, '..', 'pack', 'pack.js');
     utils.runProcessThrowError('node ' + packJs + ' --cli=' + forcecli.name);
+    utils.logInfo('Npm installing ' + forcecli.name + '-' + SDK.version + '.tgz', COLOR.green);
     utils.runProcessThrowError('npm install --prefix ' + tmpDir + ' ' + forcecli.name + '-' + SDK.version + '.tgz');
+}
+
+//
+// Install published forceios/forcedroid/forcehybrid/forcereact
+//
+function installPublishedForceCli(tmpDir, forcecli) {
+    utils.logInfo('Npm installing ' + forcecli.name, COLOR.green);
+    utils.runProcessThrowError('npm install --prefix ' + tmpDir + ' ' + forcecli.name);
 }
 
 //
@@ -177,16 +202,28 @@ function createDeployForcePackage(tmpDir, forcecli) {
 function createDeploySfdxPluginPackage(tmpDir) {
     var packJs = path.join(__dirname, '..', 'pack', 'pack.js');
     utils.runProcessThrowError('node ' + packJs + ' --sfdx-plugin');
+    utils.logInfo('Npm installing sfdx-mobilesdk-plugin-' + SDK.version + '.tgz', COLOR.green);
     utils.runProcessThrowError('npm install --prefix ' + tmpDir + ' ' + 'sfdx-mobilesdk-plugin-' + SDK.version + '.tgz');
+    utils.runProcessCatchError('sfdx plugins:uninstall sfdx-mobilesdk-plugin');
+    utils.logInfo('Sfdx linking sfdx-mobilesdk-plugin', COLOR.green);
     utils.runProcessThrowError('sfdx plugins:link ' + tmpDir + '/node_modules/sfdx-mobilesdk-plugin');
 }
 
+//
+// Installed published sfdx plugin
+//
+function installPublishedSfdxPlugin(tmpDir) {
+    utils.runProcessCatchError('sfdx plugins:uninstall sfdx-mobilesdk-plugin');
+    utils.logInfo('Sfdx installing sfdx-mobilesdk-plugin', COLOR.green);
+    // Plugin is not signed, user interaction is required to install it, so we have to pipe a 'y' in
+    spawnSync('sfdx', ['plugins:install', 'sfdx-mobilesdk-plugin'], {input: spawnSync('echo', ['y']).stdout});
+}
 
 //
 // Update cordova plugin repo
 //
 function updatePluginRepo(tmpDir, os, pluginRepoDir, sdkBranch) {
-    utils.logInfo('Updating cordova plugin at ' + sdkBranch);
+    utils.logInfo('Updating cordova plugin at ' + sdkBranch, COLOR.green);
     utils.runProcessThrowError(path.join('tools', 'update.sh') + ' -b ' + sdkBranch + ' -o ' + os, pluginRepoDir);
 }
 
@@ -200,7 +237,14 @@ function createCompileApp(tmpDir, os, actualAppType, templateRepoUri, pluginRepo
     var isHybrid = actualAppType.indexOf('hybrid') == 0;
     var isHybridRemote = actualAppType === APP_TYPE.hybrid_remote;
     var target = actualAppType + ' app for ' + os + (templateRepoUri ? ' based on template ' + getTemplateNameFromUri(templateRepoUri) : '');
-    var appName = actualAppType + os + 'App';
+    var appName = actualAppType + '_' + os + 'App';
+    // Add app type unless the app is native or react native iOS
+    var packageSuffix = (os === OS.ios && !isHybrid) ? '' : '.' + actualAppType;
+    // "native" is an illegal word for android package
+    if (actualAppType === APP_TYPE.native) {
+        packageSuffix = packageSuffix.replace('native', 'native_java');
+    }
+    var packageName = 'com.salesforce' + packageSuffix;
     var outputDir = path.join(tmpDir, appName);
     var forcecli = (isReactNative
                     ? SDK.forceclis.forcereact
@@ -237,12 +281,12 @@ function createCompileApp(tmpDir, os, actualAppType, templateRepoUri, pluginRepo
 
     execArgs += ''
         + ' --appname=' + appName
-        + ' --packagename=com.mycompany'
-        + ' --organization=MyCompany'
+        + ' --packagename=' + packageName
+        + ' --organization=Salesforce'
         + ' --outputdir=' + outputDir
         + ' --verbose'
         + (isHybridRemote ? ' --startpage=' + defaultStartPage : '')
-        + (isHybrid ? ' --pluginrepouri=' + pluginRepoUri : '');
+        + (isHybrid && pluginRepoUri ? ' --pluginrepouri=' + pluginRepoUri : '');
 
     // Generation
     var generationSucceeded = utils.runProcessCatchError(execPath + execArgs, 'GENERATING ' + target);

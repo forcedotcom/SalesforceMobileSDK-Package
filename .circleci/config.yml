@@ -1,0 +1,202 @@
+aliases:
+  - &upgrade-git
+    name: Update Git
+    command:  |
+      git --version
+      sudo apt-get install \
+        build-essential flex bison \
+        libreadline6-dev zlib1g-dev \
+        libssl-dev \
+        libcurl4-gnutls-dev \
+        libexpat1-dev \
+        tcl tk \
+        tcl-dev gettext \
+        asciidoc \
+        docbook2x
+
+      wget https://www.kernel.org/pub/software/scm/git/git-2.13.0.tar.gz
+      tar -xvzf git-2.13.0.tar.gz
+      cd git-2.13.0
+      sudo ./configure
+      sudo make && sudo make install
+      git --version
+
+  - &setup
+    name: Setup
+    command:  |
+      node ./install.js
+      sudo npm install -g cordova@7.0.0
+      cordova telemetry off
+    when: always
+
+  - &install-ant
+    name: Install Ant
+    command: brew install ant
+
+linux: &linux
+  working_directory: ~/SalesforceMobileSDK-Package
+  docker:
+    - image: circleci/android:api-27-node8-alpha
+  environment:
+    - TERM: "dumb"
+    - ADB_INSTALL_TIMEOUT: 15
+    - _JAVA_OPTIONS: "-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
+    - GRADLE_OPTS: '-Dorg.gradle.daemon=false -Dorg.gradle.jvmargs="-XX:+HeapDumpOnOutOfMemoryError"'
+    - ANDROID_NDK: '/opt/ndk/android-ndk-r10e'
+    - BUILD_THREADS: 2
+
+  attach_workspace: &attach_workspace
+    attach_workspace:
+      at: ~/SalesforceMobileSDK-Package
+
+#mac: &mac
+#  working_directory: ~/SalesforceMobileSDK-Package
+#  macos:
+#    xcode: "9.2.0"
+#  shell: /bin/bash --login -eo pipefail
+
+version: 2
+jobs:
+  build-forcedroid:
+    <<: *linux
+    steps:
+      - checkout
+      - run: *upgrade-git
+      - run: *setup
+      - run:
+          name: Build Native Java App
+          command: ./test/test_force.js --os=android --apptype=native
+          when: always
+      - run:
+          name: Build Native Kotlin App
+          command: ./test/test_force.js --os=android --apptype=native_kotlin
+          when: always
+      - run:
+          name: Build Hybrid Local App
+          command: ./test/test_force.js --os=android --apptype=hybrid_local
+          when: always
+      - run:
+          name: Build Hybrid Remote App
+          command: ./test/test_force.js --os=android --apptype=hybrid_remote
+          when: always
+      - run:
+          name: Build React Native App
+          command: ./test/test_force.js --os=android --apptype=react_native
+          when: always
+
+  build-forcedroid-sfdx:
+    <<: *linux
+    steps:
+      - checkout
+      - run: *upgrade-git
+      - run: *setup
+      - run:
+          name: Install SFDX
+          command: sudo npm install -g sfdx-cli
+          when: always
+      - run:
+          name: Build Native Java App
+          command: ./test/test_force.js --os=android --apptype=native --use-sfdx
+          when: always
+      - run:
+          name: Build Native Kotlin App
+          command: ./test/test_force.js --os=android --apptype=native_kotlin --use-sfdx
+          when: always
+      - run:
+          name: Build Hybrid Local App
+          command: ./test/test_force.js --os=android --apptype=hybrid_local --use-sfdx
+          when: always
+      - run:
+          name: Build Hybrid Remote App
+          command: ./test/test_force.js --os=android --apptype=hybrid_remote --use-sfdx
+          when: always
+      - run:
+          name: Build React Native App
+          command: ./test/test_force.js --os=android --apptype=react_native --use-sfdx
+          when: always
+
+#  build-forceios:
+#      <<: *mac
+#      steps:
+#        - checkout
+#        - run: *setup
+#        - run: *install-ant
+#        - run:
+#            name: Build Native Objective-C App
+#            command: ./test/test_force.js --os=ios --apptype=native
+#            when: always
+#        - run:
+#            name: Build Native Swift App
+#            command: ./test/test_force.js --os=ios --apptype=native_swift
+#            when: always
+#        - run:
+#            name: Build Hybrid Local App
+#            command: ./test/test_force.js --os=ios --apptype=hybrid_local
+#            when: always
+#        - run:
+#            name: Build Hybrid Remote App
+#            command: ./test/test_force.js --os=ios --apptype=hybrid_remote
+#            when: always
+#        - run:
+#            name: Build React Native App
+#            command: ./test/test_force.js --os=ios --apptype=react_native
+#            no_output_timeout: 20m
+#            when: always
+
+#  build-forceios-sfdx:
+#      <<: *mac
+#      steps:
+#        - checkout
+#        - run: *setup
+#        - run: *install-ant
+#        - run:
+#            name: Install SFDX
+#            command: sudo npm install -g sfdx-cli
+#            when: always
+#        - run:
+#            name: Build Native Objective-C App
+#            command: ./test/test_force.js --os=ios --apptype=native --use-sfdx
+#            when: always
+#        - run:
+#            name: Build Native Swift App
+#            command: ./test/test_force.js --os=ios --apptype=native_swift --use-sfdx
+#            when: always
+#        - run:
+#            name: Build Hybrid Local App
+#            command: ./test/test_force.js --os=ios --apptype=hybrid_local --use-sfdx
+#            when: always
+#        - run:
+#            name: Build Hybrid Remote App
+#            command: ./test/test_force.js --os=ios --apptype=hybrid_remote --use-sfdx
+#            when: always
+#        - run:
+#            name: Build React Native App
+#            command: ./test/test_force.js --os=ios --apptype=react_native --use-sfdx
+#            no_output_timeout: 20m
+#            when: always
+
+workflows:
+  version: 2
+
+  pr-build-all-apps:
+    jobs:
+      - build-forcedroid
+      - build-forcedroid-sfdx
+#      - build-forceios
+#      - build-forceios-sfdx
+
+  # Cron are on a timezone 8 hours ahead of PST
+  # Build everything at ~11:30pm Mon/Wed/Fri Nights
+  weekly-build-all-apps:
+    triggers:
+      - schedule:
+          cron: "30 7 * * 2,4,6"
+          filters:
+            branches:
+              only:
+                - dev
+    jobs:
+      - build-forcedroid
+      - build-forcedroid-sfdx
+#      - build-forceios
+#      - build-forceios-sfdx

@@ -1,6 +1,6 @@
 {
 				"name": "sfdx-mobilesdk-plugin",
-				"version": "6.0.0",
+				"version": "6.1.0",
 				"description": "Sfdx plugin for creating mobile apps based on the Salesforce Mobile SDK",
 				"main": "index.js",
 				"keywords": [
