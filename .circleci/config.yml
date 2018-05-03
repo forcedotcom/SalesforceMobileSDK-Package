@@ -45,10 +45,6 @@ linux: &linux
     - ANDROID_NDK: '/opt/ndk/android-ndk-r10e'
     - BUILD_THREADS: 2
 
-  attach_workspace: &attach_workspace
-    attach_workspace:
-      at: ~/SalesforceMobileSDK-Package
-
 mac: &mac
   working_directory: ~/SalesforceMobileSDK-Package
   macos:
@@ -116,64 +112,64 @@ jobs:
           when: always
 
   build-forceios:
-      <<: *mac
-       steps:
-        - checkout
-        - run: *setup
-        - run: *install-ant
-        - run:
-            name: Build Native Objective-C App
-            command: ./test/test_force.js --os=ios --apptype=native
-            when: always
-        - run:
-            name: Build Native Swift App
-            command: ./test/test_force.js --os=ios --apptype=native_swift
-            when: always
-        - run:
-            name: Build Hybrid Local App
-            command: ./test/test_force.js --os=ios --apptype=hybrid_local
-            when: always
-        - run:
-            name: Build Hybrid Remote App
-            command: ./test/test_force.js --os=ios --apptype=hybrid_remote
-            when: always
-        - run:
-            name: Build React Native App
-            command: ./test/test_force.js --os=ios --apptype=react_native
-            no_output_timeout: 20m
-            when: always
+    <<: *mac
+    steps:
+      - checkout
+      - run: *setup
+      - run: *install-ant
+      - run:
+          name: Build Native Objective-C App
+          command: ./test/test_force.js --os=ios --apptype=native
+          when: always
+      - run:
+          name: Build Native Swift App
+          command: ./test/test_force.js --os=ios --apptype=native_swift
+          when: always
+      - run:
+          name: Build Hybrid Local App
+          command: ./test/test_force.js --os=ios --apptype=hybrid_local
+          when: always
+      - run:
+          name: Build Hybrid Remote App
+          command: ./test/test_force.js --os=ios --apptype=hybrid_remote
+          when: always
+      - run:
+          name: Build React Native App
+          command: ./test/test_force.js --os=ios --apptype=react_native
+          no_output_timeout: 20m
+          when: always
 
   build-forceios-sfdx:
-      <<: *mac
-      steps:
-        - checkout
-        - run: *setup
-        - run: *install-ant
-        - run:
-            name: Install SFDX
-            command: sudo npm install -g sfdx-cli
-            when: always
-        - run:
-            name: Build Native Objective-C App
-            command: ./test/test_force.js --os=ios --apptype=native --use-sfdx
-            when: always
-        - run:
-            name: Build Native Swift App
-            command: ./test/test_force.js --os=ios --apptype=native_swift --use-sfdx
-            when: always
-        - run:
-            name: Build Hybrid Local App
-            command: ./test/test_force.js --os=ios --apptype=hybrid_local --use-sfdx
-            when: always
-        - run:
-            name: Build Hybrid Remote App
-            command: ./test/test_force.js --os=ios --apptype=hybrid_remote --use-sfdx
-            when: always
-        - run:
-            name: Build React Native App
-            command: ./test/test_force.js --os=ios --apptype=react_native --use-sfdx
-            no_output_timeout: 20m
-            when: always
+    <<: *mac
+    steps:
+      - checkout
+      - run: *setup
+      - run: *install-ant
+      - run:
+          name: Install SFDX
+          command: sudo npm install -g sfdx-cli
+          when: always
+      - run:
+          name: Build Native Objective-C App
+          command: ./test/test_force.js --os=ios --apptype=native --use-sfdx
+          when: always
+      - run:
+          name: Build Native Swift App
+          command: ./test/test_force.js --os=ios --apptype=native_swift --use-sfdx
+          when: always
+      - run:
+          name: Build Hybrid Local App
+          command: ./test/test_force.js --os=ios --apptype=hybrid_local --use-sfdx
+          when: always
+      - run:
+          name: Build Hybrid Remote App
+          command: ./test/test_force.js --os=ios --apptype=hybrid_remote --use-sfdx
+          when: always
+      - run:
+          name: Build React Native App
+          command: ./test/test_force.js --os=ios --apptype=react_native --use-sfdx
+          no_output_timeout: 20m
+          when: always
 
 workflows:
   version: 2
