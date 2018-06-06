@@ -257,8 +257,8 @@ module.exports = {
         listtemplates: {
             name: 'listtemplates',
             args: [],
-            description: 'list available Mobile SDK templates',
-            longDescription: 'List available Mobile SDK templates.',
+            description: cli => 'list available Mobile SDK templates to create ' + cli.purpose,
+            longDescription: cli => 'List available Mobile SDK templates to create ' + cli.purpose + '.',
             help: 'This command displays the list of available Mobile SDK templates.'
         }
     }
