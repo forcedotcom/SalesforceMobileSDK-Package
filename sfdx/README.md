@@ -67,6 +67,17 @@ This command initiates creation of a new app based on the standard Mobile SDK te
 
 ```
 
+### List available native iOS templates
+```
+-> sfdx mobilesdk:ios:listtemplates --help
+Usage: sfdx mobilesdk:ios:listtemplates
+
+list available Mobile SDK templates
+
+This command displays the list of available Mobile SDK templates.
+
+```
+
 ### Create iOS application from template
 ```
 -> sfdx mobilesdk:ios:createwithtemplate --help
@@ -114,6 +125,17 @@ Flags:
  -k, --packagename PACKAGENAME    (required) app package identifier (e.g. com.mycompany.myapp)
 
 This command initiates creation of a new app based on the standard Mobile SDK template.
+
+```
+
+### List available native Android templates
+```
+-> sfdx mobilesdk:android:listtemplates --help
+Usage: sfdx mobilesdk:android:listtemplates
+
+list available Mobile SDK templates
+
+This command displays the list of available Mobile SDK templates.
 
 ```
 
@@ -168,6 +190,17 @@ This command initiates creation of a new app based on the standard Mobile SDK te
 
 ```
 
+### List available hybrid templates
+```
+-> sfdx mobilesdk:hybrid:listtemplates --help
+Usage: sfdx mobilesdk:hybrid:listtemplates
+
+list available Mobile SDK templates
+
+This command displays the list of available Mobile SDK templates.
+
+```
+
 ### Create hybrid application from template
 ```
 -> sfdx mobilesdk:hybrid:createwithtemplate --help
@@ -216,6 +249,17 @@ Flags:
  -p, --platform PLATFORM          (required) comma-separated list of platforms (ios, android)
 
 This command initiates creation of a new app based on the standard Mobile SDK template.
+
+```
+
+### List available React Native templates
+```
+-> sfdx mobilesdk:reactnative:listtemplates --help
+Usage: sfdx mobilesdk:reactnative:listtemplates
+
+list available Mobile SDK templates
+
+This command displays the list of available Mobile SDK templates.
 
 ```
 

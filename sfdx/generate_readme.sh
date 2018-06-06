@@ -43,6 +43,8 @@ print "### Help for iOS"
 run 'sfdx mobilesdk:ios --help'
 print "### Create Objective-C (native) or Swift (native_swift) application"
 run 'sfdx mobilesdk:ios:create --help'
+print "### List available native iOS templates"
+run 'sfdx mobilesdk:ios:listtemplates --help'
 print "### Create iOS application from template"
 run 'sfdx mobilesdk:ios:createwithtemplate --help'
 
@@ -51,6 +53,8 @@ print "### Help for Android"
 run 'sfdx mobilesdk:android --help'
 print "### Create Java (native) or Kotlin (native_kotlin) application"
 run 'sfdx mobilesdk:android:create --help'
+print "### List available native Android templates"
+run 'sfdx mobilesdk:android:listtemplates --help'
 print "### Create Android application from template"
 run 'sfdx mobilesdk:android:createwithtemplate --help'
 
@@ -59,6 +63,8 @@ print "### Help for hybrid"
 run 'sfdx mobilesdk:hybrid --help'
 print "### Create hybrid application"
 run 'sfdx mobilesdk:hybrid:create --help'
+print "### List available hybrid templates"
+run 'sfdx mobilesdk:hybrid:listtemplates --help'
 print "### Create hybrid application from template"
 run 'sfdx mobilesdk:hybrid:createwithtemplate --help'
 
@@ -67,6 +73,8 @@ print "### Help for React Native"
 run 'sfdx mobilesdk:reactnative --help'
 print "### Create React Native application"
 run 'sfdx mobilesdk:reactnative:create --help'
+print "### List available React Native templates"
+run 'sfdx mobilesdk:reactnative:listtemplates --help'
 print "### Create React Native application from template"
 run 'sfdx mobilesdk:reactnative:createwithtemplate --help'
 
