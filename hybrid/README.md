@@ -55,6 +55,11 @@ forcehybrid createwithtemplate
 
  OR 
 
+# list available Mobile SDK templates
+forcehybrid listtemplates
+
+ OR 
+
 # show version of Mobile SDK
 forcehybrid version
 

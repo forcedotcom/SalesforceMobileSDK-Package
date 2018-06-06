@@ -44,6 +44,7 @@ sfdx mobilesdk:ios commands: (get help with sfdx help mobilesdk:ios:COMMAND)
  mobilesdk:ios:create              create an iOS native mobile application
  mobilesdk:ios:createwithtemplate  create an iOS native mobile application from
                                    a template
+ mobilesdk:ios:listtemplates       list available Mobile SDK templates
  mobilesdk:ios:version             show version of Mobile SDK
 
 ```
@@ -57,14 +58,10 @@ create an iOS native mobile application
 
 Flags:
  -n, --appname APPNAME            (required) application name
- -t, --apptype APPTYPE            (required) application type (native,
-                                  native_swift)
- -o, --organization ORGANIZATION  (required) organization name (your
-                                  company's/organization's name)
- -d, --outputdir OUTPUTDIR        output directory (leave empty for current
-                                  directory)
- -k, --packagename PACKAGENAME    (required) app package identifier (e.g.
-                                  com.mycompany.myapp)
+ -t, --apptype APPTYPE            (required) application type (native, native_swift)
+ -o, --organization ORGANIZATION  (required) organization name (your company's/organization's name)
+ -d, --outputdir OUTPUTDIR        output directory (leave empty for current directory)
+ -k, --packagename PACKAGENAME    (required) app package identifier (e.g. com.mycompany.myapp)
 
 This command initiates creation of a new app based on the standard Mobile SDK template.
 
@@ -79,12 +76,9 @@ create an iOS native mobile application from a template
 
 Flags:
  -n, --appname APPNAME                  (required) application name
- -o, --organization ORGANIZATION        (required) organization name (your
-                                        company's/organization's name)
- -d, --outputdir OUTPUTDIR              output directory (leave empty for
-                                        current directory)
- -k, --packagename PACKAGENAME          (required) app package identifier (e.g.
-                                        com.mycompany.myapp)
+ -o, --organization ORGANIZATION        (required) organization name (your company's/organization's name)
+ -d, --outputdir OUTPUTDIR              output directory (leave empty for current directory)
+ -k, --packagename PACKAGENAME          (required) app package identifier (e.g. com.mycompany.myapp)
  -r, --templaterepouri TEMPLATEREPOURI  (required) template repo URI
 
 This command initiates creation of a new app based on the Mobile SDK template that you specify. The template can be a specialized app for your app type that Mobile SDK provides, or your own custom app that you've configured to use as a template. See https://developer.salesforce.com/docs/atlas.en-us.mobile_sdk.meta/mobile_sdk/ios_new_project_template.htm for information on custom templates.
@@ -100,6 +94,7 @@ sfdx mobilesdk:android commands: (get help with sfdx help mobilesdk:android:COMM
                                        application
  mobilesdk:android:createwithtemplate  create an Android native mobile
                                        application from a template
+ mobilesdk:android:listtemplates       list available Mobile SDK templates
  mobilesdk:android:version             show version of Mobile SDK
 
 ```
@@ -113,14 +108,10 @@ create an Android native mobile application
 
 Flags:
  -n, --appname APPNAME            (required) application name
- -t, --apptype APPTYPE            (required) application type (native,
-                                  native_kotlin)
- -o, --organization ORGANIZATION  (required) organization name (your
-                                  company's/organization's name)
- -d, --outputdir OUTPUTDIR        output directory (leave empty for current
-                                  directory)
- -k, --packagename PACKAGENAME    (required) app package identifier (e.g.
-                                  com.mycompany.myapp)
+ -t, --apptype APPTYPE            (required) application type (native, native_kotlin)
+ -o, --organization ORGANIZATION  (required) organization name (your company's/organization's name)
+ -d, --outputdir OUTPUTDIR        output directory (leave empty for current directory)
+ -k, --packagename PACKAGENAME    (required) app package identifier (e.g. com.mycompany.myapp)
 
 This command initiates creation of a new app based on the standard Mobile SDK template.
 
@@ -135,12 +126,9 @@ create an Android native mobile application from a template
 
 Flags:
  -n, --appname APPNAME                  (required) application name
- -o, --organization ORGANIZATION        (required) organization name (your
-                                        company's/organization's name)
- -d, --outputdir OUTPUTDIR              output directory (leave empty for
-                                        current directory)
- -k, --packagename PACKAGENAME          (required) app package identifier (e.g.
-                                        com.mycompany.myapp)
+ -o, --organization ORGANIZATION        (required) organization name (your company's/organization's name)
+ -d, --outputdir OUTPUTDIR              output directory (leave empty for current directory)
+ -k, --packagename PACKAGENAME          (required) app package identifier (e.g. com.mycompany.myapp)
  -r, --templaterepouri TEMPLATEREPOURI  (required) template repo URI
 
 This command initiates creation of a new app based on the Mobile SDK template that you specify. The template can be a specialized app for your app type that Mobile SDK provides, or your own custom app that you've configured to use as a template. See https://developer.salesforce.com/docs/atlas.en-us.mobile_sdk.meta/mobile_sdk/ios_new_project_template.htm for information on custom templates.
@@ -155,6 +143,7 @@ sfdx mobilesdk:hybrid commands: (get help with sfdx help mobilesdk:hybrid:COMMAN
  mobilesdk:hybrid:create              create a hybrid mobile application
  mobilesdk:hybrid:createwithtemplate  create a hybrid mobile application from a
                                       template
+ mobilesdk:hybrid:listtemplates       list available Mobile SDK templates
  mobilesdk:hybrid:version             show version of Mobile SDK
 
 ```
@@ -168,18 +157,12 @@ create a hybrid mobile application
 
 Flags:
  -n, --appname APPNAME            (required) application name
- -t, --apptype APPTYPE            (required) application type (hybrid_local,
-                                  hybrid_remote)
- -o, --organization ORGANIZATION  (required) organization name (your
-                                  company's/organization's name)
- -d, --outputdir OUTPUTDIR        output directory (leave empty for current
-                                  directory)
- -k, --packagename PACKAGENAME    (required) app package identifier (e.g.
-                                  com.mycompany.myapp)
- -p, --platform PLATFORM          (required) comma-separated list of platforms
-                                  (ios, android)
- -s, --startpage STARTPAGE        app start page (the start page of your remote
-                                  app; required for hybrid_remote apps only)
+ -t, --apptype APPTYPE            (required) application type (hybrid_local, hybrid_remote)
+ -o, --organization ORGANIZATION  (required) organization name (your company's/organization's name)
+ -d, --outputdir OUTPUTDIR        output directory (leave empty for current directory)
+ -k, --packagename PACKAGENAME    (required) app package identifier (e.g. com.mycompany.myapp)
+ -p, --platform PLATFORM          (required) comma-separated list of platforms (ios, android)
+ -s, --startpage STARTPAGE        app start page (the start page of your remote app; required for hybrid_remote apps only)
 
 This command initiates creation of a new app based on the standard Mobile SDK template.
 
@@ -194,14 +177,10 @@ create a hybrid mobile application from a template
 
 Flags:
  -n, --appname APPNAME                  (required) application name
- -o, --organization ORGANIZATION        (required) organization name (your
-                                        company's/organization's name)
- -d, --outputdir OUTPUTDIR              output directory (leave empty for
-                                        current directory)
- -k, --packagename PACKAGENAME          (required) app package identifier (e.g.
-                                        com.mycompany.myapp)
- -p, --platform PLATFORM                (required) comma-separated list of
-                                        platforms (ios, android)
+ -o, --organization ORGANIZATION        (required) organization name (your company's/organization's name)
+ -d, --outputdir OUTPUTDIR              output directory (leave empty for current directory)
+ -k, --packagename PACKAGENAME          (required) app package identifier (e.g. com.mycompany.myapp)
+ -p, --platform PLATFORM                (required) comma-separated list of platforms (ios, android)
  -r, --templaterepouri TEMPLATEREPOURI  (required) template repo URI
 
 This command initiates creation of a new app based on the Mobile SDK template that you specify. The template can be a specialized app for your app type that Mobile SDK provides, or your own custom app that you've configured to use as a template. See https://developer.salesforce.com/docs/atlas.en-us.mobile_sdk.meta/mobile_sdk/ios_new_project_template.htm for information on custom templates.
@@ -217,6 +196,7 @@ sfdx mobilesdk:reactnative commands: (get help with sfdx help mobilesdk:reactnat
                                            application
  mobilesdk:reactnative:createwithtemplate  create a React Native mobile
                                            application from a template
+ mobilesdk:reactnative:listtemplates       list available Mobile SDK templates
  mobilesdk:reactnative:version             show version of Mobile SDK
 
 ```
@@ -230,14 +210,10 @@ create a React Native mobile application
 
 Flags:
  -n, --appname APPNAME            (required) application name
- -o, --organization ORGANIZATION  (required) organization name (your
-                                  company's/organization's name)
- -d, --outputdir OUTPUTDIR        output directory (leave empty for current
-                                  directory)
- -k, --packagename PACKAGENAME    (required) app package identifier (e.g.
-                                  com.mycompany.myapp)
- -p, --platform PLATFORM          (required) comma-separated list of platforms
-                                  (ios, android)
+ -o, --organization ORGANIZATION  (required) organization name (your company's/organization's name)
+ -d, --outputdir OUTPUTDIR        output directory (leave empty for current directory)
+ -k, --packagename PACKAGENAME    (required) app package identifier (e.g. com.mycompany.myapp)
+ -p, --platform PLATFORM          (required) comma-separated list of platforms (ios, android)
 
 This command initiates creation of a new app based on the standard Mobile SDK template.
 
@@ -252,14 +228,10 @@ create a React Native mobile application from a template
 
 Flags:
  -n, --appname APPNAME                  (required) application name
- -o, --organization ORGANIZATION        (required) organization name (your
-                                        company's/organization's name)
- -d, --outputdir OUTPUTDIR              output directory (leave empty for
-                                        current directory)
- -k, --packagename PACKAGENAME          (required) app package identifier (e.g.
-                                        com.mycompany.myapp)
- -p, --platform PLATFORM                (required) comma-separated list of
-                                        platforms (ios, android)
+ -o, --organization ORGANIZATION        (required) organization name (your company's/organization's name)
+ -d, --outputdir OUTPUTDIR              output directory (leave empty for current directory)
+ -k, --packagename PACKAGENAME          (required) app package identifier (e.g. com.mycompany.myapp)
+ -p, --platform PLATFORM                (required) comma-separated list of platforms (ios, android)
  -r, --templaterepouri TEMPLATEREPOURI  (required) template repo URI
 
 This command initiates creation of a new app based on the Mobile SDK template that you specify. The template can be a specialized app for your app type that Mobile SDK provides, or your own custom app that you've configured to use as a template. See https://developer.salesforce.com/docs/atlas.en-us.mobile_sdk.meta/mobile_sdk/ios_new_project_template.htm for information on custom templates.
