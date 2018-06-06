@@ -30,19 +30,7 @@ var path = require('path'),
     SDK = require('./constants'),
     utils = require('./utils'),
     configHelper = require('./configHelper'),
-    COLOR = require('./outputColors');
-
-//
-// Helper to prepare template
-// 
-function prepareTemplate(config, templateDir) {
-    var template = require(path.join(templateDir, 'template.js'));
-    return utils.runFunctionThrowError(
-        function() {
-            return template.prepare(config, utils.replaceInFiles, utils.moveFile, utils.removeFile);
-        },
-        templateDir);
-}
+    prepareTemplate = require('./templateHelper').prepareTemplate;
 
 //
 // Helper for native application creation
@@ -273,7 +261,6 @@ function actuallyCreateApp(forcecli, config) {
         process.exit(1);
     }
 }
-
 
 module.exports = {
     createApp
