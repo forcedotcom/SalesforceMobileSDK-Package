@@ -28,7 +28,10 @@
 var SDK = require('./shared/constants'),
     createHelper = require('./shared/createHelper'),
     configHelper = require('./shared/configHelper'),
-    logError = require('./shared/utils').logError;
+    logError = require('./shared/utils').logError,
+    logInfo = require('./shared/utils').logInfo,
+    templateHelper = require('./shared/templateHelper'),
+    COLOR = require('./shared/outputColors');
 
 // Flags
 function getFlags(cli, commandName) {
@@ -60,8 +63,26 @@ function runCommand(cli, commandName, vals) {
     case SDK.commands.version.name:
         configHelper.printVersion(cli);
         break;
+    case SDK.commands.listtemplates.name:
+        listTemplates(cli);
+        process.exit(0);
+        break;
     }
 }
+
+// Sfdx's listTemplates
+function listTemplates(cli) {
+    var applicableTemplates = templateHelper.getTemplates(cli);
+
+    logInfo('\nAvailable templates:\n', COLOR.cyan);
+    for (var i=0; i<applicableTemplates.length; i++) {
+        var template = applicableTemplates[i];
+        logInfo((i+1) + ') ' + template.description, COLOR.cyan);
+        logInfo('sfdx ' +  [namespace, cli.topic, SDK.commands.createwithtemplate.name].join(':') + ' --' + SDK.args.templateRepoUri.name + '=' + template.url, COLOR.magenta);
+    }
+    logInfo('');
+}
+
 
 // Topics
 function getTopics() {
@@ -102,9 +123,12 @@ function getCommands() {
     return commands;
 }
 
+// Name space
+var namespace = 'mobilesdk';
+
 module.exports = {
     namespace: {
-        name:'mobilesdk',
+        name: namespace,
         description: 'Create mobile apps based on the Salesforce Mobile SDK'
     },
     topics: getTopics(),

@@ -79,7 +79,7 @@ module.exports = {
                 'native': 'iOSNativeTemplate',
                 'native_swift': 'iOSNativeSwiftTemplate'
             },
-            commands: ['create', 'createwithtemplate', 'version']            
+            commands: ['create', 'createwithtemplate', 'version', 'listtemplates']            
         },
         forcedroid: {
             name: 'forcedroid',
@@ -93,7 +93,7 @@ module.exports = {
                 'native': 'AndroidNativeTemplate',
                 'native_kotlin': 'AndroidNativeKotlinTemplate'
             },
-            commands: ['create', 'createwithtemplate', 'version']            
+            commands: ['create', 'createwithtemplate', 'version', 'listtemplates']            
         },
         forcehybrid: {
             name: 'forcehybrid',
@@ -107,7 +107,7 @@ module.exports = {
                 'hybrid_local': 'HybridLocalTemplate',
                 'hybrid_remote': 'HybridRemoteTemplate'
             },
-            commands: ['create', 'createwithtemplate', 'version']            
+            commands: ['create', 'createwithtemplate', 'version', 'listtemplates']            
         },
         forcereact: {
             name: 'forcereact',
@@ -120,7 +120,7 @@ module.exports = {
             appTypesToPath: {
                 'react_native': 'ReactNativeTemplate'
             },
-            commands: ['create', 'createwithtemplate', 'version']
+            commands: ['create', 'createwithtemplate', 'version', 'listtemplates']
         }
     },
 
@@ -253,6 +253,13 @@ module.exports = {
             description: 'show version of Mobile SDK',
             longDescription: 'Show version of Mobile SDK.',
             help: 'This command displays to the console the version of Mobile SDK that the script uses to create apps.'
+        },
+        listtemplates: {
+            name: 'listtemplates',
+            args: [],
+            description: cli => 'list available Mobile SDK templates to create ' + cli.purpose,
+            longDescription: cli => 'List available Mobile SDK templates to create ' + cli.purpose + '.',
+            help: 'This command displays the list of available Mobile SDK templates.'
         }
     }
 };

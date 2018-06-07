@@ -31,7 +31,9 @@ var path = require('path'),
     SDK = require('./constants'),
     COLOR = require('./outputColors'),
     commandLineUtils = require('./commandLineUtils'),
-    logInfo = require('./utils').logInfo;
+    logInfo = require('./utils').logInfo,
+    getTemplates = require('./templateHelper').getTemplates;
+
 
 function applyCli(f, cli) {
     return typeof f === 'function' ? f(cli): f;
@@ -86,6 +88,10 @@ function readConfig(args, cli, handler) {
     case SDK.commands.createwithtemplate.name: 
         processorList = createArgsProcessorList(cli, commandName);
         break;
+    case SDK.commands.listtemplates.name:
+        listTemplates(cli);
+        process.exit(0);
+        break;
     default:
         usage(cli);
         process.exit(1);
@@ -103,6 +109,19 @@ function printArgs(cli, commandName) {
         .filter(arg => !arg.hidden)
         .forEach(arg => logInfo('    ' + (!arg.required  ? '[' : '') + '--' + arg.name + '=' + arg.description + (!arg.required ? ']' : ''), COLOR.magenta));
 }    
+
+function listTemplates(cli) {
+    var cliName = cli.name;
+    var applicableTemplates = getTemplates(cli);
+
+    logInfo('\nAvailable templates:\n', COLOR.cyan);
+    for (var i=0; i<applicableTemplates.length; i++) {
+        var template = applicableTemplates[i];
+        logInfo((i+1) + ') ' + template.description, COLOR.cyan);
+        logInfo(cliName + ' ' + SDK.commands.createwithtemplate.name + ' --' + SDK.args.templateRepoUri.name + '=' + template.url, COLOR.magenta);
+    }
+    logInfo('');
+}
 
 function usage(cli) {
     var cliName = cli.name;
