@@ -38,6 +38,11 @@ module.exports = {
             checkCmd: 'git --version',
             minVersion: '2.13'
         },
+        node: {
+            checkCmd: 'node --version',
+            minVersion: '6.9',
+            maxVersion: '8.11',
+        },
         npm: {
             checkCmd: 'npm -v',
             minVersion: '3.10'
@@ -74,7 +79,7 @@ module.exports = {
             purpose: 'an iOS native mobile application',
             dir: 'ios',
             platforms: ['ios'],
-            toolNames: ['git', 'npm', 'pod'],
+            toolNames: ['git', 'node', 'npm', 'pod'],
             appTypes: ['native', 'native_swift'],
             appTypesToPath: {
                 'native': 'iOSNativeTemplate',
@@ -88,7 +93,7 @@ module.exports = {
             purpose: 'an Android native mobile application',
             dir: 'android',
             platforms: ['android'],
-            toolNames: ['git', 'npm'],
+            toolNames: ['git', 'node', 'npm'],
             appTypes: ['native', 'native_kotlin'],
             appTypesToPath: {
                 'native': 'AndroidNativeTemplate',
@@ -102,7 +107,7 @@ module.exports = {
             purpose: 'a hybrid mobile application',
             dir: 'hybrid',
             platforms: ['ios', 'android'],
-            toolNames: ['git', 'npm', 'cordova'],
+            toolNames: ['git', 'node', 'npm', 'cordova'],
             appTypes: ['hybrid_local', 'hybrid_remote'],
             appTypesToPath: {
                 'hybrid_local': 'HybridLocalTemplate',
@@ -116,7 +121,7 @@ module.exports = {
             purpose: 'a React Native mobile application',
             dir: 'react',
             platforms: ['ios', 'android'],
-            toolNames: ['git', 'npm', 'pod'],
+            toolNames: ['git', 'node', 'npm', 'pod'],
             appTypes: ['react_native'],
             appTypesToPath: {
                 'react_native': 'ReactNativeTemplate'
