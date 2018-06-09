@@ -86,10 +86,11 @@ function getVersionNumberFromString(versionString) {
  *
  * @param {String} cmd Command to run to get the tool version
  * @param {String} minVersionRequired Minimum version required
+ * @param {String} maxVersionSupported Maximum version supported
  *
  * @throws {Error} if tool not found or version too low
  */
-function checkToolVersion(cmd, minVersionRequired) {
+function checkToolVersion(cmd, minVersionRequired, maxVersionSupported) {
     var toolName = cmd.split(' ')[0];
     var toolVersion;
     try {
@@ -106,6 +107,14 @@ function checkToolVersion(cmd, minVersionRequired) {
     if (toolVersionNum < minVersionRequiredNum) {
         throw new Error('Installed ' + toolName + ' version (' + toolVersion + ') is less than the minimum required version ('
                         + minVersionRequired + ').  Please update your version of ' + toolName + '.');
+    }
+
+    if (maxVersionSupported) {
+        var maxVersionSupportedNum = getVersionNumberFromString(maxVersionSupported);
+        if (toolVersionNum > maxVersionSupportedNum) {
+            throw new Error('Installed ' + toolName + ' version (' + toolVersion + ') is more than the maximum supported version ('
+                            + maxVersionSupported + ').  Please downgrade your version of ' + toolName + '.');
+        }
     }
 }
 
