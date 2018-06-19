@@ -265,7 +265,7 @@ module.exports = {
             args: [],
             description: cli => 'list available Mobile SDK templates to create ' + cli.purpose,
             longDescription: cli => 'List available Mobile SDK templates to create ' + cli.purpose + '.',
-            help: 'This command displays the list of available Mobile SDK templates.'
+            help: 'This command displays the list of available Mobile SDK templates. You can copy repo paths from the output for use with the createwithtemplate command.'
         }
     }
 };
