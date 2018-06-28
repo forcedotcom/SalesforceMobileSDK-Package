@@ -282,8 +282,9 @@ function createCompileApp(tmpDir, os, actualAppType, templateRepoUri, pluginRepo
     var isReactNative = actualAppType === APP_TYPE.react_native;
     var isHybrid = actualAppType.indexOf('hybrid') == 0;
     var isHybridRemote = actualAppType === APP_TYPE.hybrid_remote;
-    var target = actualAppType + ' app for ' + os + (templateRepoUri ? ' based on template ' + getTemplateNameFromUri(templateRepoUri) : '');
-    var appName = actualAppType + '_' + os + 'App';
+    var templateName = getTemplateNameFromUri(templateRepoUri);
+    var target = actualAppType + ' app for ' + os + (templateRepoUri ? ' based on template ' + templateName : '');
+    var appName = 'App_' + templateName.replace('#', '_') + '_' + os;
     // Add app type unless the app is native or react native iOS
     var packageSuffix = (os === OS.ios && !isHybrid) ? '' : '.' + actualAppType;
     // "native" is an illegal word for android package
