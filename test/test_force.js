@@ -95,6 +95,11 @@ function main(args) {
             }
         }
         else {
+            // Getting appType if template specified
+            if (testingWithTemplate) {	
+                chosenAppTypes = [templateHelper.getAppTypeFromTemplate(templateRepoUri)];
+            }
+            
             for (var cliName in SDK.forceclis) {
                 var cli = SDK.forceclis[cliName];
                 if (cli.platforms.some(p=>chosenOperatingSystems.indexOf(p)>=0)
@@ -156,9 +161,10 @@ function main(args) {
                     createCompileApp(tmpDir, os, appType, null, pluginRepoUri, useSfdxRequested);
                 }
             }
-
+            
             if (testingWithTemplate) {
-                createCompileApp(tmpDir, os, templateHelper.getAppTypeFromTemplate(templateRepoUri), templateRepoUri, null, useSfdxRequested);
+                // NB: chosenAppTypes[0] is appType from template
+                createCompileApp(tmpDir, os, chosenAppTypes[0], templateRepoUri, null, useSfdxRequested);
             }
         }
     }
