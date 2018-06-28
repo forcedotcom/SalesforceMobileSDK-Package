@@ -43,7 +43,7 @@ function prepareTemplate(config, templateDir) {
 }
 
 //
-// Print list of available templates
+// Get templates for the given cli
 //
 function getTemplates(cli) {
     try {
@@ -79,7 +79,33 @@ function getTemplates(cli) {
     }
 }
 
+//
+// Get appType for the given template given by its uri
+//
+function getAppTypeFromTemplate(templateRepoUriWithPossiblePath) {
+    var templateUriParsed = utils.separateRepoUrlPathBranch(templateRepoUriWithPossiblePath);
+    var templateRepoUri = templateUriParsed.repo + '#' + templateUriParsed.branch;
+    var templatePath = templateUriParsed.path;
+
+    // Creating tmp dir for template clone
+    var tmpDir = utils.mkTmpDir();
+
+    // Cloning template repo
+    var repoDir = utils.cloneRepo(tmpDir, templateRepoUri);
+
+    // Getting template
+    var appType = require(path.join(repoDir, templatePath, 'template.js')).appType;
+
+    // Cleanup
+    utils.removeFile(tmpDir);
+
+    // Done
+    return appType;
+}
+
+
 module.exports = {
     prepareTemplate,
-    getTemplates
+    getTemplates,
+    getAppTypeFromTemplate
 };
