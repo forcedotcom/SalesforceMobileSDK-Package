@@ -290,7 +290,7 @@ function createCompileApp(tmpDir, os, actualAppType, templateRepoUri, pluginRepo
     var isHybridRemote = actualAppType === APP_TYPE.hybrid_remote;
     var templateName = getTemplateNameFromUri(templateRepoUri);
     var target = actualAppType + ' app for ' + os + (templateRepoUri ? ' based on template ' + templateName : '');
-    var appName = 'App_' + templateName.replace('#', '_') + '_' + os;
+    var appName = 'App_' + (templateRepoUri ? templateName.replace('#', '_') : actualAppType) + '_' + os;
     // Add app type unless the app is native or react native iOS
     var packageSuffix = (os === OS.ios && !isHybrid) ? '' : '.' + actualAppType;
     // "native" is an illegal word for android package
@@ -462,6 +462,6 @@ function isWindows() {
 // Get template name from uri
 //
 function getTemplateNameFromUri(templateRepoUri) {
-    var parts = templateRepoUri.split('/');
+    var parts = cleanSplit(templateRepoUri, '/');
     return parts[parts.length-1];
 }
