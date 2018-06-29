@@ -53,6 +53,11 @@ forcereact createwithtemplate
 
  OR 
 
+# list available Mobile SDK templates
+forcereact listtemplates
+
+ OR 
+
 # show version of Mobile SDK
 forcereact version
 

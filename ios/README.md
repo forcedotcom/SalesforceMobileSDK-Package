@@ -52,6 +52,11 @@ forceios createwithtemplate
 
  OR 
 
+# list available Mobile SDK templates
+forceios listtemplates
+
+ OR 
+
 # show version of Mobile SDK
 forceios version
 

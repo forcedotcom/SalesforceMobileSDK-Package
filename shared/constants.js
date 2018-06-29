@@ -28,7 +28,7 @@
 var path = require('path'),
     shelljs = require('shelljs');
 
-var VERSION = '6.1.0';
+var VERSION = '6.2.0';
 
 module.exports = {
     version: VERSION,
@@ -38,18 +38,24 @@ module.exports = {
             checkCmd: 'git --version',
             minVersion: '2.13'
         },
+        node: {
+            checkCmd: 'node --version',
+            minVersion: '6.9',
+            maxVersion: '8.11',
+        },
         npm: {
             checkCmd: 'npm -v',
             minVersion: '3.10'
         },
         pod: {
             checkCmd: 'pod --version',
-            minVersion: '1.2'
+            minVersion: '1.2',
+            maxVersion: '1.4',
         },
         cordova: {
             checkCmd: 'cordova -v',
-            minVersion: '7.0.0',
             //pluginRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-CordovaPlugin#dev',    // dev
+            minVersion: '8.0.0',
             pluginRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-CordovaPlugin#v' + VERSION, // GA
             platformVersion: {
                 ios: '4.5.4',
@@ -73,13 +79,13 @@ module.exports = {
             purpose: 'an iOS native mobile application',
             dir: 'ios',
             platforms: ['ios'],
-            toolNames: ['git', 'npm', 'pod'],
+            toolNames: ['git', 'node', 'npm', 'pod'],
             appTypes: ['native', 'native_swift'],
             appTypesToPath: {
                 'native': 'iOSNativeTemplate',
                 'native_swift': 'iOSNativeSwiftTemplate'
             },
-            commands: ['create', 'createwithtemplate', 'version']            
+            commands: ['create', 'createwithtemplate', 'version', 'listtemplates']            
         },
         forcedroid: {
             name: 'forcedroid',
@@ -87,13 +93,13 @@ module.exports = {
             purpose: 'an Android native mobile application',
             dir: 'android',
             platforms: ['android'],
-            toolNames: ['git', 'npm'],
+            toolNames: ['git', 'node', 'npm'],
             appTypes: ['native', 'native_kotlin'],
             appTypesToPath: {
                 'native': 'AndroidNativeTemplate',
                 'native_kotlin': 'AndroidNativeKotlinTemplate'
             },
-            commands: ['create', 'createwithtemplate', 'version']            
+            commands: ['create', 'createwithtemplate', 'version', 'listtemplates']            
         },
         forcehybrid: {
             name: 'forcehybrid',
@@ -101,13 +107,13 @@ module.exports = {
             purpose: 'a hybrid mobile application',
             dir: 'hybrid',
             platforms: ['ios', 'android'],
-            toolNames: ['git', 'npm', 'cordova'],
+            toolNames: ['git', 'node', 'npm', 'cordova'],
             appTypes: ['hybrid_local', 'hybrid_remote'],
             appTypesToPath: {
                 'hybrid_local': 'HybridLocalTemplate',
                 'hybrid_remote': 'HybridRemoteTemplate'
             },
-            commands: ['create', 'createwithtemplate', 'version']            
+            commands: ['create', 'createwithtemplate', 'version', 'listtemplates']            
         },
         forcereact: {
             name: 'forcereact',
@@ -115,12 +121,12 @@ module.exports = {
             purpose: 'a React Native mobile application',
             dir: 'react',
             platforms: ['ios', 'android'],
-            toolNames: ['git', 'npm', 'pod'],
+            toolNames: ['git', 'node', 'npm', 'pod'],
             appTypes: ['react_native'],
             appTypesToPath: {
                 'react_native': 'ReactNativeTemplate'
             },
-            commands: ['create', 'createwithtemplate', 'version']
+            commands: ['create', 'createwithtemplate', 'version', 'listtemplates']
         }
     },
 
@@ -253,6 +259,13 @@ module.exports = {
             description: 'show version of Mobile SDK',
             longDescription: 'Show version of Mobile SDK.',
             help: 'This command displays to the console the version of Mobile SDK that the script uses to create apps.'
+        },
+        listtemplates: {
+            name: 'listtemplates',
+            args: [],
+            description: cli => 'list available Mobile SDK templates to create ' + cli.purpose,
+            longDescription: cli => 'List available Mobile SDK templates to create ' + cli.purpose + '.',
+            help: 'This command displays the list of available Mobile SDK templates. You can copy repo paths from the output for use with the createwithtemplate command.'
         }
     }
 };

@@ -52,6 +52,11 @@ forcedroid createwithtemplate
 
  OR 
 
+# list available Mobile SDK templates
+forcedroid listtemplates
+
+ OR 
+
 # show version of Mobile SDK
 forcedroid version
 
