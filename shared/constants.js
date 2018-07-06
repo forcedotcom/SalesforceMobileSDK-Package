@@ -165,7 +165,7 @@ module.exports = {
             longDescription: 'A name for the app that conforms to the naming requirements for the platform.',
             prompt: 'Enter your application name:',
             error: cli => val => 'Invalid value for application name: \'' + val + '\'.',
-            validate: cli => val => /^\S+$/.test(val)
+            validate: cli => val => (cli.platforms.indexOf('ios') != -1 ? /^[^\s-]+$/ : /^\S+$/).test(val)
         },
         packageName: {
             name: 'packagename',
