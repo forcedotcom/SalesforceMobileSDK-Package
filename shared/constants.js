@@ -143,7 +143,7 @@ module.exports = {
         appType: {
             name:'apptype',
             'char':'t',
-            description: cli => 'application type (' + cli.appTypes.join(', ') + ')',
+            description: cli => 'application type (' + cli.appTypes.join(' or ') + ', leave empty for ' + cli.appTypes[0] + ')',
             longDescription: cli => 'You can choose one of the following types of applications: ' + cli.appTypes.join(', ') + '.',
             prompt: cli => 'Enter your application type (' + cli.appTypes.join(' or ') + ', leave empty for ' + cli.appTypes[0] + '):',
             error: cli => val => 'App type must be ' + cli.appTypes.join(' or ') + '.',
