@@ -44,7 +44,8 @@ sfdx mobilesdk:ios commands: (get help with sfdx help mobilesdk:ios:COMMAND)
  mobilesdk:ios:create              create an iOS native mobile application
  mobilesdk:ios:createwithtemplate  create an iOS native mobile application from
                                    a template
- mobilesdk:ios:listtemplates       list available Mobile SDK templates
+ mobilesdk:ios:listtemplates       list available Mobile SDK templates to create
+                                   an iOS native mobile application
  mobilesdk:ios:version             show version of Mobile SDK
 
 ```
@@ -58,7 +59,7 @@ create an iOS native mobile application
 
 Flags:
  -n, --appname APPNAME            (required) application name
- -t, --apptype APPTYPE            (required) application type (native, native_swift)
+ -t, --apptype APPTYPE            application type (native_swift or native, leave empty for native_swift)
  -o, --organization ORGANIZATION  (required) organization name (your company's/organization's name)
  -d, --outputdir OUTPUTDIR        output directory (leave empty for current directory)
  -k, --packagename PACKAGENAME    (required) app package identifier (e.g. com.mycompany.myapp)
@@ -72,9 +73,9 @@ This command initiates creation of a new app based on the standard Mobile SDK te
 -> sfdx mobilesdk:ios:listtemplates --help
 Usage: sfdx mobilesdk:ios:listtemplates
 
-list available Mobile SDK templates
+list available Mobile SDK templates to create an iOS native mobile application
 
-This command displays the list of available Mobile SDK templates.
+This command displays the list of available Mobile SDK templates. You can copy repo paths from the output for use with the createwithtemplate command.
 
 ```
 
@@ -105,7 +106,9 @@ sfdx mobilesdk:android commands: (get help with sfdx help mobilesdk:android:COMM
                                        application
  mobilesdk:android:createwithtemplate  create an Android native mobile
                                        application from a template
- mobilesdk:android:listtemplates       list available Mobile SDK templates
+ mobilesdk:android:listtemplates       list available Mobile SDK templates to
+                                       create an Android native mobile
+                                       application
  mobilesdk:android:version             show version of Mobile SDK
 
 ```
@@ -119,7 +122,7 @@ create an Android native mobile application
 
 Flags:
  -n, --appname APPNAME            (required) application name
- -t, --apptype APPTYPE            (required) application type (native, native_kotlin)
+ -t, --apptype APPTYPE            application type (native or native_kotlin, leave empty for native)
  -o, --organization ORGANIZATION  (required) organization name (your company's/organization's name)
  -d, --outputdir OUTPUTDIR        output directory (leave empty for current directory)
  -k, --packagename PACKAGENAME    (required) app package identifier (e.g. com.mycompany.myapp)
@@ -133,9 +136,9 @@ This command initiates creation of a new app based on the standard Mobile SDK te
 -> sfdx mobilesdk:android:listtemplates --help
 Usage: sfdx mobilesdk:android:listtemplates
 
-list available Mobile SDK templates
+list available Mobile SDK templates to create an Android native mobile application
 
-This command displays the list of available Mobile SDK templates.
+This command displays the list of available Mobile SDK templates. You can copy repo paths from the output for use with the createwithtemplate command.
 
 ```
 
@@ -165,7 +168,8 @@ sfdx mobilesdk:hybrid commands: (get help with sfdx help mobilesdk:hybrid:COMMAN
  mobilesdk:hybrid:create              create a hybrid mobile application
  mobilesdk:hybrid:createwithtemplate  create a hybrid mobile application from a
                                       template
- mobilesdk:hybrid:listtemplates       list available Mobile SDK templates
+ mobilesdk:hybrid:listtemplates       list available Mobile SDK templates to
+                                      create a hybrid mobile application
  mobilesdk:hybrid:version             show version of Mobile SDK
 
 ```
@@ -179,7 +183,7 @@ create a hybrid mobile application
 
 Flags:
  -n, --appname APPNAME            (required) application name
- -t, --apptype APPTYPE            (required) application type (hybrid_local, hybrid_remote)
+ -t, --apptype APPTYPE            application type (hybrid_local or hybrid_remote, leave empty for hybrid_local)
  -o, --organization ORGANIZATION  (required) organization name (your company's/organization's name)
  -d, --outputdir OUTPUTDIR        output directory (leave empty for current directory)
  -k, --packagename PACKAGENAME    (required) app package identifier (e.g. com.mycompany.myapp)
@@ -195,9 +199,9 @@ This command initiates creation of a new app based on the standard Mobile SDK te
 -> sfdx mobilesdk:hybrid:listtemplates --help
 Usage: sfdx mobilesdk:hybrid:listtemplates
 
-list available Mobile SDK templates
+list available Mobile SDK templates to create a hybrid mobile application
 
-This command displays the list of available Mobile SDK templates.
+This command displays the list of available Mobile SDK templates. You can copy repo paths from the output for use with the createwithtemplate command.
 
 ```
 
@@ -230,6 +234,8 @@ sfdx mobilesdk:reactnative commands: (get help with sfdx help mobilesdk:reactnat
  mobilesdk:reactnative:createwithtemplate  create a React Native mobile
                                            application from a template
  mobilesdk:reactnative:listtemplates       list available Mobile SDK templates
+                                           to create a React Native mobile
+                                           application
  mobilesdk:reactnative:version             show version of Mobile SDK
 
 ```
@@ -257,9 +263,9 @@ This command initiates creation of a new app based on the standard Mobile SDK te
 -> sfdx mobilesdk:reactnative:listtemplates --help
 Usage: sfdx mobilesdk:reactnative:listtemplates
 
-list available Mobile SDK templates
+list available Mobile SDK templates to create a React Native mobile application
 
-This command displays the list of available Mobile SDK templates.
+This command displays the list of available Mobile SDK templates. You can copy repo paths from the output for use with the createwithtemplate command.
 
 ```
 
