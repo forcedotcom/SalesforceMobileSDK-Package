@@ -34,7 +34,7 @@ Usage:
 
 # create an Android native mobile application
 forcedroid create
-    [--apptype=application type (native or native_kotlin, leave empty for native)]
+    [--apptype=application type (native or native_kotlin, leave empty for native_kotlin)]
     --appname=application name
     --packagename=app package identifier (e.g. com.mycompany.myapp)
     --organization=organization name (your company's/organization's name)
@@ -73,8 +73,8 @@ Once the creation script completes, you'll have a fully functioning basic applic
 
 **App Type:** \( *Optional* \) The type of application you wish to develop:
 
-- **native** (default) — A fully native Android application
-- **native\_kotlin** — A fully native Android application written in Kotlin
+- **native\_kotlin** (default) — A fully native Android application written in Kotlin
+- **native** — A fully native Android application
 
 **App Name:** The name of your application
 

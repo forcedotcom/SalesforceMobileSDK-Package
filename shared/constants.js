@@ -94,7 +94,7 @@ module.exports = {
             dir: 'android',
             platforms: ['android'],
             toolNames: ['git', 'node', 'npm'],
-            appTypes: ['native', 'native_kotlin'],
+            appTypes: ['native_kotlin', 'native'],
             appTypesToPath: {
                 'native': 'AndroidNativeTemplate',
                 'native_kotlin': 'AndroidNativeKotlinTemplate'

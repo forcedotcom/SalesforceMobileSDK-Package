@@ -122,7 +122,7 @@ create an Android native mobile application
 
 Flags:
  -n, --appname APPNAME            (required) application name
- -t, --apptype APPTYPE            application type (native or native_kotlin, leave empty for native)
+ -t, --apptype APPTYPE            application type (native_kotlin or native, leave empty for native_kotlin)
  -o, --organization ORGANIZATION  (required) organization name (your company's/organization's name)
  -d, --outputdir OUTPUTDIR        output directory (leave empty for current directory)
  -k, --packagename PACKAGENAME    (required) app package identifier (e.g. com.mycompany.myapp)
