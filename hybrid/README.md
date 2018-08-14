@@ -35,7 +35,7 @@ Usage:
 # create a hybrid mobile application
 forcehybrid create
     --platform=comma-separated list of platforms (ios, android)
-    --apptype=application type (hybrid_local, hybrid_remote)
+    [--apptype=application type (hybrid_local or hybrid_remote, leave empty for hybrid_local)]
     --appname=application name
     --packagename=app package identifier (e.g. com.mycompany.myapp)
     --organization=organization name (your company's/organization's name)
@@ -74,9 +74,9 @@ Once the creation script completes, you'll have a fully functioning basic applic
 
 ### forcehybrid create options
 
-**App Type:** The type of application you wish to develop:
+**App Type:** \( *Optional* \) The type of application you wish to develop:
 
-- **hybrid\_local** — A hybrid application, based on the Cordova framework, that runs in a native container.  The app contents are developed locally in the Xcode project and are deployed to the device itself when the app is built
+- **hybrid\_local** (default) — A hybrid application, based on the Cordova framework, that runs in a native container.  The app contents are developed locally in the Xcode project and are deployed to the device itself when the app is built
 - **hybrid\_remote** — A hybrid application, based on the [Cordova](http://cordova.apache.org/) framework, that runs in a native container.  The app contents live in the cloud as a [Visualforce](http://wiki.developerforce.com/page/An_Introduction_to_Visualforce) application
 
 **App Name:** The name of your application

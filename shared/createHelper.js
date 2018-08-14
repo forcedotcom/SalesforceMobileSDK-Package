@@ -193,7 +193,7 @@ function actuallyCreateApp(forcecli, config) {
         }
 
         // Adding app type
-        if (forcecli.appTypes.length == 1) {
+        if (forcecli.appTypes.length == 1 || config.apptype === undefined || config.apptype === '') {
             config.apptype = forcecli.appTypes[0];
         }
 

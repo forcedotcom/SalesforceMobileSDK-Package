@@ -34,7 +34,7 @@ Usage:
 
 # create an iOS native mobile application
 forceios create
-    --apptype=application type (native, native_swift)
+    [--apptype=application type (native_swift or native, leave empty for native_swift)]
     --appname=application name
     --packagename=app package identifier (e.g. com.mycompany.myapp)
     --organization=organization name (your company's/organization's name)
@@ -71,10 +71,10 @@ Once the creation script completes, you'll have a fully functioning basic applic
 
 ### forceios create options
 
-**App Type:** The type of application you wish to develop:
+**App Type:** \( *Optional* \) The type of application you wish to develop:
 
+- **native\_swift** (default) — A fully native iOS application written in Swift
 - **native** — A fully native iOS application written in Objective C
-- **native\_swift** — A fully native iOS application written in Swift
 
 **App Name:** The name of your application
 

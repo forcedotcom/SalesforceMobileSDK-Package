@@ -80,7 +80,7 @@ module.exports = {
             dir: 'ios',
             platforms: ['ios'],
             toolNames: ['git', 'node', 'npm', 'pod'],
-            appTypes: ['native', 'native_swift'],
+            appTypes: ['native_swift', 'native'],
             appTypesToPath: {
                 'native': 'iOSNativeTemplate',
                 'native_swift': 'iOSNativeSwiftTemplate'
@@ -94,7 +94,7 @@ module.exports = {
             dir: 'android',
             platforms: ['android'],
             toolNames: ['git', 'node', 'npm'],
-            appTypes: ['native', 'native_kotlin'],
+            appTypes: ['native_kotlin', 'native'],
             appTypesToPath: {
                 'native': 'AndroidNativeTemplate',
                 'native_kotlin': 'AndroidNativeKotlinTemplate'
@@ -143,11 +143,12 @@ module.exports = {
         appType: {
             name:'apptype',
             'char':'t',
-            description: cli => 'application type (' + cli.appTypes.join(', ') + ')',
+            description: cli => 'application type (' + cli.appTypes.join(' or ') + ', leave empty for ' + cli.appTypes[0] + ')',
             longDescription: cli => 'You can choose one of the following types of applications: ' + cli.appTypes.join(', ') + '.',
-            prompt: cli => 'Enter your application type (' + cli.appTypes.join(', ') + '):',
+            prompt: cli => 'Enter your application type (' + cli.appTypes.join(' or ') + ', leave empty for ' + cli.appTypes[0] + '):',
             error: cli => val => 'App type must be ' + cli.appTypes.join(' or ') + '.',
-            validate: cli => val => cli.appTypes.indexOf(val) >=0
+            validate: cli => val => val === undefined || val === '' || cli.appTypes.indexOf(val) >=0,
+            required: false
         },
         templateRepoUri: {
             name:'templaterepouri',
