@@ -39,12 +39,20 @@ aliases:
 
   - &setup
     name: Setup
+    command: node ./install.js
+    when: always
+
+  - &ios-cordova
+    name: Install Cordova
     command:  |
-      node ./install.js
       npm install -g cordova@8.0.0
       cordova telemetry off
-      which cordova
-    when: always
+
+  - &android-cordova
+    name: Install Cordova
+    command:  |
+      sudo npm install -g cordova@8.0.0
+      sudo cordova telemetry off
 
   - &install-ant
     name: Install Ant
@@ -76,6 +84,7 @@ jobs:
       - checkout
       - run: *upgrade-git
       - run: *setup
+      - run: *android-cordova
       - run:
           name: Build Native Java App
           command:  |
@@ -123,6 +132,7 @@ jobs:
       - checkout
       - run: *upgrade-git
       - run: *setup
+      - run: *android-cordova
       - run:
           name: Install SFDX
           command: npm install -g sfdx-cli
@@ -176,6 +186,7 @@ jobs:
       - run: *install-ant
       - run: *downgrade-cocoapods
       - run: *downgrade-node
+      - run: *ios-cordova
       - run:
           name: Build Native Objective-C App
           command:  |
@@ -226,6 +237,7 @@ jobs:
       - run: *install-ant
       - run: *downgrade-cocoapods
       - run: *downgrade-node
+      - run: *ios-cordova
       - run:
           name: Install SFDX
           command: npm install -g sfdx-cli
