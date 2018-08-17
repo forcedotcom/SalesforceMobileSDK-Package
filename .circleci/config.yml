@@ -135,7 +135,7 @@ jobs:
       - run: *android-cordova
       - run:
           name: Install SFDX
-          command: npm install -g sfdx-cli
+          command: sudo npm install -g sfdx-cli
           when: always
       - run:
           name: Build Native Java App with SFDX
