@@ -124,6 +124,10 @@ jobs:
       - run: *upgrade-git
       - run: *setup
       - run:
+          name: Install SFDX
+          command: npm install -g sfdx-cli
+          when: always
+      - run:
           name: Build Native Java App with SFDX
           command:  |
             ./test/test_force.js --os=android --apptype=native --use-sfdx
@@ -223,6 +227,10 @@ jobs:
       - run: *downgrade-cocoapods
       - run: *downgrade-node
       - run:
+          name: Install SFDX
+          command: npm install -g sfdx-cli
+          when: always
+      - run:
           name: Build Native Objective-C App with SFDX
           command:  |
             ./test/test_force.js --os=ios --apptype=native --use-sfdx
@@ -268,6 +276,23 @@ workflows:
   version: 2
 
   pr-build-all-apps:
+    jobs:
+      - build-forcedroid
+      - build-forcedroid-sfdx
+      - build-forceios
+      - build-forceios-sfdx
+
+  # Cron are on a timezone 8 hours ahead of PST
+  # Build everything at ~11:30pm Tuesday/Thursday Nights
+  weekly-build-all-apps:
+    triggers:
+      - schedule:
+          cron: "30 7 * * 3,5"
+          filters:
+            branches:
+              only:
+                - dev
+
     jobs:
       - build-forcedroid
       - build-forcedroid-sfdx
