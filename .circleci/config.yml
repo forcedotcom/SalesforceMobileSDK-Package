@@ -149,7 +149,7 @@ jobs:
           name: Build Native Kotlin App with SFDX
           command:  |
             ./test/test_force.js --os=android --apptype=native_kotlin --use-sfdx
-            if [ ! -e tmp13920/App_native_kotlin_android/app/build/outputs/apk/debug/app-debug.apk ]; then
+            if [ ! -e tmp**/App_native_kotlin_android/app/build/outputs/apk/debug/app-debug.apk ]; then
               exit 1
             fi
           when: always
