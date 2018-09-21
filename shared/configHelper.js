@@ -143,14 +143,16 @@ function usage(cli) {
     }
     logInfo('\n OR \n', COLOR.cyan);
     logInfo(cliName, COLOR.magenta);
-    logInfo('\nWe also offer:', COLOR.cyan);
-    for (var otherCliName in SDK.forceclis) {
-        var otherCli = SDK.forceclis[otherCliName];
-        if (otherCli.name != cli.name) {
-            logInfo('- ' + otherCli.name + ': Tool for building ' + otherCli.purpose + ' using Salesforce Mobile SDK', COLOR.cyan);
+    if (cli.name !== 'forceios') {
+        logInfo('\nWe also offer:', COLOR.cyan);
+        for (var otherCliName in SDK.forceclis) {
+            var otherCli = SDK.forceclis[otherCliName];
+            if (otherCli.name != cli.name) {
+                logInfo('- ' + otherCli.name + ': Tool for building ' + otherCli.purpose + ' using Salesforce Mobile SDK', COLOR.cyan);
+            }
         }
+        logInfo('\n');
     }
-    logInfo('\n');
 }
 
 //
