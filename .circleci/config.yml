@@ -28,15 +28,6 @@ aliases:
       sudo gem install cocoapods -v 1.4
     when: always
 
-  - &downgrade-node
-    name: Downgrade to Node 8
-    command: |
-      brew install node@8
-      brew unlink node
-      brew link --overwrite node@8
-      echo 'export PATH="/usr/local/opt/node@8/bin:$PATH"' >> ~/.bash_profile
-    when: always
-
   - &setup
     name: Setup
     command: node ./install.js
@@ -58,6 +49,11 @@ aliases:
     name: Install Ant
     command: brew install ant
 
+  - &install-sfdx
+    name: Install SFDX
+    command: sudo npm install -g sfdx-cli
+    when: always
+
 linux: &linux
   working_directory: ~/SalesforceMobileSDK-Package
   docker:
@@ -73,7 +69,7 @@ linux: &linux
 mac: &mac
   working_directory: ~/SalesforceMobileSDK-Package
   macos:
-    xcode: "9.4.1"
+    xcode: "10.0.0"
   shell: /bin/bash --login -eo pipefail
 
 version: 2
@@ -84,7 +80,7 @@ jobs:
       - checkout
       - run: *upgrade-git
       - run: *setup
-      - run: *android-cordova
+      - run: *install-sfdx
       - run:
           name: Build Native Java App
           command:  |
@@ -102,42 +98,6 @@ jobs:
             fi
           when: always
       - run:
-          name: Build Hybrid Local App
-          command:  |
-            ./test/test_force.js --os=android --apptype=hybrid_local
-            if [ ! -e tmp**/App_hybrid_local_android/platforms/android/app/build/outputs/apk/debug/app-debug.apk ]; then
-              exit 1
-            fi
-          when: always
-      - run:
-          name: Build Hybrid Remote App
-          command:  |
-            ./test/test_force.js --os=android --apptype=hybrid_remote
-            if [ ! -e tmp**/App_hybrid_remote_android/platforms/android/app/build/outputs/apk/debug/app-debug.apk ]; then
-              exit 1
-            fi
-          when: always
-      - run:
-          name: Build React Native App
-          command:  |
-            ./test/test_force.js --os=android --apptype=react_native
-            if [ ! -e tmp**/App_react_native_android/android/app/build/outputs/apk/debug/app-debug.apk  ]; then
-              exit 1
-            fi
-          when: always
-
-  build-forcedroid-sfdx:
-    <<: *linux
-    steps:
-      - checkout
-      - run: *upgrade-git
-      - run: *setup
-      - run: *android-cordova
-      - run:
-          name: Install SFDX
-          command: sudo npm install -g sfdx-cli
-          when: always
-      - run:
           name: Build Native Java App with SFDX
           command:  |
             ./test/test_force.js --os=android --apptype=native --use-sfdx
@@ -150,6 +110,32 @@ jobs:
           command:  |
             ./test/test_force.js --os=android --apptype=native_kotlin --use-sfdx
             if [ ! -e tmp**/App_native_kotlin_android/app/build/outputs/apk/debug/app-debug.apk ]; then
+              exit 1
+            fi
+          when: always
+
+
+  build-forcehybrid-android:
+    <<: *linux
+    steps:
+      - checkout
+      - run: *upgrade-git
+      - run: *setup
+      - run: *android-cordova
+      - run: *install-sfdx
+      - run:
+          name: Build Hybrid Local App
+          command:  |
+            ./test/test_force.js --os=android --apptype=hybrid_local
+            if [ ! -e tmp**/App_hybrid_local_android/platforms/android/app/build/outputs/apk/debug/app-debug.apk ]; then
+              exit 1
+            fi
+          when: always
+      - run:
+          name: Build Hybrid Remote App
+          command:  |
+            ./test/test_force.js --os=android --apptype=hybrid_remote
+            if [ ! -e tmp**/App_hybrid_remote_android/platforms/android/app/build/outputs/apk/debug/app-debug.apk ]; then
               exit 1
             fi
           when: always
@@ -169,6 +155,22 @@ jobs:
               exit 1
             fi
           when: always
+
+  build-forcereact-android:
+    <<: *linux
+    steps:
+      - checkout
+      - run: *upgrade-git
+      - run: *setup
+      - run: *install-sfdx
+      - run:
+          name: Build React Native App
+          command:  |
+            ./test/test_force.js --os=android --apptype=react_native
+            if [ ! -e tmp**/App_react_native_android/android/app/build/outputs/apk/debug/app-debug.apk  ]; then
+              exit 1
+            fi
+          when: always
       - run:
           name: Build React Native App with SFDX
           command:  |
@@ -185,8 +187,7 @@ jobs:
       - run: *setup
       - run: *install-ant
       - run: *downgrade-cocoapods
-      - run: *downgrade-node
-      - run: *ios-cordova
+      - run: *install-sfdx
       - run:
           name: Build Native Objective-C App
           command:  |
@@ -204,6 +205,30 @@ jobs:
             fi
           when: always
       - run:
+          name: Build Native Objective-C App with SFDX
+          command:  |
+            ./test/test_force.js --os=ios --apptype=native --use-sfdx
+            if [ ! -e /Users/distiller/Library/Developer/Xcode/DerivedData/App_native_ios-**/Build/Products/Debug-iphoneos/App_native_ios.app ]; then
+              exit 1
+            fi
+          when: always
+      - run:
+          name: Build Native Swift App with SFDX
+          command:  |
+            ./test/test_force.js --os=ios --apptype=native_swift --use-sfdx
+            if [ ! -e /Users/distiller/Library/Developer/Xcode/DerivedData/App_native_swift_ios-**/Build/Products/Debug-iphoneos/App_native_swift_ios.app ]; then
+              exit 1
+            fi
+          when: always
+
+  build-forcehybrid-ios:
+    <<: *mac
+    steps:
+      - checkout
+      - run: *setup
+      - run: *install-ant
+      - run: *install-sfdx
+      - run:
           name: Build Hybrid Local App
           command:  |
             which cordova
@@ -217,44 +242,6 @@ jobs:
           command:  |
             ./test/test_force.js --os=ios --apptype=hybrid_remote
             if [ ! -e tmp**/App_hybrid_remote_ios/platforms/ios/build/emulator/App_hybrid_remote_ios.app ]; then
-              exit 1
-            fi
-          when: always
-      - run:
-          name: Build React Native App
-          command:  |
-            ./test/test_force.js --os=ios --apptype=react_native
-            if [ ! -e /Users/distiller/Library/Developer/Xcode/DerivedData/App_react_native_ios-**/Build/Products/Debug-iphoneos/App_react_native_ios.app ]; then
-              exit 1
-            fi
-          when: always
-
-  build-forceios-sfdx:
-    <<: *mac
-    steps:
-      - checkout
-      - run: *setup
-      - run: *install-ant
-      - run: *downgrade-cocoapods
-      - run: *downgrade-node
-      - run: *ios-cordova
-      - run:
-          name: Install SFDX
-          command: npm install -g sfdx-cli
-          when: always
-      - run:
-          name: Build Native Objective-C App with SFDX
-          command:  |
-            ./test/test_force.js --os=ios --apptype=native --use-sfdx
-            if [ ! -e /Users/distiller/Library/Developer/Xcode/DerivedData/App_native_ios-**/Build/Products/Debug-iphoneos/App_native_ios.app ]; then
-              exit 1
-            fi
-          when: always
-      - run:
-          name: Build Native Swift App with SFDX
-          command:  |
-            ./test/test_force.js --os=ios --apptype=native_swift --use-sfdx
-            if [ ! -e /Users/distiller/Library/Developer/Xcode/DerivedData/App_native_swift_ios-**/Build/Products/Debug-iphoneos/App_native_swift_ios.app ]; then
               exit 1
             fi
           when: always
@@ -275,6 +262,23 @@ jobs:
               exit 1
             fi
           when: always
+
+  build-forcereact-ios:
+    <<: *mac
+    steps:
+      - checkout
+      - run: *setup
+      - run: *install-ant
+      - run: *downgrade-cocoapods
+      - run: *install-sfdx
+      - run:
+          name: Build React Native App
+          command:  |
+            ./test/test_force.js --os=ios --apptype=react_native
+            if [ ! -e /Users/distiller/Library/Developer/Xcode/DerivedData/App_react_native_ios-**/Build/Products/Debug-iphoneos/App_react_native_ios.app ]; then
+              exit 1
+            fi
+          when: always
       - run:
           name: Build React Native App with SFDX
           command:  |
@@ -290,9 +294,11 @@ workflows:
   pr-build-all-apps:
     jobs:
       - build-forcedroid
-      - build-forcedroid-sfdx
+      - build-forcehybrid-android
+      - build-forcereact-android
       - build-forceios
-      - build-forceios-sfdx
+      - build-forcehybrid-ios
+      - build-forcereact-ios
 
   # Cron are on a timezone 8 hours ahead of PST
   # Build everything at ~8:30pm Sunday/Wednesday Nights
@@ -306,6 +312,8 @@ workflows:
                 - dev
     jobs:
       - build-forcedroid
-      - build-forcedroid-sfdx
+      - build-forcehybrid-android
+      - build-forcereact-android
       - build-forceios
-      - build-forceios-sfdx
+      - build-forcehybrid-ios
+      - build-forcereact-ios
