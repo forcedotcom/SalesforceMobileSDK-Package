@@ -68,10 +68,6 @@ function main(args) {
         usage(0);
     }
 
-    if (exitOnFailure) {
-        utils.setExitOnFailure(true);
-    }
-
     // Validation
     validateOperatingSystemsClis(chosenOperatingSystems, chosenClis);
     if (chosenClis.length == 0) validateAppTypesTemplateRepoUri(testingWithOS, chosenAppTypes, templateRepoUri);
@@ -141,6 +137,11 @@ function main(args) {
             // Use local updated clone of plugin
             pluginRepoUri = pluginRepoDir;
         }
+    }
+
+    // Set exit on failure to true
+    if (exitOnFailure) {
+        utils.setExitOnFailure(true);
     }
 
     // Test all the platforms / app types requested
