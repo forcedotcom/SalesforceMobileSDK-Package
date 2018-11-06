@@ -69,7 +69,7 @@ function main(args) {
 
     // Validation
     validateOperatingSystemsClis(chosenOperatingSystems, chosenClis);
-    validateAppTypesTemplateRepoUri(testingWithOS, chosenAppTypes, templateRepoUri);
+    if (chosenClis.length == 0) validateAppTypesTemplateRepoUri(testingWithOS, chosenAppTypes, templateRepoUri);
 
     // Actual testing
     var tmpDir = utils.mkTmpDir();
@@ -147,7 +147,9 @@ function main(args) {
                 var template = templates[j];
                 for (var k=0; k<template.platforms.length; k++) {
                     var os = template.platforms[k];
-                    createCompileApp(tmpDir, os, template.appType, template.url, null, useSfdxRequested);
+                    if (chosenOperatingSystems.length == 0 || chosenOperatingSystems.indexOf(os) >= 0) {
+                        createCompileApp(tmpDir, os, template.appType, template.url, null, useSfdxRequested);
+                    }
                 }
             }
         }
@@ -388,8 +390,8 @@ function createCompileApp(tmpDir, os, actualAppType, templateRepoUri, pluginRepo
 // Helper to validate operating systems
 //
 function validateOperatingSystemsClis(chosenOperatingSystems, chosenClis) {
-    if (!(chosenOperatingSystems.length == 0 ^ chosenClis.length == 0)) {
-        utils.logError('You need to specify at least one os or one cli (but not both)\n');
+    if (chosenOperatingSystems.length == 0 && chosenClis.length == 0) {
+        utils.logError('You need to specify at least one os or one cli\n');
         shortUsage(1);
     }
     for (var i=0; i<chosenOperatingSystems.length; i++) {
