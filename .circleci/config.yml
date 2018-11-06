@@ -82,38 +82,11 @@ jobs:
       - run: *setup
       - run: *install-sfdx
       - run:
-          name: Build Native Java App
-          command:  |
-            ./test/test_force.js --os=android --apptype=native
-            if [ ! -e tmp**/App_native_android/app/build/outputs/apk/debug/app-debug.apk ]; then
-              exit 1
-            fi
-          when: always
+          name: Building all android native templates
+          command: ! ( ./test/test_force.js --cli=forcedroid | grep -q "!FAILURE!" )
       - run:
-          name: Build Native Kotlin App
-          command:  |
-            ./test/test_force.js --os=android --apptype=native_kotlin
-            if [ ! -e tmp**/App_native_kotlin_android/app/build/outputs/apk/debug/app-debug.apk ]; then
-              exit 1
-            fi
-          when: always
-      - run:
-          name: Build Native Java App with SFDX
-          command:  |
-            ./test/test_force.js --os=android --apptype=native --use-sfdx
-            if [ ! -e tmp**/App_native_android/app/build/outputs/apk/debug/app-debug.apk ]; then
-              exit 1
-            fi
-          when: always
-      - run:
-          name: Build Native Kotlin App with SFDX
-          command:  |
-            ./test/test_force.js --os=android --apptype=native_kotlin --use-sfdx
-            if [ ! -e tmp**/App_native_kotlin_android/app/build/outputs/apk/debug/app-debug.apk ]; then
-              exit 1
-            fi
-          when: always
-
+          name: Building all android native templates with SFDX
+          command: ! ( ./test/test_force.js --cli=forcedroid --use-sfdx | grep -q "!FAILURE!" )
 
   build-forcehybrid-android:
     <<: *linux
@@ -124,37 +97,12 @@ jobs:
       - run: *android-cordova
       - run: *install-sfdx
       - run:
-          name: Build Hybrid Local App
-          command:  |
-            ./test/test_force.js --os=android --apptype=hybrid_local
-            if [ ! -e tmp**/App_hybrid_local_android/platforms/android/app/build/outputs/apk/debug/app-debug.apk ]; then
-              exit 1
-            fi
-          when: always
+          name: Building all android hybrid templates
+          command: ! ( ./test/test_force.js --cli=forcehybrid --os=android | grep -q "!FAILURE!" )
       - run:
-          name: Build Hybrid Remote App
-          command:  |
-            ./test/test_force.js --os=android --apptype=hybrid_remote
-            if [ ! -e tmp**/App_hybrid_remote_android/platforms/android/app/build/outputs/apk/debug/app-debug.apk ]; then
-              exit 1
-            fi
-          when: always
-      - run:
-          name: Build Hybrid Local App with SFDX
-          command:  |
-            ./test/test_force.js --os=android --apptype=hybrid_local --use-sfdx
-            if [ ! -e tmp**/App_hybrid_local_android/platforms/android/app/build/outputs/apk/debug/app-debug.apk ]; then
-              exit 1
-            fi
-          when: always
-      - run:
-          name: Build Hybrid Remote App with SFDX
-          command:  |
-            ./test/test_force.js --os=android --apptype=hybrid_remote --use-sfdx
-            if [ ! -e tmp**/App_hybrid_remote_android/platforms/android/app/build/outputs/apk/debug/app-debug.apk ]; then
-              exit 1
-            fi
-          when: always
+          name: Building all android hybrid templates with SFDX
+          command: ! ( ./test/test_force.js --cli=forcehybrid --os=android --use-sfdx | grep -q "!FAILURE!" )
+
 
   build-forcereact-android:
     <<: *linux
@@ -164,21 +112,11 @@ jobs:
       - run: *setup
       - run: *install-sfdx
       - run:
-          name: Build React Native App
-          command:  |
-            ./test/test_force.js --os=android --apptype=react_native
-            if [ ! -e tmp**/App_react_native_android/android/app/build/outputs/apk/debug/app-debug.apk  ]; then
-              exit 1
-            fi
-          when: always
+          name: Building all android react native templates
+          command: ! ( ./test/test_force.js --cli=forcereact --os=android | grep -q "!FAILURE!" )
       - run:
-          name: Build React Native App with SFDX
-          command:  |
-            ./test/test_force.js --os=android --apptype=react_native --use-sfdx
-            if [ ! -e tmp**/App_react_native_android/android/app/build/outputs/apk/debug/app-debug.apk  ]; then
-              exit 1
-            fi
-          when: always
+          name: Building all android react native templates with SFDX
+          command: ! ( ./test/test_force.js --cli=forcereact --os=android --use-sfdx | grep -q "!FAILURE!" )
 
   build-forceios:
     <<: *mac
@@ -189,37 +127,11 @@ jobs:
       - run: *downgrade-cocoapods
       - run: *install-sfdx
       - run:
-          name: Build Native Objective-C App
-          command:  |
-            ./test/test_force.js --os=ios --apptype=native
-            if [ ! -e /Users/distiller/Library/Developer/Xcode/DerivedData/App_native_ios-**/Build/Products/Debug-iphoneos/App_native_ios.app ]; then
-              exit 1
-            fi
-          when: always
+          name: Building all ios native templates
+          command: ! ( ./test/test_force.js --cli=forceios | grep -q "!FAILURE!" )
       - run:
-          name: Build Native Swift App
-          command:  |
-            ./test/test_force.js --os=ios --apptype=native_swift
-            if [ ! -e /Users/distiller/Library/Developer/Xcode/DerivedData/App_native_swift_ios-**/Build/Products/Debug-iphoneos/App_native_swift_ios.app ]; then
-              exit 1
-            fi
-          when: always
-      - run:
-          name: Build Native Objective-C App with SFDX
-          command:  |
-            ./test/test_force.js --os=ios --apptype=native --use-sfdx
-            if [ ! -e /Users/distiller/Library/Developer/Xcode/DerivedData/App_native_ios-**/Build/Products/Debug-iphoneos/App_native_ios.app ]; then
-              exit 1
-            fi
-          when: always
-      - run:
-          name: Build Native Swift App with SFDX
-          command:  |
-            ./test/test_force.js --os=ios --apptype=native_swift --use-sfdx
-            if [ ! -e /Users/distiller/Library/Developer/Xcode/DerivedData/App_native_swift_ios-**/Build/Products/Debug-iphoneos/App_native_swift_ios.app ]; then
-              exit 1
-            fi
-          when: always
+          name: Building all ios native templates with SFDX
+          command: ! ( ./test/test_force.js --cli=forceios --use-sfdx | grep -q "!FAILURE!" )
 
   build-forcehybrid-ios:
     <<: *mac
@@ -229,39 +141,11 @@ jobs:
       - run: *install-ant
       - run: *install-sfdx
       - run:
-          name: Build Hybrid Local App
-          command:  |
-            which cordova
-            ./test/test_force.js --os=ios --apptype=hybrid_local
-            if [ ! -e tmp**/App_hybrid_local_ios/platforms/ios/build/emulator/App_hybrid_local_ios.app ]; then
-              exit 1
-            fi
-          when: always
+          name: Building all ios hybrid templates
+          command: ! ( ./test/test_force.js --cli=forcehybrid --os=ios | grep -q "!FAILURE!" )
       - run:
-          name: Build Hybrid Remote App
-          command:  |
-            ./test/test_force.js --os=ios --apptype=hybrid_remote
-            if [ ! -e tmp**/App_hybrid_remote_ios/platforms/ios/build/emulator/App_hybrid_remote_ios.app ]; then
-              exit 1
-            fi
-          when: always
-      - run:
-          name: Build Hybrid Local App with SFDX
-          command:  |
-            which cordova
-            ./test/test_force.js --os=ios --apptype=hybrid_local --use-sfdx
-            if [ ! -e tmp**/App_hybrid_local_ios/platforms/ios/build/emulator/App_hybrid_local_ios.app ]; then
-              exit 1
-            fi
-          when: always
-      - run:
-          name: Build Hybrid Remote App with SFDX
-          command:  |
-            ./test/test_force.js --os=ios --apptype=hybrid_remote --use-sfdx
-            if [ ! -e tmp**/App_hybrid_remote_ios/platforms/ios/build/emulator/App_hybrid_remote_ios.app ]; then
-              exit 1
-            fi
-          when: always
+          name: Building all ios hybrid templates with SFDX
+          command: ! ( ./test/test_force.js --cli=forcehybrid --os=ios --use-sfdx | grep -q "!FAILURE!" )
 
   build-forcereact-ios:
     <<: *mac
@@ -272,21 +156,11 @@ jobs:
       - run: *downgrade-cocoapods
       - run: *install-sfdx
       - run:
-          name: Build React Native App
-          command:  |
-            ./test/test_force.js --os=ios --apptype=react_native
-            if [ ! -e /Users/distiller/Library/Developer/Xcode/DerivedData/App_react_native_ios-**/Build/Products/Debug-iphoneos/App_react_native_ios.app ]; then
-              exit 1
-            fi
-          when: always
+          name: Building all ios react native templates
+          command: ! ( ./test/test_force.js --cli=forcereact --os=ios | grep -q "!FAILURE!" )
       - run:
-          name: Build React Native App with SFDX
-          command:  |
-            ./test/test_force.js --os=ios --apptype=react_native --use-sfdx
-            if [ ! -e /Users/distiller/Library/Developer/Xcode/DerivedData/App_react_native_ios-**/Build/Products/Debug-iphoneos/App_react_native_ios.app ]; then
-              exit 1
-            fi
-          when: always
+          name: Building all ios react native templates with SFDX
+          command: ! ( ./test/test_force.js --cli=forcereact --os=ios --use-sfdx | grep -q "!FAILURE!" )
 
 workflows:
   version: 2
