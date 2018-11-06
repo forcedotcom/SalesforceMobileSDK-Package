@@ -145,6 +145,7 @@ jobs:
     steps:
       - checkout
       - run: *setup
+      - run: *ios-cordova
       - run: *install-ant
       - run: *install-sfdx
       - run:
