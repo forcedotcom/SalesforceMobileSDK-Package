@@ -46,6 +46,7 @@ function main(args) {
     var usageRequested = parsedArgs.hasOwnProperty('usage');
     var testProduction = parsedArgs.hasOwnProperty('test-production');
     var useSfdxRequested = parsedArgs.hasOwnProperty('use-sfdx');
+    var exitOnFailure = parsedArgs.hasOwnProperty('exit-on-failure');
     var chosenOperatingSystems = cleanSplit(parsedArgs.os, ',').map(function(s) { return s.toLowerCase(); });
     var templateRepoUri = parsedArgs.templaterepouri || '';
     var pluginRepoUri = !testProduction ? (parsedArgs.pluginrepouri || SDK.tools.cordova.pluginRepoUri) : '';
@@ -65,6 +66,10 @@ function main(args) {
     // Usage
     if (usageRequested) {
         usage(0);
+    }
+
+    if (exitOnFailure) {
+        utils.setExitOnFailure(true);
     }
 
     // Validation
@@ -184,6 +189,7 @@ function shortUsage(exitCode) {
     utils.logInfo('    (when using --os) --apptype=appType1,appType2,etc OR --templaterepouri=TEMPLATE_REPO_URI', COLOR.magenta);
     utils.logInfo('    [--use-sfdx]', COLOR.magenta);
     utils.logInfo('    [--test-production]', COLOR.magenta);
+    utils.logInfo('    [--exit-on-failure]', COLOR.magenta);
     utils.logInfo('    [--pluginrepouri=PLUGIN_REPO_URI (Defaults to uri in shared/constants.js)]', COLOR.magenta);
     utils.logInfo('    [--sdkbranch=SDK_BRANCH (Defaults to dev)]', COLOR.magenta);
     utils.logInfo('', COLOR.cyan);
