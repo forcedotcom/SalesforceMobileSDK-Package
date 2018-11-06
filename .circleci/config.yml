@@ -83,10 +83,14 @@ jobs:
       - run: *install-sfdx
       - run:
           name: Building all android native templates
-          command: ! ( ./test/test_force.js --cli=forcedroid | grep -q "!FAILURE!" )
+          command: |
+            ! ( ./test/test_force.js --cli=forcedroid | grep -q "!FAILURE!" )
+          when: always
       - run:
           name: Building all android native templates with SFDX
-          command: ! ( ./test/test_force.js --cli=forcedroid --use-sfdx | grep -q "!FAILURE!" )
+          command: |
+            ! ( ./test/test_force.js --cli=forcedroid --use-sfdx | grep -q "!FAILURE!" )
+          when: always
 
   build-forcehybrid-android:
     <<: *linux
@@ -98,11 +102,14 @@ jobs:
       - run: *install-sfdx
       - run:
           name: Building all android hybrid templates
-          command: ! ( ./test/test_force.js --cli=forcehybrid --os=android | grep -q "!FAILURE!" )
+          command: |
+            ! ( ./test/test_force.js --cli=forcehybrid --os=android | grep -q "!FAILURE!" )
+          when: always
       - run:
           name: Building all android hybrid templates with SFDX
-          command: ! ( ./test/test_force.js --cli=forcehybrid --os=android --use-sfdx | grep -q "!FAILURE!" )
-
+          command: |
+            ! ( ./test/test_force.js --cli=forcehybrid --os=android --use-sfdx | grep -q "!FAILURE!" )
+          when: always
 
   build-forcereact-android:
     <<: *linux
@@ -113,10 +120,14 @@ jobs:
       - run: *install-sfdx
       - run:
           name: Building all android react native templates
-          command: ! ( ./test/test_force.js --cli=forcereact --os=android | grep -q "!FAILURE!" )
+          command: |
+            ! ( ./test/test_force.js --cli=forcereact --os=android | grep -q "!FAILURE!" )
+          when: always
       - run:
           name: Building all android react native templates with SFDX
-          command: ! ( ./test/test_force.js --cli=forcereact --os=android --use-sfdx | grep -q "!FAILURE!" )
+          command: |
+            ! ( ./test/test_force.js --cli=forcereact --os=android --use-sfdx | grep -q "!FAILURE!" )
+          when: always
 
   build-forceios:
     <<: *mac
@@ -128,10 +139,14 @@ jobs:
       - run: *install-sfdx
       - run:
           name: Building all ios native templates
-          command: ! ( ./test/test_force.js --cli=forceios | grep -q "!FAILURE!" )
+          command: |
+            ! ( ./test/test_force.js --cli=forceios | grep -q "!FAILURE!" )
+          when: always
       - run:
           name: Building all ios native templates with SFDX
-          command: ! ( ./test/test_force.js --cli=forceios --use-sfdx | grep -q "!FAILURE!" )
+          command: |
+            ! ( ./test/test_force.js --cli=forceios --use-sfdx | grep -q "!FAILURE!" )
+          when: always
 
   build-forcehybrid-ios:
     <<: *mac
@@ -142,10 +157,14 @@ jobs:
       - run: *install-sfdx
       - run:
           name: Building all ios hybrid templates
-          command: ! ( ./test/test_force.js --cli=forcehybrid --os=ios | grep -q "!FAILURE!" )
+          command: |
+            ! ( ./test/test_force.js --cli=forcehybrid --os=ios | grep -q "!FAILURE!" )
+          when: always
       - run:
           name: Building all ios hybrid templates with SFDX
-          command: ! ( ./test/test_force.js --cli=forcehybrid --os=ios --use-sfdx | grep -q "!FAILURE!" )
+          command: |
+            ! ( ./test/test_force.js --cli=forcehybrid --os=ios --use-sfdx | grep -q "!FAILURE!" )
+          when: always
 
   build-forcereact-ios:
     <<: *mac
@@ -157,10 +176,14 @@ jobs:
       - run: *install-sfdx
       - run:
           name: Building all ios react native templates
-          command: ! ( ./test/test_force.js --cli=forcereact --os=ios | grep -q "!FAILURE!" )
+          command: |
+            ! ( ./test/test_force.js --cli=forcereact --os=ios | grep -q "!FAILURE!" )
+          when: always
       - run:
           name: Building all ios react native templates with SFDX
-          command: ! ( ./test/test_force.js --cli=forcereact --os=ios --use-sfdx | grep -q "!FAILURE!" )
+          command: |
+            ! ( ./test/test_force.js --cli=forcereact --os=ios --use-sfdx | grep -q "!FAILURE!" )
+          when: always
 
 workflows:
   version: 2
