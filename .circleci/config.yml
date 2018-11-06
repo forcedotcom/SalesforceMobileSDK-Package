@@ -80,11 +80,18 @@ jobs:
       - checkout
       - run: *upgrade-git
       - run: *setup
-      - run: *install-sfdx
       - run:
           name: Building all android native templates
           command:  ./test/test_force.js --exit-on-failure --cli=forcedroid
           when: always
+
+  build-forcedroid-sfdx:
+    <<: *linux
+    steps:
+      - checkout
+      - run: *upgrade-git
+      - run: *setup
+      - run: *install-sfdx
       - run:
           name: Building all android native templates with SFDX
           command: ./test/test_force.js --exit-on-failure --cli=forcedroid --use-sfdx
@@ -97,11 +104,19 @@ jobs:
       - run: *upgrade-git
       - run: *setup
       - run: *android-cordova
-      - run: *install-sfdx
       - run:
           name: Building all android hybrid templates
           command: ./test/test_force.js --exit-on-failure --cli=forcehybrid --os=android
           when: always
+
+  build-forcehybrid-android-sfdx:
+    <<: *linux
+    steps:
+      - checkout
+      - run: *upgrade-git
+      - run: *setup
+      - run: *android-cordova
+      - run: *install-sfdx
       - run:
           name: Building all android hybrid templates with SFDX
           command: ./test/test_force.js --exit-on-failure --cli=forcehybrid --os=android --use-sfdx
@@ -113,11 +128,18 @@ jobs:
       - checkout
       - run: *upgrade-git
       - run: *setup
-      - run: *install-sfdx
       - run:
           name: Building all android react native templates
           command: ./test/test_force.js --exit-on-failure --cli=forcereact --os=android
           when: always
+
+  build-forcereact-android-sfdx:
+    <<: *linux
+    steps:
+      - checkout
+      - run: *upgrade-git
+      - run: *setup
+      - run: *install-sfdx
       - run:
           name: Building all android react native templates with SFDX
           command: ./test/test_force.js --exit-on-failure --cli=forcereact --os=android --use-sfdx
@@ -130,11 +152,19 @@ jobs:
       - run: *setup
       - run: *install-ant
       - run: *downgrade-cocoapods
-      - run: *install-sfdx
       - run:
           name: Building all ios native templates
           command:  ./test/test_force.js --exit-on-failure --cli=forceios
           when: always
+
+  build-forceios-sfdx:
+    <<: *mac
+    steps:
+      - checkout
+      - run: *setup
+      - run: *install-ant
+      - run: *downgrade-cocoapods
+      - run: *install-sfdx
       - run:
           name: Building all ios native templates with SFDX
           command: ./test/test_force.js --exit-on-failure --cli=forceios --use-sfdx
@@ -147,11 +177,19 @@ jobs:
       - run: *setup
       - run: *ios-cordova
       - run: *install-ant
-      - run: *install-sfdx
       - run:
           name: Building all ios hybrid templates
           command: ./test/test_force.js --exit-on-failure --cli=forcehybrid --os=ios
           when: always
+
+  build-forcehybrid-ios-sfdx:
+    <<: *mac
+    steps:
+      - checkout
+      - run: *setup
+      - run: *ios-cordova
+      - run: *install-ant
+      - run: *install-sfdx
       - run:
           name: Building all ios hybrid templates with SFDX
           command: ./test/test_force.js --exit-on-failure --cli=forcehybrid --os=ios --use-sfdx
@@ -164,11 +202,19 @@ jobs:
       - run: *setup
       - run: *install-ant
       - run: *downgrade-cocoapods
-      - run: *install-sfdx
       - run:
           name: Building all ios react native templates
           command: ./test/test_force.js --exit-on-failure --cli=forcereact --os=ios
           when: always
+
+  build-forcereact-ios-sfdx:
+    <<: *mac
+    steps:
+      - checkout
+      - run: *setup
+      - run: *install-ant
+      - run: *downgrade-cocoapods
+      - run: *install-sfdx
       - run:
           name: Building all ios react native templates with SFDX
           command: ./test/test_force.js --exit-on-failure --cli=forcereact --os=ios --use-sfdx
@@ -179,12 +225,18 @@ workflows:
 
   pr-build-all-apps:
     jobs:
-      - build-forcedroid
-      - build-forcehybrid-android
-      - build-forcereact-android
       - build-forceios
       - build-forcehybrid-ios
       - build-forcereact-ios
+      - build-forcedroid
+      - build-forcehybrid-android
+      - build-forcereact-android
+      - build-forceios-sfdx
+      - build-forcehybrid-ios-sfdx
+      - build-forcereact-ios-sfdx
+      - build-forcedroid-sfdx
+      - build-forcehybrid-android-sfdx
+      - build-forcereact-android-sfdx
 
   # Cron are on a timezone 8 hours ahead of PST
   # Build everything at ~8:30pm Sunday/Wednesday Nights
@@ -197,9 +249,15 @@ workflows:
               only:
                 - dev
     jobs:
-      - build-forcedroid
-      - build-forcehybrid-android
-      - build-forcereact-android
       - build-forceios
       - build-forcehybrid-ios
       - build-forcereact-ios
+      - build-forcedroid
+      - build-forcehybrid-android
+      - build-forcereact-android
+      - build-forceios-sfdx
+      - build-forcehybrid-ios-sfdx
+      - build-forcereact-ios-sfdx
+      - build-forcedroid-sfdx
+      - build-forcehybrid-android-sfdx
+      - build-forcereact-android-sfdx
