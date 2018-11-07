@@ -59,10 +59,6 @@ function main(args) {
     var testingWithAppType = chosenAppTypes.length > 0;
     var testingWithTemplate = templateRepoUri != '';
 
-    var testingIOS = chosenOperatingSystems.indexOf(OS.ios) >= 0;
-    var testingAndroid = chosenOperatingSystems.indexOf(OS.android) >= 0;
-    var testingHybrid = chosenAppTypes.some(t=>t.indexOf("hybrid") >= 0);
-
     // Usage
     if (usageRequested) {
         usage(0);
@@ -127,7 +123,10 @@ function main(args) {
     }
 
     // Get cordova plugin repo if any hybrid testing requested
-    if (testingHybrid) {
+    if (forceClis.some(t=>t.name === 'forcehybrid')) {
+        var testingIOS = chosenOperatingSystems.indexOf(OS.ios) >= 0;
+        var testingAndroid = chosenOperatingSystems.indexOf(OS.android) >= 0;
+
         if (!testProduction && pluginRepoUri.indexOf('//') >= 0) {
             // Actual uri - clone repo - run tools/update.sh
             var pluginRepoDir = utils.cloneRepo(tmpDir, pluginRepoUri);
@@ -154,7 +153,7 @@ function main(args) {
                 for (var k=0; k<template.platforms.length; k++) {
                     var os = template.platforms[k];
                     if (chosenOperatingSystems.length == 0 || chosenOperatingSystems.indexOf(os) >= 0) {
-                        createCompileApp(tmpDir, os, template.appType, template.url, null, useSfdxRequested);
+                        createCompileApp(tmpDir, os, template.appType, template.url, pluginRepoUri, useSfdxRequested);
                     }
                 }
             }
@@ -172,7 +171,7 @@ function main(args) {
             
             if (testingWithTemplate) {
                 // NB: chosenAppTypes[0] is appType from template
-                createCompileApp(tmpDir, os, chosenAppTypes[0], templateRepoUri, null, useSfdxRequested);
+                createCompileApp(tmpDir, os, chosenAppTypes[0], templateRepoUri, pluginRepoUri, useSfdxRequested);
             }
         }
     }
