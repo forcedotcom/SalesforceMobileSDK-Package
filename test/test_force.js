@@ -59,6 +59,10 @@ function main(args) {
     var testingWithAppType = chosenAppTypes.length > 0;
     var testingWithTemplate = templateRepoUri != '';
 
+    var testingHybrid = chosenAppTypes.some(t=>t.indexOf("hybrid") >= 0) || chosenClis.indexOf("forcehybrid") >= 0;
+    var testingIOS = chosenOperatingSystems.indexOf(OS.ios) >= 0;
+    var testingAndroid = chosenOperatingSystems.indexOf(OS.android) >= 0;
+
     // Usage
     if (usageRequested) {
         usage(0);
@@ -123,10 +127,7 @@ function main(args) {
     }
 
     // Get cordova plugin repo if any hybrid testing requested
-    if (forceClis.some(t=>t.name === 'forcehybrid')) {
-        var testingIOS = chosenOperatingSystems.indexOf(OS.ios) >= 0;
-        var testingAndroid = chosenOperatingSystems.indexOf(OS.android) >= 0;
-
+    if (testingHybrid) {
         if (!testProduction && pluginRepoUri.indexOf('//') >= 0) {
             // Actual uri - clone repo - run tools/update.sh
             var pluginRepoDir = utils.cloneRepo(tmpDir, pluginRepoUri);
