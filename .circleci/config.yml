@@ -51,7 +51,7 @@ aliases:
 
   - &install-sfdx
     name: Install SFDX
-    command: sudo npm install -g sfdx-cli
+    command: npm install -g sfdx-cli
     when: always
 
 linux: &linux
