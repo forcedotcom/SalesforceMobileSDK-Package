@@ -53,7 +53,7 @@ aliases:
     name: Install SFDX
     command: |
       sudo npm install -g sfdx-cli
-      sudo chown -R $USER:$USER $HOME/.config/
+      sudo chown -R $USER $HOME/.config/
     when: always
 
 linux: &linux
