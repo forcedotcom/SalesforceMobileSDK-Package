@@ -51,7 +51,9 @@ aliases:
 
   - &install-sfdx
     name: Install SFDX
-    command: npm install -g sfdx-cli
+    command: |
+      sudo npm install -g sfdx-cli
+      sudo chown -R distiller /Users/distiller/.config/
     when: always
 
 linux: &linux
