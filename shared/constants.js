@@ -247,8 +247,10 @@ module.exports = {
                           'appName',
                           'packageName',
                           'organization',
+                          cli.appTypes.indexOf('hybrid_remote') >=0 ? 'startPage' : null,
                           'outputDir',
-                          'verbose'
+                          'verbose',
+                          cli.name === 'forcehybrid' ? 'pluginRepoUri' : null
                          ].filter(x=>x!=null),
             description: cli => 'create ' + cli.purpose + ' from a template',
             longDescription: cli => 'Create ' + cli.purpose + ' from a template.',
