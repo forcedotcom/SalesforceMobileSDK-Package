@@ -44,6 +44,8 @@ var LOG_LEVELS = {
 
 var LOG_LEVEL = LOG_LEVELS.INFO;
 
+var exitOnFailure = false;
+
 /**
  * Set log level
  *
@@ -169,7 +171,7 @@ function runProcessThrowError(cmd, dir, returnOutput) {
 }
 
 /**
- * Run shell command - throws error if any
+ * Run shell command - catch error if any (unless setExitOnFailure(true) was called)
  *
  * @param {String} cmd The command to execute.
  * @param {String} msg Message to print on success/failure.
@@ -186,6 +188,9 @@ function runProcessCatchError(cmd, msg, dir) {
         success = true;
     } catch (err) {
         logError(msg ? '!FAILURE! ' + msg : '', err);
+        if (exitOnFailure) {
+            process.exit(1);
+        }
     }
     finally {
         return success;
@@ -380,6 +385,15 @@ function log(logLevel, msg, color) {
     }
 }
 
+/**
+ * Set behavior when running shell processes 
+ *
+ * @param {Boolean} exitOFailure - pass true to exit on shell process execution failure (default is false)
+ */
+function setExitOnFailure(b) {
+    exitOnFailure = b;
+}
+
 module.exports = {
     LOG_LEVELS,
     checkToolVersion,
@@ -399,5 +413,6 @@ module.exports = {
     runFunctionThrowError,
     runProcessCatchError,
     runProcessThrowError,
-    separateRepoUrlPathBranch
+    separateRepoUrlPathBranch,
+    setExitOnFailure
 };
