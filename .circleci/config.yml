@@ -227,15 +227,15 @@ workflows:
 
   pr-build-all-apps:
     jobs:
-#      - build-forceios
-#      - build-forcehybrid-ios
-#      - build-forcereact-ios
-#      - build-forcedroid
-#      - build-forcehybrid-android
-#      - build-forcereact-android
-#      - build-forceios-sfdx
-#      - build-forcehybrid-ios-sfdx
-#      - build-forcereact-ios-sfdx
+      - build-forceios
+      - build-forcehybrid-ios
+      - build-forcereact-ios
+      - build-forcedroid
+      - build-forcehybrid-android
+      - build-forcereact-android
+      - build-forceios-sfdx
+      - build-forcehybrid-ios-sfdx
+      - build-forcereact-ios-sfdx
       - build-forcedroid-sfdx
       - build-forcehybrid-android-sfdx
       - build-forcereact-android-sfdx
