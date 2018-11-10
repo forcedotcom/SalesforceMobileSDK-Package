@@ -21,13 +21,6 @@ aliases:
       sudo make && sudo make install
       git --version
 
-  - &downgrade-cocoapods
-    name: Downgrade to CocoaPods 1.4
-    command:  |
-      echo Y | sudo gem uninstall cocoapods
-      sudo gem install cocoapods -v 1.4
-    when: always
-
   - &setup
     name: Setup
     command: node ./install.js
@@ -153,7 +146,6 @@ jobs:
       - checkout
       - run: *setup
       - run: *install-ant
-      - run: *downgrade-cocoapods
       - run:
           name: Building all ios native templates
           command:  ./test/test_force.js --exit-on-failure --cli=forceios
@@ -165,7 +157,6 @@ jobs:
       - checkout
       - run: *setup
       - run: *install-ant
-      - run: *downgrade-cocoapods
       - run: *install-sfdx
       - run:
           name: Building all ios native templates with SFDX
@@ -203,7 +194,6 @@ jobs:
       - checkout
       - run: *setup
       - run: *install-ant
-      - run: *downgrade-cocoapods
       - run:
           name: Building all ios react native templates
           command: ./test/test_force.js --exit-on-failure --cli=forcereact --os=ios
@@ -215,7 +205,6 @@ jobs:
       - checkout
       - run: *setup
       - run: *install-ant
-      - run: *downgrade-cocoapods
       - run: *install-sfdx
       - run:
           name: Building all ios react native templates with SFDX
