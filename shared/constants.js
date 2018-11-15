@@ -41,7 +41,7 @@ module.exports = {
         node: {
             checkCmd: 'node --version',
             minVersion: '6.9',
-            maxVersion: '10.11'
+            maxVersion: '11.1'
         },
         npm: {
             checkCmd: 'npm -v',
