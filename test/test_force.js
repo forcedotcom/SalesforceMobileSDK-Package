@@ -298,7 +298,7 @@ function createCompileApp(tmpDir, os, actualAppType, templateRepoUri, pluginRepo
     var isHybrid = actualAppType.indexOf('hybrid') == 0;
     var isHybridRemote = actualAppType === APP_TYPE.hybrid_remote;
     var templateName = getTemplateNameFromUri(templateRepoUri);
-    if (templateName.indexOf('HybridRemoteTemplate') == 0) {
+    if (templateName && templateName.indexOf('HybridRemoteTemplate') == 0) {
         // XXX createwithtemplate doesn't work for hybrid remote template
         //     because the arg validation only accept startpage if apptype is available as an arg
         // 
