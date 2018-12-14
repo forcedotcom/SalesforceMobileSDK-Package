@@ -28,7 +28,7 @@
 var path = require('path'),
     shelljs = require('shelljs');
 
-var VERSION = '6.2.0';
+var VERSION = '7.0.0-rc';
 
 module.exports = {
     version: VERSION,
@@ -41,7 +41,7 @@ module.exports = {
         node: {
             checkCmd: 'node --version',
             minVersion: '6.9',
-            maxVersion: '8.11',
+            maxVersion: '11.1'
         },
         npm: {
             checkCmd: 'npm -v',
@@ -50,16 +50,16 @@ module.exports = {
         pod: {
             checkCmd: 'pod --version',
             minVersion: '1.2',
-            maxVersion: '1.4',
+            maxVersion: '1.6'
         },
         cordova: {
             checkCmd: 'cordova -v',
-            //pluginRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-CordovaPlugin#dev',    // dev
-            minVersion: '8.0.0',
+            // pluginRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-CordovaPlugin#dev',    // dev
+            minVersion: '8.1.2',
             pluginRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-CordovaPlugin#v' + VERSION, // GA
             platformVersion: {
-                ios: '4.5.4',
-                android: '7.0.0'
+                ios: '4.5.5',
+                android: '7.1.2'
             }
         }
     },
@@ -80,7 +80,7 @@ module.exports = {
             dir: 'ios',
             platforms: ['ios'],
             toolNames: ['git', 'node', 'npm', 'pod'],
-            appTypes: ['native', 'native_swift'],
+            appTypes: ['native_swift', 'native'],
             appTypesToPath: {
                 'native': 'iOSNativeTemplate',
                 'native_swift': 'iOSNativeSwiftTemplate'
@@ -94,7 +94,7 @@ module.exports = {
             dir: 'android',
             platforms: ['android'],
             toolNames: ['git', 'node', 'npm'],
-            appTypes: ['native', 'native_kotlin'],
+            appTypes: ['native_kotlin', 'native'],
             appTypesToPath: {
                 'native': 'AndroidNativeTemplate',
                 'native_kotlin': 'AndroidNativeKotlinTemplate'
@@ -143,11 +143,12 @@ module.exports = {
         appType: {
             name:'apptype',
             'char':'t',
-            description: cli => 'application type (' + cli.appTypes.join(', ') + ')',
+            description: cli => 'application type (' + cli.appTypes.join(' or ') + ', leave empty for ' + cli.appTypes[0] + ')',
             longDescription: cli => 'You can choose one of the following types of applications: ' + cli.appTypes.join(', ') + '.',
-            prompt: cli => 'Enter your application type (' + cli.appTypes.join(', ') + '):',
+            prompt: cli => 'Enter your application type (' + cli.appTypes.join(' or ') + ', leave empty for ' + cli.appTypes[0] + '):',
             error: cli => val => 'App type must be ' + cli.appTypes.join(' or ') + '.',
-            validate: cli => val => cli.appTypes.indexOf(val) >=0
+            validate: cli => val => val === undefined || val === '' || cli.appTypes.indexOf(val) >=0,
+            required: false
         },
         templateRepoUri: {
             name:'templaterepouri',
@@ -165,7 +166,7 @@ module.exports = {
             longDescription: 'A name for the app that conforms to the naming requirements for the platform.',
             prompt: 'Enter your application name:',
             error: cli => val => 'Invalid value for application name: \'' + val + '\'.',
-            validate: cli => val => /^\S+$/.test(val)
+            validate: cli => val => (cli.platforms.indexOf('ios') != -1 ? /^[^\s-]+$/ : /^\S+$/).test(val)
         },
         packageName: {
             name: 'packagename',
@@ -246,8 +247,10 @@ module.exports = {
                           'appName',
                           'packageName',
                           'organization',
+                          cli.appTypes.indexOf('hybrid_remote') >=0 ? 'startPage' : null,
                           'outputDir',
-                          'verbose'
+                          'verbose',
+                          cli.name === 'forcehybrid' ? 'pluginRepoUri' : null
                          ].filter(x=>x!=null),
             description: cli => 'create ' + cli.purpose + ' from a template',
             longDescription: cli => 'Create ' + cli.purpose + ' from a template.',

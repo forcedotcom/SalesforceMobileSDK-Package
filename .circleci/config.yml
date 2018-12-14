@@ -3,6 +3,7 @@ aliases:
     name: Update Git
     command:  |
       git --version
+      sudo apt-get update
       sudo apt-get install \
         build-essential flex bison \
         libreadline6-dev zlib1g-dev \
@@ -23,20 +24,36 @@ aliases:
 
   - &setup
     name: Setup
-    command:  |
-      node ./install.js
-      sudo npm install -g cordova@7.0.0
-      cordova telemetry off
+    command: node ./install.js
     when: always
+
+  - &ios-cordova
+    name: Install Cordova
+    command:  |
+      npm install -g cordova@8.1.2
+      cordova telemetry off
+
+  - &android-cordova
+    name: Install Cordova
+    command:  |
+      sudo npm install -g cordova@8.1.2
+      sudo cordova telemetry off
 
   - &install-ant
     name: Install Ant
     command: brew install ant
 
+  - &install-sfdx
+    name: Install SFDX
+    command: |
+      sudo npm install -g sfdx-cli
+      sudo chown -R `whoami` $HOME/.config/
+    when: always
+
 linux: &linux
   working_directory: ~/SalesforceMobileSDK-Package
   docker:
-    - image: circleci/android:api-27-node8-alpha
+    - image: circleci/android:api-28-node8-alpha
   environment:
     - TERM: "dumb"
     - ADB_INSTALL_TIMEOUT: 15
@@ -48,7 +65,7 @@ linux: &linux
 mac: &mac
   working_directory: ~/SalesforceMobileSDK-Package
   macos:
-    xcode: "9.3.0"
+    xcode: "10.0.0"
   shell: /bin/bash --login -eo pipefail
 
 version: 2
@@ -60,24 +77,8 @@ jobs:
       - run: *upgrade-git
       - run: *setup
       - run:
-          name: Build Native Java App
-          command: ./test/test_force.js --os=android --apptype=native
-          when: always
-      - run:
-          name: Build Native Kotlin App
-          command: ./test/test_force.js --os=android --apptype=native_kotlin
-          when: always
-      - run:
-          name: Build Hybrid Local App
-          command: ./test/test_force.js --os=android --apptype=hybrid_local
-          when: always
-      - run:
-          name: Build Hybrid Remote App
-          command: ./test/test_force.js --os=android --apptype=hybrid_remote
-          when: always
-      - run:
-          name: Build React Native App
-          command: ./test/test_force.js --os=android --apptype=react_native
+          name: Building all android native templates
+          command:  ./test/test_force.js --exit-on-failure --cli=forcedroid
           when: always
 
   build-forcedroid-sfdx:
@@ -86,29 +87,58 @@ jobs:
       - checkout
       - run: *upgrade-git
       - run: *setup
+      - run: *install-sfdx
       - run:
-          name: Install SFDX
-          command: sudo npm install -g sfdx-cli
+          name: Building all android native templates with SFDX
+          command: ./test/test_force.js --exit-on-failure --cli=forcedroid --use-sfdx
           when: always
+
+  build-forcehybrid-android:
+    <<: *linux
+    steps:
+      - checkout
+      - run: *upgrade-git
+      - run: *setup
+      - run: *android-cordova
       - run:
-          name: Build Native Java App
-          command: ./test/test_force.js --os=android --apptype=native --use-sfdx
+          name: Building all android hybrid templates
+          command: ./test/test_force.js --exit-on-failure --cli=forcehybrid --os=android
           when: always
+
+  build-forcehybrid-android-sfdx:
+    <<: *linux
+    steps:
+      - checkout
+      - run: *upgrade-git
+      - run: *setup
+      - run: *android-cordova
+      - run: *install-sfdx
       - run:
-          name: Build Native Kotlin App
-          command: ./test/test_force.js --os=android --apptype=native_kotlin --use-sfdx
+          name: Building all android hybrid templates with SFDX
+          command: ./test/test_force.js --exit-on-failure --cli=forcehybrid --os=android --use-sfdx
           when: always
+
+  build-forcereact-android:
+    <<: *linux
+    steps:
+      - checkout
+      - run: *upgrade-git
+      - run: *setup
       - run:
-          name: Build Hybrid Local App
-          command: ./test/test_force.js --os=android --apptype=hybrid_local --use-sfdx
+          name: Building all android react native templates
+          command: ./test/test_force.js --exit-on-failure --cli=forcereact --os=android
           when: always
+
+  build-forcereact-android-sfdx:
+    <<: *linux
+    steps:
+      - checkout
+      - run: *upgrade-git
+      - run: *setup
+      - run: *install-sfdx
       - run:
-          name: Build Hybrid Remote App
-          command: ./test/test_force.js --os=android --apptype=hybrid_remote --use-sfdx
-          when: always
-      - run:
-          name: Build React Native App
-          command: ./test/test_force.js --os=android --apptype=react_native --use-sfdx
+          name: Building all android react native templates with SFDX
+          command: ./test/test_force.js --exit-on-failure --cli=forcereact --os=android --use-sfdx
           when: always
 
   build-forceios:
@@ -118,25 +148,8 @@ jobs:
       - run: *setup
       - run: *install-ant
       - run:
-          name: Build Native Objective-C App
-          command: ./test/test_force.js --os=ios --apptype=native
-          when: always
-      - run:
-          name: Build Native Swift App
-          command: ./test/test_force.js --os=ios --apptype=native_swift
-          when: always
-      - run:
-          name: Build Hybrid Local App
-          command: ./test/test_force.js --os=ios --apptype=hybrid_local
-          when: always
-      - run:
-          name: Build Hybrid Remote App
-          command: ./test/test_force.js --os=ios --apptype=hybrid_remote
-          when: always
-      - run:
-          name: Build React Native App
-          command: ./test/test_force.js --os=ios --apptype=react_native
-          no_output_timeout: 20m
+          name: Building all ios native templates
+          command:  ./test/test_force.js --exit-on-failure --cli=forceios
           when: always
 
   build-forceios-sfdx:
@@ -145,30 +158,58 @@ jobs:
       - checkout
       - run: *setup
       - run: *install-ant
+      - run: *install-sfdx
       - run:
-          name: Install SFDX
-          command: sudo npm install -g sfdx-cli
+          name: Building all ios native templates with SFDX
+          command: ./test/test_force.js --exit-on-failure --cli=forceios --use-sfdx
           when: always
+
+  build-forcehybrid-ios:
+    <<: *mac
+    steps:
+      - checkout
+      - run: *setup
+      - run: *ios-cordova
+      - run: *install-ant
       - run:
-          name: Build Native Objective-C App
-          command: ./test/test_force.js --os=ios --apptype=native --use-sfdx
+          name: Building all ios hybrid templates
+          command: ./test/test_force.js --exit-on-failure --cli=forcehybrid --os=ios
           when: always
+
+  build-forcehybrid-ios-sfdx:
+    <<: *mac
+    steps:
+      - checkout
+      - run: *setup
+      - run: *ios-cordova
+      - run: *install-ant
+      - run: *install-sfdx
       - run:
-          name: Build Native Swift App
-          command: ./test/test_force.js --os=ios --apptype=native_swift --use-sfdx
+          name: Building all ios hybrid templates with SFDX
+          command: ./test/test_force.js --exit-on-failure --cli=forcehybrid --os=ios --use-sfdx
           when: always
+
+  build-forcereact-ios:
+    <<: *mac
+    steps:
+      - checkout
+      - run: *setup
+      - run: *install-ant
       - run:
-          name: Build Hybrid Local App
-          command: ./test/test_force.js --os=ios --apptype=hybrid_local --use-sfdx
+          name: Building all ios react native templates
+          command: ./test/test_force.js --exit-on-failure --cli=forcereact --os=ios
           when: always
+
+  build-forcereact-ios-sfdx:
+    <<: *mac
+    steps:
+      - checkout
+      - run: *setup
+      - run: *install-ant
+      - run: *install-sfdx
       - run:
-          name: Build Hybrid Remote App
-          command: ./test/test_force.js --os=ios --apptype=hybrid_remote --use-sfdx
-          when: always
-      - run:
-          name: Build React Native App
-          command: ./test/test_force.js --os=ios --apptype=react_native --use-sfdx
-          no_output_timeout: 20m
+          name: Building all ios react native templates with SFDX
+          command: ./test/test_force.js --exit-on-failure --cli=forcereact --os=ios --use-sfdx
           when: always
 
 workflows:
@@ -176,23 +217,39 @@ workflows:
 
   pr-build-all-apps:
     jobs:
-      - build-forcedroid
-      - build-forcedroid-sfdx
       - build-forceios
+      - build-forcehybrid-ios
+      - build-forcereact-ios
+      - build-forcedroid
+      - build-forcehybrid-android
+      - build-forcereact-android
       - build-forceios-sfdx
+      - build-forcehybrid-ios-sfdx
+      - build-forcereact-ios-sfdx
+      - build-forcedroid-sfdx
+      - build-forcehybrid-android-sfdx
+      - build-forcereact-android-sfdx
 
   # Cron are on a timezone 8 hours ahead of PST
-  # Build everything at ~11:30pm Mon/Wed/Fri Nights
+  # Build everything at ~8:30pm Sunday/Wednesday Nights
   weekly-build-all-apps:
     triggers:
       - schedule:
-          cron: "30 7 * * 2,4,6"
+          cron: "30 4 * * 2,4,6"
           filters:
             branches:
               only:
                 - dev
     jobs:
-      - build-forcedroid
-      - build-forcedroid-sfdx
       - build-forceios
+      - build-forcehybrid-ios
+      - build-forcereact-ios
+      - build-forcedroid
+      - build-forcehybrid-android
+      - build-forcereact-android
       - build-forceios-sfdx
+      - build-forcehybrid-ios-sfdx
+      - build-forcereact-ios-sfdx
+      - build-forcedroid-sfdx
+      - build-forcehybrid-android-sfdx
+      - build-forcereact-android-sfdx

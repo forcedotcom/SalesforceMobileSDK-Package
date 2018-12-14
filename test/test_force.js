@@ -46,6 +46,7 @@ function main(args) {
     var usageRequested = parsedArgs.hasOwnProperty('usage');
     var testProduction = parsedArgs.hasOwnProperty('test-production');
     var useSfdxRequested = parsedArgs.hasOwnProperty('use-sfdx');
+    var exitOnFailure = parsedArgs.hasOwnProperty('exit-on-failure');
     var chosenOperatingSystems = cleanSplit(parsedArgs.os, ',').map(function(s) { return s.toLowerCase(); });
     var templateRepoUri = parsedArgs.templaterepouri || '';
     var pluginRepoUri = !testProduction ? (parsedArgs.pluginrepouri || SDK.tools.cordova.pluginRepoUri) : '';
@@ -58,9 +59,9 @@ function main(args) {
     var testingWithAppType = chosenAppTypes.length > 0;
     var testingWithTemplate = templateRepoUri != '';
 
+    var testingHybrid = chosenAppTypes.some(t=>t.indexOf("hybrid") >= 0) || chosenClis.indexOf("forcehybrid") >= 0;
     var testingIOS = chosenOperatingSystems.indexOf(OS.ios) >= 0;
     var testingAndroid = chosenOperatingSystems.indexOf(OS.android) >= 0;
-    var testingHybrid = chosenAppTypes.some(t=>t.indexOf("hybrid") >= 0);
 
     // Usage
     if (usageRequested) {
@@ -69,7 +70,7 @@ function main(args) {
 
     // Validation
     validateOperatingSystemsClis(chosenOperatingSystems, chosenClis);
-    validateAppTypesTemplateRepoUri(testingWithOS, chosenAppTypes, templateRepoUri);
+    if (chosenClis.length == 0) validateAppTypesTemplateRepoUri(testingWithOS, chosenAppTypes, templateRepoUri);
 
     // Actual testing
     var tmpDir = utils.mkTmpDir();
@@ -138,6 +139,11 @@ function main(args) {
         }
     }
 
+    // Set exit on failure to true
+    if (exitOnFailure) {
+        utils.setExitOnFailure(true);
+    }
+
     // Test all the platforms / app types requested
     if (testingWithClis) {
         for (var i=0; i<chosenClis.length; i++) {
@@ -147,7 +153,9 @@ function main(args) {
                 var template = templates[j];
                 for (var k=0; k<template.platforms.length; k++) {
                     var os = template.platforms[k];
-                    createCompileApp(tmpDir, os, template.appType, template.url, null, useSfdxRequested);
+                    if (chosenOperatingSystems.length == 0 || chosenOperatingSystems.indexOf(os) >= 0) {
+                        createCompileApp(tmpDir, os, template.appType, template.url, pluginRepoUri, useSfdxRequested);
+                    }
                 }
             }
         }
@@ -164,7 +172,7 @@ function main(args) {
             
             if (testingWithTemplate) {
                 // NB: chosenAppTypes[0] is appType from template
-                createCompileApp(tmpDir, os, chosenAppTypes[0], templateRepoUri, null, useSfdxRequested);
+                createCompileApp(tmpDir, os, chosenAppTypes[0], templateRepoUri, pluginRepoUri, useSfdxRequested);
             }
         }
     }
@@ -182,6 +190,7 @@ function shortUsage(exitCode) {
     utils.logInfo('    (when using --os) --apptype=appType1,appType2,etc OR --templaterepouri=TEMPLATE_REPO_URI', COLOR.magenta);
     utils.logInfo('    [--use-sfdx]', COLOR.magenta);
     utils.logInfo('    [--test-production]', COLOR.magenta);
+    utils.logInfo('    [--exit-on-failure]', COLOR.magenta);
     utils.logInfo('    [--pluginrepouri=PLUGIN_REPO_URI (Defaults to uri in shared/constants.js)]', COLOR.magenta);
     utils.logInfo('    [--sdkbranch=SDK_BRANCH (Defaults to dev)]', COLOR.magenta);
     utils.logInfo('', COLOR.cyan);
@@ -289,6 +298,13 @@ function createCompileApp(tmpDir, os, actualAppType, templateRepoUri, pluginRepo
     var isHybrid = actualAppType.indexOf('hybrid') == 0;
     var isHybridRemote = actualAppType === APP_TYPE.hybrid_remote;
     var templateName = getTemplateNameFromUri(templateRepoUri);
+    if (templateName && templateName.indexOf('HybridRemoteTemplate') == 0) {
+        // XXX createwithtemplate doesn't work for hybrid remote template
+        //     because the arg validation only accept startpage if apptype is available as an arg
+        // 
+        // As a work around, we make sure create with --apptype=xxx is called instead of createwithtemplate
+        templateRepoUri = null;
+    }
     var target = actualAppType + ' app for ' + os + (templateRepoUri ? ' based on template ' + templateName : '');
     var appName = 'App_' + (templateRepoUri ? templateName.replace('#', '_') : actualAppType) + '_' + os;
     // Add app type unless the app is native or react native iOS
@@ -388,8 +404,8 @@ function createCompileApp(tmpDir, os, actualAppType, templateRepoUri, pluginRepo
 // Helper to validate operating systems
 //
 function validateOperatingSystemsClis(chosenOperatingSystems, chosenClis) {
-    if (!(chosenOperatingSystems.length == 0 ^ chosenClis.length == 0)) {
-        utils.logError('You need to specify at least one os or one cli (but not both)\n');
+    if (chosenOperatingSystems.length == 0 && chosenClis.length == 0) {
+        utils.logError('You need to specify at least one os or one cli\n');
         shortUsage(1);
     }
     for (var i=0; i<chosenOperatingSystems.length; i++) {
