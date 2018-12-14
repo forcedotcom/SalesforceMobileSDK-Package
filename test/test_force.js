@@ -288,6 +288,10 @@ function updatePluginRepo(tmpDir, os, pluginRepoDir, sdkBranch) {
     utils.runProcessThrowError(path.join('tools', 'update.sh') + ' -b ' + sdkBranch + ' -o ' + os, pluginRepoDir);
 }
 
+function cleanName(name) {
+    return name.replace('#', '_').replace('-', '_');
+}
+
 //
 // Create and compile app
 //
@@ -306,7 +310,7 @@ function createCompileApp(tmpDir, os, actualAppType, templateRepoUri, pluginRepo
         templateRepoUri = null;
     }
     var target = actualAppType + ' app for ' + os + (templateRepoUri ? ' based on template ' + templateName : '');
-    var appName = 'App_' + (templateRepoUri ? templateName.replace('#', '_') : actualAppType) + '_' + os;
+    var appName = 'App_' + (templateRepoUri ? cleanName(templateName) : actualAppType) + '_' + os;
     // Add app type unless the app is native or react native iOS
     var packageSuffix = (os === OS.ios && !isHybrid) ? '' : '.' + actualAppType;
     // "native" is an illegal word for android package
