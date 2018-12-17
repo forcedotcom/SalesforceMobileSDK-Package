@@ -289,7 +289,7 @@ function updatePluginRepo(tmpDir, os, pluginRepoDir, sdkBranch) {
 }
 
 function cleanName(name) {
-    return name.replace('#', '_').replace('-', '_');
+    return name.replace(/[#-\.]/g, '_')
 }
 
 //
