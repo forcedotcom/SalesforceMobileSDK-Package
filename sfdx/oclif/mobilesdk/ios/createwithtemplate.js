@@ -26,46 +26,23 @@
  */
 const path = require('path');
 
-const LegacyCommand = require('../../../../shared/oclifAdapter');
+const OclifAdapter = require('../../../shared/oclifAdapter');
 const SDK = require('../../../shared/constants');
-const configHelper = require('../../../shared/configHelper');
 
-class IosCreateWithTemplateCommand extends LegacyCommand {
-
-    static get description() {
-        return this.command.description
-    }
-
-    static get longDescription() {
-        return this.command.longDescription
-    }
-
-    static get hidden() {
-        return !!this.command.hidden;
-    }
-
-    static get flagsConfig() {
-        return LegacyCommand.toFlagsConfig(this.command.args);
-    }
-
-    static get commandName() { return path.parse(__filename).name }
-
+class IosCreateWithTemplateCommand extends OclifAdapter {
     static get command() {
-        if (!this._command) {
-            this._command = configHelper.getCommandExpanded(SDK.forceclis.forceios, this.commandName);
-        }
-        return this._command;
+        return OclifAdapter.getCommand.call(this, SDK.forceclis.forceios, path.parse(__filename).name);
     }
-
     async run() {
-        const legacyContext = this.resolveHerokuContext();
-        if (LegacyCommand.validateCommand(SDK.forceclis.forceios,
-            IosCreateWithTemplateCommand.command.name, legacyContext)) {
-
-            return LegacyCommand.runCommand(SDK.forceclis.forceios,
-                IosCreateWithTemplateCommand.command.name, this.flags);
-        }
+        this.execute(SDK.forceclis.forceios, IosCreateWithTemplateCommand);
     }
 }
+
+IosCreateWithTemplateCommand.description = OclifAdapter.formatDescription(IosCreateWithTemplateCommand.command.description,
+  IosCreateWithTemplateCommand.command.help);
+
+IosCreateWithTemplateCommand.longDescription = IosCreateWithTemplateCommand.command.longDescription;
+IosCreateWithTemplateCommand.hidden = IosCreateWithTemplateCommand.command.hidden;
+IosCreateWithTemplateCommand.flags = OclifAdapter.toFlags(IosCreateWithTemplateCommand.command.args);
 
 exports.IosCreateWithTemplateCommand = IosCreateWithTemplateCommand;

@@ -26,46 +26,23 @@
  */
 const path = require('path');
 
-const LegacyCommand = require('../../../../shared/oclifAdapter');
+const OclifAdapter = require('../../../shared/oclifAdapter');
 const SDK = require('../../../shared/constants');
-const configHelper = require('../../../shared/configHelper');
 
-class IosCreateCommand extends LegacyCommand {
-
-    static get description() {
-        return this.command.description
-    }
-
-    static get longDescription() {
-        return this.command.longDescription
-    }
-
-    static get hidden() {
-        return !!this.command.hidden;
-    }
-
-    static get flagsConfig() {
-        return LegacyCommand.toFlagsConfig(this.command.args);
-    }
-
-    static get commandName() { return path.parse(__filename).name }
-
+class IosCreateCommand extends OclifAdapter {
     static get command() {
-        if (!this._command) {
-            this._command = configHelper.getCommandExpanded(SDK.forceclis.forceios, this.commandName);
-        }
-        return this._command;
+        return OclifAdapter.getCommand.call(this, SDK.forceclis.forceios, path.parse(__filename).name);
     }
-
     async run() {
-        const legacyContext = this.resolveHerokuContext();
-        if (LegacyCommand.validateCommand(SDK.forceclis.forceios,
-            IosCreateCommand.command.name, legacyContext)) {
-
-            return LegacyCommand.runCommand(SDK.forceclis.forceios,
-                IosCreateCommand.command.name, this.flags);
-        }
+        this.execute(SDK.forceclis.forceios, IosCreateCommand);
     }
 }
+
+IosCreateCommand.description = OclifAdapter.formatDescription(IosCreateCommand.command.description,
+  IosCreateCommand.command.help);
+
+IosCreateCommand.longDescription = IosCreateCommand.command.longDescription;
+IosCreateCommand.hidden = IosCreateCommand.command.hidden;
+IosCreateCommand.flags = OclifAdapter.toFlags(IosCreateCommand.command.args);
 
 exports.IosCreateCommand = IosCreateCommand;

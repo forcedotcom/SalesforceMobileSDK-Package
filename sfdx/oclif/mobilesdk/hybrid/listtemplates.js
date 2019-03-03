@@ -26,46 +26,23 @@
  */
 const path = require('path');
 
-const LegacyCommand = require('../../../shared/oclifAdapter');
+const OclifAdapter = require('../../../shared/oclifAdapter');
 const SDK = require('../../../shared/constants');
-const configHelper = require('../../../shared/configHelper');
 
-class HybridListTemplatesCommand extends LegacyCommand {
-
-    static get description() {
-        return this.command.description
-    }
-
-    static get longDescription() {
-        return this.command.longDescription
-    }
-
-    static get hidden() {
-        return !!this.command.hidden;
-    }
-
-    static get flagsConfig() {
-        return LegacyCommand.toFlagsConfig(this.command.args);
-    }
-
-    static get commandName() { return path.parse(__filename).name }
-
+class HybridListTemplatesCommand extends OclifAdapter {
     static get command() {
-        if (!this._command) {
-            this._command = configHelper.getCommandExpanded(SDK.forceclis.forcehybrid, this.commandName);
-        }
-        return this._command;
+        return OclifAdapter.getCommand.call(this, SDK.forceclis.forcehybrid, path.parse(__filename).name);
     }
-
     async run() {
-        const legacyContext = this.resolveHerokuContext();
-        if (LegacyCommand.validateCommand(SDK.forceclis.forcedroid,
-            AndroidVersionCommand.command.name, legacyContext.flags)) {
-
-            return LegacyCommand.runCommand(SDK.forceclis.forcedroid,
-                AndroidVersionCommand.command.name, legacyContext.flags);
-        }
+        this.execute(SDK.forceclis.forcehybrid, HybridListTemplatesCommand);
     }
 }
+
+HybridListTemplatesCommand.description = OclifAdapter.formatDescription(HybridListTemplatesCommand.command.description,
+  HybridListTemplatesCommand.command.help);
+
+HybridListTemplatesCommand.longDescription = HybridListTemplatesCommand.command.longDescription;
+HybridListTemplatesCommand.hidden = HybridListTemplatesCommand.command.hidden;
+HybridListTemplatesCommand.flags = OclifAdapter.toFlags(HybridListTemplatesCommand.command.args);
 
 exports.HybridListTemplatesCommand = HybridListTemplatesCommand;
