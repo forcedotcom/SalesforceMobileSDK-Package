@@ -55,7 +55,7 @@ function getArgsExpanded(cli, commandName) {
                  promptIf: arg.promptIf,
                  required: arg.required === undefined ? true : arg.required,
                  hasValue: arg.hasValue === undefined ? true : arg.hasValue,
-                 hidden: arg.description == null,
+                 hidden: applyCli(arg.hidden, cli),
                  type: arg.type
              })
             );

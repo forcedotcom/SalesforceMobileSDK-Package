@@ -26,42 +26,24 @@
  */
 const path = require('path');
 
-const LegacyCommand = require('../../../shared/oclifAdapter');
+const OclifAdapter = require('../../../shared/oclifAdapter');
 const SDK = require('../../../shared/constants');
-const configHelper = require('../../../shared/configHelper');
 
-class AndroidVersionCommand extends LegacyCommand {
-
-    static get description() {
-        return this.command.description;
-    }
-
-    static get longDescription() {
-        return this.command.longDescription;
-    }
-
-    static get hidden() {
-        return !!this.command.hidden;
-    }
-
-    static get flagsConfig() {
-        return LegacyCommand.toFlagsConfig(this.command.args);
-    }
-
-    static get commandName() {
-        return path.parse(__filename).name;
-    }
-
+class AndroidVersionCommand extends OclifAdapter {
     static get command() {
-        if (!this._command) {
-            this._command = configHelper.getCommandExpanded(SDK.forceclis.forcedroid, this.commandName);
-        }
-        return this._command;
+        return OclifAdapter.getCommand.call(this, SDK.forceclis.forcedroid, path.parse(__filename).name);
     }
 
     async run() {
-        this.execute(SDK.forceclis.forcedroid, AndroidVersionCommand.command.name);
+        this.execute(SDK.forceclis.forcedroid, AndroidVersionCommand);
     }
 }
+
+AndroidVersionCommand.description = OclifAdapter.formatDescription(AndroidVersionCommand.command.description,
+    AndroidVersionCommand.command.help);
+
+AndroidVersionCommand.longDescription = AndroidVersionCommand.command.longDescription;
+AndroidVersionCommand.hidden = AndroidVersionCommand.command.hidden;
+AndroidVersionCommand.flags = OclifAdapter.toFlags(AndroidVersionCommand.command.args);
 
 exports.AndroidVersionCommand = AndroidVersionCommand;

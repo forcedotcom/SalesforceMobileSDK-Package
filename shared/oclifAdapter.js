@@ -26,22 +26,24 @@
  */
 const COLOR = require('./outputColors');
 
-const Flags = require('@salesforce/command').flags;
 const SDK = require('./constants');
 const configHelper = require('./configHelper');
 const createHelper = require('./createHelper');
 const templateHelper = require('./templateHelper');
 const logInfo = require('./utils').logInfo;
 const logError = require('./utils').logError;
+const os = require('os');
 
-const { set } = require('@salesforce/kit');
 const { SfdxError } = require('@salesforce/core');
-const { SfdxCommand } = require('@salesforce/command');
-const { isKeyOf } = require('@salesforce/ts-types');
+const { Command, flags } = require('@oclif/command');
 
 const namespace = 'mobilesdk';
 
-class OclifAdapter extends SfdxCommand {
+class OclifAdapter extends Command {
+
+    static formatDescription(description, help) {
+        return `${description}${os.EOL}${os.EOL}${help}`;
+    }
 
     static listTemplates(cli) {
         const applicableTemplates = templateHelper.getTemplates(cli);
@@ -92,10 +94,10 @@ class OclifAdapter extends SfdxCommand {
      *
      * @param {Array} flags The legacy flags to convert.
      */
-    static toFlagsConfig(flags) {
+    static toFlags(flagContent) {
         const flagsConfig = {};
-        if (flags) {
-            flags.forEach(flag => {
+        if (flagContent) {
+            flagContent.forEach(flag => {
                 const { name, char, hidden, required, longDescription, type, values, array } = flag;
                 const description = flag.description || '';
                 const config = {
@@ -113,39 +115,29 @@ class OclifAdapter extends SfdxCommand {
                 if (values) {
                     config.options = values;
                 }
-                delete flag.hasValue;
-                if (name === 'apiversion') {
-                    // backdoor for forcibly setting `char` on the config; this is disallowed by the
-                    // sfdx flags typings, as its discouraged, but in this case we need to do it for
-                    // backward compatibility
-                    set(config, 'char', char);
-                    flagsConfig.apiversion = Flags.builtin(config);
-                } else {
-                    if (type && isKeyOf(Flags, type)) {
-                        if (type === 'boolean') {
-                            flagsConfig[name] = Flags.boolean(config);
-                        } else if (array) {
-                            flagsConfig[name] = Flags.array(config);
-                        } else if (type === 'string') {
-                            flagsConfig[name] = Flags.string(config);
-                        } else {
-                            // TODO
-                            throw new Error('oh noes! ' + JSON.stringify(flag));
-                        }
-                    } else {
-                        // TODO
-                        throw new Error('oh noes! ' + JSON.stringify(flag));
-                    }
+                delete flagContent.hasValue;
+                if (type === 'boolean') {
+                    flagsConfig[name] = flags.boolean(config);
+                }
+                else if (array) {
+                    flagsConfig[name] = flags.array(config);
+                }
+                else if (type === 'string') {
+                    flagsConfig[name] = flags.string(config);
+                }
+                else {
+                    // TODO
+                    throw new Error('oh noes! ' + JSON.stringify(flag));
                 }
             });
         }
         return flagsConfig;
     }
 
-    execute(cli, commandName) {
-        const legacyContext = this.resolveHerokuContext();
-        if (OclifAdapter.validateCommand(cli, commandName, legacyContext.flags)) {
-            return OclifAdapter.runCommand(cli, commandName, legacyContext.flags);
+    execute(cli, klass) {
+        const { flags } = this.parse(klass);
+        if (OclifAdapter.validateCommand(cli, klass.command.name, flags)) {
+            return OclifAdapter.runCommand(cli, klass.command.name, flags);
         }
     }
 
@@ -192,5 +184,12 @@ class OclifAdapter extends SfdxCommand {
         });
     }
 }
+
+OclifAdapter.getCommand = function(cli, commandName) {
+    if (!this._command) {
+        this._command = configHelper.getCommandExpanded(cli, commandName);
+    }
+    return this._command;
+};
 
 module.exports = OclifAdapter;

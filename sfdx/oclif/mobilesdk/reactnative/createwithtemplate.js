@@ -26,46 +26,24 @@
  */
 const path = require('path');
 
-const LegacyCommand = require('../../../../shared/oclifAdapter');
+const OclifAdapter = require('../../../shared/oclifAdapter');
 const SDK = require('../../../shared/constants');
-const configHelper = require('../../../shared/configHelper');
 
-class ReactNativeCreateWithTemplateCommand extends LegacyCommand {
-
-    static get description() {
-        return this.command.description
-    }
-
-    static get longDescription() {
-        return this.command.longDescription
-    }
-
-    static get hidden() {
-        return !!this.command.hidden;
-    }
-
-    static get flagsConfig() {
-        return LegacyCommand.toFlagsConfig(this.command.args);
-    }
-
-    static get commandName() { return path.parse(__filename).name }
-
+class ReactNativeCreateWithTemplateCommand extends OclifAdapter {
     static get command() {
-        if (!this._command) {
-            this._command = configHelper.getCommandExpanded(SDK.forceclis.forcereact, this.commandName);
-        }
-        return this._command;
+        return OclifAdapter.getCommand.call(this, SDK.forceclis.forcereact, path.parse(__filename).name);
     }
-
     async run() {
-        this.resolveHerokuContext();
-        if (LegacyCommand.validateCommand(SDK.forceclis.forcereact,
-            ReactNativeCreateWithTemplateCommand.command.name, this.flags)) {
-
-            return LegacyCommand.runCommand(SDK.forceclis.forcereact,
-                ReactNativeCreateWithTemplateCommand.command.name, this.flags);
-        }
+        this.execute(SDK.forceclis.forcereact, ReactNativeCreateWithTemplateCommand);
     }
 }
+
+ReactNativeCreateWithTemplateCommand.description =
+  OclifAdapter.formatDescription(ReactNativeCreateWithTemplateCommand.command.description,
+  ReactNativeCreateWithTemplateCommand.command.help);
+
+ReactNativeCreateWithTemplateCommand.longDescription = ReactNativeCreateWithTemplateCommand.command.longDescription;
+ReactNativeCreateWithTemplateCommand.hidden = ReactNativeCreateWithTemplateCommand.command.hidden;
+ReactNativeCreateWithTemplateCommand.flags = OclifAdapter.toFlags(ReactNativeCreateWithTemplateCommand.command.args);
 
 exports.ReactNativeCreateWithTemplateCommand = ReactNativeCreateWithTemplateCommand;

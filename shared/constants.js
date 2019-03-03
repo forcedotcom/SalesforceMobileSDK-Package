@@ -219,18 +219,21 @@ module.exports = {
         verbose: {
             name: 'verbose',
             'char': 'v',
-            description: 'increase verbose level',
+            description: 'increase information output',
             hasValue: false,
             required: false,
-            type: 'boolean'
+            type: 'boolean',
+            hidden: true
         },
         pluginRepoUri: {
             name: 'pluginrepouri',
+            description: 'supply a plugin repository uri',
             'char': 'v',
             error: cli => val => 'Invalid value for plugin repo uri: \'' + val + '\'.',
             validate: cli => val => /.*/.test(val),
             required: false,
-            type: 'string'
+            type: 'string',
+            hidden: true
         }
     },
 

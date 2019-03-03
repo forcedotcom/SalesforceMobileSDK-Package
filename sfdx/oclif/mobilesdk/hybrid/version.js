@@ -26,42 +26,24 @@
  */
 const path = require('path');
 
-const LegacyCommand = require('../../../shared/oclifAdapter');
+const OclifAdapter = require('../../../shared/oclifAdapter');
 const SDK = require('../../../shared/constants');
-const configHelper = require('../../../shared/configHelper');
 
-class HybridVersionCommand extends LegacyCommand {
-
-    static get description() {
-        return this.command.description;
-    }
-
-    static get longDescription() {
-        return this.command.longDescription;
-    }
-
-    static get hidden() {
-        return !!this.command.hidden;
-    }
-
-    static get flagsConfig() {
-        return LegacyCommand.toFlagsConfig(this.command.args);
-    }
-
-    static get commandName() {
-        return path.parse(__filename).name;
-    }
-
+class HybridVersionCommand extends OclifAdapter {
     static get command() {
-        if (!this._command) {
-            this._command = configHelper.getCommandExpanded(SDK.forceclis.forcehybrid, this.commandName);
-        }
-        return this._command;
+        return OclifAdapter.getCommand.call(this, SDK.forceclis.forcehybrid, path.parse(__filename).name);
     }
-
     async run() {
-        this.execute(SDK.forceclis.forcehybrid, HybridVersionCommand.command.name);
+        this.execute(SDK.forceclis.forcehybrid, HybridVersionCommand);
     }
 }
 
+HybridVersionCommand.description = OclifAdapter.formatDescription(HybridVersionCommand.command.description,
+  HybridVersionCommand.command.help);
+
+HybridVersionCommand.longDescription = HybridVersionCommand.command.longDescription;
+HybridVersionCommand.hidden = HybridVersionCommand.command.hidden;
+HybridVersionCommand.flags = OclifAdapter.toFlags(HybridVersionCommand.command.args);
+
 exports.HybridVersionCommand = HybridVersionCommand;
+

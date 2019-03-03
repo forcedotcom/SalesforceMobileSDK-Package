@@ -26,42 +26,23 @@
  */
 const path = require('path');
 
-const LegacyCommand = require('../../../shared/oclifAdapter');
+const OclifAdapter = require('../../../shared/oclifAdapter');
 const SDK = require('../../../shared/constants');
-const configHelper = require('../../../shared/configHelper');
 
-class IosVersionCommand extends LegacyCommand {
-
-    static get description() {
-        return this.command.description;
-    }
-
-    static get longDescription() {
-        return this.command.longDescription;
-    }
-
-    static get hidden() {
-        return !!this.command.hidden;
-    }
-
-    static get flagsConfig() {
-        return LegacyCommand.toFlagsConfig(this.command.args);
-    }
-
-    static get commandName() {
-        return path.parse(__filename).name;
-    }
-
+class IosVersionCommand extends OclifAdapter {
     static get command() {
-        if (!this._command) {
-            this._command = configHelper.getCommandExpanded(SDK.forceclis.forceios, this.commandName);
-        }
-        return this._command;
+        return OclifAdapter.getCommand.call(this, SDK.forceclis.forceios, path.parse(__filename).name);
     }
-
     async run() {
-        this.execute(SDK.forceclis.forceios, IosVersionCommand.command.name);
+        this.execute(SDK.forceclis.forceios, IosVersionCommand);
     }
 }
+
+IosVersionCommand.description = OclifAdapter.formatDescription(IosVersionCommand.command.description,
+  IosVersionCommand.command.help);
+
+IosVersionCommand.longDescription = IosVersionCommand.command.longDescription;
+IosVersionCommand.hidden = IosVersionCommand.command.hidden;
+IosVersionCommand.flags = OclifAdapter.toFlags(IosVersionCommand.command.args);
 
 exports.IosVersionCommand = IosVersionCommand;
