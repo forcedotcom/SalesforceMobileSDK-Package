@@ -1,0 +1,8 @@
+#!/usr/bin/env node
+
+// THis is needed to support debugging code that spawns node processes. If you start a node process it will
+// inherit the parent process' debug settings.
+process.env.NODE_OPTIONS = '--inspect=0';
+
+require('@oclif/command').run().catch(require('@oclif/errors/handle'));
+

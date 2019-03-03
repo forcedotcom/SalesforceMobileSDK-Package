@@ -55,10 +55,11 @@ function getArgsExpanded(cli, commandName) {
                  promptIf: arg.promptIf,
                  required: arg.required === undefined ? true : arg.required,
                  hasValue: arg.hasValue === undefined ? true : arg.hasValue,
-                 hidden: arg.description == null
+                 hidden: applyCli(arg.hidden, cli),
+                 type: arg.type
              })
             );
-    
+
 }
 
 function getCommandExpanded(cli, commandName) {
@@ -75,7 +76,7 @@ function getCommandExpanded(cli, commandName) {
 function readConfig(args, cli, handler) {
     var commandLineArgs = args.slice(2, args.length);
     var commandName = commandLineArgs.shift();
-    commandName = commandName ? commandName.toLowerCase() : commandName; 
+    commandName = commandName ? commandName.toLowerCase() : commandName;
 
     var processorList = null;
 
@@ -84,8 +85,8 @@ function readConfig(args, cli, handler) {
         printVersion(cli);
         process.exit(0);
         break;
-    case SDK.commands.create.name: 
-    case SDK.commands.createwithtemplate.name: 
+    case SDK.commands.create.name:
+    case SDK.commands.createwithtemplate.name:
         processorList = createArgsProcessorList(cli, commandName);
         break;
     case SDK.commands.listtemplates.name:
@@ -108,7 +109,7 @@ function printArgs(cli, commandName) {
     getArgsExpanded(cli, commandName)
         .filter(arg => !arg.hidden)
         .forEach(arg => logInfo('    ' + (!arg.required  ? '[' : '') + '--' + arg.name + '=' + arg.description + (!arg.required ? ']' : ''), COLOR.magenta));
-}    
+}
 
 function listTemplates(cli) {
     var cliName = cli.name;
@@ -128,7 +129,7 @@ function usage(cli) {
     var cliVersion = SDK.version;
     var appTypes = cli.appTypes;
     var platforms = cli.platforms;
-    
+
     logInfo('\n' + cliName + ': Tool for building ' + cli.purpose + ' using Salesforce Mobile SDK', COLOR.cyan);
     logInfo('\nUsage:\n', COLOR.cyan);
     for (var i=0; i<cli.commands.length; i++) {
@@ -171,10 +172,10 @@ function createArgsProcessorList(cli, commandName) {
 // * argProcessorList: ArgProcessorList
 // * argName: string, name of argument
 // * prompt: string for prompt
-// * error: function 
+// * error: function
 // * validation: function or null (no validation)
 // * preprocessor: function or null
-// 
+//
 function addProcessorFor(argProcessorList, argName, prompt, error, validation, preprocessor) {
     argProcessorList.addArgProcessor(argName, prompt, function(val) {
         val = val.trim();
