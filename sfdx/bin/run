@@ -4,5 +4,6 @@
 // inherit the parent process' debug settings resulting in a port in use error. Un-comment to work around.
 // process.env.NODE_OPTIONS = '--inspect=0';
 
-require('@oclif/command').run().catch(require('@oclif/errors/handle'));
-
+require('@oclif/command').run()
+  .then(require('@oclif/command/flush'))
+  .catch(require('@oclif/errors/handle'));
