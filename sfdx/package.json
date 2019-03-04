@@ -58,6 +58,6 @@
         "commands": "./oclif"
     },
     "scripts": {
-        "prepare": "oclif-dev manifest"
+        "prepare": "node_modules/.bin/oclif-dev manifest"
     }
 }
