@@ -3,3 +3,4 @@ package-lock.json
 sfdx/yarn.lock
 tmp*/
 .idea
+**/oclif.manifest.json

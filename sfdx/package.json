@@ -21,12 +21,19 @@
         }
     ],
     "engines": {
-        "node": ">=8.4.0"
+        "node": ">=8.10.0"
     },
     "dependencies": {
         "@oclif/command": "1",
         "@oclif/config": "1",
-        "@salesforce/core": "^1.0.1"
+        "@oclif/errors": "1",
+        "@oclif/plugin-help": "2",
+        "@salesforce/core": "^1.1.2",
+        "globby": "^9.0.0",
+        "shelljs": "0.7.0"
+    },
+    "devDependencies": {
+        "@oclif/dev-cli": "^1"
     },
     "repository": {
         "type": "git",
@@ -43,10 +50,15 @@
         }
     ],
     "files": [
-        "/index.js",
-        "/shared/**/*.js"
+        "/shared/**/*.js",
+        "/oclif/**/*.js",
+        "/bin"
     ],
     "oclif": {
         "commands": "./oclif"
+    },
+    "scripts": {
+        "prepare": "oclif-dev manifest",
+        "clean": "node scripts/clean.js"
     }
 }
