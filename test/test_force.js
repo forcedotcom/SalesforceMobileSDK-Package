@@ -39,6 +39,7 @@ main(process.argv);
 // Main function
 //
 function main(args) {
+    process.env.NODE_ENV = 'development'; // This is needed so the sfdx dependencies get installed. (Need node_modules/.bin/oclif-dev)
     var commandLineArgs = process.argv.slice(2, args.length);
     var parsedArgs = commandLineUtils.parseArgs(commandLineArgs);
 
@@ -55,7 +56,7 @@ function main(args) {
     var chosenClis = cleanSplit(parsedArgs.cli, ',');
 
     var testingWithOS = chosenOperatingSystems.length > 0;
-    var testingWithClis = chosenClis.length > 0;    
+    var testingWithClis = chosenClis.length > 0;
     var testingWithAppType = chosenAppTypes.length > 0;
     var testingWithTemplate = templateRepoUri != '';
 
@@ -97,10 +98,10 @@ function main(args) {
         }
         else {
             // Getting appType if template specified
-            if (testingWithTemplate) {	
+            if (testingWithTemplate) {
                 chosenAppTypes = [templateHelper.getAppTypeFromTemplate(templateRepoUri)];
             }
-            
+
             for (var cliName in SDK.forceclis) {
                 var cli = SDK.forceclis[cliName];
                 if (cli.platforms.some(p=>chosenOperatingSystems.indexOf(p)>=0)
@@ -114,7 +115,7 @@ function main(args) {
 
         for (var i=0; i<forceClis.length; i++) {
             var cli = forceClis[i];
-            
+
             if (testProduction) {
                 // Install forcexxx package
                 installPublishedForceCli(tmpDir, cli);
@@ -169,7 +170,7 @@ function main(args) {
                     createCompileApp(tmpDir, os, appType, null, pluginRepoUri, useSfdxRequested);
                 }
             }
-            
+
             if (testingWithTemplate) {
                 // NB: chosenAppTypes[0] is appType from template
                 createCompileApp(tmpDir, os, chosenAppTypes[0], templateRepoUri, pluginRepoUri, useSfdxRequested);
@@ -208,7 +209,7 @@ function shortUsage(exitCode) {
 
 function usage(exitCode) {
     shortUsage();
-    
+
     utils.logInfo('  If a cli is targeted:', COLOR.cyan);
     utils.logInfo('  - generates cli package and deploys it to a temporary directory', COLOR.cyan);
     utils.logInfo('  - fetches list of applicable templates for that cli', COLOR.cyan);
@@ -305,7 +306,7 @@ function createCompileApp(tmpDir, os, actualAppType, templateRepoUri, pluginRepo
     if (templateName && templateName.indexOf('HybridRemoteTemplate') == 0) {
         // XXX createwithtemplate doesn't work for hybrid remote template
         //     because the arg validation only accept startpage if apptype is available as an arg
-        // 
+        //
         // As a work around, we make sure create with --apptype=xxx is called instead of createwithtemplate
         templateRepoUri = null;
     }
