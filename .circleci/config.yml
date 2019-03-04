@@ -61,12 +61,15 @@ linux: &linux
     - GRADLE_OPTS: '-Dorg.gradle.daemon=false -Dorg.gradle.jvmargs="-XX:+HeapDumpOnOutOfMemoryError"'
     - ANDROID_NDK: '/opt/ndk/android-ndk-r10e'
     - BUILD_THREADS: 2
+    - NODE_ENV: development
 
 mac: &mac
   working_directory: ~/SalesforceMobileSDK-Package
   macos:
     xcode: "10.0.0"
   shell: /bin/bash --login -eo pipefail
+  environment:
+    - NODE_ENV: development
 
 version: 2
 jobs:

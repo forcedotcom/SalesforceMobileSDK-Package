@@ -39,7 +39,6 @@ main(process.argv);
 // Main function
 //
 function main(args) {
-    process.env.NODE_ENV = 'development'; // This is needed so the sfdx dependencies get installed. (Need node_modules/.bin/oclif-dev)
     var commandLineArgs = process.argv.slice(2, args.length);
     var parsedArgs = commandLineUtils.parseArgs(commandLineArgs);
 
