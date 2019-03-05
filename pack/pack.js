@@ -12,9 +12,9 @@ var path = require('path'),
 // Calling main
 main(process.argv);
 
-// 
+//
 // Main function
-// 
+//
 function main(args) {
     var commandLineArgs = process.argv.slice(2, args.length);
     var parsedArgs = commandLineUtils.parseArgs(commandLineArgs);
@@ -47,12 +47,12 @@ function main(args) {
 
 //
 // Create package with name from dir
-// 
+//
 function pack(name, relativeDir) {
     var packageName = name + '-' + SDK.version + '.tgz';
 
     utils.logInfo('Creating ' + packageName, COLOR.green);
-    
+
     // Packing
     var packageRepoDir = path.join(__dirname, '..');
     var dir = path.join(packageRepoDir, relativeDir);
@@ -61,6 +61,7 @@ function pack(name, relativeDir) {
     // npm pack doesn't following links
     utils.removeFile(sharedDir);
     shelljs.cp('-R', path.join(packageRepoDir, 'shared'), dir);
+    utils.runProcessThrowError('npm install @oclif/dev-cli', dir);// This is needed for npm prepack
     utils.runProcessThrowError('npm pack', dir);
     utils.removeFile(sharedDir);
     shelljs.ln('-s', path.join('..', 'shared'), sharedDir);
@@ -69,7 +70,7 @@ function pack(name, relativeDir) {
     utils.moveFile(path.join(dir, packageName), packageName);
 }
 
-// 
+//
 // Like split, but splitting null returns [] instead of throwing an error
 //                 splitting '' returns [] instead of ['']
 //
