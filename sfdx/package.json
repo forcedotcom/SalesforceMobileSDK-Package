@@ -28,12 +28,10 @@
         "@oclif/config": "1",
         "@oclif/errors": "1",
         "@oclif/plugin-help": "2",
+        "@oclif/dev-cli": "^1",
         "@salesforce/core": "^1.1.2",
         "globby": "^9.0.0",
         "shelljs": "0.7.0"
-    },
-    "devDependencies": {
-        "@oclif/dev-cli": "^1"
     },
     "repository": {
         "type": "git",
