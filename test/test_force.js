@@ -259,11 +259,7 @@ function installPublishedForceCli(tmpDir, forcecli) {
 // Create and deploy sfdx plugin
 //
 function createDeploySfdxPluginPackage(tmpDir) {
-    var parentPath = path.join(__dirname, '..');
-
-    var packJs = path.join(parentPath, 'pack', 'pack.js');
-
-    utils.runProcessCatchError(`node install.js`, 'finshed installing dependecies', parentPath);
+    var packJs = path.join(__dirname, '..', 'pack', 'pack.js');
     utils.runProcessThrowError('node ' + packJs + ' --sfdx-plugin');
     utils.logInfo('Npm installing sfdx-mobilesdk-plugin-' + SDK.version + '.tgz', COLOR.green);
     utils.runProcessThrowError('npm install --prefix ' + tmpDir + ' ' + 'sfdx-mobilesdk-plugin-' + SDK.version + '.tgz');
