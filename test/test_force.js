@@ -263,10 +263,10 @@ function createDeploySfdxPluginPackage(tmpDir) {
     var packJs = path.join(__dirname, '..', 'pack', 'pack.js');
     utils.runProcessThrowError('node ' + packJs + ' --sfdx-plugin');
     utils.logInfo('Npm installing sfdx-mobilesdk-plugin-' + SDK.version + '.tgz', COLOR.green);
-    utils.runProcessThrowError('sudo npm install --prefix ' + tmpDir + ' ' + 'sfdx-mobilesdk-plugin-' + SDK.version + '.tgz');
+    utils.runProcessThrowError('npm install --prefix ' + tmpDir + ' ' + 'sfdx-mobilesdk-plugin-' + SDK.version + '.tgz');
     utils.runProcessCatchError('sfdx plugins:uninstall sfdx-mobilesdk-plugin');
     utils.logInfo('Sfdx linking sfdx-mobilesdk-plugin', COLOR.green);
-    utils.runProcessThrowError('sudo sfdx plugins:link ' + tmpDir + '/node_modules/sfdx-mobilesdk-plugin');
+    utils.runProcessThrowError('sfdx plugins:link ' + tmpDir + '/node_modules/sfdx-mobilesdk-plugin');
 }
 
 //
