@@ -30,6 +30,7 @@ var SDK = require('./shared/constants'),
     configHelper = require('./shared/configHelper'),
     logError = require('./shared/utils').logError,
     logInfo = require('./shared/utils').logInfo,
+    checkToolVersion = require('./shared/utils').checkToolVersion,
     templateHelper = require('./shared/templateHelper'),
     COLOR = require('./shared/outputColors');
 
@@ -113,6 +114,10 @@ function getCommands() {
                 help: command.help,
                 flags: command.args,
                 run(context) {
+                    // Fail if sfdx cli version not supported
+                    var sfdxTool = SDK.tools['sfdx']
+                    checkToolVersion(sfdxTool.checkCmd, sfdxTool.minVersion, sfdxTool.maxVersion);
+
                     if (validateCommand(this.cli, this.command, context.flags)) {
                         runCommand(this.cli, this.command, context.flags);
                     }
