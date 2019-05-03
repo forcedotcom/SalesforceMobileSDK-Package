@@ -51,11 +51,6 @@ module.exports = {
             minVersion: '1.2',
             maxVersion: '1.6'
         },
-        sfdx: {
-            checkCmd: 'sfdx --version',
-            minVersion: '6.0',
-            maxVersion: '6.56'
-        },
         cordova: {
             checkCmd: 'cordova -v',
             pluginRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-CordovaPlugin#dev',    // dev
