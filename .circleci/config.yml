@@ -53,7 +53,7 @@ aliases:
 linux: &linux
   working_directory: ~/SalesforceMobileSDK-Package
   docker:
-    - image: circleci/android:api-28-node8
+    - image: circleci/android:api-28-node
   environment:
     - TERM: "dumb"
     - ADB_INSTALL_TIMEOUT: 15
