@@ -377,7 +377,7 @@ function createCompileApp(tmpDir, os, actualAppType, templateRepoUri, pluginRepo
             var workspacePath = path.join(appDir, appName + '.xcworkspace');
             utils.runProcessCatchError('xcodebuild -workspace ' + workspacePath
                                        + ' -scheme ' + appName
-                                       + ' clean build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO',
+                                       + ' clean build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO',
                                        'COMPILING ' + target);
         }
         else {
