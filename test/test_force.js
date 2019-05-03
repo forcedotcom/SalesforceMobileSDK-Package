@@ -11,8 +11,7 @@ var spawnSync = require('child_process').spawnSync,
     utils = require('../shared/utils'),
     templateHelper = require('../shared/templateHelper.js'),
     SDK = require('../shared/constants'),
-    COLOR = require('../shared/outputColors'),
-    SDK = require('../shared/constants')
+    COLOR = require('../shared/outputColors')
 ;
 
 // Enums
