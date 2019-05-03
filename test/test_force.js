@@ -54,7 +54,7 @@ function main(args) {
     var chosenClis = cleanSplit(parsedArgs.cli, ',');
 
     var testingWithOS = chosenOperatingSystems.length > 0;
-    var testingWithClis = chosenClis.length > 0;    
+    var testingWithClis = chosenClis.length > 0;
     var testingWithAppType = chosenAppTypes.length > 0;
     var testingWithTemplate = templateRepoUri != '';
 
@@ -96,10 +96,10 @@ function main(args) {
         }
         else {
             // Getting appType if template specified
-            if (testingWithTemplate) {	
+            if (testingWithTemplate) {
                 chosenAppTypes = [templateHelper.getAppTypeFromTemplate(templateRepoUri)];
             }
-            
+
             for (var cliName in SDK.forceclis) {
                 var cli = SDK.forceclis[cliName];
                 if (cli.platforms.some(p=>chosenOperatingSystems.indexOf(p)>=0)
@@ -113,7 +113,7 @@ function main(args) {
 
         for (var i=0; i<forceClis.length; i++) {
             var cli = forceClis[i];
-            
+
             if (testProduction) {
                 // Install forcexxx package
                 installPublishedForceCli(tmpDir, cli);
@@ -168,7 +168,7 @@ function main(args) {
                     createCompileApp(tmpDir, os, appType, null, pluginRepoUri, useSfdxRequested);
                 }
             }
-            
+
             if (testingWithTemplate) {
                 // NB: chosenAppTypes[0] is appType from template
                 createCompileApp(tmpDir, os, chosenAppTypes[0], templateRepoUri, pluginRepoUri, useSfdxRequested);
@@ -207,7 +207,7 @@ function shortUsage(exitCode) {
 
 function usage(exitCode) {
     shortUsage();
-    
+
     utils.logInfo('  If a cli is targeted:', COLOR.cyan);
     utils.logInfo('  - generates cli package and deploys it to a temporary directory', COLOR.cyan);
     utils.logInfo('  - fetches list of applicable templates for that cli', COLOR.cyan);
@@ -266,7 +266,18 @@ function createDeploySfdxPluginPackage(tmpDir) {
     utils.runProcessThrowError('npm install --prefix ' + tmpDir + ' ' + 'sfdx-mobilesdk-plugin-' + SDK.version + '.tgz');
     utils.runProcessCatchError('sfdx plugins:uninstall sfdx-mobilesdk-plugin');
     utils.logInfo('Sfdx linking sfdx-mobilesdk-plugin', COLOR.green);
+
+    var oclifManifestPath = path.join(__dirname, '..', 'sfdx', 'oclif.manifest.json');
+    var mobileSdkTmpPath = path.join(tmpDir, 'node_modules', 'sfdx-mobilesdk-plugin');
+
+    utils.runProcessThrowError(`ls ${oclifManifestPath}`);
+
+    console.log(`Copying file: ${oclifManifestPath} to ${mobileSdkTmpPath}`);
+
+    // Gotta copy the oclif manifest to the target link folder.
+    utils.runProcessThrowError(`cp ${oclifManifestPath} ${mobileSdkTmpPath}`);
     utils.runProcessThrowError('sfdx plugins:link ' + tmpDir + '/node_modules/sfdx-mobilesdk-plugin');
+    console.log('-- Finished plugins link --');
 }
 
 //
@@ -304,7 +315,7 @@ function createCompileApp(tmpDir, os, actualAppType, templateRepoUri, pluginRepo
     if (templateName && templateName.indexOf('HybridRemoteTemplate') == 0) {
         // XXX createwithtemplate doesn't work for hybrid remote template
         //     because the arg validation only accept startpage if apptype is available as an arg
-        // 
+        //
         // As a work around, we make sure create with --apptype=xxx is called instead of createwithtemplate
         templateRepoUri = null;
     }
