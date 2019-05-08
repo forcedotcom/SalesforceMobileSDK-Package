@@ -30,7 +30,8 @@ var path = require('path'),
     SDK = require('./constants'),
     utils = require('./utils'),
     configHelper = require('./configHelper'),
-    prepareTemplate = require('./templateHelper').prepareTemplate;
+    prepareTemplate = require('./templateHelper').prepareTemplate,
+    shelljs = require('shelljs');
 
 //
 // Helper for native application creation
@@ -82,6 +83,22 @@ function createHybridApp(config) {
     // Run cordova prepare
     utils.runProcessThrowError('cordova prepare', config.projectDir);
 
+    if (config.platform === 'ios') {
+        var xcSettingsDir = path.join(config.projectDir,'/platforms/ios' + '/' + config.appname + '.xcworkspace','xcshareddata')
+        var xcSettingsFile = path.join(xcSettingsDir, 'WorkspaceSettings.xcsettings')
+        var plistFileContent = '<?xml version="1.0" encoding="UTF-8"?>\n' +
+                               '<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">\n' +
+                               '<plist version="1.0">\n' + 
+                               '<dict>\n'  +
+                               '<key>BuildSystemType</key>\n' + 
+                               '<string>Original</string>\n' + 
+                               '</dict>\n' + 
+                               '</plist>\n';
+        utils.logInfo("Creating WorkspaceSettings.xcsettings for project. Setting the BuildSystemType to original in " + xcSettingsFile);
+        shelljs.ShellString(plistFileContent).to(xcSettingsFile)
+        utils.logInfo("Created WorkspaceSettings.xcsettings for project " + config.appname);
+    }
+   
     // Done
     return prepareResult;
 
