@@ -31,7 +31,7 @@ var path = require('path'),
     utils = require('./utils'),
     configHelper = require('./configHelper'),
     prepareTemplate = require('./templateHelper').prepareTemplate,
-    shelljs = require('shelljs');
+    fs = require('fs');
 
 //
 // Helper for native application creation
@@ -95,7 +95,7 @@ function createHybridApp(config) {
                                '</dict>\n' + 
                                '</plist>\n';
         utils.logInfo("Creating WorkspaceSettings.xcsettings for project. Setting the BuildSystemType to original in " + xcSettingsFile);
-        shelljs.ShellString(plistFileContent).to(xcSettingsFile)
+        fs.writeFileSync(xcSettingsFile,plistFileContent,'utf8');
         utils.logInfo("Created WorkspaceSettings.xcsettings for project " + config.appname);
     }
    
