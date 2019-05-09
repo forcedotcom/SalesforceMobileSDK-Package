@@ -386,7 +386,7 @@ function createCompileApp(tmpDir, os, actualAppType, templateRepoUri, pluginRepo
     } else if (isHybrid) {
         workspaceDir = path.join(outputDir, 'platforms', os);
         if (isHybridRemote) {
-            utils.runProcessCatchError("grep '\"startPage\": \"" + defaultStartPage + "\"' "  + path.join(workspaceDir, 'www', 'bootconfig.json'),  "bootconfig.json should be updated to reflect user input remote url.");
+            utils.runProcessCatchError("grep '\"startPage\": \"" + defaultStartPage + "\"' "  + path.join(outputDir, 'www', 'bootconfig.json'),  "bootconfig.json should be updated to reflect user input remote url.");
         }
 
     } else if (isReactNative) {
