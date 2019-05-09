@@ -379,39 +379,38 @@ function createCompileApp(tmpDir, os, actualAppType, templateRepoUri, pluginRepo
     }
 
     // App dir
-    var appDir = actualAppType === APP_TYPE.react_native ? path.join(outputDir, os) : outputDir;
-
+    var workspaceDir;
     // Compilation
-    if (isNative || isReactNative) {
-        if (os == OS.ios) {
-            // IOS - Native
-            var workspacePath = path.join(appDir, appName + '.xcworkspace');
-            utils.runProcessCatchError('xcodebuild -workspace ' + workspacePath
-                                       + ' -scheme ' + appName
-                                       + ' clean build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO',
-                                       'COMPILING ' + target);
+    if (isNative) {
+        workspaceDir = outputDir;
+    } else if (isHybrid) {
+        workspaceDir = path.join(outputDir, 'platforms', os);
+        if (isHybridRemote) {
+            utils.runProcessCatchError("grep '\"startPage\": \"" + defaultStartPage + "\"' "  + path.join(workspaceDir, 'www', 'bootconfig.json'),  "bootconfig.json should be updated to reflect user input remote url.");
         }
-        else {
-            // Android - Native
-            var appDir = actualAppType === APP_TYPE.react_native ? path.join(outputDir, os) : outputDir;
-            var gradle = isWindows() ? '.\\gradlew.bat' : './gradlew';
-            utils.runProcessCatchError(gradle + ' assembleDebug', 'COMPILING ' + target, appDir);
-        }
+
+    } else if (isReactNative) {
+        workspaceDir = path.join(outputDir, os);
+    }
+    
+    if (os == OS.ios) {
+        buildForiOS(target, workspaceDir, appName);
     }
     else {
-        if (isHybridRemote) {
-            utils.runProcessCatchError("grep '\"startPage\": \"" + defaultStartPage + "\"' "  + appDir + '/www/bootconfig.json',  "bootconfig.json should be updated to reflect user input remote url.");
-        }
-        if (os == OS.ios) {
-            // IOS - Hybrid
-            utils.runProcessCatchError('cordova build', 'COMPILING ' + target, appDir);
-        }
-        else {
-            // Android - Hybrid
-            var gradle = isWindows() ? '.\\gradlew.bat' : './gradlew';
-            utils.runProcessCatchError(gradle + ' assembleDebug', 'COMPILING ' + target, path.join(appDir, 'platforms', 'android'));
-        }
+        buildForAndroid(target, workspaceDir);
     }
+}
+
+function buildForiOS(target, workspaceDir, appName) {
+    utils.runProcessCatchError('xcodebuild -workspace ' + path.join(workspaceDir, appName + '.xcworkspace')
+                               + ' -scheme ' + appName
+                               + ' clean build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO',
+                               'COMPILING ' + target);
+}
+
+function buildForAndroid(target, workspaceDir) {
+    var gradle = isWindows() ? '.\\gradlew.bat' : './gradlew';
+    utils.runProcessCatchError(gradle + ' assembleDebug', 'COMPILING ' + target, workspaceDir);
 }
 
 //
