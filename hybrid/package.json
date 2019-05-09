@@ -1,43 +1,23 @@
 {
-				"name": "forcehybrid",
-				"version": "7.1.0",
-				"description": "Utilities for creating hybrid mobile apps based on the Salesforce Mobile SDK for iOS and Android",
-				"keywords": [
-								"mobilesdk",
-								"ios",
-								"android",
-								"hybrid",
-								"salesforce",
-								"mobile",
-								"sdk"
-				],
-				"homepage": "https://github.com/forcedotcom/SalesforceMobileSDK-Package",
-				"bugs": "https://github.com/forcedotcom/SalesforceMobileSDK-Package/issues",
-				"licenses": [
-								{
-												"type": "Salesforce.com Mobile SDK License",
-												"url": "https://github.com/forcedotcom/SalesforceMobileSDK-iOS/blob/master/LICENSE.md"
-								}
-				],
-				"bin": {
-								"forcehybrid": "forcehybrid.js"
-				},
-				"dependencies": {
-								"@oclif/dev-cli": "^1.22.0",
-								"shelljs": "~0.7.0"
-				},
-				"repository": {
-								"type": "git",
-								"url": "https://github.com/forcedotcom/SalesforceMobileSDK-Package.git"
-				},
-				"author": {
-								"name": "Wolfgang Mathurin",
-								"email": "wmathurin@salesforce.com"
-				},
-				"contributors": [
-								{
-												"name": "Bharath Hariharan",
-												"email": "bhariharan@salesforce.com"
-								}
-				]
+	"name": "forcehybrid",
+	"version": "7.1.0",
+	"description": "Utilities for creating hybrid mobile apps based on the Salesforce Mobile SDK for iOS and Android",
+	"keywords": [ "mobilesdk", "ios", "android", "hybrid", "salesforce", "mobile", "sdk" ],
+	"homepage": "https://github.com/forcedotcom/SalesforceMobileSDK-Package",
+	"bugs": "https://github.com/forcedotcom/SalesforceMobileSDK-Package/issues",
+	"licenses" : [
+	    { "type": "Salesforce.com Mobile SDK License", "url": "https://github.com/forcedotcom/SalesforceMobileSDK-iOS/blob/master/LICENSE.md" }
+	],
+	"bin" : { "forcehybrid" : "forcehybrid.js" },
+    "dependencies": {
+        "shelljs": "~0.7.0"
+    },
+	"repository": {
+		"type" : "git",
+		"url" : "https://github.com/forcedotcom/SalesforceMobileSDK-Package.git"
+	},
+	"author": { "name": "Wolfgang Mathurin", "email": "wmathurin@salesforce.com" },
+	"contributors": [
+        { "name": "Bharath Hariharan", "email": "bhariharan@salesforce.com" }
+    ]
 }
