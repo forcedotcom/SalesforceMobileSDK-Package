@@ -7,8 +7,8 @@ echo "$1" >> README.md
 run() {
 echo "\`\`\`" >> README.md
 echo "-> $1" >> README.md
-# removing colors, make sure to install gnu-sed (brew install gnu-sed --with-default-names)
-$1 | sed -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[mGK]//g" >> README.md
+# removing colors, make sure to install gnu-sed (brew install gnu-sed)
+$1 | gsed -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[mGK]//g" >> README.md
 echo "\`\`\`" >> README.md
 echo "" >> README.md
 }
