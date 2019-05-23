@@ -30,7 +30,8 @@ var path = require('path'),
     SDK = require('./constants'),
     utils = require('./utils'),
     configHelper = require('./configHelper'),
-    prepareTemplate = require('./templateHelper').prepareTemplate;
+    prepareTemplate = require('./templateHelper').prepareTemplate,
+    fs = require('fs');
 
 //
 // Helper for native application creation
@@ -65,7 +66,7 @@ function createHybridApp(config) {
     utils.runProcessThrowError('cordova plugin add ' + config.cordovaPluginRepoUri + ' --force', config.projectDir);
 
     // Web directory - the home for the template
-    var webDir = path.join(config.projectDir, 'www')    
+    var webDir = path.join(config.projectDir, 'www');
     
     // Remove the default Cordova app.
     utils.removeFile(webDir);
@@ -82,6 +83,29 @@ function createHybridApp(config) {
     // Run cordova prepare
     utils.runProcessThrowError('cordova prepare', config.projectDir);
 
+    if (config.platform === 'ios') {
+        var xcSettingsFile = path.join(config.projectDir,'platforms', 'ios', config.appname + '.xcworkspace', 'xcshareddata', 'WorkspaceSettings.xcsettings');
+        var plistFileContent = '<?xml version="1.0" encoding="UTF-8"?>\n' +
+                               '<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">\n' +
+                               '<plist version="1.0">\n' + 
+                               '<dict>\n'  +
+                               '<key>BuildSystemType</key>\n' + 
+                               '<string>Original</string>\n' + 
+                               '</dict>\n' + 
+                               '</plist>\n';
+        utils.logInfo('Creating WorkspaceSettings.xcsettings for project. Setting the BuildSystemType to original in ' + xcSettingsFile);
+        fs.writeFileSync(xcSettingsFile,plistFileContent,'utf8');
+        utils.logInfo('Created WorkspaceSettings.xcsettings for project ' + config.appname);
+
+        // Removing libCordova.a from build (it causes issues e.g. CDVWKWebViewEngine won't register as plugin because it won't be recognized as a kind of CDVPlugin)
+        utils.logInfo('Updating xcode project file');
+        var xcodeProjectFile = path.join(config.projectDir,'platforms', 'ios', config.appname + '.xcodeproj', 'project.pbxproj')
+        var xcodeProjectFileContent = fs.readFileSync(xcodeProjectFile, 'utf8');
+        var newXcodeProjectFileContent = xcodeProjectFileContent.split('\n').filter(line => line.indexOf('libCordova.a in Frameworks') == -1).join('\n');
+        fs.writeFileSync(xcodeProjectFile, newXcodeProjectFileContent);
+        utils.logInfo('Updated  xcode project file');
+    }
+   
     // Done
     return prepareResult;
 

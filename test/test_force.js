@@ -11,8 +11,7 @@ var spawnSync = require('child_process').spawnSync,
     utils = require('../shared/utils'),
     templateHelper = require('../shared/templateHelper.js'),
     SDK = require('../shared/constants'),
-    COLOR = require('../shared/outputColors'),
-    SDK = require('../shared/constants')
+    COLOR = require('../shared/outputColors')
 ;
 
 // Enums
@@ -55,7 +54,7 @@ function main(args) {
     var chosenClis = cleanSplit(parsedArgs.cli, ',');
 
     var testingWithOS = chosenOperatingSystems.length > 0;
-    var testingWithClis = chosenClis.length > 0;    
+    var testingWithClis = chosenClis.length > 0;
     var testingWithAppType = chosenAppTypes.length > 0;
     var testingWithTemplate = templateRepoUri != '';
 
@@ -97,10 +96,10 @@ function main(args) {
         }
         else {
             // Getting appType if template specified
-            if (testingWithTemplate) {	
+            if (testingWithTemplate) {
                 chosenAppTypes = [templateHelper.getAppTypeFromTemplate(templateRepoUri)];
             }
-            
+
             for (var cliName in SDK.forceclis) {
                 var cli = SDK.forceclis[cliName];
                 if (cli.platforms.some(p=>chosenOperatingSystems.indexOf(p)>=0)
@@ -114,7 +113,7 @@ function main(args) {
 
         for (var i=0; i<forceClis.length; i++) {
             var cli = forceClis[i];
-            
+
             if (testProduction) {
                 // Install forcexxx package
                 installPublishedForceCli(tmpDir, cli);
@@ -169,7 +168,7 @@ function main(args) {
                     createCompileApp(tmpDir, os, appType, null, pluginRepoUri, useSfdxRequested);
                 }
             }
-            
+
             if (testingWithTemplate) {
                 // NB: chosenAppTypes[0] is appType from template
                 createCompileApp(tmpDir, os, chosenAppTypes[0], templateRepoUri, pluginRepoUri, useSfdxRequested);
@@ -208,7 +207,7 @@ function shortUsage(exitCode) {
 
 function usage(exitCode) {
     shortUsage();
-    
+
     utils.logInfo('  If a cli is targeted:', COLOR.cyan);
     utils.logInfo('  - generates cli package and deploys it to a temporary directory', COLOR.cyan);
     utils.logInfo('  - fetches list of applicable templates for that cli', COLOR.cyan);
@@ -267,7 +266,18 @@ function createDeploySfdxPluginPackage(tmpDir) {
     utils.runProcessThrowError('npm install --prefix ' + tmpDir + ' ' + 'sfdx-mobilesdk-plugin-' + SDK.version + '.tgz');
     utils.runProcessCatchError('sfdx plugins:uninstall sfdx-mobilesdk-plugin');
     utils.logInfo('Sfdx linking sfdx-mobilesdk-plugin', COLOR.green);
+
+    var oclifManifestPath = path.join(__dirname, '..', 'sfdx', 'oclif.manifest.json');
+    var mobileSdkTmpPath = path.join(tmpDir, 'node_modules', 'sfdx-mobilesdk-plugin');
+
+    utils.runProcessThrowError(`ls ${oclifManifestPath}`);
+
+    console.log(`Copying file: ${oclifManifestPath} to ${mobileSdkTmpPath}`);
+
+    // Gotta copy the oclif manifest to the target link folder.
+    utils.runProcessThrowError(`cp ${oclifManifestPath} ${mobileSdkTmpPath}`);
     utils.runProcessThrowError('sfdx plugins:link ' + tmpDir + '/node_modules/sfdx-mobilesdk-plugin');
+    console.log('-- Finished plugins link --');
 }
 
 //
@@ -289,7 +299,7 @@ function updatePluginRepo(tmpDir, os, pluginRepoDir, sdkBranch) {
 }
 
 function cleanName(name) {
-    return name.replace('#', '_').replace('-', '_');
+    return name.replace(/[#-\.]/g, '_')
 }
 
 //
@@ -305,7 +315,7 @@ function createCompileApp(tmpDir, os, actualAppType, templateRepoUri, pluginRepo
     if (templateName && templateName.indexOf('HybridRemoteTemplate') == 0) {
         // XXX createwithtemplate doesn't work for hybrid remote template
         //     because the arg validation only accept startpage if apptype is available as an arg
-        // 
+        //
         // As a work around, we make sure create with --apptype=xxx is called instead of createwithtemplate
         templateRepoUri = null;
     }
@@ -369,39 +379,38 @@ function createCompileApp(tmpDir, os, actualAppType, templateRepoUri, pluginRepo
     }
 
     // App dir
-    var appDir = actualAppType === APP_TYPE.react_native ? path.join(outputDir, os) : outputDir;
-
+    var workspaceDir;
     // Compilation
-    if (isNative || isReactNative) {
-        if (os == OS.ios) {
-            // IOS - Native
-            var workspacePath = path.join(appDir, appName + '.xcworkspace');
-            utils.runProcessCatchError('xcodebuild -workspace ' + workspacePath
-                                       + ' -scheme ' + appName
-                                       + ' clean build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO',
-                                       'COMPILING ' + target);
+    if (isNative) {
+        workspaceDir = outputDir;
+    } else if (isHybrid) {
+        workspaceDir = path.join(outputDir, 'platforms', os);
+        if (isHybridRemote) {
+            utils.runProcessCatchError("grep '\"startPage\": \"" + defaultStartPage + "\"' "  + path.join(outputDir, 'www', 'bootconfig.json'),  "bootconfig.json should be updated to reflect user input remote url.");
         }
-        else {
-            // Android - Native
-            var appDir = actualAppType === APP_TYPE.react_native ? path.join(outputDir, os) : outputDir;
-            var gradle = isWindows() ? '.\\gradlew.bat' : './gradlew';
-            utils.runProcessCatchError(gradle + ' assembleDebug', 'COMPILING ' + target, appDir);
-        }
+
+    } else if (isReactNative) {
+        workspaceDir = path.join(outputDir, os);
+    }
+    
+    if (os == OS.ios) {
+        buildForiOS(target, workspaceDir, appName);
     }
     else {
-        if (isHybridRemote) {
-            utils.runProcessCatchError("grep '\"startPage\": \"" + defaultStartPage + "\"' "  + appDir + '/www/bootconfig.json',  "bootconfig.json should be updated to reflect user input remote url.");
-        }
-        if (os == OS.ios) {
-            // IOS - Hybrid
-            utils.runProcessCatchError('cordova build', 'COMPILING ' + target, appDir);
-        }
-        else {
-            // Android - Hybrid
-            var gradle = isWindows() ? '.\\gradlew.bat' : './gradlew';
-            utils.runProcessCatchError(gradle + ' assembleDebug', 'COMPILING ' + target, path.join(appDir, 'platforms', 'android'));
-        }
+        buildForAndroid(target, workspaceDir);
     }
+}
+
+function buildForiOS(target, workspaceDir, appName) {
+    utils.runProcessCatchError('xcodebuild -workspace ' + path.join(workspaceDir, appName + '.xcworkspace')
+                               + ' -scheme ' + appName
+                               + ' clean build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO',
+                               'COMPILING ' + target);
+}
+
+function buildForAndroid(target, workspaceDir) {
+    var gradle = isWindows() ? '.\\gradlew.bat' : './gradlew';
+    utils.runProcessCatchError(gradle + ' assembleDebug', 'COMPILING ' + target, workspaceDir);
 }
 
 //

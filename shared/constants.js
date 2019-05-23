@@ -28,7 +28,7 @@
 var path = require('path'),
     shelljs = require('shelljs');
 
-var VERSION = '7.0.0';
+var VERSION = '7.1.0';
 
 module.exports = {
     version: VERSION,
@@ -40,8 +40,7 @@ module.exports = {
         },
         node: {
             checkCmd: 'node --version',
-            minVersion: '6.9',
-            maxVersion: '11.1'
+            minVersion: '6.9'
         },
         npm: {
             checkCmd: 'npm -v',
@@ -54,12 +53,12 @@ module.exports = {
         },
         cordova: {
             checkCmd: 'cordova -v',
-            // pluginRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-CordovaPlugin#dev',    // dev
+            pluginRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-CordovaPlugin#dev',    // dev
             minVersion: '8.1.2',
-            pluginRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-CordovaPlugin#v' + VERSION, // GA
+            // pluginRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-CordovaPlugin#v' + VERSION, // GA
             platformVersion: {
-                ios: '4.5.5',
-                android: '7.1.2'
+                ios: '5.0.0',
+                android: '8.0.0'
             }
         }
     },
@@ -69,8 +68,8 @@ module.exports = {
         android: 'Android Studio'
     },
 
-    //templatesRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-Templates#dev',    // dev
-    templatesRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-Templates#v' + VERSION, // GA
+    templatesRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-Templates#dev',    // dev
+    // templatesRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-Templates#v' + VERSION, // GA
 
     forceclis: {
         forceios: {
@@ -85,7 +84,7 @@ module.exports = {
                 'native': 'iOSNativeTemplate',
                 'native_swift': 'iOSNativeSwiftTemplate'
             },
-            commands: ['create', 'createwithtemplate', 'version', 'listtemplates']            
+            commands: ['create', 'createwithtemplate', 'version', 'listtemplates']
         },
         forcedroid: {
             name: 'forcedroid',
@@ -99,7 +98,7 @@ module.exports = {
                 'native': 'AndroidNativeTemplate',
                 'native_kotlin': 'AndroidNativeKotlinTemplate'
             },
-            commands: ['create', 'createwithtemplate', 'version', 'listtemplates']            
+            commands: ['create', 'createwithtemplate', 'version', 'listtemplates']
         },
         forcehybrid: {
             name: 'forcehybrid',
@@ -113,7 +112,7 @@ module.exports = {
                 'hybrid_local': 'HybridLocalTemplate',
                 'hybrid_remote': 'HybridRemoteTemplate'
             },
-            commands: ['create', 'createwithtemplate', 'version', 'listtemplates']            
+            commands: ['create', 'createwithtemplate', 'version', 'listtemplates']
         },
         forcereact: {
             name: 'forcereact',
@@ -138,7 +137,8 @@ module.exports = {
             longDescription: cli => 'A comma-separated list of one or more platforms you support. The script creates a project for each platform you select. Available options are ' + cli.platforms.join(', ') + '.',
             prompt: cli => 'Enter the target platform(s) separated by commas (' + cli.platforms.join(', ') + '):',
             error: cli => val => 'Platform(s) must be in ' + cli.platforms.join(', '),
-            validate: cli => val => !val.split(",").some(p=>cli.platforms.indexOf(p) == -1)
+            validate: cli => val => !val.split(",").some(p=>cli.platforms.indexOf(p) == -1),
+            type: 'string'
         },
         appType: {
             name:'apptype',
@@ -148,7 +148,8 @@ module.exports = {
             prompt: cli => 'Enter your application type (' + cli.appTypes.join(' or ') + ', leave empty for ' + cli.appTypes[0] + '):',
             error: cli => val => 'App type must be ' + cli.appTypes.join(' or ') + '.',
             validate: cli => val => val === undefined || val === '' || cli.appTypes.indexOf(val) >=0,
-            required: false
+            required: false,
+            type: 'string'
         },
         templateRepoUri: {
             name:'templaterepouri',
@@ -157,7 +158,8 @@ module.exports = {
             longDescription: 'The URI of a repository that contains the template application to be used as the basis of your new app. See https://developer.salesforce.com/docs/atlas.en-us.mobile_sdk.meta/mobile_sdk/ios_new_project_template.htm for information on creating templates.',
             prompt: 'Enter URI of repo containing template application:',
             error: cli => val => 'Invalid value for template repo uri: \'' + val + '\'.',
-            validate: cli => val => /^\S+$/.test(val)
+            validate: cli => val => /^\S+$/.test(val),
+            type: 'string'
         },
         appName: {
             name: 'appname',
@@ -166,7 +168,8 @@ module.exports = {
             longDescription: 'A name for the app that conforms to the naming requirements for the platform.',
             prompt: 'Enter your application name:',
             error: cli => val => 'Invalid value for application name: \'' + val + '\'.',
-            validate: cli => val => (cli.platforms.indexOf('ios') != -1 ? /^[^\s-]+$/ : /^\S+$/).test(val)
+            validate: cli => val => (cli.platforms.indexOf('ios') != -1 ? /^[^\s-]+$/ : /^\S+$/).test(val),
+            type: 'string'
         },
         packageName: {
             name: 'packagename',
@@ -176,6 +179,7 @@ module.exports = {
             prompt: 'Enter your package name:',
             error: cli => val => '\'' + val + '\' is not a valid package name.',
             validate: cli => val => /^[a-z]+[a-z0-9_]*(\.[a-z]+[a-z0-9_]*)*$/.test(val),
+            type: 'string'
         },
         organization: {
             name: 'organization',
@@ -184,7 +188,8 @@ module.exports = {
             longDescription: 'The name of your company or organization. This string is user-defined and may contain spaces and punctuation.',
             prompt: 'Enter your organization name (Acme, Inc.):',
             error: cli => val => 'Invalid value for organization: \'' + val + '\'.',
-            validate: cli => val => /\S+/.test(val)
+            validate: cli => val => /\S+/.test(val),
+            type: 'string'
         },
         outputDir: {
             name:'outputdir',
@@ -194,7 +199,8 @@ module.exports = {
             prompt: 'Enter output directory for your app (leave empty for the current directory):',
             error: cli => val => 'Invalid value for output directory (directory must not already exist): \'' + val + '\'.',
             validate: cli => val => val === undefined || val === '' || !shelljs.test('-e', path.resolve(val)),
-            required:false
+            required:false,
+            type: 'string'
         },
         startPage: {
             name:'startpage',
@@ -205,22 +211,29 @@ module.exports = {
             error: cli => val => 'Invalid value for start page: \'' + val + '\'.',
             validate: cli => val => /\S+/.test(val),
             required: false,
-            promptIf: otherArgs => otherArgs.apptype === 'hybrid_remote'
+            promptIf: otherArgs => otherArgs.apptype === 'hybrid_remote',
+            type: 'string'
         },
         // Private args
         verbose: {
-            name:'verbose',
-            'char':'v',
-            hasValue:false,
-            required:false
+            name: 'verbose',
+            'char': 'v',
+            description: 'increase information output',
+            hasValue: false,
+            required: false,
+            type: 'boolean',
+            hidden: true
         },
         pluginRepoUri: {
-            name:'pluginrepouri',
-            'char':'v',
+            name: 'pluginrepouri',
+            description: 'supply a plugin repository uri',
+            'char': 'v',
             error: cli => val => 'Invalid value for plugin repo uri: \'' + val + '\'.',
             validate: cli => val => /.*/.test(val),
-            required:false
-        }  
+            required: false,
+            type: 'string',
+            hidden: true
+        }
     },
 
     commands: {

@@ -7,8 +7,8 @@ echo "$1" >> README.md
 run() {
 echo "\`\`\`" >> README.md
 echo "-> $1" >> README.md
-# removing colors, make sure to install gnu-sed (brew install gnu-sed --with-default-names)
-$1 | sed -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[mGK]//g" >> README.md
+# removing colors, make sure to install gnu-sed (brew install gnu-sed)
+$1 | gsed -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[mGK]//g" >> README.md
 echo "\`\`\`" >> README.md
 echo "" >> README.md
 }
@@ -17,6 +17,20 @@ cat <<EOT > README.md
 # sfdx-mobilesdk-plugin 
 
 A plugin for the Salesforce CLI to create mobile applications to interface with the [Salesforce Platform](http://www.salesforce.com/platform/overview/), leveraging the [Salesforce Mobile SDK for iOS](https://github.com/forcedotcom/SalesforceMobileSDK-iOS) and the [Salesforce Mobile SDK for Android](https://github.com/forcedotcom/SalesforceMobileSDK-Android) repos.
+
+## Special Note Regarding SFDX and Oclif
+
+SFDX now supports the Heroku "O"pen "CLI" "F"ramework and sfdx-mobilesdk-plugin v7.1.0 has been updated to be compatible. The new plugin will run in both version 6 and version 7 instances of the SFDX cli. However, older versions of the mobilesdk plugin will not work in the Oclif version of the CLI. 
+
+If there is a need to use an older plugin one must first uninstall V7 of the CLI and install a V6 instance.
+
+To determine the latest version of v6 go here:
+
+https://www.npmjs.com/package/sfdx-cli?activeTab=versions
+
+The most reliable way to install a previous version of the CLI is via npm.
+
+\`npm install sfdx-cli@<V6 version from npmjs> -g\`
 
 ## Setup
 

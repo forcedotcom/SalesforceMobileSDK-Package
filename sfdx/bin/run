@@ -1,0 +1,9 @@
+#!/usr/bin/env node
+
+// This is needed to support debugging code that spawns node processes. This code will start a node process and it will
+// inherit the parent process' debug settings resulting in a port in use error. Un-comment to work around.
+// process.env.NODE_OPTIONS = '--inspect=0';
+
+require('@oclif/command').run()
+  .then(require('@oclif/command/flush'))
+  .catch(require('@oclif/errors/handle'));

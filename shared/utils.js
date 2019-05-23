@@ -70,7 +70,7 @@ function setLogLevel(logLevel) {
  */
 function getVersionNumberFromString(versionString) {
 	// Only supporting major/minor version checking at this point.
-	var versionRegex = /^(\d+)(\.(\d+))?.*$/;
+    var versionRegex = new RegExp(/^[^\d]*(\d+)(\.(\d+))?.*$/, 'm');
 	var matchArray = versionString.match(versionRegex);
 	if (matchArray === null) {
 		log(LOG_LEVELS.WARN, 'Invalid version string "' + versionString + '". Should be in the format x[.y[.ignored]]');
@@ -220,7 +220,8 @@ function runFunctionThrowError(func, dir) {
  */
 
 function mkTmpDir() {
-    var timestamp = (new Date()).toLocaleTimeString().replace(/[^0-9]/g,'');
+    var d = new Date();
+    var timestamp = new Date(d.getTime() - 1000*60*d.getTimezoneOffset()).toISOString().replace(/[^0-9T.]/g, ''); // e.g. 20190510T134348.528 for Fri May 10 2019 13:43:48 GMT-0700 (Pacific Daylight Time)
     var tmpDir = path.resolve('tmp' + timestamp);
     logDebug('Making temp dir:' + tmpDir);
     shelljs.mkdir('-p', tmpDir);
