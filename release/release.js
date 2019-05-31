@@ -98,7 +98,8 @@ async function start() {
     config.tmpDir = utils.mkTmpDir()
 
     // Release!!
-    releaseShared()
+    // releaseShared()
+    releaseAndroid()
 }
 
 //
@@ -123,6 +124,32 @@ function releaseShared() {
 }
 
 //
+// Release function for android repo
+//
+function releaseAndroid() {
+    utils.logInfo(`* PROCESSING ${REPO.android}`, COLOR.green)
+    cloneAndRun(REPO.android, [
+        `git checkout ${config.devBranch}`,
+        `git checkout ${config.masterBranch}`,
+        `./install.sh`,
+        `git merge --no-ff ${config.devBranch}`,
+        `./setVersion.sh -v ${config.versionReleased} -c ${config.versionCodeReleased} -d no`,
+        {cmd:'git pull origin ${config.masterBranch}', dir:'external/shared'},
+        `git add *`,
+        `git commit -m "Mobile SDK ${config.versionReleased}"`,
+        `git tag ${config.versionReleased}`,
+        `git push origin ${config.masterBranch} --tag`,
+        `git checkout ${config.devBranch}`,
+        `git pull origin ${config.masterBranch}`,
+        `./setVersion.sh -v ${config.nextVersion} -c ${config.nextVersionCode} -d yes`,
+        {cmd:'git pull origin ${config.devBranch}', dir:'external/shared'},        
+        `git add *`,
+        `git commit -m "Merging ${config.masterBranch} back to ${config.devBranch}"`,
+        `git push origin ${config.devBranch}`
+    ])
+}
+
+//
 // Helper functions
 //
 function cloneAndRun(repo, cmds) {
@@ -133,8 +160,10 @@ function cloneAndRun(repo, cmds) {
     }
 }
 
-function run(index, count, cmd, dir) {
-    utils.logInfo(`** ${index}/${count} ${cmd}`)
+function run(index, count, cmdOrObj, directory) {
+    const cmd = typeof(cmdOrObj)=='string' ? cmdOrObj : cmdOrObj.cmd
+    const dir = typeof(cmdOrObj)=='string' ? directory : cmdOrObj.dir
+    utils.logInfo(`** ${index}/${count} ${cmd}`, COLOR.green)
     utils.runProcessThrowError(cmd, dir)
 }
 
@@ -142,9 +171,10 @@ function urlForRepo(repo) {
     return `git@github.com:${config.org}/${repo}`;
 }
 
-/* To setup / cleanup test branches
+/* To cleanup / setup test branches
+   git branch -D master2; git push origin :master2
+   git branch -D dev2; git push origin :dev2
+   git tag -d 7.2.0; git push --delete origin 7.2.0
    git checkout master; git checkout -b master2; git push origin master2
    git checkout dev;    git checkout -b dev2;    git push origin dev2
-   git branch -D master2; git push origin :master2; git tag -d 7.2.0; git push --delete origin 7.2.0
-   git branch -D dev2; git push origin :dev2; 
 */
