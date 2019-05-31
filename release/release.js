@@ -1,15 +1,12 @@
 #!/usr/bin/env node
 
 // Dependencies
-const spawnSync = require('child_process').spawnSync,
-      path = require('path'),
-      shelljs = require('shelljs'),
+const path = require('path'),
       prompts = require('prompts'),
       utils = require('../shared/utils'),
-      templateHelper = require('../shared/templateHelper.js'),
-      SDK = require('../shared/constants'),
       COLOR = require('../shared/outputColors')
 
+// Constants
 const REPO = {
     shared: 'SalesforceMobileSDK-Shared',
     android: 'SalesforceMobileSDK-Android',
@@ -22,6 +19,45 @@ const REPO = {
     pkg: 'SalesforceMobileSDK-Package'
 }
 
+// Questions
+const QUESTIONS = [
+    {
+        type: 'text',
+        name: 'org',
+        message: 'Organization (e.g. forcedotcom) ?'
+    },
+    {
+        type: 'text',
+        name: 'masterBranch',
+        message: 'Release branch (e.g. master) ?'
+    },
+    {
+        type: 'text',
+        name: 'devBranch',
+        message: 'Development branch (e.g. dev) ?'
+    },
+    {
+        type: 'text',
+        name: 'versionReleased',
+        message: 'Version being released (e.g. 7.2.0) ?'
+    },
+    {
+        type: 'text',
+        name: 'versionCodeReleased',
+        message: 'Version code for Android being released (e.g. 64) ?'
+    },
+    {
+        type: 'text',
+        name: 'nextVersion',
+        message: 'Next version (e.g. 7.3.0) ?'
+    },
+    {
+        type: 'text',
+        name: 'nextVersionCode',
+        message: 'Next version code for Android (e.g. 65) ?'
+    }
+]
+
 // Calling start
 var config = {}
 start()
@@ -30,55 +66,9 @@ start()
 // Main function
 //
 async function start() {
-    config = await prompts([
-        {
-            type: 'text',
-            name: 'org',
-            message: 'Organization (e.g. forcedotcom) ?'
-        },
-        {
-            type: 'text',
-            name: 'masterBranch',
-            message: 'Release branch (e.g. master) ?'
-        },
-        {
-            type: 'text',
-            name: 'devBranch',
-            message: 'Development branch (e.g. dev) ?'
-        },
-        {
-            type: 'text',
-            name: 'versionReleased',
-            message: 'Version being released (e.g. 7.2.0) ?'
-        },
-        {
-            type: 'text',
-            name: 'versionCodeReleased',
-            message: 'Version code for Android being released (e.g. 64) ?'
-        },
-        {
-            type: 'text',
-            name: 'nextVersion',
-            message: 'Next version (e.g. 7.3.0) ?'
-        },
-        {
-            type: 'text',
-            name: 'nextVersionCode',
-            message: 'Next version code for Android (e.g. 65) ?'
-        }
-    ])
+    config = await prompts(QUESTIONS)
 
-    
-    // Extra confirmation step for forcedotcom
-    if (config.org === 'forcedotcom') {
-        const confirmation = await prompts([{type:'confirm',
-                                             name:'value',
-                                             initial:false,
-                                             message:'Are you sure you want to run the script against forcedotcom?'}])
-        if (!confirmation.value) {
-            process.exit(0)
-        }
-    }
+    await validateConfig()
 
     // Final confirmation
     utils.logParagraph([
@@ -90,17 +80,33 @@ async function start() {
                                               name:'value',
                                               initial:false,
                                               message:'Are you sure you want to proceed?'}])                                         
-    if (!finalConfirmation.value) {
+
+     if (!finalConfirmation.value) {
         process.exit(0)
     }
-
     
-    config.tmpDir = utils.mkTmpDir()
-
     // Release!!
-    // releaseShared()
+    config.tmpDir = utils.mkTmpDir()
+    releaseShared()
     releaseAndroid()
 }
+
+async function validateConfig() {
+    if (Object.keys(config).length < QUESTIONS.length) {
+        process.exit(0)
+    }
+    
+    // Extra confirmation step for forcedotcom
+    if (config.org === 'forcedotcom') {
+        const confirmation = await prompts([{type:'confirm',
+                                             name:'value',
+                                             initial:false,
+                                             message:'Are you sure you want to run the script against forcedotcom?'}])
+        if (!confirmation.value) {
+            process.exit(0)
+        }
+    }
+}    
 
 //
 // Release function for shared repo
