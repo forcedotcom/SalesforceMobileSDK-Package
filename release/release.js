@@ -4,7 +4,7 @@
 const spawnSync = require('child_process').spawnSync,
       path = require('path'),
       shelljs = require('shelljs'),
-      prompts = require('prompts')
+      prompts = require('prompts'),
       utils = require('../shared/utils'),
       templateHelper = require('../shared/templateHelper.js'),
       SDK = require('../shared/constants'),
@@ -49,7 +49,7 @@ async function start() {
         {
             type: 'text',
             name: 'versionReleased',
-            message: 'Version being released (e.g. 7.5.0) ?'
+            message: 'Version being released (e.g. 7.2.0) ?'
         },
         {
             type: 'text',
@@ -59,7 +59,7 @@ async function start() {
         {
             type: 'text',
             name: 'nextVersion',
-            message: 'Next version (e.g. 7.6.0) ?'
+            message: 'Next version (e.g. 7.3.0) ?'
         },
         {
             type: 'text',
@@ -107,14 +107,14 @@ async function start() {
 function releaseShared() {
     utils.logInfo(`* PROCESSING ${REPO.shared}`)
     cloneAndRun(REPO.shared, [
-        `git fetch origin ${config.masterBranch}`,
-        `git fetch origin ${config.devBranch}`,
+        `git checkout ${config.devBranch}`,
         `git checkout ${config.masterBranch}`,
-        `git merge --no-ff -m "Mobile SDK ${config.versionReleased}"" ${config.devBranch}`,
-        `git push origin ${config.masterBranch}`,
+        `git merge --no-ff -m "Mobile SDK ${config.versionReleased}" ${config.devBranch}`,
+        `git tag ${config.versionReleased}`,
+        `git push origin ${config.masterBranch} --tag`,
         `git checkout ${config.devBranch}`,
         `git pull origin ${config.masterBranch}`,
-        `git setVersion.sh -v ${config.nextVersion}`,
+        `./setVersion.sh -v ${config.nextVersion}`,
         `./tools/update.sh`,
         `git add *`,
         `git commit -m "Merging ${config.masterBranch} back to ${config.devBranch}"`,
@@ -134,11 +134,17 @@ function cloneAndRun(repo, cmds) {
 }
 
 function run(index, count, cmd, dir) {
-        utils.logInfo(`** ${index}/${count} ${cmd}`)
-//        utils.runProcessThrowError(cmd, dir)
+    utils.logInfo(`** ${index}/${count} ${cmd}`)
+    utils.runProcessThrowError(cmd, dir)
 }
 
 function urlForRepo(repo) {
     return `git@github.com:${config.org}/${repo}`;
 }
 
+/* To setup / cleanup test branches
+   git checkout master; git checkout -b master2; git push origin master2
+   git checkout dev;    git checkout -b dev2;    git push origin dev2
+   git branch -D master2; git push origin :master2; git tag -d 7.2.0; git push --delete origin 7.2.0
+   git branch -D dev2; git push origin :dev2; 
+*/
