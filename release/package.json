@@ -1,0 +1,14 @@
+{
+    "name": "release",
+    "engines": {
+        "node": ">=8.10.0"
+    },
+    "dependencies": {
+        "prompts": "^2.1.0",
+        "shelljs": "0.7.0"
+    },
+    "author": {
+        "name": "Wolfgang Mathurin",
+        "email": "wmathurin@salesforce.com"
+    }
+}
