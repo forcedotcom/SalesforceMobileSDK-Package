@@ -75,7 +75,7 @@ async function start() {
         `RELEASING version ${config.versionReleased} (code ${config.versionCodeReleased} on Android)`,
         `Will merge ${config.devBranch} to ${config.masterBranch} on ${config.org}`,
         `Afterwards ${config.devBranch} will be for version ${config.nextVersion} (code ${config.nextVersionCode} on Android)`
-    ])
+    ], COLOR.red)
     const finalConfirmation = await prompts([{type:'confirm',
                                               name:'value',
                                               initial:false,
@@ -91,6 +91,9 @@ async function start() {
     releaseAndroid()
 }
 
+//
+// Config validation
+//
 async function validateConfig() {
     if (Object.keys(config).length < QUESTIONS.length) {
         process.exit(0)
@@ -112,65 +115,104 @@ async function validateConfig() {
 // Release function for shared repo
 //
 function releaseShared() {
-    utils.logInfo(`* PROCESSING ${REPO.shared}`)
-    cloneAndRun(REPO.shared, [
-        `git checkout ${config.devBranch}`,
-        `git checkout ${config.masterBranch}`,
-        `git merge --no-ff -m "Mobile SDK ${config.versionReleased}" ${config.devBranch}`,
-        `git tag ${config.versionReleased}`,
-        `git push origin ${config.masterBranch} --tag`,
-        `git checkout ${config.devBranch}`,
-        `git pull origin ${config.masterBranch}`,
-        `./setVersion.sh -v ${config.nextVersion}`,
-        `./tools/update.sh`,
-        `git add *`,
-        `git commit -m "Merging ${config.masterBranch} back to ${config.devBranch}"`,
-        `git push origin ${config.devBranch}`
-    ])
+    const repo = REPO.shared
+    const cmds = {
+        msg: `PROCESSING ${repo}`,
+        cmds: [
+            cloneAndCheckout(repo),
+            `git merge --no-ff -m "Mobile SDK ${config.versionReleased}" ${config.devBranch}`,
+            `git tag ${config.versionReleased}`,
+            `git push origin ${config.masterBranch} --tag`,
+            `git checkout ${config.devBranch}`,
+            `git pull origin ${config.masterBranch}`,
+            `./setVersion.sh -v ${config.nextVersion}`,
+            `./tools/update.sh`,
+            commitAndPushDev()
+        ]
+    }
+    runCmds(path.join(config.tmpDir, repo), cmds)
 }
 
 //
 // Release function for android repo
 //
 function releaseAndroid() {
-    utils.logInfo(`* PROCESSING ${REPO.android}`, COLOR.green)
-    cloneAndRun(REPO.android, [
-        `git checkout ${config.devBranch}`,
-        `git checkout ${config.masterBranch}`,
-        `./install.sh`,
-        `git merge --no-ff ${config.devBranch}`,
-        `./setVersion.sh -v ${config.versionReleased} -c ${config.versionCodeReleased} -d no`,
-        {cmd:'git pull origin ${config.masterBranch}', dir:'external/shared'},
-        `git add *`,
-        `git commit -m "Mobile SDK ${config.versionReleased}"`,
-        `git tag ${config.versionReleased}`,
-        `git push origin ${config.masterBranch} --tag`,
-        `git checkout ${config.devBranch}`,
-        `git pull origin ${config.masterBranch}`,
-        `./setVersion.sh -v ${config.nextVersion} -c ${config.nextVersionCode} -d yes`,
-        {cmd:'git pull origin ${config.devBranch}', dir:'external/shared'},        
-        `git add *`,
-        `git commit -m "Merging ${config.masterBranch} back to ${config.devBranch}"`,
-        `git push origin ${config.devBranch}`
-    ])
+    const repo = REPO.android
+    const cmds = {
+        msg: `PROCESSING ${repo}`,
+        cmds: [
+            cloneAndCheckout(repo),
+            `./install.sh`,
+            `git merge --no-ff ${config.devBranch}`,
+            `./setVersion.sh -v ${config.versionReleased} -c ${config.versionCodeReleased} -d no`,
+            {cmd:`git pull origin ${config.masterBranch}`, dir:'external/shared'},
+            `git add *`,
+            `git commit -m "Mobile SDK ${config.versionReleased}"`,
+            `git tag ${config.versionReleased}`,
+            `git push origin ${config.masterBranch} --tag`,
+            `git checkout ${config.devBranch}`,
+            `git pull origin ${config.masterBranch}`,
+            `./setVersion.sh -v ${config.nextVersion} -c ${config.nextVersionCode} -d yes`,
+            {cmd:`git pull origin ${config.devBranch}`, dir:'external/shared'},
+            commitAndPushDev()
+        ]
+    }
+    runCmds(path.join(config.tmpDir, repo), cmds)
 }
 
 //
 // Helper functions
 //
-function cloneAndRun(repo, cmds) {
-    run(1, cmds.length+1, `git clone ${urlForRepo(repo)}`, config.tmpDir)
-    const repoDir = path.join(config.tmpDir, repo)
-    for (i=0; i<cmds.length; i++) {
-        run(i+2, cmds.length+1, cmds[i], repoDir)
+function cloneAndCheckout(repo) {
+    return {
+        msg: `Cloning ${repo}`,
+        cmds: [
+            {cmd:`git clone ${urlForRepo(repo)}`, dir:config.tmpDir},
+            `git checkout ${config.devBranch}`,
+            `git checkout ${config.masterBranch}`
+        ]
     }
 }
 
-function run(index, count, cmdOrObj, directory) {
-    const cmd = typeof(cmdOrObj)=='string' ? cmdOrObj : cmdOrObj.cmd
-    const dir = typeof(cmdOrObj)=='string' ? directory : cmdOrObj.dir
-    utils.logInfo(`** ${index}/${count} ${cmd}`, COLOR.green)
-    utils.runProcessThrowError(cmd, dir)
+function commitAndPushDev() {
+    return {
+        msg: `Committing back to ${config.devBranch}`,
+        cmds: [
+            `git add *`,
+            `git commit -m "Merging ${config.masterBranch} back to ${config.devBranch}"`,
+            `git push origin ${config.devBranch}`
+        ]
+    }
+}
+
+function runCmds(dir, cmds, depth) {
+    if (!depth) {
+        utils.logInfo(`=== ${cmds.msg} ===`, COLOR.magenta)
+    }
+
+    depth = depth || 1
+    const count = cmds.cmds.length
+    for (var i=0; i<count; i++) {
+        const cmd = cmds.cmds[i]
+        if (typeof(cmd) === 'string') {
+            runCmd(dir, cmd, i+1, count, depth)
+        } else if (cmd.cmd) {
+            runCmd(cmd.dir, cmd.cmd, i+1, count, depth)
+        } else if (cmd.cmds) {
+            print(cmd.msg, i+1, count, depth)
+            runCmds(dir, cmd, depth + 1)
+        }
+    }
+}
+        
+function runCmd(dir, cmd, index, count, depth) {
+    print(cmd, index, count, depth)
+    // utils.runProcessThrowError(cmd, dir)
+}
+
+function print(msg, index, count, depth) {
+    const prefix = new Array(depth+1).join("*")
+    utils.logInfo(`${prefix} ${index}/${count} ${msg}`, COLOR.green)
 }
 
 function urlForRepo(repo) {

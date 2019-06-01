@@ -321,15 +321,16 @@ function cloneRepo(tmpDir, repoUrlWithBranch) {
  *
  * @param {String} lines
  */
-function logParagraph(lines) {
+function logParagraph(lines, color) {
+    color = color || COLOR.green;
     logInfo("");
-    logInfo("********************************************************************************", COLOR.green);
-    logInfo("*", COLOR.green);
+    logInfo("********************************************************************************", color);
+    logInfo("*", color);
     for (var i=0; i<lines.length; i++) {
-        logInfo("*   " + lines[i], COLOR.green);
+        logInfo("*   " + lines[i], color);
     }
-    logInfo("*", COLOR.green);
-    logInfo("********************************************************************************", COLOR.green);
+    logInfo("*", color);
+    logInfo("********************************************************************************", color);
     logInfo("");
 }
 
