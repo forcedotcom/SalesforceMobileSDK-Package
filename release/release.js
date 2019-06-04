@@ -11,7 +11,7 @@ const REPO = {
     shared: 'SalesforceMobileSDK-Shared',
     android: 'SalesforceMobileSDK-Android',
     ios: 'SalesforceMobileSDK-iOS',
-    ioshybrid: 'SalesforceMobileSDK-iOS',
+    ioshybrid: 'SalesforceMobileSDK-iOS-Hybrid',
     iospecs: 'SalesforceMobileSDK-iOS-Specs',
     cordovaplugin: 'SalesforceMobileSDK-CordovaPlugin',
     reactnative: 'SalesforceMobileSDK-ReactNative',
@@ -68,97 +68,134 @@ start()
 async function start() {
     config = await prompts(QUESTIONS)
 
-    await validateConfig()
+    validateConfig()
 
     // Final confirmation
     utils.logParagraph([
         `RELEASING version ${config.versionReleased} (code ${config.versionCodeReleased} on Android)`,
         `Will merge ${config.devBranch} to ${config.masterBranch} on ${config.org}`,
         `Afterwards ${config.devBranch} will be for version ${config.nextVersion} (code ${config.nextVersionCode} on Android)`
-    ], COLOR.red)
-    const finalConfirmation = await prompts([{type:'confirm',
-                                              name:'value',
-                                              initial:false,
-                                              message:'Are you sure you want to proceed?'}])                                         
-
-     if (!finalConfirmation.value) {
+    ], COLOR.magenta)
+    if (!await proceedPrompt()) {
         process.exit(0)
     }
     
     // Release!!
+    utils.setExitOnFailure(true)
     config.tmpDir = utils.mkTmpDir()
-    releaseShared()
-    releaseAndroid()
+    await releaseShared()
+    await releaseAndroid()
+    await releaseIOS()
+    await releaseIOSHybrid()
 }
 
 //
 // Config validation
 //
-async function validateConfig() {
+function validateConfig() {
     if (Object.keys(config).length < QUESTIONS.length) {
         process.exit(0)
-    }
-    
-    // Extra confirmation step for forcedotcom
-    if (config.org === 'forcedotcom') {
-        const confirmation = await prompts([{type:'confirm',
-                                             name:'value',
-                                             initial:false,
-                                             message:'Are you sure you want to run the script against forcedotcom?'}])
-        if (!confirmation.value) {
-            process.exit(0)
-        }
     }
 }    
 
 //
+// Proceed prompt
+async function proceedPrompt() {
+    const confirmation = await prompts([{type:'confirm',
+                                              name:'value',
+                                              initial:false,
+                                              message:'Are you sure you want to proceed?'}])                                         
+
+    return confirmation.value
+}
+
+//
 // Release function for shared repo
 //
-function releaseShared() {
+async function releaseShared() {
     const repo = REPO.shared
     const cmds = {
         msg: `PROCESSING ${repo}`,
         cmds: [
             cloneAndCheckout(repo),
-            `git merge --no-ff -m "Mobile SDK ${config.versionReleased}" ${config.devBranch}`,
-            `git tag ${config.versionReleased}`,
-            `git push origin ${config.masterBranch} --tag`,
-            `git checkout ${config.devBranch}`,
-            `git pull origin ${config.masterBranch}`,
+            mergeDevToMaster(),
+            commitTagAndPushMaster(),
+            checkoutDevAndPullMaster(),
             `./setVersion.sh -v ${config.nextVersion}`,
             `./tools/update.sh`,
             commitAndPushDev()
         ]
     }
-    runCmds(path.join(config.tmpDir, repo), cmds)
+    await runCmds(path.join(config.tmpDir, repo), cmds)
 }
 
 //
-// Release function for android repo
+// Release function for android repo (missing: javadoc generation)
 //
-function releaseAndroid() {
+async function releaseAndroid() {
     const repo = REPO.android
     const cmds = {
         msg: `PROCESSING ${repo}`,
         cmds: [
             cloneAndCheckout(repo),
             `./install.sh`,
-            `git merge --no-ff ${config.devBranch}`,
+            mergeDevToMaster(),
             `./setVersion.sh -v ${config.versionReleased} -c ${config.versionCodeReleased} -d no`,
-            {cmd:`git pull origin ${config.masterBranch}`, dir:'external/shared'},
-            `git add *`,
-            `git commit -m "Mobile SDK ${config.versionReleased}"`,
-            `git tag ${config.versionReleased}`,
-            `git push origin ${config.masterBranch} --tag`,
-            `git checkout ${config.devBranch}`,
-            `git pull origin ${config.masterBranch}`,
+            updateSubmodules(config.masterBranch, ['external/shared']),
+            commitTagAndPushMaster(),
+            checkoutDevAndPullMaster(),
             `./setVersion.sh -v ${config.nextVersion} -c ${config.nextVersionCode} -d yes`,
-            {cmd:`git pull origin ${config.devBranch}`, dir:'external/shared'},
+            updateSubmodules(config.devBranch, ['external/shared']),
             commitAndPushDev()
         ]
     }
-    runCmds(path.join(config.tmpDir, repo), cmds)
+    await runCmds(path.join(config.tmpDir, repo), cmds)
 }
+
+//
+// Release function for iOS repo (missing: apple doc generation)
+//
+async function releaseIOS() {
+    const repo = REPO.ios
+    const cmds = {
+        msg: `PROCESSING ${repo}`,
+        cmds: [
+            cloneAndCheckout(repo),
+            `./install.sh`,
+            mergeDevToMaster(),
+            `./setVersion.sh -v ${config.versionReleased} -d no`,
+            commitTagAndPushMaster(),
+            checkoutDevAndPullMaster(),
+            `./setVersion.sh -v ${config.nextVersion} -d yes`,
+            commitAndPushDev()
+        ]
+    }
+    await runCmds(path.join(config.tmpDir, repo), cmds)
+}
+
+//
+// Release function for iOS-Hybrid repo
+//
+async function releaseIOSHybrid() {
+    const repo = REPO.ioshybrid
+    const cmds = {
+        msg: `PROCESSING ${repo}`,
+        cmds: [
+            cloneAndCheckout(repo),
+            `./install.sh`,
+            mergeDevToMaster(),
+            updateSubmodules(config.masterBranch, ['external/shared', 'external/SalesforceMobileSDK-iOS']),
+            commitTagAndPushMaster(),
+            checkoutDevAndPullMaster(),
+            `./setVersion.sh -v ${config.nextVersion}`,
+            updateSubmodules(config.devBranch, ['external/shared', 'external/SalesforceMobileSDK-iOS']),
+            commitAndPushDev()
+        ]
+    }
+    await runCmds(path.join(config.tmpDir, repo), cmds)
+}
+
+
 
 //
 // Helper functions
@@ -174,6 +211,34 @@ function cloneAndCheckout(repo) {
     }
 }
 
+function mergeDevToMaster() {
+    return {
+        msg: `Merging ${config.devBranch} to ${config.masterBranch}`,
+        cmds: [
+            `git merge --no-ff -m "Mobile SDK ${config.versionReleased}" ${config.devBranch}`,
+        ]
+    }
+}
+
+function updateSubmodules(branch, submodulePaths) {
+    return {
+        msg: `Updating submodules to ${branch}`,
+        cmds: submodulePaths.map(path => { return {cmd:`git pull origin ${branch}`, reldir:path} })
+    }
+}
+
+function commitTagAndPushMaster(commit) {
+    return {
+        msg: `Committing and tagging ${config.masterBranch}`,
+        cmds: [
+            commit ? `git add *` : null,
+            commit ? `git commit -m "Mobile SDK ${config.versionReleased}"` : null,
+            `git tag ${config.versionReleased}`,
+            `git push origin ${config.masterBranch} --tag`,
+        ]
+    }
+}
+
 function commitAndPushDev() {
     return {
         msg: `Committing back to ${config.devBranch}`,
@@ -185,21 +250,38 @@ function commitAndPushDev() {
     }
 }
 
-function runCmds(dir, cmds, depth) {
+function checkoutDevAndPullMaster() {
+    return {
+        msg: `Back to ${config.devBranch}`,
+        cmds: [
+            `git checkout ${config.devBranch}`,
+            `git pull origin ${config.masterBranch}`
+        ]
+    }
+}
+
+async function runCmds(dir, cmds, depth) {
     if (!depth) {
-        utils.logInfo(`=== ${cmds.msg} ===`, COLOR.magenta)
+        utils.logInfo(`\n=== ${cmds.msg} ===`, COLOR.magenta)
+        if (!await proceedPrompt()) {
+            return
+        }
     }
 
     depth = depth || 1
+    cmds.cmds = cmds.cmds.filter(x => !!x)
     const count = cmds.cmds.length
     for (var i=0; i<count; i++) {
         const cmd = cmds.cmds[i]
         if (typeof(cmd) === 'string') {
             runCmd(dir, cmd, i+1, count, depth)
         } else if (cmd.cmd) {
-            runCmd(cmd.dir, cmd.cmd, i+1, count, depth)
+            runCmd(cmd.dir || path.join(dir, cmd.reldir), cmd.cmd, i+1, count, depth)
         } else if (cmd.cmds) {
             print(cmd.msg, i+1, count, depth)
+            if (!await proceedPrompt()) {
+                return
+            }
             runCmds(dir, cmd, depth + 1)
         }
     }
@@ -207,7 +289,7 @@ function runCmds(dir, cmds, depth) {
         
 function runCmd(dir, cmd, index, count, depth) {
     print(cmd, index, count, depth)
-    // utils.runProcessThrowError(cmd, dir)
+    utils.runProcessCatchError(cmd, cmd, dir)
 }
 
 function print(msg, index, count, depth) {
@@ -218,11 +300,22 @@ function print(msg, index, count, depth) {
 function urlForRepo(repo) {
     return `git@github.com:${config.org}/${repo}`;
 }
-
+ 
 /* To cleanup / setup test branches
+
+   git checkout master
    git branch -D master2; git push origin :master2
    git branch -D dev2; git push origin :dev2
    git tag -d 7.2.0; git push --delete origin 7.2.0
    git checkout master; git checkout -b master2; git push origin master2
+   gsed -i "s/forcedotcom/wmathurin/g" .gitmodules
+   git add .gitmodules
+   git commit -m "Pointing to fork"
+   git push origin master2
    git checkout dev;    git checkout -b dev2;    git push origin dev2
+   gsed -i "s/forcedotcom/wmathurin/g" .gitmodules
+   git add .gitmodules
+   git commit -m "Pointing to fork"
+   git push origin dev2
+
 */
