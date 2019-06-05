@@ -90,6 +90,7 @@ async function start() {
     await releaseCordovaPlugin()
     await releaseReactNative()
     await releaseTemplates()
+    await releasePackage()
 }
 
 //
@@ -256,7 +257,7 @@ async function releaseReactNative() {
 }
 
 //
-// Release function for ReactNative repo
+// Release function for Templates repo
 //
 async function releaseTemplates() {
     const repo = REPO.templates
@@ -274,6 +275,28 @@ async function releaseTemplates() {
     }
     await runCmds(path.join(config.tmpDir, repo), cmds)
 }
+
+//
+// Release function for Package repo
+//
+async function releasePackage() {
+    const repo = REPO.pkg
+    const cmds = {
+        msg: `PROCESSING ${repo}`,
+        cmds: [
+            cloneAndCheckout(repo, true /* skip install */),
+            mergeDevToMaster(),
+            setVersion(config.versionReleased, false),
+            commitTagAndPushMaster(),
+            checkoutDevAndPullMaster(),
+            setVersion(config.nextVersion, true),
+            commitAndPushDev()
+        ]
+    }
+    await runCmds(path.join(config.tmpDir, repo), cmds)
+}
+
+
 
 //
 // Helper functions
