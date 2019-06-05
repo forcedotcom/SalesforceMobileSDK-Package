@@ -81,12 +81,12 @@ async function start() {
     }
     
     // Release!!
-    utils.setExitOnFailure(true)
     config.tmpDir = utils.mkTmpDir()
     await releaseShared()
     await releaseAndroid()
     await releaseIOS()
     await releaseIOSHybrid()
+    await releaseIOSSpecs
 }
 
 //
@@ -102,9 +102,9 @@ function validateConfig() {
 // Proceed prompt
 async function proceedPrompt() {
     const confirmation = await prompts([{type:'confirm',
-                                              name:'value',
-                                              initial:false,
-                                              message:'Are you sure you want to proceed?'}])                                         
+                                         name:'value',
+                                         initial:false,
+                                         message:'Are you sure you want to proceed?'}])                                         
 
     return confirmation.value
 }
@@ -119,10 +119,10 @@ async function releaseShared() {
         cmds: [
             cloneAndCheckout(repo),
             mergeDevToMaster(),
+            setVersion(config.versionReleased),
             commitTagAndPushMaster(),
             checkoutDevAndPullMaster(),
-            `./setVersion.sh -v ${config.nextVersion}`,
-            `./tools/update.sh`,
+            setVersion(config.nextVersion),
             commitAndPushDev()
         ]
     }
@@ -137,14 +137,13 @@ async function releaseAndroid() {
     const cmds = {
         msg: `PROCESSING ${repo}`,
         cmds: [
-            cloneAndCheckout(repo),
-            `./install.sh`,
+            cloneAndCheckout(repo, true),
             mergeDevToMaster(),
-            `./setVersion.sh -v ${config.versionReleased} -c ${config.versionCodeReleased} -d no`,
+            setVersion(config.versionReleased, false, config.versionCodeReleased),
             updateSubmodules(config.masterBranch, ['external/shared']),
             commitTagAndPushMaster(),
             checkoutDevAndPullMaster(),
-            `./setVersion.sh -v ${config.nextVersion} -c ${config.nextVersionCode} -d yes`,
+            setVersion(config.nextVersion, true, config.nextVersionCode),
             updateSubmodules(config.devBranch, ['external/shared']),
             commitAndPushDev()
         ]
@@ -160,13 +159,12 @@ async function releaseIOS() {
     const cmds = {
         msg: `PROCESSING ${repo}`,
         cmds: [
-            cloneAndCheckout(repo),
-            `./install.sh`,
+            cloneAndCheckout(repo, true),
             mergeDevToMaster(),
-            `./setVersion.sh -v ${config.versionReleased} -d no`,
+            setVersion(config.versionReleased, false),
             commitTagAndPushMaster(),
             checkoutDevAndPullMaster(),
-            `./setVersion.sh -v ${config.nextVersion} -d yes`,
+            setVersion(config.nextVersion, true),
             commitAndPushDev()
         ]
     }
@@ -181,15 +179,32 @@ async function releaseIOSHybrid() {
     const cmds = {
         msg: `PROCESSING ${repo}`,
         cmds: [
-            cloneAndCheckout(repo),
-            `./install.sh`,
+            cloneAndCheckout(repo, true),
             mergeDevToMaster(),
+            setVersion(config.versionReleased, false),
             updateSubmodules(config.masterBranch, ['external/shared', 'external/SalesforceMobileSDK-iOS']),
             commitTagAndPushMaster(),
             checkoutDevAndPullMaster(),
-            `./setVersion.sh -v ${config.nextVersion}`,
+            setVersion(config.nextVersion, true),
             updateSubmodules(config.devBranch, ['external/shared', 'external/SalesforceMobileSDK-iOS']),
             commitAndPushDev()
+        ]
+    }
+    await runCmds(path.join(config.tmpDir, repo), cmds)
+}
+
+//
+// Release function for iOS-Specs repo
+//
+async function releaseIOSSpecs() {
+    const repo = REPO.iosSpecs
+    const cmds = {
+        msg: `PROCESSING ${repo}`,
+        cmds: [
+            cloneAndCheckout(repo),
+            mergeDevToMaster(),
+            `update.sh -b ${config.masterBranch} -v {config.versionReleased}`,
+            commitTagAndPushMaster()
         ]
     }
     await runCmds(path.join(config.tmpDir, repo), cmds)
@@ -200,13 +215,23 @@ async function releaseIOSHybrid() {
 //
 // Helper functions
 //
-function cloneAndCheckout(repo) {
+function setVersion(version, isDev, code) {
+    return {
+        msg: `Running setVersion`,
+        cmds: [
+            `./setVersion.sh -v ${version}`  + (isDev != undefined ? ` -d ${isDev}`:'') + (code != undefined ? ` -c ${code}`:'')
+        ]
+    }
+}
+
+function cloneAndCheckout(repo, runInstall) {
     return {
         msg: `Cloning ${repo}`,
         cmds: [
             {cmd:`git clone ${urlForRepo(repo)}`, dir:config.tmpDir},
             `git checkout ${config.devBranch}`,
-            `git checkout ${config.masterBranch}`
+            `git checkout ${config.masterBranch}`,
+            runInstall ? 'install.sh' : ''
         ]
     }
 }
@@ -227,12 +252,12 @@ function updateSubmodules(branch, submodulePaths) {
     }
 }
 
-function commitTagAndPushMaster(commit) {
+function commitTagAndPushMaster() {
     return {
         msg: `Committing and tagging ${config.masterBranch}`,
         cmds: [
-            commit ? `git add *` : null,
-            commit ? `git commit -m "Mobile SDK ${config.versionReleased}"` : null,
+            `git add *`,
+            `git commit -m "Mobile SDK ${config.versionReleased}"`,
             `git tag ${config.versionReleased}`,
             `git push origin ${config.masterBranch} --tag`,
         ]
@@ -286,10 +311,14 @@ async function runCmds(dir, cmds, depth) {
         }
     }
 }
-        
+
 function runCmd(dir, cmd, index, count, depth) {
     print(cmd, index, count, depth)
-    utils.runProcessCatchError(cmd, cmd, dir)
+    try {
+        utils.runProcessThrowError(cmd, dir)
+    } catch (e) {
+        process.exit(1);        
+    }
 }
 
 function print(msg, index, count, depth) {
@@ -300,7 +329,7 @@ function print(msg, index, count, depth) {
 function urlForRepo(repo) {
     return `git@github.com:${config.org}/${repo}`;
 }
- 
+
 /* To cleanup / setup test branches
 
    git checkout master
