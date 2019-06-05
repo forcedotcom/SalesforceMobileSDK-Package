@@ -19,6 +19,14 @@ const REPO = {
     pkg: 'SalesforceMobileSDK-Package'
 }
 
+const DEPTH_PREFIX = {
+    1: '=',
+    2: '-',
+    3: ' ',
+    4: ' ',
+    5: ' ',
+}
+
 // Questions
 const QUESTIONS = [
     {
@@ -117,84 +125,28 @@ async function proceedPrompt() {
 // Release function for shared repo
 //
 async function releaseShared() {
-    const repo = REPO.shared
-    const cmds = {
-        msg: `PROCESSING ${repo}`,
-        cmds: [
-            cloneAndCheckout(repo, true /* skip install */),
-            mergeDevToMaster(),
-            setVersion(config.versionReleased),
-            commitTagAndPushMaster(),
-            checkoutDevAndPullMaster(),
-            setVersion(config.nextVersion),
-            commitAndPushDev()
-        ]
-    }
-    await runCmds(path.join(config.tmpDir, repo), cmds)
+    await releaseRepo(REPO.shared, false /* runInstall */)
 }
 
 //
 // Release function for android repo (missing: javadoc generation)
 //
 async function releaseAndroid() {
-    const repo = REPO.android
-    const cmds = {
-        msg: `PROCESSING ${repo}`,
-        cmds: [
-            cloneAndCheckout(repo),
-            mergeDevToMaster(),
-            setVersion(config.versionReleased, false, config.versionCodeReleased),
-            updateSubmodules(config.masterBranch, ['external/shared']),
-            commitTagAndPushMaster(),
-            checkoutDevAndPullMaster(),
-            setVersion(config.nextVersion, true, config.nextVersionCode),
-            updateSubmodules(config.devBranch, ['external/shared']),
-            commitAndPushDev()
-        ]
-    }
-    await runCmds(path.join(config.tmpDir, repo), cmds)
+    await releaseRepo(REPO.android, true /* runInstall */, ['external/shared'])
 }
 
 //
 // Release function for iOS repo (missing: apple doc generation)
 //
 async function releaseIOS() {
-    const repo = REPO.ios
-    const cmds = {
-        msg: `PROCESSING ${repo}`,
-        cmds: [
-            cloneAndCheckout(repo),
-            mergeDevToMaster(),
-            setVersion(config.versionReleased, false),
-            commitTagAndPushMaster(),
-            checkoutDevAndPullMaster(),
-            setVersion(config.nextVersion, true),
-            commitAndPushDev()
-        ]
-    }
-    await runCmds(path.join(config.tmpDir, repo), cmds)
+    await releaseRepo(REPO.ios, true /* runInstall */)
 }
 
 //
 // Release function for iOS-Hybrid repo
 //
 async function releaseIOSHybrid() {
-    const repo = REPO.ioshybrid
-    const cmds = {
-        msg: `PROCESSING ${repo}`,
-        cmds: [
-            cloneAndCheckout(repo),
-            mergeDevToMaster(),
-            setVersion(config.versionReleased, false),
-            updateSubmodules(config.masterBranch, ['external/shared', 'external/SalesforceMobileSDK-iOS']),
-            commitTagAndPushMaster(),
-            checkoutDevAndPullMaster(),
-            setVersion(config.nextVersion, true),
-            updateSubmodules(config.devBranch, ['external/shared', 'external/SalesforceMobileSDK-iOS']),
-            commitAndPushDev()
-        ]
-    }
-    await runCmds(path.join(config.tmpDir, repo), cmds)
+    await releaseRepo(REPO.ioshybrid, true /* runInstall */, ['external/shared', 'external/SalesforceMobileSDK-iOS'])
 }
 
 //
@@ -205,10 +157,10 @@ async function releaseIOSSpecs() {
     const cmds = {
         msg: `PROCESSING ${repo}`,
         cmds: [
-            cloneAndCheckout(repo, true /* skip install */),
-            mergeDevToMaster(),
+            cloneAndInstall(repo),
+            checkoutMasterAndMergeDev(),
             `update.sh -b ${config.masterBranch} -v {config.versionReleased}`,
-            commitTagAndPushMaster(true /* skip tagging */)
+            commitAndPushMaster()
         ]
     }
     await runCmds(path.join(config.tmpDir, repo), cmds)
@@ -218,105 +170,83 @@ async function releaseIOSSpecs() {
 // Release function for CordovaPlugin repo
 //
 async function releaseCordovaPlugin() {
-    const repo = REPO.cordovaplugin
-    const cmds = {
-        msg: `PROCESSING ${repo}`,
-        cmds: [
-            cloneAndCheckout(repo, true /* skip install */),
-            mergeDevToMaster(),
-            `./tools/update.sh -b ${config.masterBranch}`,
-            setVersion(config.versionReleased, false),
-            commitTagAndPushMaster(),
-            checkoutDevAndPullMaster(),
-            `./tools/update.sh -b ${config.devBranch}`,
-            setVersion(config.nextVersion, true),
-            commitAndPushDev()
-        ]
-    }
-    await runCmds(path.join(config.tmpDir, repo), cmds)
+    await releaseRepo(REPO.cordovaplugin, false /* runInstall */, null, `./tools/update.sh -b ${config.masterBranch}`, `./tools/update.sh -b ${config.devBranch}`)
 }
 
 //
 // Release function for ReactNative repo
 //
 async function releaseReactNative() {
-    const repo = REPO.reactnative
-    const cmds = {
-        msg: `PROCESSING ${repo}`,
-        cmds: [
-            cloneAndCheckout(repo, true /* skip install */),
-            mergeDevToMaster(),
-            setVersion(config.versionReleased),
-            commitTagAndPushMaster(),
-            checkoutDevAndPullMaster(),
-            setVersion(config.nextVersion),
-            commitAndPushDev()
-        ]
-    }
-    await runCmds(path.join(config.tmpDir, repo), cmds)
+    await releaseRepo(REPO.reactnative)
 }
 
 //
 // Release function for Templates repo
 //
 async function releaseTemplates() {
-    const repo = REPO.templates
-    const cmds = {
-        msg: `PROCESSING ${repo}`,
-        cmds: [
-            cloneAndCheckout(repo, true /* skip install */),
-            mergeDevToMaster(),
-            setVersion(config.versionReleased, false),
-            commitTagAndPushMaster(),
-            checkoutDevAndPullMaster(),
-            setVersion(config.nextVersion, true),
-            commitAndPushDev()
-        ]
-    }
-    await runCmds(path.join(config.tmpDir, repo), cmds)
+    await releaseRepo(REPO.templates)
 }
 
 //
 // Release function for Package repo
 //
 async function releasePackage() {
-    const repo = REPO.pkg
-    const cmds = {
-        msg: `PROCESSING ${repo}`,
-        cmds: [
-            cloneAndCheckout(repo, true /* skip install */),
-            mergeDevToMaster(),
-            setVersion(config.versionReleased, false),
-            commitTagAndPushMaster(),
-            checkoutDevAndPullMaster(),
-            setVersion(config.nextVersion, true),
-            commitAndPushDev()
-        ]
-    }
-    await runCmds(path.join(config.tmpDir, repo), cmds)
+    await releaseRepo(REPO.pkg)
 }
-
 
 
 //
 // Helper functions
 //
-function cloneAndCheckout(repo, skipInstall) {
+async function releaseRepo(repo, runInstall, submodulePaths, masterPostMergeCmd, devPostMergeCmd) {
+    const cmds = {
+        msg: `PROCESSING ${repo}`,
+        cmds: [
+            cloneAndInstall(repo, runInstall),
+            // master
+            {
+                msg: `Working on ${config.masterBranch}`,
+                cmds: [
+                    checkoutMasterAndMergeDev(),
+                    masterPostMergeCmd,
+                    setVersion(config.versionReleased, false, config.versionCodeReleased),
+                    updateSubmodules(config.masterBranch, submodulePaths),
+                    commitAndPushMaster(),
+                    tagMaster()
+                ]
+            },
+            // dev
+            {
+                msg: `Working on ${config.devBranch}`,
+                cmds: [
+                    checkoutDevAndMergeMaster(),
+                    devPostMergeCmd,
+                    setVersion(config.nextVersion, true, config.nextVersionCode),
+                    updateSubmodules(config.devBranch, submodulePaths),
+                    commitAndPushDev()
+                ]
+            }
+        ]
+    }
+    await runCmds(path.join(config.tmpDir, repo), cmds)
+}
+
+function cloneAndInstall(repo, runInstall) {
     return {
         msg: `Cloning ${repo}`,
         cmds: [
             {cmd:`git clone ${urlForRepo(repo)}`, dir:config.tmpDir},
-            `git checkout ${config.devBranch}`,
-            `git checkout ${config.masterBranch}`,
-            skipInstall ? null : 'install.sh',
+            runInstall ? 'install.sh' : null,
         ]
     }
 }
 
-function mergeDevToMaster() {
+function checkoutMasterAndMergeDev() {
     return {
         msg: `Merging ${config.devBranch} to ${config.masterBranch}`,
         cmds: [
+            `git checkout ${config.devBranch}`,
+            `git checkout ${config.masterBranch}`,
             `git merge --no-ff -m "Mobile SDK ${config.versionReleased}" ${config.devBranch}`,
         ]
     }
@@ -324,7 +254,7 @@ function mergeDevToMaster() {
 
 function setVersion(version, isDev, code) {
     return {
-        msg: `Running setVersion`,
+        msg: `Running setVersion ${version}`,
         cmds: [
             `./setVersion.sh -v ${version}`  + (isDev != undefined ? ` -d ${isDev}`:'') + (code != undefined ? ` -c ${code}`:'')
         ]
@@ -332,19 +262,30 @@ function setVersion(version, isDev, code) {
 }
 
 function updateSubmodules(branch, submodulePaths) {
+    if (submodulePaths == null || submodulePaths.length == 0) return null;
+
     return {
         msg: `Updating submodules to ${branch}`,
         cmds: submodulePaths.map(path => { return {cmd:`git pull origin ${branch}`, reldir:path} })
     }
 }
 
-function commitTagAndPushMaster(skipTagging) {
+function commitAndPushMaster() {
     return {
-        msg: `Committing and tagging ${config.masterBranch}`,
+        msg: `Pushing to ${config.masterBranch}`,
         cmds: [
             `git add *`,
             `git commit -m "Mobile SDK ${config.versionReleased}"`,
-            skipTagging ? null : `git tag ${config.versionReleased}`,
+            `git push origin ${config.masterBranch}`,
+        ]
+    }
+}
+
+function tagMaster() {
+    return {
+        msg: `Tagging ${config.masterBranch} with ${config.versionReleased}`,
+        cmds: [
+            `git tag ${config.versionReleased}`,
             `git push origin ${config.masterBranch} --tag`,
         ]
     }
@@ -352,7 +293,7 @@ function commitTagAndPushMaster(skipTagging) {
 
 function commitAndPushDev() {
     return {
-        msg: `Committing back to ${config.devBranch}`,
+        msg: `Pushing to ${config.devBranch}`,
         cmds: [
             `git add *`,
             `git commit -m "Merging ${config.masterBranch} back to ${config.devBranch}"`,
@@ -361,9 +302,9 @@ function commitAndPushDev() {
     }
 }
 
-function checkoutDevAndPullMaster() {
+function checkoutDevAndMergeMaster() {
     return {
-        msg: `Back to ${config.devBranch}`,
+        msg: `Merging ${config.masterBranch} back to ${config.devBranch}`,
         cmds: [
             `git checkout ${config.devBranch}`,
             `git pull origin ${config.masterBranch}`
@@ -390,9 +331,6 @@ async function runCmds(dir, cmds, depth) {
             runCmd(cmd.dir || path.join(dir, cmd.reldir), cmd.cmd, i+1, count, depth)
         } else if (cmd.cmds) {
             print(cmd.msg, i+1, count, depth)
-            // if (!await proceedPrompt()) {
-            //    return
-            // }
             runCmds(dir, cmd, depth + 1)
         }
     }
@@ -408,7 +346,7 @@ function runCmd(dir, cmd, index, count, depth) {
 }
 
 function print(msg, index, count, depth) {
-    const prefix = new Array(depth+1).join("*")
+    const prefix = new Array(2*(depth+1)).join(DEPTH_PREFIX[depth])
     utils.logInfo(`${prefix} ${index}/${count} ${msg}`, COLOR.green)
 }
 
