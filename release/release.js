@@ -86,7 +86,10 @@ async function start() {
     await releaseAndroid()
     await releaseIOS()
     await releaseIOSHybrid()
-    await releaseIOSSpecs
+    await releaseIOSSpecs()
+    await releaseCordovaPlugin()
+    await releaseReactNative()
+    await releaseTemplates()
 }
 
 //
@@ -117,7 +120,7 @@ async function releaseShared() {
     const cmds = {
         msg: `PROCESSING ${repo}`,
         cmds: [
-            cloneAndCheckout(repo),
+            cloneAndCheckout(repo, true /* skip install */),
             mergeDevToMaster(),
             setVersion(config.versionReleased),
             commitTagAndPushMaster(),
@@ -137,7 +140,7 @@ async function releaseAndroid() {
     const cmds = {
         msg: `PROCESSING ${repo}`,
         cmds: [
-            cloneAndCheckout(repo, true),
+            cloneAndCheckout(repo),
             mergeDevToMaster(),
             setVersion(config.versionReleased, false, config.versionCodeReleased),
             updateSubmodules(config.masterBranch, ['external/shared']),
@@ -159,7 +162,7 @@ async function releaseIOS() {
     const cmds = {
         msg: `PROCESSING ${repo}`,
         cmds: [
-            cloneAndCheckout(repo, true),
+            cloneAndCheckout(repo),
             mergeDevToMaster(),
             setVersion(config.versionReleased, false),
             commitTagAndPushMaster(),
@@ -179,7 +182,7 @@ async function releaseIOSHybrid() {
     const cmds = {
         msg: `PROCESSING ${repo}`,
         cmds: [
-            cloneAndCheckout(repo, true),
+            cloneAndCheckout(repo),
             mergeDevToMaster(),
             setVersion(config.versionReleased, false),
             updateSubmodules(config.masterBranch, ['external/shared', 'external/SalesforceMobileSDK-iOS']),
@@ -197,41 +200,92 @@ async function releaseIOSHybrid() {
 // Release function for iOS-Specs repo
 //
 async function releaseIOSSpecs() {
-    const repo = REPO.iosSpecs
+    const repo = REPO.iospecs
     const cmds = {
         msg: `PROCESSING ${repo}`,
         cmds: [
-            cloneAndCheckout(repo),
+            cloneAndCheckout(repo, true /* skip install */),
             mergeDevToMaster(),
             `update.sh -b ${config.masterBranch} -v {config.versionReleased}`,
-            commitTagAndPushMaster()
+            commitTagAndPushMaster(true /* skip tagging */)
         ]
     }
     await runCmds(path.join(config.tmpDir, repo), cmds)
 }
 
+//
+// Release function for CordovaPlugin repo
+//
+async function releaseCordovaPlugin() {
+    const repo = REPO.cordovaplugin
+    const cmds = {
+        msg: `PROCESSING ${repo}`,
+        cmds: [
+            cloneAndCheckout(repo, true /* skip install */),
+            mergeDevToMaster(),
+            `./tools/update.sh -b ${config.masterBranch}`,
+            setVersion(config.versionReleased, false),
+            commitTagAndPushMaster(),
+            checkoutDevAndPullMaster(),
+            `./tools/update.sh -b ${config.devBranch}`,
+            setVersion(config.nextVersion, true),
+            commitAndPushDev()
+        ]
+    }
+    await runCmds(path.join(config.tmpDir, repo), cmds)
+}
 
+//
+// Release function for ReactNative repo
+//
+async function releaseReactNative() {
+    const repo = REPO.reactnative
+    const cmds = {
+        msg: `PROCESSING ${repo}`,
+        cmds: [
+            cloneAndCheckout(repo, true /* skip install */),
+            mergeDevToMaster(),
+            setVersion(config.versionReleased),
+            commitTagAndPushMaster(),
+            checkoutDevAndPullMaster(),
+            setVersion(config.nextVersion),
+            commitAndPushDev()
+        ]
+    }
+    await runCmds(path.join(config.tmpDir, repo), cmds)
+}
+
+//
+// Release function for ReactNative repo
+//
+async function releaseTemplates() {
+    const repo = REPO.templates
+    const cmds = {
+        msg: `PROCESSING ${repo}`,
+        cmds: [
+            cloneAndCheckout(repo, true /* skip install */),
+            mergeDevToMaster(),
+            setVersion(config.versionReleased, false),
+            commitTagAndPushMaster(),
+            checkoutDevAndPullMaster(),
+            setVersion(config.nextVersion, true),
+            commitAndPushDev()
+        ]
+    }
+    await runCmds(path.join(config.tmpDir, repo), cmds)
+}
 
 //
 // Helper functions
 //
-function setVersion(version, isDev, code) {
-    return {
-        msg: `Running setVersion`,
-        cmds: [
-            `./setVersion.sh -v ${version}`  + (isDev != undefined ? ` -d ${isDev}`:'') + (code != undefined ? ` -c ${code}`:'')
-        ]
-    }
-}
-
-function cloneAndCheckout(repo, runInstall) {
+function cloneAndCheckout(repo, skipInstall) {
     return {
         msg: `Cloning ${repo}`,
         cmds: [
             {cmd:`git clone ${urlForRepo(repo)}`, dir:config.tmpDir},
             `git checkout ${config.devBranch}`,
             `git checkout ${config.masterBranch}`,
-            runInstall ? 'install.sh' : ''
+            skipInstall ? null : 'install.sh',
         ]
     }
 }
@@ -245,6 +299,15 @@ function mergeDevToMaster() {
     }
 }
 
+function setVersion(version, isDev, code) {
+    return {
+        msg: `Running setVersion`,
+        cmds: [
+            `./setVersion.sh -v ${version}`  + (isDev != undefined ? ` -d ${isDev}`:'') + (code != undefined ? ` -c ${code}`:'')
+        ]
+    }
+}
+
 function updateSubmodules(branch, submodulePaths) {
     return {
         msg: `Updating submodules to ${branch}`,
@@ -252,13 +315,13 @@ function updateSubmodules(branch, submodulePaths) {
     }
 }
 
-function commitTagAndPushMaster() {
+function commitTagAndPushMaster(skipTagging) {
     return {
         msg: `Committing and tagging ${config.masterBranch}`,
         cmds: [
             `git add *`,
             `git commit -m "Mobile SDK ${config.versionReleased}"`,
-            `git tag ${config.versionReleased}`,
+            skipTagging ? null : `git tag ${config.versionReleased}`,
             `git push origin ${config.masterBranch} --tag`,
         ]
     }
@@ -304,9 +367,9 @@ async function runCmds(dir, cmds, depth) {
             runCmd(cmd.dir || path.join(dir, cmd.reldir), cmd.cmd, i+1, count, depth)
         } else if (cmd.cmds) {
             print(cmd.msg, i+1, count, depth)
-            if (!await proceedPrompt()) {
-                return
-            }
+            // if (!await proceedPrompt()) {
+            //    return
+            // }
             runCmds(dir, cmd, depth + 1)
         }
     }
@@ -315,7 +378,7 @@ async function runCmds(dir, cmds, depth) {
 function runCmd(dir, cmd, index, count, depth) {
     print(cmd, index, count, depth)
     try {
-        utils.runProcessThrowError(cmd, dir)
+        //        utils.runProcessThrowError(cmd, dir)
     } catch (e) {
         process.exit(1);        
     }
