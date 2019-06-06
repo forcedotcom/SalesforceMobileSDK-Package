@@ -36,6 +36,21 @@ const path = require('path'),
       urlForRepo = require('./common.js').urlForRepo,
       REPO = require('./common.js').REPO
 
+
+const templatesPackageJsons = [
+    './AndroidIDPTemplate/package.json',
+    './SmartSyncExplorerReactNative/package.json',
+    './AndroidNativeKotlinTemplate/package.json',
+    './SmartSyncExplorerSwift/package.json',
+    './AndroidNativeTemplate/package.json',
+    './iOSIDPTemplate/package.json',
+    './HybridLocalTemplate/package.json',
+    './iOSNativeSwiftTemplate/package.json',
+    './HybridRemoteTemplate/package.json',
+    './iOSNativeTemplate/package.json',
+    './ReactNativeTemplate/package.json'
+]
+
 // Questions
 const QUESTIONS = [
     {
@@ -94,14 +109,14 @@ async function start() {
 
     config.tmpDir = utils.mkTmpDir()
     await prepareRepo(REPO.shared)
-    await prepareRepo(REPO.android, {hasDoc:true, hasSubmodules: true, hasLibReact: true})
+    await prepareRepo(REPO.android, {hasDoc:true, filesWithOrg: ['.gitmodules', './libs/SalesforceReact/package.json']})
     await prepareRepo(REPO.ios, {hasDoc:true})
-    await prepareRepo(REPO.ioshybrid, {hasSubmodules: true})
-    await prepareRepo(REPO.iospecs, {noTag: true, noDev: true})
-    await prepareRepo(REPO.cordovaplugin)
+    await prepareRepo(REPO.ioshybrid, {filesWithOrg: ['.gitmodules']})
+    await prepareRepo(REPO.iospecs, {noTag: true, noDev: true, filesWithOrg:['update.sh']})
+    await prepareRepo(REPO.cordovaplugin, {filesWithOrg:['./tools/update.sh']})
     await prepareRepo(REPO.reactnative)
-    await prepareRepo(REPO.templates)
-    await prepareRepo(REPO.pkg)
+    await prepareRepo(REPO.templates, {filesWithOrg:templatesPackageJsons})
+    await prepareRepo(REPO.pkg, {fileWithOrg:['./shared/constants.js']})
 }
 
 async function prepareRepo(repo, params) {
@@ -143,14 +158,15 @@ async function prepareRepo(repo, params) {
                     `git push origin ${config.testMasterBranch}`
                 ]
             },
-            !params.hasSubmodules ? null : {
-                msg: `Pointing submodules to ${config.testOrg} in ${config.testMasterBranch} branch`,
+            !params.filesWithOrg ? null : {
+                msg: `Pointing to fork ${config.testOrg} in ${config.testMasterBranch} branch`,
                 cmds: [
                     `git checkout ${config.testMasterBranch}`,
-                    `gsed -i "s/forcedotcom/${config.testOrg}/g" .gitmodules`,
-                    `git add .gitmodules`,
-                    !params.hasLibReact ? null : `gsed -i "s/forcedotcom/${config.testOrg}/g" ./libs/SalesforceReact/package.json`,
-                    !params.hasLibReact ? null : `git add ./libs/SalesforceReact/package.json`,
+                    {
+                        msg: `Editing files`,
+                        cmds: params.filesWithOrg.map(path => { return `gsed -i "s/forcedotcom/${config.testOrg}/g" ${path}` })
+                    },
+                    `git add *`,
                     `git commit -m "Pointing to fork"`,
                     `git push origin ${config.testMasterBranch}`,
                 ]
@@ -163,13 +179,15 @@ async function prepareRepo(repo, params) {
                     `git push origin ${config.testDevBranch}`
                 ]
             },
-            params.noDev || !params.hasSubmodules ? null : {
-                msg: `Pointing submodules to ${config.testOrg} in ${config.testDevBranch} branch`,
+            params.noDev || !params.filesWithOrg ? null : {
+                msg: `Pointing to fork ${config.testOrg} in ${config.testDevBranch} branch`,
                 cmds: [
-                    `gsed -i "s/forcedotcom/${config.testOrg}/g" .gitmodules`,
-                    `git add .gitmodules`,
-                    !params.hasLibReact ? null : `gsed -i "s/forcedotcom/${config.testOrg}/g" ./libs/SalesforceReact/package.json`,
-                    !params.hasLibReact ? null : `git add ./libs/SalesforceReact/package.json`,
+                    `git checkout ${config.testDevBranch}`,
+                    {
+                        msg: `Editing files`,
+                        cmds: params.filesWithOrg.map(path => { return `gsed -i "s/forcedotcom/${config.testOrg}/g" ${path}` })
+                    },
+                    `git add *`,
                     `git commit -m "Pointing to fork"`,
                     `git push origin ${config.testDevBranch}`,
                 ]
