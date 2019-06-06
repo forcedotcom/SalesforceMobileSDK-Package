@@ -148,25 +148,19 @@ function replaceTextInFile(fileName, textInFile, replacementText) {
  */
 function runProcessThrowError(cmd, dir, returnOutput) {
     logDebug('Running: ' + cmd);
-    if (dir) shelljs.pushd(dir);
-    try {
-        if (returnOutput) {
-            return execSync(cmd).toString();
-        }
-        else {
-            var stdio = [];
-            if (LOG_LEVEL >= LOG_LEVELS.DEBUG) {
-                stdio = [0,1,2]
-            }
-            else if (LOG_LEVEL >= LOG_LEVELS.ERROR) {
-                stdio = [0,2]
-            }
-
-            execSync(cmd, {stdio: stdio});
-        }
+    if (returnOutput) {
+        return execSync(cmd, {cwd: dir}).toString();
     }
-    finally {
-        if (dir) shelljs.popd();
+    else {
+        var stdio = [];
+        if (LOG_LEVEL >= LOG_LEVELS.DEBUG) {
+            stdio = [0,1,2]
+        }
+        else if (LOG_LEVEL >= LOG_LEVELS.ERROR) {
+            stdio = [0,2]
+        }
+
+        execSync(cmd, {cwd: dir, stdio: stdio});
     }
 }
 
