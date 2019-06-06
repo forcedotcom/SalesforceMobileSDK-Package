@@ -55,6 +55,11 @@ const QUESTIONS = [
     },
     {
         type: 'text',
+        name: 'testDocBranch',
+        message: 'Name of test doc branch (e.g. gh-pages2) ?'
+    },
+    {
+        type: 'text',
         name: 'testVersion',
         message: 'Name of test version (e.g. 9.5.1) ?'
     }
@@ -89,17 +94,18 @@ async function start() {
 
     config.tmpDir = utils.mkTmpDir()
     await prepareRepo(REPO.shared)
-    await prepareRepo(REPO.android, true /* hasSubmodules */, true /* hasLibReact */)
-    await prepareRepo(REPO.ios)
-    await prepareRepo(REPO.ioshybrid, true /* hasSubmodules */)
-    await prepareRepo(REPO.iospecs, false /* hasSubmodules */, false /* hasLibReact */, true /* noTag */, true /* noDev */)
+    await prepareRepo(REPO.android, {hasDoc:true, hasSubmodules: true, hasLibReact: true})
+    await prepareRepo(REPO.ios, {hasDoc:true})
+    await prepareRepo(REPO.ioshybrid, {hasSubmodules: true})
+    await prepareRepo(REPO.iospecs, {noTag: true, noDev: true})
     await prepareRepo(REPO.cordovaplugin)
     await prepareRepo(REPO.reactnative)
     await prepareRepo(REPO.templates)
     await prepareRepo(REPO.pkg)
 }
 
-async function prepareRepo(repo, hasSubmodules, hasLibReact, noTag, noDev) {
+async function prepareRepo(repo, params) {
+    params = params || {}
     const cmds = {
         msg: `PROCESSING ${repo}`,
         cmds: [
@@ -107,18 +113,22 @@ async function prepareRepo(repo, hasSubmodules, hasLibReact, noTag, noDev) {
             {
                 msg: `Dropping ${config.testMasterBranch} branch`,
                 cmds : [
-                    `git branch -D ${config.testMasterBranch}`,
                     `git push origin :${config.testMasterBranch}`
                 ]
             },
-            noDev ? null : {
+            params.noDev ? null : {
                 msg: `Dropping ${config.testDevBranch} branch`,
                 cmds: [
-                    `git branch -D ${config.testDevBranch}`,
                     `git push origin :${config.testDevBranch}`
                 ]
             },
-            noTag ? null : {
+            !params.hasDoc ? null : {
+                msg: `Dropping ${config.testDocBranch} branch`,
+                cmds: [
+y                    `git push origin :${config.testDocBranch}`
+                ]
+             },
+            params.noTag ? null : {
                 msg: `Dropping ${config.testVersion} tag`,
                 cmds: [
                     `git tag -d ${config.testVersion}`,
@@ -133,19 +143,19 @@ async function prepareRepo(repo, hasSubmodules, hasLibReact, noTag, noDev) {
                     `git push origin ${config.testMasterBranch}`
                 ]
             },
-            !hasSubmodules ? null : {
+            !params.hasSubmodules ? null : {
                 msg: `Pointing submodules to ${config.testOrg} in ${config.testMasterBranch} branch`,
                 cmds: [
                     `git checkout ${config.testMasterBranch}`,
                     `gsed -i "s/forcedotcom/${config.testOrg}/g" .gitmodules`,
                     `git add .gitmodules`,
-                    !hasLibReact ? null : `gsed -i "s/forcedotcom/${config.testOrg}/g" ./libs/SalesforceReact/package.json`,
-                    !hasLibReact ? null : `git add ./libs/SalesforceReact/package.json`,
+                    !params.hasLibReact ? null : `gsed -i "s/forcedotcom/${config.testOrg}/g" ./libs/SalesforceReact/package.json`,
+                    !params.hasLibReact ? null : `git add ./libs/SalesforceReact/package.json`,
                     `git commit -m "Pointing to fork"`,
                     `git push origin ${config.testMasterBranch}`,
                 ]
             },
-            noDev ? null : {
+            params.noDev ? null : {
                 msg: `Creating ${config.testDevBranch} branch`,
                 cmds: [
                     `git checkout dev`,
@@ -153,17 +163,25 @@ async function prepareRepo(repo, hasSubmodules, hasLibReact, noTag, noDev) {
                     `git push origin ${config.testDevBranch}`
                 ]
             },
-            noDev || !hasSubmodules ? null : {
+            params.noDev || !params.hasSubmodules ? null : {
                 msg: `Pointing submodules to ${config.testOrg} in ${config.testDevBranch} branch`,
                 cmds: [
                     `gsed -i "s/forcedotcom/${config.testOrg}/g" .gitmodules`,
                     `git add .gitmodules`,
-                    !hasLibReact ? null : `gsed -i "s/forcedotcom/${config.testOrg}/g" ./libs/SalesforceReact/package.json`,
-                    !hasLibReact ? null : `git add ./libs/SalesforceReact/package.json`,
+                    !params.hasLibReact ? null : `gsed -i "s/forcedotcom/${config.testOrg}/g" ./libs/SalesforceReact/package.json`,
+                    !params.hasLibReact ? null : `git add ./libs/SalesforceReact/package.json`,
                     `git commit -m "Pointing to fork"`,
                     `git push origin ${config.testDevBranch}`,
                 ]
-            }
+            },
+            !params.hasDoc ? null : {
+                msg: `Creating ${config.testDocBranch} branch`,
+                cmds: [
+                    `git checkout gh-pages`,
+                    `git checkout -b ${config.testDocBranch}`,
+                    `git push origin ${config.testDocBranch}`
+                ]
+            },
         ]
     }
 
@@ -190,6 +208,11 @@ function validateConfig() {
 
     if (config.testDevBranch === 'dev') {
         utils.logError(`You can't use ${config.testDevBranch} for testing`)
+        process.exit(1)
+    }
+
+    if (config.testDocBranch === 'gh-pages') {
+        utils.logError(`You can't use ${config.testDocBranch} for testing`)
         process.exit(1)
     }
 
