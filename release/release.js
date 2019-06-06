@@ -55,6 +55,11 @@ const QUESTIONS = [
     },
     {
         type: 'text',
+        name: 'docBranch',
+        message: 'Doc branch (e.g. gh-pages) ?'
+    },
+    {
+        type: 'text',
         name: 'versionReleased',
         message: 'Version being released (e.g. 7.2.0) ?'
     },
@@ -94,6 +99,7 @@ async function start() {
         ` RELEASING version ${config.versionReleased} (code ${config.versionCodeReleased} on Android) `,
         ``,
         `Will merge ${config.devBranch} to ${config.masterBranch} on ${config.org}`,
+        `New doc will be published to ${config.docBranch}`,
         `Afterwards ${config.devBranch} will be for version ${config.nextVersion} (code ${config.nextVersionCode} on Android)`
     ], COLOR.magenta)
     if (!await proceedPrompt()) {
