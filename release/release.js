@@ -132,52 +132,62 @@ function validateConfig() {
 // Release function for shared repo
 //
 async function releaseShared() {
-    await releaseRepo(REPO.shared, false /* runInstall */)
+    await releaseRepo(REPO.shared)
 }
 
 //
 // Release function for android repo (missing: javadoc generation)
 //
 async function releaseAndroid() {
-    await releaseRepo(REPO.android, true /* runInstall */, ['external/shared'])
+    await releaseRepo(REPO.android, {
+        masterPostMergeCmd: './install.sh',
+        devPostMergeCmd: './install.sh',
+        submodulePaths: ['external/shared'],
+        genDocCmd: genDocAndroid()
+    })
 }
 
 //
 // Release function for iOS repo (missing: apple doc generation)
 //
 async function releaseIOS() {
-    await releaseRepo(REPO.ios, true /* runInstall */)
+    await releaseRepo(REPO.ios, {
+        masterPostMergeCmd: './install.sh',
+        devPostMergeCmd: './install.sh',
+        genDocCmd: genDocIOS()        
+    })
 }
 
 //
 // Release function for iOS-Hybrid repo
 //
 async function releaseIOSHybrid() {
-    await releaseRepo(REPO.ioshybrid, true /* runInstall */, ['external/shared', 'external/SalesforceMobileSDK-iOS'])
+    await releaseRepo(REPO.ioshybrid, {
+        masterPostMergeCmd: './install.sh',
+        devPostMergeCmd: './install.sh',
+        submodulePaths: ['external/shared', 'external/SalesforceMobileSDK-iOS']
+    })
 }
 
 //
 // Release function for iOS-Specs repo
 //
 async function releaseIOSSpecs() {
-    const repo = REPO.iospecs
-    const cmds = {
-        msg: `${repo}`,
-        cmds: [
-            {cmd:`git clone ${urlForRepo(config.org, repo)}`, dir:config.tmpDir},
-            checkoutMasterAndMergeDev(),
-            `./update.sh -b ${config.masterBranch} -v {config.versionReleased}`,
-            commitAndPushMaster()
-        ]
-    }
-    await runCmds(path.join(config.tmpDir, repo), cmds)
+    await releaseRepo(REPO.iospecs, {
+        masterPostMergeCmd:`./update.sh -b ${config.masterBranch} -v {config.versionReleased}`,
+        noDev: true,
+        noTag: true
+    })
 }
 
 //
 // Release function for CordovaPlugin repo
 //
 async function releaseCordovaPlugin() {
-    await releaseRepo(REPO.cordovaplugin, false /* runInstall */, null, `./tools/update.sh -b ${config.masterBranch}`, `./tools/update.sh -b ${config.devBranch}`)
+    await releaseRepo(REPO.cordovaplugin, {
+        masterPostMergeCmd:`./tools/update.sh -b ${config.masterBranch}`,
+        devPostMergeCmd:`./tools/update.sh -b ${config.devBranch}`
+    })
 }
 
 //
@@ -205,34 +215,33 @@ async function releasePackage() {
 //
 // Helper functions
 //
-async function releaseRepo(repo, runInstall, submodulePaths, masterPostMergeCmd, devPostMergeCmd) {
+async function releaseRepo(repo, params) {
+    params = params || {}
     const cmds = {
         msg: `PROCESSING ${repo}`,
         cmds: [
             {cmd:`git clone ${urlForRepo(config.org, repo)}`, dir:config.tmpDir},
-            runInstall ? './install.sh' : null,
             // master
             {
                 msg: `Working on ${config.masterBranch}`,
                 cmds: [
                     checkoutMasterAndMergeDev(),
-                    masterPostMergeCmd,
-                    runInstall ? './install.sh' : null,
+                    params.masterPostMergeCmd,
                     setVersion(config.versionReleased, false, config.versionCodeReleased),
-                    updateSubmodules(config.masterBranch, submodulePaths),
+                    params.submodulePaths ? updateSubmodules(config.masterBranch, params.submodulePaths) : null,
                     commitAndPushMaster(),
-                    tagMaster()
+                    params.noTag ? null : tagMaster(),
+                    params.genDocCmd
                 ]
             },
             // dev
-            {
+            params.noDev ? null : {
                 msg: `Working on ${config.devBranch}`,
                 cmds: [
                     checkoutDevAndMergeMaster(),
-                    runInstall ? './install.sh' : null,
-                    devPostMergeCmd,
+                    params.devPostMergeCmd,
                     setVersion(config.nextVersion, true, config.nextVersionCode),
-                    updateSubmodules(config.devBranch, submodulePaths),
+                    params.submodulePaths ? updateSubmodules(config.devBranch, params.submodulePaths) : null,
                     commitAndPushDev()
                 ]
             }
@@ -256,14 +265,12 @@ function setVersion(version, isDev, code) {
     return {
         msg: `Running setVersion ${version}`,
         cmds: [
-            `./setVersion.sh -v ${version}`  + (isDev != undefined ? ` -d ${isDev}`:'') + (code != undefined ? ` -c ${code}`:'')
+            `./setVersion.sh -v ${version}`  + (isDev != undefined ? ` -d ${isDev ? "yes" : "no"}`:'') + (code != undefined ? ` -c ${code}`:'')
         ]
     }
 }
 
 function updateSubmodules(branch, submodulePaths) {
-    if (submodulePaths == null || submodulePaths.length == 0) return null;
-
     return {
         msg: `Updating submodules to ${branch}`,
         cmds: submodulePaths.map(path => { return {cmd:`git pull origin ${branch}`, reldir:path} })
@@ -308,6 +315,40 @@ function checkoutDevAndMergeMaster() {
         cmds: [
             `git checkout ${config.devBranch}`,
             `git pull origin ${config.masterBranch}`
+        ]
+    }
+}
+
+function genDocIOS() {
+    return {
+        msg: `Generating docs for iOS`,
+        cmds: [
+            `git checkout ${config.masterBranch}`,
+            `./docs/generate_docs.sh`,
+            `mv ./build/artifacts/doc ../docIOS`,
+            `git checkout ${config.docBranch}`,
+            `rm -rf Documentation/*`,
+            `mv ../docIOS/* ./Documentation/`,
+            `git add Documentation`,
+            `git commit -m "Apple doc for Mobile SDK ${config.versionReleased}"`,
+            `git push origin ${config.docBranch}`
+        ]
+    }
+}
+
+function genDocAndroid() {
+    return {
+        msg: `Generating docs for Android`,
+        cmds: [
+            `git checkout ${config.masterBranch}`,
+            `./tools/generate_doc.sh`,
+            `mv ./doc ../docAndroid`,
+            `git checkout ${config.docBranch}`,            
+            `rm -rf *`,
+            `mv ../docAndroid/* .`,
+            `git add *`,
+            `git commit -m "Java doc for Mobile SDK ${config.versionReleased}"`,
+            `git push origin ${config.docBranch}`
         ]
     }
 }

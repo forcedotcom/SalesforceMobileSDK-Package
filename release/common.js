@@ -67,7 +67,16 @@ async function runCmds(dir, cmds, depth) {
         if (typeof(cmd) === 'string') {
             await runCmd(dir, cmd, i+1, count, depth)
         } else if (cmd.cmd) {
-            await runCmd(cmd.dir || path.join(dir, cmd.reldir), cmd.cmd, i+1, count, depth)
+            // use cmd.dir if defined
+            // otherwise use cmd.reldir (appended to dir) if defined
+            // otherwise use dir
+            const cmdDir = cmd.dir
+                  ? cmd.dir
+                  : (cmd.reldir
+                     ? path.join(dir, cmd.reldir)
+                     : dir)
+            
+            await runCmd(cmd.dir || cmd.reldir ? path.join(dir, cmd.reldir), cmd.cmd, i+1, count, depth)
         } else if (cmd.cmds) {
             print(cmd.msg, i+1, count, depth)
             await runCmds(dir, cmd, depth + 1)
