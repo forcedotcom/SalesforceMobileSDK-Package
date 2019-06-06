@@ -46,8 +46,14 @@ const REPO = {
 
 const DEPTH_PREFIX = {
     1: '=',
-    2: '+',
+    2: '-',
     3: '-'
+}
+
+const DEPTH_COLOR = {
+    1: COLOR.blue,
+    2: COLOR.yellow,
+    3: COLOR.green
 }
  
 // Run a bunch of commands
@@ -75,8 +81,7 @@ async function runCmds(dir, cmds, depth) {
                   : (cmd.reldir
                      ? path.join(dir, cmd.reldir)
                      : dir)
-            
-            await runCmd(cmd.dir || cmd.reldir ? path.join(dir, cmd.reldir), cmd.cmd, i+1, count, depth)
+            await runCmd(cmdDir, cmd.cmd, i+1, count, depth)
         } else if (cmd.cmds) {
             print(cmd.msg, i+1, count, depth)
             await runCmds(dir, cmd, depth + 1)
@@ -108,7 +113,7 @@ async function runCmd(dir, cmd, index, count, depth) {
 
 function print(msg, index, count, depth) {
     const prefix = new Array(2*(depth+1)).join(DEPTH_PREFIX[depth] || ' ')
-    utils.logInfo(`${prefix} ${index}/${count} ${msg}`, COLOR.green)
+    utils.logInfo(`\n${prefix} ${index}/${count} ${msg}`, DEPTH_COLOR[depth] || COLOR.green)
 }
 
 function urlForRepo(org, repo) {

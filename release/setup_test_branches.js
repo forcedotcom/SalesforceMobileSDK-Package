@@ -125,7 +125,7 @@ async function prepareRepo(repo, params) {
             !params.hasDoc ? null : {
                 msg: `Dropping ${config.testDocBranch} branch`,
                 cmds: [
-y                    `git push origin :${config.testDocBranch}`
+                    `git push origin :${config.testDocBranch}`
                 ]
              },
             params.noTag ? null : {
