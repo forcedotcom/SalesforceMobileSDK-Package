@@ -89,17 +89,17 @@ async function start() {
 
     config.tmpDir = utils.mkTmpDir()
     await prepareRepo(REPO.shared)
-    await prepareRepo(REPO.android, true /* hasSubmodules */)
+    await prepareRepo(REPO.android, true /* hasSubmodules */, true /* hasLibReact */)
     await prepareRepo(REPO.ios)
     await prepareRepo(REPO.ioshybrid, true /* hasSubmodules */)
-    await prepareRepo(REPO.iospecs, false /* hasSubmodules */, true /* noTag */, true /* noDev */)
+    await prepareRepo(REPO.iospecs, false /* hasSubmodules */, false /* hasLibReact */, true /* noTag */, true /* noDev */)
     await prepareRepo(REPO.cordovaplugin)
     await prepareRepo(REPO.reactnative)
     await prepareRepo(REPO.templates)
     await prepareRepo(REPO.pkg)
 }
 
-async function prepareRepo(repo, hasSubmodules, noTag, noDev) {
+async function prepareRepo(repo, hasSubmodules, hasLibReact, noTag, noDev) {
     const cmds = {
         msg: `PROCESSING ${repo}`,
         cmds: [
@@ -139,6 +139,8 @@ async function prepareRepo(repo, hasSubmodules, noTag, noDev) {
                     `git checkout ${config.testMasterBranch}`,
                     `gsed -i "s/forcedotcom/${config.testOrg}/g" .gitmodules`,
                     `git add .gitmodules`,
+                    !hasLibReact ? null : `gsed -i "s/forcedotcom/${config.testOrg}/g" ./libs/SalesforceReact/package.json`,
+                    !hasLibReact ? null : `git add ./libs/SalesforceReact/package.json`,
                     `git commit -m "Pointing to fork"`,
                     `git push origin ${config.testMasterBranch}`,
                 ]
@@ -156,6 +158,8 @@ async function prepareRepo(repo, hasSubmodules, noTag, noDev) {
                 cmds: [
                     `gsed -i "s/forcedotcom/${config.testOrg}/g" .gitmodules`,
                     `git add .gitmodules`,
+                    !hasLibReact ? null : `gsed -i "s/forcedotcom/${config.testOrg}/g" ./libs/SalesforceReact/package.json`,
+                    !hasLibReact ? null : `git add ./libs/SalesforceReact/package.json`,
                     `git commit -m "Pointing to fork"`,
                     `git push origin ${config.testDevBranch}`,
                 ]
