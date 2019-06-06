@@ -173,11 +173,17 @@ async function releaseIOSHybrid() {
 // Release function for iOS-Specs repo
 //
 async function releaseIOSSpecs() {
-    await releaseRepo(REPO.iospecs, {
-        masterPostMergeCmd:`./update.sh -b ${config.masterBranch} -v {config.versionReleased}`,
-        noDev: true,
-        noTag: true
-    })
+    const repo = REPO.iospecs
+    const cmds = {
+        msg: `PROCESSING ${repo}`,
+        cmds: [
+            {cmd:`git clone ${urlForRepo(config.org, repo)}`, dir:config.tmpDir},
+            `git checkout ${config.masterBranch}`,
+            `./update.sh -b ${config.masterBranch} -v ${config.versionReleased}`,
+            commitAndPushMaster()
+        ]
+    }
+    await runCmds(path.join(config.tmpDir, repo), cmds)
 }
 
 //
@@ -228,20 +234,20 @@ async function releaseRepo(repo, params) {
                     checkoutMasterAndMergeDev(),
                     params.masterPostMergeCmd,
                     setVersion(config.versionReleased, false, config.versionCodeReleased),
-                    params.submodulePaths ? updateSubmodules(config.masterBranch, params.submodulePaths) : null,
+                    updateSubmodules(config.masterBranch, params.submodulePaths),
                     commitAndPushMaster(),
-                    params.noTag ? null : tagMaster(),
+                    tagMaster(),
                     params.genDocCmd
                 ]
             },
             // dev
-            params.noDev ? null : {
+            {
                 msg: `Working on ${config.devBranch}`,
                 cmds: [
                     checkoutDevAndMergeMaster(),
                     params.devPostMergeCmd,
                     setVersion(config.nextVersion, true, config.nextVersionCode),
-                    params.submodulePaths ? updateSubmodules(config.devBranch, params.submodulePaths) : null,
+                    updateSubmodules(config.devBranch, params.submodulePaths),
                     commitAndPushDev()
                 ]
             }
@@ -271,7 +277,7 @@ function setVersion(version, isDev, code) {
 }
 
 function updateSubmodules(branch, submodulePaths) {
-    return {
+    return !submodulePaths ? null : {
         msg: `Updating submodules to ${branch}`,
         cmds: submodulePaths.map(path => { return {cmd:`git pull origin ${branch}`, reldir:path} })
     }
