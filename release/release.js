@@ -1,31 +1,40 @@
 #!/usr/bin/env node
+/*
+ * Copyright (c) 2019-present, salesforce.com, inc.
+ * All rights reserved.
+ * Redistribution and use of this software in source and binary forms, with or
+ * without modification, are permitted provided that the following conditions
+ * are met:
+ * - Redistributions of source code must retain the above copyright notice, this
+ * list of conditions and the following disclaimer.
+ * - Redistributions in binary form must reproduce the above copyright notice,
+ * this list of conditions and the following disclaimer in the documentation
+ * and/or other materials provided with the distribution.
+ * - Neither the name of salesforce.com, inc. nor the names of its contributors
+ * may be used to endorse or promote products derived from this software without
+ * specific prior written permission of salesforce.com, inc.
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ */
 
 // Dependencies
 const path = require('path'),
       prompts = require('prompts'),
       utils = require('../shared/utils'),
-      COLOR = require('../shared/outputColors')
-
-// Constants
-const REPO = {
-    shared: 'SalesforceMobileSDK-Shared',
-    android: 'SalesforceMobileSDK-Android',
-    ios: 'SalesforceMobileSDK-iOS',
-    ioshybrid: 'SalesforceMobileSDK-iOS-Hybrid',
-    iospecs: 'SalesforceMobileSDK-iOS-Specs',
-    cordovaplugin: 'SalesforceMobileSDK-CordovaPlugin',
-    reactnative: 'SalesforceMobileSDK-ReactNative',
-    templates: 'SalesforceMobileSDK-Templates',
-    pkg: 'SalesforceMobileSDK-Package'
-}
-
-const DEPTH_PREFIX = {
-    1: '=',
-    2: '-',
-    3: ' ',
-    4: ' ',
-    5: ' ',
-}
+      COLOR = require('../shared/outputColors'),
+      proceedPrompt = require('./common.js').proceedPrompt,
+      runCmds = require('./common.js').runCmds,
+      urlForRepo = require('./common.js').urlForRepo,
+      REPO = require('./common.js').REPO
 
 // Questions
 const QUESTIONS = [
@@ -67,6 +76,7 @@ const QUESTIONS = [
 ]
 
 // Calling start
+utils.setLogLevel(utils.LOG_LEVELS.DEBUG)
 var config = {}
 start()
 
@@ -106,20 +116,9 @@ async function start() {
 //
 function validateConfig() {
     if (Object.keys(config).length < QUESTIONS.length) {
-        process.exit(0)
+        process.exit(1)
     }
 }    
-
-//
-// Proceed prompt
-async function proceedPrompt() {
-    const confirmation = await prompts([{type:'confirm',
-                                         name:'value',
-                                         initial:false,
-                                         message:'Are you sure you want to proceed?'}])                                         
-
-    return confirmation.value
-}
 
 //
 // Release function for shared repo
@@ -159,7 +158,7 @@ async function releaseIOSSpecs() {
         cmds: [
             cloneAndInstall(repo),
             checkoutMasterAndMergeDev(),
-            `update.sh -b ${config.masterBranch} -v {config.versionReleased}`,
+            `./update.sh -b ${config.masterBranch} -v {config.versionReleased}`,
             commitAndPushMaster()
         ]
     }
@@ -235,8 +234,8 @@ function cloneAndInstall(repo, runInstall) {
     return {
         msg: `Cloning ${repo}`,
         cmds: [
-            {cmd:`git clone ${urlForRepo(repo)}`, dir:config.tmpDir},
-            runInstall ? 'install.sh' : null,
+            {cmd:`git clone ${urlForRepo(config.org, repo)}`, dir:config.tmpDir},
+            runInstall ? './install.sh' : null,
         ]
     }
 }
@@ -311,64 +310,3 @@ function checkoutDevAndMergeMaster() {
         ]
     }
 }
-
-async function runCmds(dir, cmds, depth) {
-    if (!depth) {
-        utils.logInfo(`\n=== ${cmds.msg} ===`, COLOR.magenta)
-        if (!await proceedPrompt()) {
-            return
-        }
-    }
-
-    depth = depth || 1
-    cmds.cmds = cmds.cmds.filter(x => !!x)
-    const count = cmds.cmds.length
-    for (var i=0; i<count; i++) {
-        const cmd = cmds.cmds[i]
-        if (typeof(cmd) === 'string') {
-            runCmd(dir, cmd, i+1, count, depth)
-        } else if (cmd.cmd) {
-            runCmd(cmd.dir || path.join(dir, cmd.reldir), cmd.cmd, i+1, count, depth)
-        } else if (cmd.cmds) {
-            print(cmd.msg, i+1, count, depth)
-            runCmds(dir, cmd, depth + 1)
-        }
-    }
-}
-
-function runCmd(dir, cmd, index, count, depth) {
-    print(cmd, index, count, depth)
-    try {
-        //        utils.runProcessThrowError(cmd, dir)
-    } catch (e) {
-        process.exit(1);        
-    }
-}
-
-function print(msg, index, count, depth) {
-    const prefix = new Array(2*(depth+1)).join(DEPTH_PREFIX[depth])
-    utils.logInfo(`${prefix} ${index}/${count} ${msg}`, COLOR.green)
-}
-
-function urlForRepo(repo) {
-    return `git@github.com:${config.org}/${repo}`;
-}
-
-/* To cleanup / setup test branches
-
-   git checkout master
-   git branch -D master2; git push origin :master2
-   git branch -D dev2; git push origin :dev2
-   git tag -d 7.2.0; git push --delete origin 7.2.0
-   git checkout master; git checkout -b master2; git push origin master2
-   gsed -i "s/forcedotcom/wmathurin/g" .gitmodules
-   git add .gitmodules
-   git commit -m "Pointing to fork"
-   git push origin master2
-   git checkout dev;    git checkout -b dev2;    git push origin dev2
-   gsed -i "s/forcedotcom/wmathurin/g" .gitmodules
-   git add .gitmodules
-   git commit -m "Pointing to fork"
-   git push origin dev2
-
-*/
