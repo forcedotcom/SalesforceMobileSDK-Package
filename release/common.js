@@ -54,7 +54,7 @@ const DEPTH_PREFIX = {
 async function runCmds(dir, cmds, depth) {
     if (!depth) {
         utils.logInfo(`\n=== ${cmds.msg} ===`, COLOR.magenta)
-        if (!await proceedPrompt()) {
+        if (!await proceedPrompt('Answer y(es) to proceed and n(o) to skip:')) {
             return
         }
     }

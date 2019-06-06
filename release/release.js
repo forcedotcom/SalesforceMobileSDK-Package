@@ -90,7 +90,9 @@ async function start() {
 
     // Final confirmation
     utils.logParagraph([
-        `RELEASING version ${config.versionReleased} (code ${config.versionCodeReleased} on Android)`,
+        ``,
+        ` RELEASING version ${config.versionReleased} (code ${config.versionCodeReleased} on Android) `,
+        ``,
         `Will merge ${config.devBranch} to ${config.masterBranch} on ${config.org}`,
         `Afterwards ${config.devBranch} will be for version ${config.nextVersion} (code ${config.nextVersionCode} on Android)`
     ], COLOR.magenta)
@@ -154,9 +156,9 @@ async function releaseIOSHybrid() {
 async function releaseIOSSpecs() {
     const repo = REPO.iospecs
     const cmds = {
-        msg: `PROCESSING ${repo}`,
+        msg: `${repo}`,
         cmds: [
-            cloneAndInstall(repo),
+            {cmd:`git clone ${urlForRepo(config.org, repo)}`, dir:config.tmpDir},
             checkoutMasterAndMergeDev(),
             `./update.sh -b ${config.masterBranch} -v {config.versionReleased}`,
             commitAndPushMaster()
@@ -201,13 +203,15 @@ async function releaseRepo(repo, runInstall, submodulePaths, masterPostMergeCmd,
     const cmds = {
         msg: `PROCESSING ${repo}`,
         cmds: [
-            cloneAndInstall(repo, runInstall),
+            {cmd:`git clone ${urlForRepo(config.org, repo)}`, dir:config.tmpDir},
+            runInstall ? './install.sh' : null,
             // master
             {
                 msg: `Working on ${config.masterBranch}`,
                 cmds: [
                     checkoutMasterAndMergeDev(),
                     masterPostMergeCmd,
+                    runInstall ? './install.sh' : null,
                     setVersion(config.versionReleased, false, config.versionCodeReleased),
                     updateSubmodules(config.masterBranch, submodulePaths),
                     commitAndPushMaster(),
@@ -219,6 +223,7 @@ async function releaseRepo(repo, runInstall, submodulePaths, masterPostMergeCmd,
                 msg: `Working on ${config.devBranch}`,
                 cmds: [
                     checkoutDevAndMergeMaster(),
+                    runInstall ? './install.sh' : null,
                     devPostMergeCmd,
                     setVersion(config.nextVersion, true, config.nextVersionCode),
                     updateSubmodules(config.devBranch, submodulePaths),
@@ -228,16 +233,6 @@ async function releaseRepo(repo, runInstall, submodulePaths, masterPostMergeCmd,
         ]
     }
     await runCmds(path.join(config.tmpDir, repo), cmds)
-}
-
-function cloneAndInstall(repo, runInstall) {
-    return {
-        msg: `Cloning ${repo}`,
-        cmds: [
-            {cmd:`git clone ${urlForRepo(config.org, repo)}`, dir:config.tmpDir},
-            runInstall ? './install.sh' : null,
-        ]
-    }
 }
 
 function checkoutMasterAndMergeDev() {
