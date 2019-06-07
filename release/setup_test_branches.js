@@ -128,7 +128,6 @@ async function start() {
 
     // Final confirmation
     utils.logParagraph([
-        ``,
         ` SETTING UP TEST BRANCHES FOR RELEASE TESTING `,
         ``,
         `Will drop and recreate ${config.testMasterBranch} off of master on all repos in ${config.testOrg}`,
@@ -145,6 +144,7 @@ async function start() {
     } else {
         utils.mkDirIfNeeded(config.tmpDir)
     }
+
     await prepareRepo(REPO.shared)
     await prepareRepo(REPO.android, {hasDoc:true, filesWithOrg: ['.gitmodules', './libs/SalesforceReact/package.json'], submodulePaths:['./external/shared']})
     await prepareRepo(REPO.ios, {hasDoc:true})

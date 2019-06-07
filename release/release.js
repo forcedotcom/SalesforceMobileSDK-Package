@@ -130,7 +130,6 @@ async function start() {
 
     // Final confirmation
     utils.logParagraph([
-        ``,
         ` RELEASING version ${config.versionReleased} (code ${config.versionCodeReleased} on Android) `,
         ``,
         `Will merge ${config.devBranch} to ${config.masterBranch} on ${config.org}`,
