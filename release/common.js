@@ -53,8 +53,10 @@ const DEPTH_PREFIX = {
 const DEPTH_COLOR = {
     1: COLOR.blue,
     2: COLOR.yellow,
-    3: COLOR.green
+    3: COLOR.cyan
 }
+
+var autoYesForPrompts = false
  
 // Run a bunch of commands
 async function runCmds(dir, cmds, depth) {
@@ -81,7 +83,7 @@ async function runCmds(dir, cmds, depth) {
                   : (cmd.reldir
                      ? path.join(dir, cmd.reldir)
                      : dir)
-            await runCmd(cmdDir, cmd.cmd, i+1, count, depth)
+            await runCmd(cmdDir, cmd.cmd, i+1, count, depth, cmd.ignoreError)
         } else if (cmd.cmds) {
             print(cmd.msg, i+1, count, depth)
             await runCmds(dir, cmd, depth + 1)
@@ -91,6 +93,10 @@ async function runCmds(dir, cmds, depth) {
 
 // Proceed prompt
 async function proceedPrompt(msg) {
+    if (autoYesForPrompts) {
+        return true
+    }
+    
     const confirmation = await prompts([{type:'confirm',
                                          name:'value',
                                          initial:false,
@@ -100,12 +106,13 @@ async function proceedPrompt(msg) {
 }
 
 
-async function runCmd(dir, cmd, index, count, depth) {
-    print(cmd, index, count, depth)
+async function runCmd(dir, cmd, index, count, depth, ignoreError) {
+    const p = `.../${dir.split('/').slice(-2).join('/')}`
+    print(`${p} > ${cmd}`, index, count, depth)
     try {
         utils.runProcessThrowError(cmd, dir)
     } catch (e) {
-        if (!await proceedPrompt('An error occurred. Continue?')) {
+        if (!ignoreError && !await proceedPrompt('An error occurred. Continue?')) {
             process.exit(1);
         }
     }
@@ -120,9 +127,14 @@ function urlForRepo(org, repo) {
     return `git@github.com:${org}/${repo}`;
 }
 
+function setAutoYesForPrompts(b) {
+    autoYesForPrompts = b;
+}
+
 module.exports = {
     REPO,
     runCmds,
     proceedPrompt,
-    urlForRepo
+    urlForRepo,
+    setAutoYesForPrompts
 }

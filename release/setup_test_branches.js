@@ -34,8 +34,9 @@ const path = require('path'),
       proceedPrompt = require('./common.js').proceedPrompt,
       runCmds = require('./common.js').runCmds,
       urlForRepo = require('./common.js').urlForRepo,
-      REPO = require('./common.js').REPO
-
+      setAutoYesForPrompts = require('./common.js').setAutoYesForPrompts,
+      REPO = require('./common.js').REPO,
+      VERSION = require('../shared/constants.js').version
 
 const templatesPackageJsons = [
     './AndroidIDPTemplate/package.json',
@@ -56,27 +57,38 @@ const QUESTIONS = [
     {
         type: 'text',
         name: 'testOrg',
-        message: 'Organization (e.g. wmathurin) ?'
+        message: 'Organization ?',
+        initial: 'wmathurin'
     },
     {
         type: 'text',
         name: 'testMasterBranch',
-        message: 'Name of test master branch (e.g. master2) ?'
+        message: 'Name of test master branch ?',
+        initial: 'master2'
     },
     {
         type: 'text',
         name: 'testDevBranch',
-        message: 'Name of test dev branch (e.g. dev2) ?'
+        message: 'Name of test dev branch ?',
+        initial: 'dev2'
     },
     {
         type: 'text',
         name: 'testDocBranch',
-        message: 'Name of test doc branch (e.g. gh-pages2) ?'
+        message: 'Name of test doc branch ?',
+        initial: 'gh-pages2'
     },
     {
         type: 'text',
         name: 'testVersion',
-        message: 'Name of test version (e.g. 9.5.1) ?'
+        message: `Name of test version ?`,
+        initial: VERSION
+    },
+    {
+        type:'confirm',
+        name: 'autoYesForPrompts',
+        message: `Automatically answer yes to all prompts?`,
+        initial: true
     }
 ]
 
@@ -92,6 +104,7 @@ async function start() {
     config = await prompts(QUESTIONS)
 
     validateConfig()
+    setAutoYesForPrompts(config.autoYesForPrompts)
 
     // Final confirmation
     utils.logParagraph([
@@ -108,15 +121,15 @@ async function start() {
     }
 
     config.tmpDir = utils.mkTmpDir()
-    await prepareRepo(REPO.shared)
-    await prepareRepo(REPO.android, {hasDoc:true, filesWithOrg: ['.gitmodules', './libs/SalesforceReact/package.json']})
-    await prepareRepo(REPO.ios, {hasDoc:true})
-    await prepareRepo(REPO.ioshybrid, {filesWithOrg: ['.gitmodules']})
+//    await prepareRepo(REPO.shared)
+//    await prepareRepo(REPO.android, {hasDoc:true, filesWithOrg: ['.gitmodules', './libs/SalesforceReact/package.json'], submodulePaths:['./external/shared']})
+//    await prepareRepo(REPO.ios, {hasDoc:true})
+    await prepareRepo(REPO.ioshybrid, {filesWithOrg: ['.gitmodules'], submodulePaths:['./external/shared']})
     await prepareRepo(REPO.iospecs, {noTag: true, noDev: true, filesWithOrg:['update.sh']})
     await prepareRepo(REPO.cordovaplugin, {filesWithOrg:['./tools/update.sh']})
     await prepareRepo(REPO.reactnative)
     await prepareRepo(REPO.templates, {filesWithOrg:templatesPackageJsons})
-    await prepareRepo(REPO.pkg, {fileWithOrg:['./shared/constants.js']})
+    await prepareRepo(REPO.pkg, {filesWithOrg:['./shared/constants.js']})
 }
 
 async function prepareRepo(repo, params) {
@@ -125,86 +138,94 @@ async function prepareRepo(repo, params) {
         msg: `PROCESSING ${repo}`,
         cmds: [
             {cmd:`git clone ${urlForRepo(config.testOrg, repo)}`, dir:config.tmpDir},
-            {
-                msg: `Dropping ${config.testMasterBranch} branch`,
-                cmds : [
-                    `git push origin :${config.testMasterBranch}`
-                ]
-            },
-            params.noDev ? null : {
-                msg: `Dropping ${config.testDevBranch} branch`,
-                cmds: [
-                    `git push origin :${config.testDevBranch}`
-                ]
-            },
-            !params.hasDoc ? null : {
-                msg: `Dropping ${config.testDocBranch} branch`,
-                cmds: [
-                    `git push origin :${config.testDocBranch}`
-                ]
-             },
-            params.noTag ? null : {
-                msg: `Dropping ${config.testVersion} tag`,
-                cmds: [
-                    `git tag -d ${config.testVersion}`,
-                    `git push --delete origin ${config.testVersion}`
-                ]
-            },
-            {
-                msg: `Creating ${config.testMasterBranch} branch`,
-                cmds: [
-                    `git checkout master`,
-                    `git checkout -b ${config.testMasterBranch}`,
-                    `git push origin ${config.testMasterBranch}`
-                ]
-            },
-            !params.filesWithOrg ? null : {
-                msg: `Pointing to fork ${config.testOrg} in ${config.testMasterBranch} branch`,
-                cmds: [
-                    `git checkout ${config.testMasterBranch}`,
-                    {
-                        msg: `Editing files`,
-                        cmds: params.filesWithOrg.map(path => { return `gsed -i "s/forcedotcom/${config.testOrg}/g" ${path}` })
-                    },
-                    `git add *`,
-                    `git commit -m "Pointing to fork"`,
-                    `git push origin ${config.testMasterBranch}`,
-                ]
-            },
-            params.noDev ? null : {
-                msg: `Creating ${config.testDevBranch} branch`,
-                cmds: [
-                    `git checkout dev`,
-                    `git checkout -b ${config.testDevBranch}`,
-                    `git push origin ${config.testDevBranch}`
-                ]
-            },
-            params.noDev || !params.filesWithOrg ? null : {
-                msg: `Pointing to fork ${config.testOrg} in ${config.testDevBranch} branch`,
-                cmds: [
-                    `git checkout ${config.testDevBranch}`,
-                    {
-                        msg: `Editing files`,
-                        cmds: params.filesWithOrg.map(path => { return `gsed -i "s/forcedotcom/${config.testOrg}/g" ${path}` })
-                    },
-                    `git add *`,
-                    `git commit -m "Pointing to fork"`,
-                    `git push origin ${config.testDevBranch}`,
-                ]
-            },
-            !params.hasDoc ? null : {
-                msg: `Creating ${config.testDocBranch} branch`,
-                cmds: [
-                    `git checkout gh-pages`,
-                    `git checkout -b ${config.testDocBranch}`,
-                    `git push origin ${config.testDocBranch}`
-                ]
-            },
+            deleteBranch(config.testMasterBranch),
+            params.noDev ? null : deleteBranch(config.testDevBranch),
+            !params.hasDoc ? null : deleteBranch(config.testDocBranch),
+            params.noTag ? null : deleteTag(config.testVersion),
+            createBranch(config.testMasterBranch, 'master'),
+            !params.filesWithOrg ? null : pointToFork(config.testMasterBranch, params),
+            !params.submodulePaths ? null : updateSubmodules(config.testMasterBranch, params),
+            params.noDev ? null : createBranch(config.testDevBranch, 'dev'),
+            params.noDev || !params.filesWithOrg ? null : pointToFork(config.testDevBranch, params),            
+            !params.submodulePaths ? null : updateSubmodules(config.testDevBranch, params),
+            !params.hasDoc ? null : createBranch(config.testDocBranch, 'gh-pages')
         ]
     }
 
     await runCmds(path.join(config.tmpDir, repo), cmds)
 }
+
+//
+// Helper functions
+//
+function deleteBranch(branch) {
+    return {
+        msg: `Deleting ${branch} branch`,
+        cmds: [
+            `git push origin :${branch}`
+        ]
+    }
+}
+
+function deleteTag(tag) {
+    return {
+        msg: `Deleting ${tag} tag`,
+        cmds: [
+            `git tag -d ${tag}`,
+            `git push --delete origin ${tag}`
+        ]
+    }
+}
+
+function createBranch(branch, rootBranch) {
+    return    {
+        msg: `Creating ${branch} branch off of ${rootBranch}`,
+        cmds: [
+            `git checkout ${rootBranch}`,
+            `git checkout -b ${branch}`,
+            `git push origin ${branch}`
+        ]
+    }    
+}
+
+function pointToFork(branch, params) {
+    return {
+        msg: `Pointing to fork ${config.testOrg} in ${branch} branch`,
+        cmds: [
+            `git checkout ${branch}`,
+            {
+                msg: `Editing files`,
+                cmds: params.filesWithOrg.map(path => `gsed -i "s/forcedotcom/${config.testOrg}/g" ${path}`)
+            },
+            {
+                msg: `Git adding files`,
+                cmds: params.filesWithOrg.map(path => `git add ${path}` )
+            },
+            `git commit -m "Pointing to fork"`,
+            `git push origin ${branch}`,
+        ]
+    }
+}
+
+function updateSubmodules(branch, params) {
+    return {
+        msg: `Pointing submodules to ${branch} branch`,
+        cmds: [
+            `git checkout ${branch}`,
+            {
+                msg: `Pulling ${branch}`,
+                cmds: params.submodulePaths.map(path => { return { cmd:`git pull origin ${branch}`, reldir:path } })
+            },
+            {
+                msg: `Git adding modified submodules`,
+                cmds: params.submodulePaths.map(path => `git add ${path}` )
+            },
+            `git commit -m "Updating submodules"`,
+            `git push origin ${branch}`,
+        ]
+    }
+}
+
 
 //
 // Config validation
@@ -234,7 +255,7 @@ function validateConfig() {
         process.exit(1)
     }
 
-    if (config.testVersion <= '7.1.0') {
+    if (config.testVersion < VERSION) {
         utils.logError(`You can't use ${config.testVersion} for testing`)
         process.exit(1)
     }

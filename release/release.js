@@ -277,10 +277,11 @@ function setVersion(version, isDev, code) {
 }
 
 function updateSubmodules(branch, submodulePaths) {
-    return !submodulePaths ? null : {
+    const cmds = !submodulePaths ? null : {
         msg: `Updating submodules to ${branch}`,
         cmds: submodulePaths.map(path => { return {cmd:`git pull origin ${branch}`, reldir:path} })
     }
+    return cmds
 }
 
 function commitAndPushMaster() {
@@ -288,7 +289,7 @@ function commitAndPushMaster() {
         msg: `Pushing to ${config.masterBranch}`,
         cmds: [
             `git add *`,
-            `git commit -m "Mobile SDK ${config.versionReleased}"`,
+            {cmd: `git commit -m "Mobile SDK ${config.versionReleased}"`, ignoreError: true},
             `git push origin ${config.masterBranch}`,
         ]
     }

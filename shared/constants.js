@@ -28,7 +28,7 @@
 var path = require('path'),
     shelljs = require('shelljs');
 
-var VERSION = '7.1.0';
+var VERSION = '7.2.0';
 
 module.exports = {
     version: VERSION,
