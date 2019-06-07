@@ -215,6 +215,7 @@ function deleteBranch(branch) {
     return {
         msg: `Deleting ${branch} branch`,
         cmds: [
+            `git checkout master`,
             {cmd: `git branch -D ${branch}`, ignoreError: true},
             {cmd: `git push origin :${branch}`, ignoreError: true}
         ]

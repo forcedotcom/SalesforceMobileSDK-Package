@@ -451,6 +451,7 @@ function generateNpmPackages() {
             `node ./pack/pack.js --sfdx-plugin`,
             `mv ./force*.tgz ../`,
             `mv ./sfdx-*.tgz ../`,
+            `git checkout -- .`
         ]
     }
 }
