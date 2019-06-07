@@ -159,9 +159,7 @@ async function prepareRepo(repo, params) {
                     {
                         msg: `Setting up ${config.testMasterBranch}`,
                         cmds: [
-                            createBranch(config.testMasterBranch, 'master'),
-                            !params.filesWithOrg ? null : pointToFork(config.testMasterBranch, params),
-                            !params.submodulePaths ? null : updateSubmodules(config.testMasterBranch, params)
+                            createBranch(config.testMasterBranch, 'master') // not fixing submodules / package.json files so it's doesn't conflict on merge
                         ]
                     },
                     !params.hasDoc ? null : createBranch(config.testDocBranch, 'gh-pages'),
@@ -170,6 +168,7 @@ async function prepareRepo(repo, params) {
                         cmds: [
                             createBranch(config.testDevBranch, 'dev'),
                             mergeMasterToDev(),
+                            !params.filesWithOrg ? null : pointToFork(config.testDevBranch, params),
                             !params.submodulePaths ? null : updateSubmodules(config.testDevBranch, params)
                         ]
                     }
