@@ -156,6 +156,30 @@ async function start() {
     await releaseReactNative()
     await releaseTemplates()
     await releasePackage()
+
+    utils.logParagraph([
+        ` NEXT STEPS `,
+        ``,
+        `To publish to NPM, perform the following steps.`,
+        `  cd ${config.tmpDir}`,
+        `  npm publish forceios-${config.versionReleased}.tgz`,
+        `  npm publish forcedroid-${config.versionReleased}.tgz`,
+        `  npm publish forcehybrid-${config.versionReleased}.tgz`,
+        `  npm publish forcereact-${config.versionReleased}.tgz`,
+        `  npm publish sfdx-mobilesdk-plugin-${config.versionReleased}.tgz`,
+        ``,
+        `To publish to Bintray jCenter, perform the following steps.`,
+        `  cd ${path.join(config.tmpDir, REPO.android)}`,
+        `  ./gradlew :libs:SalesforceAnalytics:bintrayUpload`,
+        `  ./gradlew :libs:SalesforceSDK:bintrayUpload`,
+        `  ./gradlew :libs:SmartStore:bintrayUpload`,
+        `  ./gradlew :libs:SmartSync:bintrayUpload`,
+        `  ./gradlew :libs:SalesforceHybrid:bintrayUpload`,
+        ``,
+        `Do NOT publish until absolutely certain and you know what you’re doing.`,
+        `There’s no going back from here.`
+    ], COLOR.magenta)
+
 }
 
 //
@@ -248,27 +272,8 @@ async function releaseTemplates() {
 //
 async function releasePackage() {
     await releaseRepo(REPO.pkg, {
-        postReleaseGenerateCmd: generatePackages()
+        postReleaseGenerateCmd: generateNpmPackages()
     })        
-}
-
-//
-// Generate npm packages
-//
-async function generatePackages() {
-    const cmds = {
-        msg: `GENERATING npm packages`,
-        cmds: [
-            `git checkout ${config.masterBranch}`,
-            `node ./install.js`,
-            `node ./pack/pack.js --cli=forceios,forcedroid,forcehybrid,forcereact`,
-            `node ./pack/pack.js --sfdx-plugin`,
-            `mv ./force*.tgz ../`,
-            `mv ./sfdx-*.tgz ../`,
-        ]
-    }
-
-    await runCmds(path.join(config.tmpDir, REPO.pkg), cmds)
 }
 
 //
@@ -303,7 +308,9 @@ async function releaseRepo(repo, params) {
                     updateSubmodules(config.devBranch, params.submodulePaths),
                     commitAndPushDev()
                 ]
-            }
+            },
+            // In master branch
+            `git checkout ${config.masterBranch}`
         ]
     }
     await runCmds(path.join(config.tmpDir, repo), cmds)
