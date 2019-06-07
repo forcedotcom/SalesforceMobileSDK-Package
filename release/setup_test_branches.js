@@ -86,6 +86,12 @@ const QUESTIONS = [
     },
     {
         type:'confirm',
+        name: 'cleanupOnly',
+        message: `Cleanup only?`,
+        initial: false
+    },
+    {
+        type:'confirm',
         name: 'autoYesForPrompts',
         message: `Automatically answer yes to all prompts?`,
         initial: true
@@ -121,10 +127,10 @@ async function start() {
     }
 
     config.tmpDir = utils.mkTmpDir()
-//    await prepareRepo(REPO.shared)
-//    await prepareRepo(REPO.android, {hasDoc:true, filesWithOrg: ['.gitmodules', './libs/SalesforceReact/package.json'], submodulePaths:['./external/shared']})
-//    await prepareRepo(REPO.ios, {hasDoc:true})
-    await prepareRepo(REPO.ioshybrid, {filesWithOrg: ['.gitmodules'], submodulePaths:['./external/shared']})
+    await prepareRepo(REPO.shared)
+    await prepareRepo(REPO.android, {hasDoc:true, filesWithOrg: ['.gitmodules', './libs/SalesforceReact/package.json'], submodulePaths:['./external/shared']})
+    await prepareRepo(REPO.ios, {hasDoc:true})
+    await prepareRepo(REPO.ioshybrid, {filesWithOrg: ['.gitmodules'], submodulePaths:['./external/shared', './external/SalesforceMobileSDK-iOS']})
     await prepareRepo(REPO.iospecs, {noTag: true, noDev: true, filesWithOrg:['update.sh']})
     await prepareRepo(REPO.cordovaplugin, {filesWithOrg:['./tools/update.sh']})
     await prepareRepo(REPO.reactnative)
@@ -138,17 +144,27 @@ async function prepareRepo(repo, params) {
         msg: `PROCESSING ${repo}`,
         cmds: [
             {cmd:`git clone ${urlForRepo(config.testOrg, repo)}`, dir:config.tmpDir},
-            deleteBranch(config.testMasterBranch),
-            params.noDev ? null : deleteBranch(config.testDevBranch),
-            !params.hasDoc ? null : deleteBranch(config.testDocBranch),
-            params.noTag ? null : deleteTag(config.testVersion),
-            createBranch(config.testMasterBranch, 'master'),
-            !params.filesWithOrg ? null : pointToFork(config.testMasterBranch, params),
-            !params.submodulePaths ? null : updateSubmodules(config.testMasterBranch, params),
-            params.noDev ? null : createBranch(config.testDevBranch, 'dev'),
-            params.noDev || !params.filesWithOrg ? null : pointToFork(config.testDevBranch, params),            
-            !params.submodulePaths ? null : updateSubmodules(config.testDevBranch, params),
-            !params.hasDoc ? null : createBranch(config.testDocBranch, 'gh-pages')
+            {
+                msg: `Cleaning up test branches/tag in ${repo}`,
+                cmds: [
+                    deleteBranch(config.testMasterBranch),
+                    params.noDev ? null : deleteBranch(config.testDevBranch),
+                    !params.hasDoc ? null : deleteBranch(config.testDocBranch),
+                    params.noTag ? null : deleteTag(config.testVersion)
+                ]
+            },
+            config.cleanupOnly ? null : {
+                msg: `Setting up test branches in ${repo}`,
+                cmds: [
+                    createBranch(config.testMasterBranch, 'master'),
+                    !params.filesWithOrg ? null : pointToFork(config.testMasterBranch, params),
+                    !params.submodulePaths ? null : updateSubmodules(config.testMasterBranch, params),
+                    params.noDev ? null : createBranch(config.testDevBranch, 'dev'),
+                    params.noDev || !params.filesWithOrg ? null : pointToFork(config.testDevBranch, params),            
+                    !params.submodulePaths ? null : updateSubmodules(config.testDevBranch, params),
+                    !params.hasDoc ? null : createBranch(config.testDocBranch, 'gh-pages')
+                ]
+            }
         ]
     }
 
@@ -169,10 +185,10 @@ function deleteBranch(branch) {
 
 function deleteTag(tag) {
     return {
-        msg: `Deleting ${tag} tag`,
+        msg: `Deleting v${tag} tag`,
         cmds: [
-            `git tag -d ${tag}`,
-            `git push --delete origin ${tag}`
+            `git tag -d v${tag}`,
+            `git push --delete origin v${tag}`
         ]
     }
 }
@@ -193,14 +209,15 @@ function pointToFork(branch, params) {
         msg: `Pointing to fork ${config.testOrg} in ${branch} branch`,
         cmds: [
             `git checkout ${branch}`,
-            {
-                msg: `Editing files`,
-                cmds: params.filesWithOrg.map(path => `gsed -i "s/forcedotcom/${config.testOrg}/g" ${path}`)
-            },
-            {
-                msg: `Git adding files`,
-                cmds: params.filesWithOrg.map(path => `git add ${path}` )
-            },
+            ... params.filesWithOrg.map(path => {
+                return {
+                    msg: `Editing file ${path}`,
+                    cmds: [
+                        `gsed -i "s/forcedotcom/${config.testOrg}/g" ${path}`,
+                        `git add ${path}`
+                    ]
+                }
+            }),
             `git commit -m "Pointing to fork"`,
             `git push origin ${branch}`,
         ]
@@ -209,17 +226,22 @@ function pointToFork(branch, params) {
 
 function updateSubmodules(branch, params) {
     return {
-        msg: `Pointing submodules to ${branch} branch`,
+        msg: `Updating submodules in ${branch} branch`,
         cmds: [
             `git checkout ${branch}`,
-            {
-                msg: `Pulling ${branch}`,
-                cmds: params.submodulePaths.map(path => { return { cmd:`git pull origin ${branch}`, reldir:path } })
-            },
-            {
-                msg: `Git adding modified submodules`,
-                cmds: params.submodulePaths.map(path => `git add ${path}` )
-            },
+            `git submodule init`,
+            `git submodule update`,
+            `git submodule sync`,
+            ... params.submodulePaths.map(path => {
+                return {
+                    msg: `Fixing submodule ${path}`,
+                    cmds: [
+                        {cmd: `git checkout ${branch}`, reldir:path },
+                        {cmd: `git pull origin ${branch}`, reldir:path },
+                        `git add ${path}`
+                    ]
+                }
+            }),
             `git commit -m "Updating submodules"`,
             `git push origin ${branch}`,
         ]
