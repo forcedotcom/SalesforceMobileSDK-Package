@@ -108,7 +108,7 @@ const QUESTIONS = [
         type:'confirm',
         name: 'autoYesForPrompts',
         message: `Automatically answer yes to all prompts?`,
-        initial: true
+        initial: false
     }
 ]
 
@@ -161,7 +161,7 @@ async function prepareRepo(repo, params) {
     const cmds = {
         msg: `PROCESSING ${repo}`,
         cmds: [
-            {cmd:`git clone ${urlForRepo(config.testOrg, repo)}`, dir:config.tmpDir},
+            cloneOrClean(repo),
             {
                 msg: `Cleaning up test branches/tag in ${repo}`,
                 cmds: [
@@ -201,11 +201,22 @@ async function prepareRepo(repo, params) {
 //
 // Helper functions
 //
+function cloneOrClean(repo) {
+    return {
+        msg: `Preparing ${repo}`,
+        cmds: [
+            {cmd:`git clone ${urlForRepo(config.org, repo)}`, dir:config.tmpDir, ignoreError: true}, // will fail if repo already cloned
+            `git checkout -- .`                                                   
+        ]
+    }
+}
+
 function deleteBranch(branch) {
     return {
         msg: `Deleting ${branch} branch`,
         cmds: [
-            `git push origin :${branch}`
+            {cmd: `git branch -D ${branch}`, ignoreError: true},
+            {cmd: `git push origin :${branch}`, ignoreError: true}
         ]
     }
 }
@@ -214,8 +225,8 @@ function deleteTag(tag) {
     return {
         msg: `Deleting v${tag} tag`,
         cmds: [
-            `git tag -d v${tag}`,
-            `git push --delete origin v${tag}`
+            {cmd: `git tag -d v${tag}`, ignoreError: true},
+            {cmd: `git push --delete origin v${tag}`, ignoreError: true}
         ]
     }
 }
@@ -225,7 +236,7 @@ function createBranch(branch, rootBranch) {
         msg: `Creating ${branch} branch off of ${rootBranch}`,
         cmds: [
             `git checkout ${rootBranch}`,
-            `git checkout -b ${branch}`,
+            `git checkout -b ${branch}`, 
             `git push origin ${branch}`
         ]
     }    
