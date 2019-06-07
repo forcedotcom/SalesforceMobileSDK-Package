@@ -108,8 +108,7 @@ async function proceedPrompt(msg) {
 
 
 async function runCmd(dir, cmd, index, count, depth, ignoreError) {
-    const p = `.../${dir.split('/').slice(-2).join('/')}`
-    print(`${p} > ${cmd}`, index, count, depth)
+    print(`${dir} > ${cmd}`, index, count, depth)
     try {
         utils.runProcessThrowError(cmd, dir)
     } catch (e) {
