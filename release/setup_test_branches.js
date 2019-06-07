@@ -119,7 +119,7 @@ async function start() {
         ``,
         `Will drop and recreate ${config.testMasterBranch} off of master on all repos in ${config.testOrg}`,
         `Will drop and recreate ${config.testDevBranch} off of dev on all applicable repos`,
-        `Will drop tag ${config.testVersion}`
+        `Will drop tag v${config.testVersion}`
     ], COLOR.magenta)
 
     if (!await proceedPrompt()) {
@@ -156,13 +156,23 @@ async function prepareRepo(repo, params) {
             config.cleanupOnly ? null : {
                 msg: `Setting up test branches in ${repo}`,
                 cmds: [
-                    createBranch(config.testMasterBranch, 'master'),
-                    !params.filesWithOrg ? null : pointToFork(config.testMasterBranch, params),
-                    !params.submodulePaths ? null : updateSubmodules(config.testMasterBranch, params),
-                    params.noDev ? null : createBranch(config.testDevBranch, 'dev'),
-                    params.noDev || !params.filesWithOrg ? null : pointToFork(config.testDevBranch, params),            
-                    !params.submodulePaths ? null : updateSubmodules(config.testDevBranch, params),
-                    !params.hasDoc ? null : createBranch(config.testDocBranch, 'gh-pages')
+                    {
+                        msg: `Setting up ${config.testMasterBranch}`,
+                        cmds: [
+                            createBranch(config.testMasterBranch, 'master'),
+                            !params.filesWithOrg ? null : pointToFork(config.testMasterBranch, params),
+                            !params.submodulePaths ? null : updateSubmodules(config.testMasterBranch, params)
+                        ]
+                    },
+                    !params.hasDoc ? null : createBranch(config.testDocBranch, 'gh-pages'),
+                    params.noDev ? null : {
+                        msg: `Setting up ${config.testDevBranch}`,
+                        cmds: [
+                            createBranch(config.testDevBranch, 'dev'),
+                            mergeMasterToDev(),
+                            !params.submodulePaths ? null : updateSubmodules(config.testDevBranch, params)
+                        ]
+                    }
                 ]
             }
         ]
@@ -204,6 +214,19 @@ function createBranch(branch, rootBranch) {
     }    
 }
 
+function mergeMasterToDev() {
+    return {
+        msg: `Merging ${config.testMasterBranch} to ${config.testDevBranch}`,
+        cmds: [
+            `git checkout ${config.testDevBranch}`,
+            `git submodule sync`,
+            `git submodule update`,
+            `git merge -m "Merge from ${config.testMasterBranch}" ${config.testMasterBranch}`,
+            `git push origin ${config.testDevBranch}`
+        ]
+    }
+}
+
 function pointToFork(branch, params) {
     return {
         msg: `Pointing to fork ${config.testOrg} in ${branch} branch`,
@@ -229,14 +252,12 @@ function updateSubmodules(branch, params) {
         msg: `Updating submodules in ${branch} branch`,
         cmds: [
             `git checkout ${branch}`,
-            `git submodule init`,
-            `git submodule update`,
             `git submodule sync`,
+            `git submodule update`,
             ... params.submodulePaths.map(path => {
                 return {
                     msg: `Fixing submodule ${path}`,
                     cmds: [
-                        {cmd: `git checkout ${branch}`, reldir:path },
                         {cmd: `git pull origin ${branch}`, reldir:path },
                         `git add ${path}`
                     ]

@@ -47,7 +47,8 @@ const REPO = {
 const DEPTH_PREFIX = {
     1: '=',
     2: '-',
-    3: '-'
+    3: '-',
+    4: '-'
 }
 
 const DEPTH_COLOR = {

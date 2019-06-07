@@ -99,6 +99,7 @@ async function start() {
         ` RELEASING version ${config.versionReleased} (code ${config.versionCodeReleased} on Android) `,
         ``,
         `Will merge ${config.devBranch} to ${config.masterBranch} on ${config.org}`,
+        `Will apply tag v${config.versionReleased}`,
         `New doc will be published to ${config.docBranch}`,
         `Afterwards ${config.devBranch} will be for version ${config.nextVersion} (code ${config.nextVersionCode} on Android)`
     ], COLOR.magenta)
@@ -256,7 +257,9 @@ function checkoutMasterAndMergeDev() {
         cmds: [
             `git checkout ${config.devBranch}`,
             `git checkout ${config.masterBranch}`,
-            `git merge --no-ff -m "Mobile SDK ${config.versionReleased}" ${config.devBranch}`,
+            `git submodule sync`,
+            `git submodule update`,
+            `git merge --no-ff -m "Merging ${config.devBranch} into ${config.masterBranch}" ${config.devBranch}`,
         ]
     }
 }
@@ -273,12 +276,7 @@ function setVersion(version, isDev, code) {
 function updateSubmodules(branch, submodulePaths) {
     const cmds = !submodulePaths ? null : {
         msg: `Updating submodules to ${branch}`,
-        cmds: [
-            `git submodule init`,
-            `git submodule update`,
-            `git submodule sync`,
-            ... submodulePaths.map(path => { return {cmd:`git pull origin ${branch}`, reldir:path} })
-        ]
+        cmds: submodulePaths.map(path => { return {cmd:`git pull origin ${branch}`, reldir:path} })
     }
     return cmds
 }
@@ -320,6 +318,8 @@ function checkoutDevAndMergeMaster() {
         msg: `Merging ${config.masterBranch} back to ${config.devBranch}`,
         cmds: [
             `git checkout ${config.devBranch}`,
+            `git submodule sync`,
+            `git submodule update`,
             `git pull origin ${config.masterBranch}`
         ]
     }
