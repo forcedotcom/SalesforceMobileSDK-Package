@@ -38,6 +38,14 @@ const path = require('path'),
       REPO = require('./common.js').REPO,
       VERSION = require('../shared/constants.js').version
 
+// Default values for prompt
+const tmpDirDefault = "generate-new-dir"
+const testOrgDefault = "wmathurin"
+const testMasterBranchDefault = "master2"
+const testDevBranchDefault = "dev2"
+const testDocBranchDefault = "doc2"
+const testVersionDefault = VERSION
+
 const templatesPackageJsons = [
     './AndroidIDPTemplate/package.json',
     './SmartSyncExplorerReactNative/package.json',
@@ -56,33 +64,39 @@ const templatesPackageJsons = [
 const QUESTIONS = [
     {
         type: 'text',
+        name: 'tmpDir',
+        message: 'Work directory ?',
+        initial: tmpDirDefault
+    },
+    {
+        type: 'text',
         name: 'testOrg',
         message: 'Organization ?',
-        initial: 'wmathurin'
+        initial: testOrgDefault
     },
     {
         type: 'text',
         name: 'testMasterBranch',
         message: 'Name of test master branch ?',
-        initial: 'master2'
+        initial: testMasterBranchDefault
     },
     {
         type: 'text',
         name: 'testDevBranch',
         message: 'Name of test dev branch ?',
-        initial: 'dev2'
+        initial: testDevBranchDefault
     },
     {
         type: 'text',
         name: 'testDocBranch',
         message: 'Name of test doc branch ?',
-        initial: 'gh-pages2'
+        initial: testDocBranchDefault
     },
     {
         type: 'text',
         name: 'testVersion',
         message: `Name of test version ?`,
-        initial: VERSION
+        initial: testVersionDefault
     },
     {
         type:'confirm',
@@ -126,7 +140,9 @@ async function start() {
         process.exit(0)
     }
 
-    config.tmpDir = utils.mkTmpDir()
+    if (config.tmpDir == tmpDirDefault) {
+        config.tmpDir = utils.mkTmpDir()
+    }
     await prepareRepo(REPO.shared)
     await prepareRepo(REPO.android, {hasDoc:true, filesWithOrg: ['.gitmodules', './libs/SalesforceReact/package.json'], submodulePaths:['./external/shared']})
     await prepareRepo(REPO.ios, {hasDoc:true})
