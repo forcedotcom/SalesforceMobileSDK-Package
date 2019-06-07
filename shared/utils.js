@@ -223,6 +223,15 @@ function mkTmpDir() {
 }
 
 /**
+ * Make directory if it does not exist
+ * 
+ * @param {string} Path of directory to create
+*/
+function mkDirIfNeeded(dir) {
+    shelljs.mkdir('-p', dir);
+}
+
+/**
  * Replace string in files.
  *
  * @param {String or RegExp} from String to match.
@@ -402,6 +411,7 @@ module.exports = {
     logInfo,
     logParagraph,
     mkTmpDir,
+    mkDirIfNeeded,
     moveFile,
     setLogLevel,
     removeFile,

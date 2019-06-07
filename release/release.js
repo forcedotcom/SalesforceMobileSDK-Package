@@ -145,7 +145,10 @@ async function start() {
     // Release!!
     if (config.tmpDir == tmpDirDefault) {
         config.tmpDir = utils.mkTmpDir()
+    } else {
+        utils.mkDirIfNeeded(config.tmpDir)
     }
+
         
     await releaseShared()
     await releaseAndroid()

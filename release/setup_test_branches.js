@@ -142,6 +142,8 @@ async function start() {
 
     if (config.tmpDir == tmpDirDefault) {
         config.tmpDir = utils.mkTmpDir()
+    } else {
+        utils.mkDirIfNeeded(config.tmpDir)
     }
     await prepareRepo(REPO.shared)
     await prepareRepo(REPO.android, {hasDoc:true, filesWithOrg: ['.gitmodules', './libs/SalesforceReact/package.json'], submodulePaths:['./external/shared']})
