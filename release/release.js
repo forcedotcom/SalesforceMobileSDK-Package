@@ -34,7 +34,9 @@ const path = require('path'),
       proceedPrompt = require('./common.js').proceedPrompt,
       runCmds = require('./common.js').runCmds,
       urlForRepo = require('./common.js').urlForRepo,
-      REPO = require('./common.js').REPO
+      REPO = require('./common.js').REPO,
+      VERSION = require('../shared/constants.js').version
+
 
 // Questions
 const QUESTIONS = [
@@ -61,7 +63,7 @@ const QUESTIONS = [
     {
         type: 'text',
         name: 'versionReleased',
-        message: 'Version being released (e.g. 7.2.0) ?'
+        message: `Version being released (e.g. ${VERSION}) ?`
     },
     {
         type: 'text',
@@ -71,7 +73,7 @@ const QUESTIONS = [
     {
         type: 'text',
         name: 'nextVersion',
-        message: 'Next version (e.g. 7.3.0) ?'
+        message: 'Next version (e.g. 7.2.0) ?'
     },
     {
         type: 'text',
