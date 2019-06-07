@@ -34,6 +34,7 @@ const path = require('path'),
       proceedPrompt = require('./common.js').proceedPrompt,
       runCmds = require('./common.js').runCmds,
       urlForRepo = require('./common.js').urlForRepo,
+      setAutoYesForPrompts = require('./common.js').setAutoYesForPrompts,
       REPO = require('./common.js').REPO,
       VERSION = require('../shared/constants.js').version
 
