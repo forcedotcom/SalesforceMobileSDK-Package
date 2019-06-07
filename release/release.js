@@ -155,6 +155,7 @@ async function start() {
     await releaseReactNative()
     await releaseTemplates()
     await releasePackage()
+    await generatePackages()
 }
 
 //
@@ -249,6 +250,24 @@ async function releasePackage() {
     await releaseRepo(REPO.pkg)
 }
 
+//
+// Generate npm packages
+//
+async function generatePackages() {
+    const cmds = {
+        msg: `GENERATING npm packages`,
+        cmds: [
+            `git checkout ${config.masterBranch}`,
+            `node ./install.js`,
+            `node ./pack/pack.js --cli=forceios,forcedroid,forcehybrid,forcereact`,
+            `node ./pack/pack.js --sfdx-plugin`,
+            `mv ./force*.tgz ../`,
+            `mv ./sfdx-*.tgz ../`,
+        ]
+    }
+
+    await runCmds(path.join(config.tmpDir, REPO.pkg), cmds)
+}
 
 //
 // Helper functions
