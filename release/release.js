@@ -47,8 +47,6 @@ const docBranchDefault = "gh-pages2"
 const versionReleasedDefault = VERSION
 const versionCodeReleasedDefault = 64
 const nextVersionDefault = "7.2.0"
-const nextVersionCodeDefault = 65
-
 
 // Questions
 const QUESTIONS = [
@@ -89,7 +87,7 @@ const QUESTIONS = [
         initial: versionReleasedDefault
     },
     {
-        type: 'text',
+        type: 'number',
         name: 'versionCodeReleased',
         message: 'Version code for Android being released ?',
         initial: versionCodeReleasedDefault
@@ -99,12 +97,6 @@ const QUESTIONS = [
         name: 'nextVersion',
         message: 'Next version ?',
         initial: nextVersionDefault
-    },
-    {
-        type: 'text',
-        name: 'nextVersionCode',
-        message: 'Next version code for Android ?',
-        initial: nextVersionCodeDefault
     },
     {
         type:'confirm',
@@ -127,6 +119,8 @@ async function start() {
 
     validateConfig()
     setAutoYesForPrompts(config.autoYesForPrompts)
+
+    config.nextVersionCode = config.versionCodeReleased + 1
 
     // Final confirmation
     utils.logParagraph([
