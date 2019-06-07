@@ -37,48 +37,79 @@ const path = require('path'),
       REPO = require('./common.js').REPO,
       VERSION = require('../shared/constants.js').version
 
+// Default values for prompt
+const tmpDirDefault = "generate-new-dir"
+const orgDefault = "wmathurin"
+const masterBranchDefault = "master2"
+const devBranchDefault = "dev2"
+const docBranchDefault = "doc2"
+const versionReleasedDefault = VERSION
+const versionCodeReleasedDefault = 64
+const nextVersionDefault = "7.2.0"
+const nextVersionCodeDefault = 65
+
 
 // Questions
 const QUESTIONS = [
     {
         type: 'text',
+        name: 'tmpDir',
+        message: 'Work directory ?',
+        initial: tmpDirDefault
+    },
+    {
+        type: 'text',
         name: 'org',
-        message: 'Organization (e.g. forcedotcom) ?'
+        message: 'Organization ?',
+        initial: orgDefault
     },
     {
         type: 'text',
         name: 'masterBranch',
-        message: 'Release branch (e.g. master) ?'
+        message: 'Release branch ?',
+        initial: masterBranchDefault
     },
     {
         type: 'text',
         name: 'devBranch',
-        message: 'Development branch (e.g. dev) ?'
+        message: 'Development branch ?',
+        initial: devBranchDefault
     },
     {
         type: 'text',
         name: 'docBranch',
-        message: 'Doc branch (e.g. gh-pages) ?'
+        message: 'Doc branch (e.g. gh-pages) ?',
+        initial: docBranchDefault
     },
     {
         type: 'text',
         name: 'versionReleased',
-        message: `Version being released (e.g. ${VERSION}) ?`
+        message: `Version being released ?`,
+        initial: versionReleasedDefault
     },
     {
         type: 'text',
         name: 'versionCodeReleased',
-        message: 'Version code for Android being released (e.g. 64) ?'
+        message: 'Version code for Android being released ?',
+        initial: versionCodeReleasedDefault
     },
     {
         type: 'text',
         name: 'nextVersion',
-        message: 'Next version (e.g. 7.2.0) ?'
+        message: 'Next version ?',
+        initial: nextVersionDefault
     },
     {
         type: 'text',
         name: 'nextVersionCode',
-        message: 'Next version code for Android (e.g. 65) ?'
+        message: 'Next version code for Android ?',
+        initial: nextVersionCodeDefault
+    },
+    {
+        type:'confirm',
+        name: 'autoYesForPrompts',
+        message: `Automatically answer yes to all prompts?`,
+        initial: false
     }
 ]
 
@@ -94,6 +125,7 @@ async function start() {
     config = await prompts(QUESTIONS)
 
     validateConfig()
+    setAutoYesForPrompts(config.autoYesForPrompts)
 
     // Final confirmation
     utils.logParagraph([
@@ -110,7 +142,9 @@ async function start() {
     }
     
     // Release!!
-    config.tmpDir = utils.mkTmpDir()
+    if (config.tmpDir == tmpDirDefault) {
+        config.tmpDir = utils.mkTmpDir()
+    }
     await releaseShared()
     await releaseAndroid()
     await releaseIOS()
