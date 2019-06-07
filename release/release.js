@@ -140,8 +140,6 @@ async function releaseShared() {
 //
 async function releaseAndroid() {
     await releaseRepo(REPO.android, {
-        masterPostMergeCmd: './install.sh',
-        devPostMergeCmd: './install.sh',
         submodulePaths: ['external/shared'],
         genDocCmd: genDocAndroid()
     })
@@ -152,8 +150,6 @@ async function releaseAndroid() {
 //
 async function releaseIOS() {
     await releaseRepo(REPO.ios, {
-        masterPostMergeCmd: './install.sh',
-        devPostMergeCmd: './install.sh',
         genDocCmd: genDocIOS()        
     })
 }
@@ -163,8 +159,6 @@ async function releaseIOS() {
 //
 async function releaseIOSHybrid() {
     await releaseRepo(REPO.ioshybrid, {
-        masterPostMergeCmd: './install.sh',
-        devPostMergeCmd: './install.sh',
         submodulePaths: ['external/shared', 'external/SalesforceMobileSDK-iOS']
     })
 }
@@ -279,7 +273,12 @@ function setVersion(version, isDev, code) {
 function updateSubmodules(branch, submodulePaths) {
     const cmds = !submodulePaths ? null : {
         msg: `Updating submodules to ${branch}`,
-        cmds: submodulePaths.map(path => { return {cmd:`git pull origin ${branch}`, reldir:path} })
+        cmds: [
+            `git submodule init`,
+            `git submodule update`,
+            `git submodule sync`,
+            ... submodulePaths.map(path => { return {cmd:`git pull origin ${branch}`, reldir:path} })
+        ]
     }
     return cmds
 }
@@ -297,9 +296,9 @@ function commitAndPushMaster() {
 
 function tagMaster() {
     return {
-        msg: `Tagging ${config.masterBranch} with ${config.versionReleased}`,
+        msg: `Tagging ${config.masterBranch} with v${config.versionReleased}`,
         cmds: [
-            `git tag ${config.versionReleased}`,
+            `git tag v${config.versionReleased}`,
             `git push origin ${config.masterBranch} --tag`,
         ]
     }
