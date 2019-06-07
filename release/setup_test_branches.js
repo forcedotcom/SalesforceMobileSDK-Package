@@ -43,7 +43,7 @@ const tmpDirDefault = "generate-new-dir"
 const testOrgDefault = "wmathurin"
 const testMasterBranchDefault = "master2"
 const testDevBranchDefault = "dev2"
-const testDocBranchDefault = "doc2"
+const testDocBranchDefault = "gh-pages2"
 const testVersionDefault = VERSION
 
 const templatesPackageJsons = [

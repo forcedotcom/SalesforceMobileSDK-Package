@@ -43,7 +43,7 @@ const tmpDirDefault = "generate-new-dir"
 const orgDefault = "wmathurin"
 const masterBranchDefault = "master2"
 const devBranchDefault = "dev2"
-const docBranchDefault = "doc2"
+const docBranchDefault = "gh-pages2"
 const versionReleasedDefault = VERSION
 const versionCodeReleasedDefault = 64
 const nextVersionDefault = "7.2.0"
@@ -146,6 +146,7 @@ async function start() {
     if (config.tmpDir == tmpDirDefault) {
         config.tmpDir = utils.mkTmpDir()
     }
+        
     await releaseShared()
     await releaseAndroid()
     await releaseIOS()
@@ -155,7 +156,6 @@ async function start() {
     await releaseReactNative()
     await releaseTemplates()
     await releasePackage()
-    await generatePackages()
 }
 
 //
@@ -180,7 +180,7 @@ async function releaseShared() {
 async function releaseAndroid() {
     await releaseRepo(REPO.android, {
         submodulePaths: ['external/shared'],
-        genDocCmd: genDocAndroid()
+        postReleaseGenerateCmd: generateDocAndroid()
     })
 }
 
@@ -189,7 +189,7 @@ async function releaseAndroid() {
 //
 async function releaseIOS() {
     await releaseRepo(REPO.ios, {
-        genDocCmd: genDocIOS()        
+        postReleaseGenerateCmd: generateDocIOS()        
     })
 }
 
@@ -247,7 +247,9 @@ async function releaseTemplates() {
 // Release function for Package repo
 //
 async function releasePackage() {
-    await releaseRepo(REPO.pkg)
+    await releaseRepo(REPO.pkg, {
+        postReleaseGenerateCmd: generatePackages()
+    })        
 }
 
 //
@@ -288,7 +290,7 @@ async function releaseRepo(repo, params) {
                     updateSubmodules(config.masterBranch, params.submodulePaths),
                     commitAndPushMaster(),
                     tagMaster(),
-                    params.genDocCmd
+                    params.postReleaseGenerateCmd
                 ]
             },
             // dev
@@ -363,7 +365,7 @@ function commitAndPushDev() {
         msg: `Pushing to ${config.devBranch}`,
         cmds: [
             `git add *`,
-            `git commit -m "Merging ${config.masterBranch} back to ${config.devBranch}"`,
+            `git commit -m "Updating version numbers to ${config.nextVersion}"`,
             `git push origin ${config.devBranch}`
         ]
     }
@@ -376,12 +378,12 @@ function checkoutDevAndMergeMaster() {
             `git checkout ${config.devBranch}`,
             `git submodule sync`,
             `git submodule update`,
-            `git pull origin ${config.masterBranch}`
+            `git merge --no-ff -m "Merging ${config.masterBranch} into ${config.devBranch}" ${config.masterBranch}`,
         ]
     }
 }
 
-function genDocIOS() {
+function generateDocIOS() {
     return {
         msg: `Generating docs for iOS`,
         cmds: [
@@ -398,7 +400,7 @@ function genDocIOS() {
     }
 }
 
-function genDocAndroid() {
+function generateDocAndroid() {
     return {
         msg: `Generating docs for Android`,
         cmds: [
@@ -414,3 +416,18 @@ function genDocAndroid() {
         ]
     }
 }
+
+function generateNpmPackages() {
+    return {
+        msg: `Generating npm packages`,
+        cmds: [
+            `git checkout ${config.masterBranch}`,
+            `node ./install.js`,
+            `node ./pack/pack.js --cli=forceios,forcedroid,forcehybrid,forcereact`,
+            `node ./pack/pack.js --sfdx-plugin`,
+            `mv ./force*.tgz ../`,
+            `mv ./sfdx-*.tgz ../`,
+        ]
+    }
+}
+    
