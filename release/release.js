@@ -158,9 +158,20 @@ async function start() {
     await releasePackage()
 
     utils.logParagraph([
-        ` NEXT STEPS `,
+        ` NEXT STEPS: TEST then PUBLISH`,
         ``,
-        `To publish to NPM, perform the following steps.`,
+        `To test forcexxx, do the following (using forceios as an example):`,
+        `  cd ${config.tmpDir}`,
+        `  npm i --prefix . forceios-${config.versionReleased}.tgz`,
+        `  ./node_modules/.bin/forceios version`,
+        `  ./node_modules/.bin/forceios create`,
+        ``,
+        `To test the sfdx plugin, do the following:`,
+        `  cd ${config.tmpDir}`,
+        `  npm i --prefix . sfdx-mobilesdk-plugin-${config.versionReleased}.tgz`,
+        `  sfdx plugins:link ./node_modules/sfdx-mobilesdk-plugin`,
+        ``,
+        `To publish to NPM, perform the following steps:`,
         `  cd ${config.tmpDir}`,
         `  npm publish forceios-${config.versionReleased}.tgz`,
         `  npm publish forcedroid-${config.versionReleased}.tgz`,
@@ -168,7 +179,7 @@ async function start() {
         `  npm publish forcereact-${config.versionReleased}.tgz`,
         `  npm publish sfdx-mobilesdk-plugin-${config.versionReleased}.tgz`,
         ``,
-        `To publish to Bintray jCenter, perform the following steps.`,
+        `To publish to Bintray jCenter, perform the following steps:`,
         `  cd ${path.join(config.tmpDir, REPO.android)}`,
         `  ./gradlew :libs:SalesforceAnalytics:bintrayUpload`,
         `  ./gradlew :libs:SalesforceSDK:bintrayUpload`,
@@ -176,7 +187,7 @@ async function start() {
         `  ./gradlew :libs:SmartSync:bintrayUpload`,
         `  ./gradlew :libs:SalesforceHybrid:bintrayUpload`,
         ``,
-        `Do NOT publish until absolutely certain and you know what you’re doing.`,
+        `Do NOT publish until absolutely certain.`,
         `There’s no going back from here.`
     ], COLOR.magenta)
 
