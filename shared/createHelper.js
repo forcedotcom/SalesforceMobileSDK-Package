@@ -84,7 +84,8 @@ function createHybridApp(config) {
     utils.runProcessThrowError('cordova prepare', config.projectDir);
 
     if (config.platform === 'ios') {
-        var xcSettingsFile = path.join(config.projectDir,'platforms', 'ios', config.appname + '.xcworkspace', 'xcshareddata', 'WorkspaceSettings.xcsettings');
+        var xcSettingsDir = path.join(config.projectDir,'platforms', 'ios', config.appname + '.xcworkspace', 'xcshareddata')
+        var xcSettingsFile = path.join(xcSettingsDir, 'WorkspaceSettings.xcsettings');
         var plistFileContent = '<?xml version="1.0" encoding="UTF-8"?>\n' +
                                '<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">\n' +
                                '<plist version="1.0">\n' + 
@@ -94,6 +95,7 @@ function createHybridApp(config) {
                                '</dict>\n' + 
                                '</plist>\n';
         utils.logInfo('Creating WorkspaceSettings.xcsettings for project. Setting the BuildSystemType to original in ' + xcSettingsFile);
+        utils.mkDirIfNeeded(xcSettingsDir)
         fs.writeFileSync(xcSettingsFile,plistFileContent,'utf8');
         utils.logInfo('Created WorkspaceSettings.xcsettings for project ' + config.appname);
 
