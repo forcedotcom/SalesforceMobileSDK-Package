@@ -115,7 +115,9 @@ function main(args) {
         // Using updated local clone of plugin repo if pluginRepoUri does not point to tag
         if (!pluginRepoUri.indexOf('//') >= 0 && !sdkBranch.match(/v[0-9.]+/)) {
             var pluginRepoDir = utils.cloneRepo(tmpDir, pluginRepoUri);
-            updatePluginRepo(tmpDir, pluginRepoDir, sdkBranch);
+            if (testingIOS && testingAndroid) updatePluginRepo(tmpDir, 'all', pluginRepoDir, sdkBranch);
+            if (testingIOS && !testingAndroid) updatePluginRepo(tmpDir, OS.ios, pluginRepoDir, sdkBranch);
+            if (testingAndroid && !testingIOS) updatePluginRepo(tmpDir, OS.android, pluginRepoDir, sdkBranch);
             // Use local updated clone of plugin
             pluginRepoUri = pluginRepoDir;
         }
@@ -263,9 +265,9 @@ function installPublishedSfdxPlugin(tmpDir) {
 //
 // Update cordova plugin repo
 //
-function updatePluginRepo(tmpDir, pluginRepoDir, sdkBranch) {
+function updatePluginRepo(tmpDir, os, pluginRepoDir, sdkBranch) {
     utils.logInfo('Updating cordova plugin at ' + sdkBranch, COLOR.green);
-    utils.runProcessThrowError(path.join('tools', 'update.sh') + ' -b ' + sdkBranch, pluginRepoDir);
+    utils.runProcessThrowError(path.join('tools', 'update.sh') + ' -b ' + sdkBranch + ' -o ' + os, pluginRepoDir);
 }
 
 function cleanName(name) {
