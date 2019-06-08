@@ -148,25 +148,19 @@ function replaceTextInFile(fileName, textInFile, replacementText) {
  */
 function runProcessThrowError(cmd, dir, returnOutput) {
     logDebug('Running: ' + cmd);
-    if (dir) shelljs.pushd(dir);
-    try {
-        if (returnOutput) {
-            return execSync(cmd).toString();
-        }
-        else {
-            var stdio = [];
-            if (LOG_LEVEL >= LOG_LEVELS.DEBUG) {
-                stdio = [0,1,2]
-            }
-            else if (LOG_LEVEL >= LOG_LEVELS.ERROR) {
-                stdio = [0,2]
-            }
-
-            execSync(cmd, {stdio: stdio});
-        }
+    if (returnOutput) {
+        return execSync(cmd, {cwd: dir}).toString();
     }
-    finally {
-        if (dir) shelljs.popd();
+    else {
+        var stdio = [];
+        if (LOG_LEVEL >= LOG_LEVELS.DEBUG) {
+            stdio = [0,1,2]
+        }
+        else if (LOG_LEVEL >= LOG_LEVELS.ERROR) {
+            stdio = [0,2]
+        }
+
+        execSync(cmd, {cwd: dir, stdio: stdio});
     }
 }
 
@@ -226,6 +220,15 @@ function mkTmpDir() {
     logDebug('Making temp dir:' + tmpDir);
     shelljs.mkdir('-p', tmpDir);
     return tmpDir;
+}
+
+/**
+ * Make directory if it does not exist
+ * 
+ * @param {string} Path of directory to create
+*/
+function mkDirIfNeeded(dir) {
+    shelljs.mkdir('-p', dir);
 }
 
 /**
@@ -321,15 +324,16 @@ function cloneRepo(tmpDir, repoUrlWithBranch) {
  *
  * @param {String} lines
  */
-function logParagraph(lines) {
+function logParagraph(lines, color) {
+    color = color || COLOR.green;
     logInfo("");
-    logInfo("********************************************************************************", COLOR.green);
-    logInfo("*", COLOR.green);
+    logInfo("********************************************************************************", color);
+    logInfo("*", color);
     for (var i=0; i<lines.length; i++) {
-        logInfo("*   " + lines[i], COLOR.green);
+        logInfo("*   " + lines[i], color);
     }
-    logInfo("*", COLOR.green);
-    logInfo("********************************************************************************", COLOR.green);
+    logInfo("*", color);
+    logInfo("********************************************************************************", color);
     logInfo("");
 }
 
@@ -407,6 +411,7 @@ module.exports = {
     logInfo,
     logParagraph,
     mkTmpDir,
+    mkDirIfNeeded,
     moveFile,
     setLogLevel,
     removeFile,

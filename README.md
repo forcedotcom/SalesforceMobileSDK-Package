@@ -50,3 +50,8 @@ sfdx mobilesdk:reactnative --help
 ```shell
 ./pack/pack.js
 ```
+
+## To do a full release
+```
+./release/release.js
+```
