@@ -33,7 +33,7 @@ const path = require('path'),
       COLOR = require('../shared/outputColors'),
       proceedPrompt = require('./common.js').proceedPrompt,
       runCmds = require('./common.js').runCmds,
-      urlForRepo = require('./common.js').urlForRepo,
+      cloneOrClean = require('./common.js').cloneOrClean,
       setAutoYesForPrompts = require('./common.js').setAutoYesForPrompts,
       REPO = require('./common.js').REPO,
       VERSION = require('../shared/constants.js').version
@@ -241,7 +241,7 @@ async function releaseIOSSpecs() {
     const cmds = {
         msg: `PROCESSING ${repo}`,
         cmds: [
-            cloneOrClean(repo),
+            cloneOrClean(config.org, repo, config.tmpDir),
             `git checkout ${config.masterBranch}`,
             `./update.sh -b ${config.masterBranch} -v ${config.versionReleased}`,
             commitAndPushMaster()
@@ -291,7 +291,7 @@ async function releaseRepo(repo, params) {
     const cmds = {
         msg: `PROCESSING ${repo}`,
         cmds: [
-            cloneOrClean(repo),
+            cloneOrClean(config.org, repo, config.tmpDir),
             // master
             {
                 msg: `Working on ${config.masterBranch}`,
@@ -321,16 +321,6 @@ async function releaseRepo(repo, params) {
         ]
     }
     await runCmds(path.join(config.tmpDir, repo), cmds)
-}
-
-function cloneOrClean(repo) {
-    return {
-        msg: `Preparing ${repo}`,
-        cmds: [
-            {cmd:`git clone ${urlForRepo(config.org, repo)}`, dir:config.tmpDir, ignoreError: true}, // will fail if repo already cloned
-            `git checkout -- .`                                                   // will do nothing if repo was just cloned
-        ]
-    }
 }
 
 function checkoutMasterAndMergeDev() {

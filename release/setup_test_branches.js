@@ -33,7 +33,7 @@ const path = require('path'),
       COLOR = require('../shared/outputColors'),
       proceedPrompt = require('./common.js').proceedPrompt,
       runCmds = require('./common.js').runCmds,
-      urlForRepo = require('./common.js').urlForRepo,
+      cloneOrClean = require('./common.js').cloneOrClean,
       setAutoYesForPrompts = require('./common.js').setAutoYesForPrompts,
       REPO = require('./common.js').REPO,
       VERSION = require('../shared/constants.js').version
@@ -161,7 +161,7 @@ async function prepareRepo(repo, params) {
     const cmds = {
         msg: `PROCESSING ${repo}`,
         cmds: [
-            cloneOrClean(repo),
+            cloneOrClean(config.testOrg, repo, config.tmpDir),
             {
                 msg: `Cleaning up test branches/tag in ${repo}`,
                 cmds: [
@@ -201,16 +201,6 @@ async function prepareRepo(repo, params) {
 //
 // Helper functions
 //
-function cloneOrClean(repo) {
-    return {
-        msg: `Preparing ${repo}`,
-        cmds: [
-            {cmd:`git clone ${urlForRepo(config.org, repo)}`, dir:config.tmpDir, ignoreError: true}, // will fail if repo already cloned
-            `git checkout -- .`                                                   
-        ]
-    }
-}
-
 function deleteBranch(branch) {
     return {
         msg: `Deleting ${branch} branch`,

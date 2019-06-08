@@ -131,10 +131,22 @@ function setAutoYesForPrompts(b) {
     autoYesForPrompts = b;
 }
 
+function cloneOrClean(org, repo, dir) {
+    return {
+        msg: `Preparing ${repo}`,
+        cmds: [
+            {cmd: `git clone ${urlForRepo(org, repo)}`, dir: dir, ignoreError: true},
+            {cmd: `git checkout -- .`, dir: path.join(dir, repo)}
+        ]
+    }
+}
+
+
 module.exports = {
     REPO,
     runCmds,
     proceedPrompt,
     urlForRepo,
-    setAutoYesForPrompts
+    setAutoYesForPrompts,
+    cloneOrClean
 }
