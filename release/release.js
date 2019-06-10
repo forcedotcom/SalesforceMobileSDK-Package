@@ -157,7 +157,6 @@ async function start() {
         ` NEXT STEPS: TEST then PUBLISH`,
         ``,
         `To test the NPM packages, go to ${config.tmpDir}/${REPO.pkg} and do:`,
-        `  git checkout ${config.masterBranch}`,
         `  ./test/test_force.js --cli=forceios,forcedroid,forcereact,forcehybrid`,
         `  ./test/test_force.js --cli=forceios,forcedroid,forcereact,forcehybrid --use-sfdx`,
         `You should also open and run the generated apps in XCode / Android Studio.`,
@@ -343,7 +342,11 @@ function setVersion(version, isDev, code) {
 function updateSubmodules(branch, submodulePaths) {
     const cmds = !submodulePaths ? null : {
         msg: `Updating submodules to ${branch}`,
-        cmds: submodulePaths.map(path => { return {cmd:`git pull origin ${branch}`, reldir:path} })
+        cmds: [
+            `git submodule sync`,
+            `git submodule update`,
+            ... submodulePaths.map(path => { return {cmd:`git pull origin ${branch}`, reldir:path} })
+        ]
     }
     return cmds
 }
