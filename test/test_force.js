@@ -1,8 +1,5 @@
 #!/usr/bin/env node
 
-// Defaults
-var defaultSdkBranch = 'dev';
-
 // Dependencies
 var spawnSync = require('child_process').spawnSync,
     path = require('path'),
@@ -43,13 +40,11 @@ function main(args) {
 
     // Args extraction
     var usageRequested = parsedArgs.hasOwnProperty('usage');
-    var testProduction = parsedArgs.hasOwnProperty('test-production');
     var useSfdxRequested = parsedArgs.hasOwnProperty('use-sfdx');
     var exitOnFailure = parsedArgs.hasOwnProperty('exit-on-failure');
     var chosenOperatingSystems = cleanSplit(parsedArgs.os, ',').map(function(s) { return s.toLowerCase(); });
     var templateRepoUri = parsedArgs.templaterepouri || '';
-    var pluginRepoUri = !testProduction ? (parsedArgs.pluginrepouri || SDK.tools.cordova.pluginRepoUri) : '';
-    var sdkBranch = parsedArgs.sdkbranch || defaultSdkBranch;
+    var pluginRepoUri = parsedArgs.pluginrepouri || SDK.tools.cordova.pluginRepoUri;
     var chosenAppTypes = cleanSplit(parsedArgs.apptype, ',');
     var chosenClis = cleanSplit(parsedArgs.cli, ',');
 
@@ -76,14 +71,8 @@ function main(args) {
 
     // Install sfdx plugin or force clis
     if (useSfdxRequested) {
-        if (testProduction) {
-            // Install publised sfdx plugin
-            installPublishedSfdxPlugin(tmpDir);
-        }
-        else {
-            // Create sfdx plugin
-            createDeploySfdxPluginPackage(tmpDir);
-        }
+        // Create sfdx plugin
+        createDeploySfdxPluginPackage(tmpDir);
     }
     else {
         var forceClis= [];
@@ -114,21 +103,17 @@ function main(args) {
         for (var i=0; i<forceClis.length; i++) {
             var cli = forceClis[i];
 
-            if (testProduction) {
-                // Install forcexxx package
-                installPublishedForceCli(tmpDir, cli);
-            }
-            else {
-                // Create forcexxx packages needed
-                createDeployForcePackage(tmpDir, cli);
-            }
+            // Create forcexxx packages needed
+            createDeployForcePackage(tmpDir, cli);
         }
     }
 
     // Get cordova plugin repo if any hybrid testing requested
     if (testingHybrid) {
-        if (!testProduction && pluginRepoUri.indexOf('//') >= 0) {
-            // Actual uri - clone repo - run tools/update.sh
+        var sdkBranch = utils.separateRepoUrlPathBranch(pluginRepoUri).branch;
+
+        // Using updated local clone of plugin repo if pluginRepoUri does not point to tag
+        if (!pluginRepoUri.indexOf('//') >= 0 && !sdkBranch.match(/v[0-9.]+/)) {
             var pluginRepoDir = utils.cloneRepo(tmpDir, pluginRepoUri);
             if (testingIOS && testingAndroid) updatePluginRepo(tmpDir, 'all', pluginRepoDir, sdkBranch);
             if (testingIOS && !testingAndroid) updatePluginRepo(tmpDir, OS.ios, pluginRepoDir, sdkBranch);
@@ -188,10 +173,8 @@ function shortUsage(exitCode) {
     utils.logInfo('    --os=os1,os2,etc  OR --cli=cli1,cli2,etc', COLOR.magenta);
     utils.logInfo('    (when using --os) --apptype=appType1,appType2,etc OR --templaterepouri=TEMPLATE_REPO_URI', COLOR.magenta);
     utils.logInfo('    [--use-sfdx]', COLOR.magenta);
-    utils.logInfo('    [--test-production]', COLOR.magenta);
     utils.logInfo('    [--exit-on-failure]', COLOR.magenta);
     utils.logInfo('    [--pluginrepouri=PLUGIN_REPO_URI (Defaults to uri in shared/constants.js)]', COLOR.magenta);
-    utils.logInfo('    [--sdkbranch=SDK_BRANCH (Defaults to dev)]', COLOR.magenta);
     utils.logInfo('', COLOR.cyan);
     utils.logInfo('  Where:', COLOR.cyan);
     utils.logInfo('  - osX is : ios or android', COLOR.cyan);
@@ -214,8 +197,7 @@ function usage(exitCode) {
     utils.logInfo('  - creates and compiles applications for specified operating systems and applicable templates', COLOR.cyan);
     utils.logInfo('', COLOR.cyan);
     utils.logInfo('  If hybrid is targeted:', COLOR.cyan);
-    utils.logInfo('  - clones PLUGIN_REPO_URI ', COLOR.cyan);
-    utils.logInfo('  - runs ./tools/update.sh -b SDK_BRANCH to update clone of plugin repo', COLOR.cyan);
+    utils.logInfo('  - if plugin_repo_uri points to a branch, use local clone of plugin repo (where we first run ./tools/update.sh)', COLOR.cyan);
     utils.logInfo('  - generates forcehybrid package and deploys it to a temporary directory', COLOR.cyan);
     utils.logInfo('  - creates and compiles applications for specified operating systems, template and plugin', COLOR.cyan);
     utils.logInfo('', COLOR.cyan);
@@ -232,8 +214,6 @@ function usage(exitCode) {
     utils.logInfo('  - creates and compiles applications for specified operating systems and template', COLOR.cyan);
     utils.logInfo('', COLOR.cyan);
     utils.logInfo('  If use-sfdx is specified, then the sfdx-mobilesdk-plugin package is generated and used through sfdx for creating the applications', COLOR.cyan);
-    utils.logInfo('', COLOR.cyan);
-    utils.logInfo('  If test-production is specified, then the published forceios/forcedroid/forcehybrid/forcereact/sfdx-mobilesdk-plugin are used', COLOR.cyan);
 
     process.exit(exitCode);
 }
@@ -246,14 +226,6 @@ function createDeployForcePackage(tmpDir, forcecli) {
     utils.runProcessThrowError('node ' + packJs + ' --cli=' + forcecli.name);
     utils.logInfo('Npm installing ' + forcecli.name + '-' + SDK.version + '.tgz', COLOR.green);
     utils.runProcessThrowError('npm install --prefix ' + tmpDir + ' ' + forcecli.name + '-' + SDK.version + '.tgz');
-}
-
-//
-// Install published forceios/forcedroid/forcehybrid/forcereact
-//
-function installPublishedForceCli(tmpDir, forcecli) {
-    utils.logInfo('Npm installing ' + forcecli.name, COLOR.green);
-    utils.runProcessThrowError('npm install --prefix ' + tmpDir + ' ' + forcecli.name);
 }
 
 //
@@ -272,12 +244,12 @@ function createDeploySfdxPluginPackage(tmpDir) {
 
     utils.runProcessThrowError(`ls ${oclifManifestPath}`);
 
-    console.log(`Copying file: ${oclifManifestPath} to ${mobileSdkTmpPath}`);
+    utils.logInfo(`Copying file: ${oclifManifestPath} to ${mobileSdkTmpPath}`, COLOR.green);
 
     // Gotta copy the oclif manifest to the target link folder.
     utils.runProcessThrowError(`cp ${oclifManifestPath} ${mobileSdkTmpPath}`);
     utils.runProcessThrowError('sfdx plugins:link ' + tmpDir + '/node_modules/sfdx-mobilesdk-plugin');
-    console.log('-- Finished plugins link --');
+    utils.logInfo('-- Finished plugins link --', COLOR.green);
 }
 
 //
