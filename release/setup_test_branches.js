@@ -239,7 +239,7 @@ function mergeMasterToDev() {
         cmds: [
             `git checkout ${config.testDevBranch}`,
             `git submodule sync`,
-            `git submodule update`,
+            `git submodule update --init`,
             `git merge -m "Merge from ${config.testMasterBranch}" ${config.testMasterBranch}`,
             `git push origin ${config.testDevBranch}`
         ]
@@ -272,7 +272,7 @@ function updateSubmodules(branch, params) {
         cmds: [
             `git checkout ${branch}`,
             `git submodule sync`,
-            `git submodule update`,
+            `git submodule update --init`,
             ... params.submodulePaths.map(path => {
                 return {
                     msg: `Fixing submodule ${path}`,

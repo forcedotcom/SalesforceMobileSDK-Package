@@ -324,7 +324,7 @@ function checkoutMasterAndMergeDev() {
             `git checkout ${config.devBranch}`,
             `git checkout ${config.masterBranch}`,
             `git submodule sync`,
-            `git submodule update`,
+            `git submodule update --init`,
             `git merge --no-ff -m "Merging ${config.devBranch} into ${config.masterBranch}" ${config.devBranch}`,
         ]
     }
@@ -344,7 +344,7 @@ function updateSubmodules(branch, submodulePaths) {
         msg: `Updating submodules to ${branch}`,
         cmds: [
             `git submodule sync`,
-            `git submodule update`,
+            `git submodule update --init`,
             ... submodulePaths.map(path => { return {cmd:`git pull origin ${branch}`, reldir:path} })
         ]
     }
