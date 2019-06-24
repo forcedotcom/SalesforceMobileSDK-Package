@@ -30,7 +30,7 @@
         "@oclif/plugin-help": "2",
         "@salesforce/core": "^1.1.2",
         "globby": "^9.0.0",
-        "shelljs": "0.7.0"
+        "shelljs": "0.8.3"
     },
     "devDependencies": {
         "@oclif/dev-cli": "^1.22.0"
