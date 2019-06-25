@@ -14,7 +14,7 @@
     },
 	"bin" : { "forceios" : "forceios.js" },
     "dependencies": {
-        "shelljs": "~0.7.0"
+        "shelljs": "0.8.3"
     },
 	"repository": {
 		"type" : "git",
