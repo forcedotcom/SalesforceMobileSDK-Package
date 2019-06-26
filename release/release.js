@@ -36,11 +36,12 @@ const path = require('path'),
       cloneOrClean = require('./common.js').cloneOrClean,
       setAutoYesForPrompts = require('./common.js').setAutoYesForPrompts,
       REPO = require('./common.js').REPO,
-      VERSION = require('../shared/constants.js').version
+      VERSION = require('../shared/constants.js').version,
+      os = require("os")
 
 // Default values for prompt
 const tmpDirDefault = "generate-new-dir"
-const orgDefault = "wmathurin"
+const orgDefault = os.userInfo().username
 const masterBranchDefault = "master2"
 const devBranchDefault = "dev2"
 const docBranchDefault = "gh-pages2"
