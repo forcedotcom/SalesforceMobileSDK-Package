@@ -1,6 +1,6 @@
 {
     "name": "sfdx-mobilesdk-plugin",
-    "version": "7.1.2",
+    "version": "7.2.0",
     "description": "Sfdx plugin for creating mobile apps based on the Salesforce Mobile SDK",
     "keywords": [
         "mobilesdk",
@@ -30,7 +30,7 @@
         "@oclif/plugin-help": "2",
         "@salesforce/core": "^1.1.2",
         "globby": "^9.0.0",
-        "shelljs": "0.7.0"
+        "shelljs": "0.8.3"
     },
     "devDependencies": {
         "@oclif/dev-cli": "^1.22.0"
