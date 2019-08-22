@@ -39,10 +39,6 @@ aliases:
       sudo npm install -g cordova@8.1.2
       sudo cordova telemetry off
 
-  - &install-ant
-    name: Install Ant
-    command: brew install ant
-
   - &install-sfdx
     name: Install SFDX
     command: |
@@ -146,7 +142,6 @@ jobs:
     steps:
       - checkout
       - run: *setup
-      - run: *install-ant
       - run:
           name: Building all ios native templates
           command:  ./test/test_force.js --exit-on-failure --cli=forceios
@@ -157,7 +152,6 @@ jobs:
     steps:
       - checkout
       - run: *setup
-      - run: *install-ant
       - run: *install-sfdx
       - run:
           name: Building all ios native templates with SFDX
@@ -170,11 +164,9 @@ jobs:
       - checkout
       - run: *setup
       - run: *ios-cordova
-      - run: *install-ant
       - run:
           name: Building all ios hybrid templates
           command: ./test/test_force.js --exit-on-failure --cli=forcehybrid --os=ios --no-plugin-update
-          no_output_timeout: 20m
           when: always
 
   forcehybrid-ios-sfdx:
@@ -183,12 +175,10 @@ jobs:
       - checkout
       - run: *setup
       - run: *ios-cordova
-      - run: *install-ant
       - run: *install-sfdx
       - run:
           name: Building all ios hybrid templates with SFDX
           command: ./test/test_force.js --exit-on-failure --cli=forcehybrid --os=ios --use-sfdx --no-plugin-update
-          no_output_timeout: 20m
           when: always
 
   forcereact-ios:
@@ -196,11 +186,9 @@ jobs:
     steps:
       - checkout
       - run: *setup
-      - run: *install-ant
       - run:
           name: Building all ios react native templates
           command: ./test/test_force.js --exit-on-failure --cli=forcereact --os=ios
-          no_output_timeout: 20m
           when: always
 
   forcereact-ios-sfdx:
@@ -208,12 +196,10 @@ jobs:
     steps:
       - checkout
       - run: *setup
-      - run: *install-ant
       - run: *install-sfdx
       - run:
           name: Building all ios react native templates with SFDX
           command: ./test/test_force.js --exit-on-failure --cli=forcereact --os=ios --use-sfdx
-          no_output_timeout: 20m
           when: always
 
 workflows:
