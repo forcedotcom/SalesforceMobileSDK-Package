@@ -174,6 +174,7 @@ jobs:
       - run:
           name: Building all ios hybrid templates
           command: ./test/test_force.js --exit-on-failure --cli=forcehybrid --os=ios --no-plugin-update
+          no_output_timeout: 20m
           when: always
 
   forcehybrid-ios-sfdx:
@@ -187,6 +188,7 @@ jobs:
       - run:
           name: Building all ios hybrid templates with SFDX
           command: ./test/test_force.js --exit-on-failure --cli=forcehybrid --os=ios --use-sfdx --no-plugin-update
+          no_output_timeout: 20m
           when: always
 
   forcereact-ios:
@@ -198,6 +200,7 @@ jobs:
       - run:
           name: Building all ios react native templates
           command: ./test/test_force.js --exit-on-failure --cli=forcereact --os=ios
+          no_output_timeout: 20m
           when: always
 
   forcereact-ios-sfdx:
@@ -210,6 +213,7 @@ jobs:
       - run:
           name: Building all ios react native templates with SFDX
           command: ./test/test_force.js --exit-on-failure --cli=forcereact --os=ios --use-sfdx
+          no_output_timeout: 20m
           when: always
 
 workflows:
