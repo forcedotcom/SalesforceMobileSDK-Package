@@ -102,7 +102,7 @@ jobs:
       - run: *android-cordova
       - run:
           name: Building all android hybrid templates
-          command: ./test/test_force.js --exit-on-failure --cli=forcehybrid --os=android
+          command: ./test/test_force.js --exit-on-failure --cli=forcehybrid --os=android --no-plugin-update
           when: always
 
   forcehybrid-android-sfdx:
@@ -115,7 +115,7 @@ jobs:
       - run: *install-sfdx
       - run:
           name: Building all android hybrid templates with SFDX
-          command: ./test/test_force.js --exit-on-failure --cli=forcehybrid --os=android --use-sfdx
+          command: ./test/test_force.js --exit-on-failure --cli=forcehybrid --os=android --use-sfdx --no-plugin-update
           when: always
 
   forcereact-android:
@@ -173,7 +173,7 @@ jobs:
       - run: *install-ant
       - run:
           name: Building all ios hybrid templates
-          command: ./test/test_force.js --exit-on-failure --cli=forcehybrid --os=ios
+          command: ./test/test_force.js --exit-on-failure --cli=forcehybrid --os=ios --no-plugin-update
           when: always
 
   forcehybrid-ios-sfdx:
@@ -186,7 +186,7 @@ jobs:
       - run: *install-sfdx
       - run:
           name: Building all ios hybrid templates with SFDX
-          command: ./test/test_force.js --exit-on-failure --cli=forcehybrid --os=ios --use-sfdx
+          command: ./test/test_force.js --exit-on-failure --cli=forcehybrid --os=ios --use-sfdx --no-plugin-update
           when: always
 
   forcereact-ios:
