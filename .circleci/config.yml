@@ -61,7 +61,7 @@ linux: &linux
 mac: &mac
   working_directory: ~/SalesforceMobileSDK-Package
   macos:
-    xcode: "10.3.0"
+    xcode: "11.0.0"
   shell: /bin/bash --login -eo pipefail
 
 version: 2
