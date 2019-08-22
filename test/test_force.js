@@ -41,6 +41,7 @@ function main(args) {
     // Args extraction
     var usageRequested = parsedArgs.hasOwnProperty('usage');
     var useSfdxRequested = parsedArgs.hasOwnProperty('use-sfdx');
+    var noPluginUpdate = parsedArgs.hasOwnProperty('no-plugin-update');
     var exitOnFailure = parsedArgs.hasOwnProperty('exit-on-failure');
     var chosenOperatingSystems = cleanSplit(parsedArgs.os, ',').map(function(s) { return s.toLowerCase(); });
     var templateRepoUri = parsedArgs.templaterepouri || '';
@@ -112,8 +113,8 @@ function main(args) {
     if (testingHybrid) {
         var sdkBranch = utils.separateRepoUrlPathBranch(pluginRepoUri).branch;
 
-        // Using updated local clone of plugin repo if pluginRepoUri does not point to tag
-        if (!pluginRepoUri.indexOf('//') >= 0 && !sdkBranch.match(/v[0-9.]+/)) {
+        // Using updated local clone of plugin repo if pluginRepoUri does not point to tag and noPluginUpdate is false
+        if (!pluginRepoUri.indexOf('//') >= 0 && !sdkBranch.match(/v[0-9.]+/) && !noPluginUpdate) {
             var pluginRepoDir = utils.cloneRepo(tmpDir, pluginRepoUri);
             if (testingIOS && testingAndroid) updatePluginRepo(tmpDir, 'all', pluginRepoDir, sdkBranch);
             if (testingIOS && !testingAndroid) updatePluginRepo(tmpDir, OS.ios, pluginRepoDir, sdkBranch);
@@ -175,6 +176,7 @@ function shortUsage(exitCode) {
     utils.logInfo('    [--use-sfdx]', COLOR.magenta);
     utils.logInfo('    [--exit-on-failure]', COLOR.magenta);
     utils.logInfo('    [--pluginrepouri=PLUGIN_REPO_URI (Defaults to uri in shared/constants.js)]', COLOR.magenta);
+    utils.logInfo('    [--no-plugin-update]', COLOR.magenta);
     utils.logInfo('', COLOR.cyan);
     utils.logInfo('  Where:', COLOR.cyan);
     utils.logInfo('  - osX is : ios or android', COLOR.cyan);
