@@ -272,13 +272,13 @@ function updatePluginRepo(tmpDir, os, pluginRepoDir, sdkBranch) {
     utils.runProcessThrowError(path.join('tools', 'update.sh') + ' -b ' + sdkBranch + ' -o ' + os, pluginRepoDir);
 }
 
-function cleanName(name, delimiter) {
-    return name.replace(/[#_\.]/g, delimiter);
+function cleanName(name) {
+    return name.replace(/[#_\.]/g, '_');
 }
 
-function templateCleanName(name, delimiter) {
+function templateCleanName(name) {
     // remove trailing tag/branch, then change camel case to delimiter separated.
-    return cleanSplit(name, '#')[0].replace(/([A-Z])/g, delimiter + "$1").slice(1).toLowerCase();
+    return cleanSplit(name, '#')[0].replace(/([A-Z])/g, "_$1").slice(1).toLowerCase();
 }
 
 //
@@ -299,8 +299,7 @@ function createCompileApp(tmpDir, os, actualAppType, templateRepoUri, pluginRepo
         templateRepoUri = null;
     }
     var target = actualAppType + ' app for ' + os + (templateRepoUri ? ' based on template ' + templateName : '');
-    var delimiter = (os === OS.ios) ? '_' : '_';
-    var appName = (templateRepoUri ? templateCleanName(templateName, delimiter) : cleanName(actualAppType, delimiter));
+    var appName = (templateRepoUri ? templateCleanName(templateName) : cleanName(actualAppType));
     // "native" is an illegal word for android package
     if (os === OS.android && appName === 'native') {
         appName = 'native_java'
