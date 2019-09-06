@@ -178,7 +178,7 @@ module.exports = {
             longDescription: 'A string in reverse internet domain format that identifies your app\'s package or bundle. For example, "com.mycompany.myapp".',
             prompt: 'Enter your package name:',
             error: cli => val => '\'' + val + '\' is not a valid package name.',
-            validate: cli => val => /^[a-z]+[a-z0-9_]*(\.[a-z]+[a-z0-9_]*)*$/.test(val),
+            validate: cli => val => /^[a-z]+[a-z0-9_]*(\.[a-z]+[a-z0-9_-]*)*$/.test(val),
             type: 'string'
         },
         organization: {

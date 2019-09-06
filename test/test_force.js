@@ -273,7 +273,12 @@ function updatePluginRepo(tmpDir, os, pluginRepoDir, sdkBranch) {
 }
 
 function cleanName(name) {
-    return name.replace(/[#-\.]/g, '_')
+    return name.replace(/[#_\.]/g, '_');
+}
+
+function templateCleanName(name) {
+    // remove trailing tag/branch, then change camel case to delimiter separated.
+    return cleanSplit(name, '#')[0].replace(/([A-Z])/g, "_$1").slice(1).toLowerCase();
 }
 
 //
@@ -294,14 +299,11 @@ function createCompileApp(tmpDir, os, actualAppType, templateRepoUri, pluginRepo
         templateRepoUri = null;
     }
     var target = actualAppType + ' app for ' + os + (templateRepoUri ? ' based on template ' + templateName : '');
-    var appName = 'App_' + (templateRepoUri ? cleanName(templateName) : actualAppType) + '_' + os;
-    // Add app type unless the app is native or react native iOS
-    var packageSuffix = (os === OS.ios && !isHybrid) ? '' : '.' + actualAppType;
+    var appName = (templateRepoUri ? templateCleanName(templateName) : cleanName(actualAppType));
     // "native" is an illegal word for android package
-    if (actualAppType === APP_TYPE.native) {
-        packageSuffix = packageSuffix.replace('native', 'native_java');
+    if (os === OS.android && appName === 'native') {
+        appName = 'native_java';
     }
-    var packageName = 'com.salesforce' + packageSuffix;
     var outputDir = path.join(tmpDir, appName);
     var forcecli = (isReactNative
                     ? SDK.forceclis.forcereact
@@ -313,6 +315,11 @@ function createCompileApp(tmpDir, os, actualAppType, templateRepoUri, pluginRepo
                          )
                       )
                    );
+
+    var packageName = (os === OS.ios && !isHybrid) ? 'com.salesforce' : 'com.salesforce.' + appName;
+    if (os === OS.ios && !isHybrid) {
+        packageName = packageName.replace(/[_]/g, '-');
+    }
 
     var execPath = useSfdxRequested
         ? 'sfdx mobilesdk:' + forcecli.topic + ':'
