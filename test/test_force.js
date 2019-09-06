@@ -302,9 +302,8 @@ function createCompileApp(tmpDir, os, actualAppType, templateRepoUri, pluginRepo
     var appName = (templateRepoUri ? templateCleanName(templateName) : cleanName(actualAppType));
     // "native" is an illegal word for android package
     if (os === OS.android && appName === 'native') {
-        appName = 'native_java'
+        appName = 'native_java';
     }
-
     var outputDir = path.join(tmpDir, appName);
     var forcecli = (isReactNative
                     ? SDK.forceclis.forcereact
@@ -319,7 +318,7 @@ function createCompileApp(tmpDir, os, actualAppType, templateRepoUri, pluginRepo
 
     var packageName = (os === OS.ios && !isHybrid) ? 'com.salesforce' : 'com.salesforce.' + appName;
     if (os === OS.ios && !isHybrid) {
-        packageName = packageName.replace(/[_]/g, '-')
+        packageName = packageName.replace(/[_]/g, '-');
     }
 
     var execPath = useSfdxRequested
