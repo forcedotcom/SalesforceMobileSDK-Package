@@ -177,7 +177,8 @@ async function prepareRepo(repo, params) {
                     {
                         msg: `Setting up ${config.testMasterBranch}`,
                         cmds: [
-                            createBranch(config.testMasterBranch, 'master') // not fixing submodules / package.json files so it's doesn't conflict on merge
+                            createBranch(config.testMasterBranch, 'master'), // not fixing submodules / package.json files so it's doesn't conflict on merge
+                            params.noDev && params.filesWithOrg ? pointToFork(config.testMasterBranch, params) : null
                         ]
                     },
                     !params.hasDoc ? null : createBranch(config.testDocBranch, 'gh-pages'),
