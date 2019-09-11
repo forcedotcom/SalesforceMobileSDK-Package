@@ -289,7 +289,7 @@ function createCompileApp(tmpDir, os, actualAppType, templateRepoUri, pluginRepo
     }
     var target = computeTargetDescription(os, actualAppType, templateRepoUri);
     var appName = computeAppName(os, actualAppType, templateRepoUri);
-    var packageName = computePackageName(appName);
+    var packageName = computePackageName(os, actualAppType, appName);
 
     var outputDir = path.join(tmpDir, appName);
     var forcecli = (isReactNative
@@ -506,7 +506,8 @@ function computeTargetDescription(os, actualAppType, templateRepoUri) {
 //
 // Compute app package
 //
-function computePackageName(appName) {
-    return 'com.salesforce.' + appName
+function computePackageName(os, actualAppType, appName) {
+    var isHybrid = actualAppType === APP_TYPE.hybrid_local || actualAppType === APP_TYPE.hybrid_remote;
+    return 'com.salesforce' + (os === OS.ios && !isHybrid ? '' : '.' + appName);
 }
     
