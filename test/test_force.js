@@ -271,16 +271,6 @@ function updatePluginRepo(tmpDir, os, pluginRepoDir, sdkBranch) {
     utils.logInfo('Updating cordova plugin at ' + sdkBranch, COLOR.green);
     utils.runProcessThrowError(path.join('tools', 'update.sh') + ' -b ' + sdkBranch + ' -o ' + os, pluginRepoDir);
 }
-
-function cleanName(name) {
-    return name.replace(/[#_\.]/g, '_');
-}
-
-function templateCleanName(name) {
-    // remove trailing tag/branch, then change camel case to delimiter separated.
-    return cleanSplit(name, '#')[0].replace(/([A-Z])/g, "_$1").slice(1).toLowerCase();
-}
-
 //
 // Create and compile app
 //
@@ -290,20 +280,17 @@ function createCompileApp(tmpDir, os, actualAppType, templateRepoUri, pluginRepo
     var isReactNative = actualAppType === APP_TYPE.react_native;
     var isHybrid = actualAppType.indexOf('hybrid') == 0;
     var isHybridRemote = actualAppType === APP_TYPE.hybrid_remote;
-    var templateName = getTemplateNameFromUri(templateRepoUri);
-    if (templateName && templateName.indexOf('HybridRemoteTemplate') == 0) {
+    if (isHybridRemote) {
         // XXX createwithtemplate doesn't work for hybrid remote template
         //     because the arg validation only accept startpage if apptype is available as an arg
         //
         // As a work around, we make sure create with --apptype=xxx is called instead of createwithtemplate
         templateRepoUri = null;
     }
-    var target = actualAppType + ' app for ' + os + (templateRepoUri ? ' based on template ' + templateName : '');
-    var appName = (templateRepoUri ? templateCleanName(templateName) : cleanName(actualAppType));
-    // "native" is an illegal word for android package
-    if (os === OS.android && appName === 'native') {
-        appName = 'native_java';
-    }
+    var target = computeTargetDescription(os, actualAppType, templateRepoUri);
+    var appName = computeAppName(os, actualAppType, templateRepoUri);
+    var packageName = computePackageName(appName);
+
     var outputDir = path.join(tmpDir, appName);
     var forcecli = (isReactNative
                     ? SDK.forceclis.forcereact
@@ -316,10 +303,6 @@ function createCompileApp(tmpDir, os, actualAppType, templateRepoUri, pluginRepo
                       )
                    );
 
-    var packageName = (os === OS.ios && !isHybrid) ? 'com.salesforce' : 'com.salesforce.' + appName;
-    if (os === OS.ios && !isHybrid) {
-        packageName = packageName.replace(/[_]/g, '-');
-    }
 
     var execPath = useSfdxRequested
         ? 'sfdx mobilesdk:' + forcecli.topic + ':'
@@ -470,8 +453,60 @@ function isWindows() {
 
 //
 // Get template name from uri
+// e.g. https://github.com/forcedotcom/SalesforceMobileSDK-Templates/iOSNativeTemplate#dev --> iOSNativeTemplate
 //
 function getTemplateNameFromUri(templateRepoUri) {
-    var parts = cleanSplit(templateRepoUri, '/');
+    var parts = cleanSplit(cleanSplit(templateRepoUri, '#')[0], '/');
     return parts[parts.length-1];
 }
+
+
+//
+// Get template version from uri
+// e.g. https://github.com/forcedotcom/SalesforceMobileSDK-Templates/iOSNativeTemplate#dev --> dev
+//
+function getTemplateVersionFromUri(templateRepoUri) {
+    var parts = cleanSplit(templateRepoUri, '#');
+    return parts.length == 2 ? parts[1] : 'master';
+}
+
+//
+// Compute app name
+// Try to keep name short (drop the word template if present) but unique (prepend os if not present)
+//
+function computeAppName(os, actualAppType, templateRepoUri) {
+    var appName;
+    if (templateRepoUri) {
+        appName = getTemplateNameFromUri(templateRepoUri).toLowerCase();
+    } else {
+        appName = actualAppType.replace(/_/g, '');
+    }
+
+    // Prepending os if not already in name
+    if (appName.indexOf(os) == -1) {
+        appName = os + appName;
+    }
+
+    // Removing template if in name
+    appName = appName.replace(/template/g, '');
+
+    return appName;
+}
+
+//
+// Compute target description
+// 
+function computeTargetDescription(os, actualAppType, templateRepoUri) {
+    return actualAppType + ' app for ' + os
+        + (templateRepoUri
+           ? ' based on template ' + getTemplateNameFromUri(templateRepoUri) + ' (' + getTemplateVersionFromUri(templateRepoUri) + ')'
+           : '');    
+}
+
+//
+// Compute app package
+//
+function computePackageName(appName) {
+    return 'com.salesforce.' + appName
+}
+    
