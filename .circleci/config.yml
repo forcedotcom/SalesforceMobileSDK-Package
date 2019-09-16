@@ -39,10 +39,6 @@ aliases:
       sudo npm install -g cordova@8.1.2
       sudo cordova telemetry off
 
-  - &install-ant
-    name: Install Ant
-    command: brew install ant
-
   - &install-sfdx
     name: Install SFDX
     command: |
@@ -65,7 +61,7 @@ linux: &linux
 mac: &mac
   working_directory: ~/SalesforceMobileSDK-Package
   macos:
-    xcode: "10.2.1"
+    xcode: "11.0.0"
   shell: /bin/bash --login -eo pipefail
 
 version: 2
@@ -102,7 +98,7 @@ jobs:
       - run: *android-cordova
       - run:
           name: Building all android hybrid templates
-          command: ./test/test_force.js --exit-on-failure --cli=forcehybrid --os=android
+          command: ./test/test_force.js --exit-on-failure --cli=forcehybrid --os=android --no-plugin-update
           when: always
 
   forcehybrid-android-sfdx:
@@ -115,7 +111,7 @@ jobs:
       - run: *install-sfdx
       - run:
           name: Building all android hybrid templates with SFDX
-          command: ./test/test_force.js --exit-on-failure --cli=forcehybrid --os=android --use-sfdx
+          command: ./test/test_force.js --exit-on-failure --cli=forcehybrid --os=android --use-sfdx --no-plugin-update
           when: always
 
   forcereact-android:
@@ -146,7 +142,6 @@ jobs:
     steps:
       - checkout
       - run: *setup
-      - run: *install-ant
       - run:
           name: Building all ios native templates
           command:  ./test/test_force.js --exit-on-failure --cli=forceios
@@ -157,7 +152,6 @@ jobs:
     steps:
       - checkout
       - run: *setup
-      - run: *install-ant
       - run: *install-sfdx
       - run:
           name: Building all ios native templates with SFDX
@@ -170,10 +164,9 @@ jobs:
       - checkout
       - run: *setup
       - run: *ios-cordova
-      - run: *install-ant
       - run:
           name: Building all ios hybrid templates
-          command: ./test/test_force.js --exit-on-failure --cli=forcehybrid --os=ios
+          command: ./test/test_force.js --exit-on-failure --cli=forcehybrid --os=ios --no-plugin-update
           when: always
 
   forcehybrid-ios-sfdx:
@@ -182,11 +175,10 @@ jobs:
       - checkout
       - run: *setup
       - run: *ios-cordova
-      - run: *install-ant
       - run: *install-sfdx
       - run:
           name: Building all ios hybrid templates with SFDX
-          command: ./test/test_force.js --exit-on-failure --cli=forcehybrid --os=ios --use-sfdx
+          command: ./test/test_force.js --exit-on-failure --cli=forcehybrid --os=ios --use-sfdx --no-plugin-update
           when: always
 
   forcereact-ios:
@@ -194,7 +186,6 @@ jobs:
     steps:
       - checkout
       - run: *setup
-      - run: *install-ant
       - run:
           name: Building all ios react native templates
           command: ./test/test_force.js --exit-on-failure --cli=forcereact --os=ios
@@ -205,7 +196,6 @@ jobs:
     steps:
       - checkout
       - run: *setup
-      - run: *install-ant
       - run: *install-sfdx
       - run:
           name: Building all ios react native templates with SFDX
