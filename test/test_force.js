@@ -182,7 +182,7 @@ function shortUsage(exitCode) {
     utils.logInfo('  - osX is : ios or android', COLOR.cyan);
     utils.logInfo('  - cliX is : forceios or forcedroid or forcehybrid or forcereact', COLOR.cyan);
     utils.logInfo('  - appTypeX is: native, native_swift, native_kotlin, react_native, hybrid_local or hybrid_remote', COLOR.cyan);
-    utils.logInfo('  - templaterepouri is a template repo uri e.g. https://github.com/forcedotcom/SalesforceMobileSDK-Templates/SmartSyncExplorerReactNative#dev', COLOR.cyan);
+    utils.logInfo('  - templaterepouri is a template repo uri e.g. https://github.com/forcedotcom/SalesforceMobileSDK-Templates/MobileSyncExplorerReactNative#dev', COLOR.cyan);
     utils.logInfo('', COLOR.cyan);
 
     if (typeof(exitCode) !== 'undefined') {
