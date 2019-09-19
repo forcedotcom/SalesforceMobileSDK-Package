@@ -175,7 +175,7 @@ async function start() {
         `  ./gradlew :libs:SalesforceAnalytics:bintrayUpload`,
         `  ./gradlew :libs:SalesforceSDK:bintrayUpload`,
         `  ./gradlew :libs:SmartStore:bintrayUpload`,
-        `  ./gradlew :libs:SmartSync:bintrayUpload`,
+        `  ./gradlew :libs:MobileSync:bintrayUpload`,
         `  ./gradlew :libs:SalesforceHybrid:bintrayUpload`,
         ``,
         `Do NOT publish until absolutely certain.`,
