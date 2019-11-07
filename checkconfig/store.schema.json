@@ -1,0 +1,39 @@
+{
+    "title" : "Store configuration",
+    "description" : "Use this schema to validate userstore.json or globalstore.json",
+    "type": "object",
+    "properties": {
+        "soups": {
+            "type": "array",
+            "items": {
+                "title": "Configuration for soup",
+                "type": "object",
+                "properties": {
+                    "soupName": {
+                        "title": "Name of soup",
+                        "type": "string"
+                    },
+                    "indexes": {
+                        "title": "Indexes for the soup",
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "path": {
+                                    "type": "string"
+                                },
+                                "type": {
+                                    "type": "string",
+                                    "enum": ["string", "integer", "floating", "json1", "full_text"]
+                                }
+                            },
+                            "required": ["path", "type"]
+                        }
+                    }
+                },
+                "required": ["soupName", "indexes"]
+            }
+        }
+    },
+    "required": ["soups"]
+}
