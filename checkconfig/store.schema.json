@@ -1,5 +1,5 @@
 {
-    "title" : "Store configuration",
+    "title" : "Store configuration schema",
     "description" : "Use this schema to validate userstore.json or globalstore.json",
     "type": "object",
     "properties": {
