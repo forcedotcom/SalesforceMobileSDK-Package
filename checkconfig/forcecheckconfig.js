@@ -34,15 +34,14 @@ var spawnSync = utils = require('../shared/utils'),
     path = require('path'),
     SDK = require('../shared/constants'),
     COLOR = require('../shared/outputColors'),
-    storeSchema = require('./store.schema.json'),
-    syncsSchema = require('./syncs.schema.json')
-    Ajv = require('ajv')
+    Ajv = require('ajv'),
+    jsonlint = require('jsonlint')
 ;
 
-// Config types
-var CONFIG_TYPES = {
-    store: 'store',
-    syncs: 'syncs'
+// Config type to schema map
+var SCHEMA = {
+    store: 'store.schema.json',
+    syncs: 'syncs.schema.json'
 };
 
 
@@ -79,7 +78,7 @@ function main(args) {
     }
 
     // Show error if invalid
-    if (!CONFIG_TYPES.hasOwnProperty(configType)) {
+    if (!SCHEMA.hasOwnProperty(configType)) {
         utils.logError(`You specified a config type [${configType}] that does not exist\n`);
         process.exit(1);
     }
@@ -108,16 +107,30 @@ function usage(exitCode) {
 
 
 //
-// Config validation
+// Validate config against schema
 //
 function checkConfig(configPath, configType) {
-    var config = require(path.resolve(configPath));
-    var schema = configType == CONFIG_TYPES.store ? storeSchema : syncsSchema;
+    var config = readJsonFile(configPath)
+    var schema = readJsonFile(SCHEMA[configType])
     var ajv = new Ajv({allErrors: true});
     var valid = ajv.validate(schema, config);
     if (!valid) {
         utils.logError(JSON.stringify(ajv.errors, null, "  "))
     } else {
         utils.logInfo(`${configPath} conforms to ${configType} schema\n`, COLOR.green)
+    }
+}
+
+//
+// Read json from file and validates that is valid json
+//
+function readJsonFile(filePath) {
+    try {
+        var content = fs.readFileSync(path.resolve(filePath), "UTF-8");
+        var json = jsonlint.parse(content);
+        return json;
+    } catch (error) {
+        utils.logError(`Error parsing ${filePath}: ${error}\n`);
+        process.exit(1);
     }
 }

@@ -23,7 +23,8 @@
 		"forcecheckconfig": "forcecheckconfig.js"
 	},
 	"dependencies": {
-		"ajv": "^6.10.2"
+		"ajv": "^6.10.2",
+		"jsonlint": "^1.6.3"
 	},
 	"repository": {
 		"type": "git",
