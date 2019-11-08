@@ -32,13 +32,14 @@ Usage:
   Where:
   - configPath is the path to a store config or a syncs config
   - configType is: store or syncs
+  
 ```
 
 ## Checking a store config file
-forcecheckconfig --path=userstore.json --type=store
+Simply type `forcecheckconfig --path=userstore.json --type=store`
 
 ## Checking a syncs config file
-forcecheckconfig --path=usersyncs.json --type=syncs
+Simply type `forcecheckconfig --path=usersyncs.json --type=syncs`
 
 
 ## More information
