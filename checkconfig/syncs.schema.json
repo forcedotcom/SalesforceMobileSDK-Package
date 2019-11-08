@@ -1,43 +1,109 @@
 {
     "title" : "Syncs configuration schema",
     "description" : "Use this schema to validate usersyncs.json or globalsyncs.json",
+    "definitions": {
+        "mergeMode": {
+            "type": "string",
+            "enum": ["LEAVE_IF_CHANGED", "OVERWRITE"]
+        },
+        "fieldlist": {
+            "type": "array",
+            "items": { "type": "string"}
+        },
+        "syncDownOptions": {
+            "type": "object",
+            "properties": {
+                "mergeMode": { "$ref": "#/definitions/mergeMode" }
+            },
+            "required": ["mergeMode"]
+        },
+        "syncUpOptions": {
+            "type": "object",
+            "properties": {
+                "mergeMode": { "$ref": "#/definitions/mergeMode" },
+                "fieldlist": { "$ref": "#/definitions/fieldlist" }
+            },
+            "required": ["mergeMode"]
+        },
+        "syncTarget": {
+            "type": "object",
+            "properties": {
+                "idFieldName": { "type": "string" },
+                "modificationDateFieldName": { "type": "string" },
+                "iOSImpl": { "type": "string" },
+                "androidImpl": { "type" : "string" }
+            }
+        },
+        "syncDownTarget": {
+            "allOf": [
+                { "$ref": "#/definitions/syncTarget" },
+                {
+                    "properties": {
+                        "type": {
+                            "type": "string",
+                            "enum": ["mru", "soql", "sosl", "refresh", "parent_children", "custom", "metadata", "layout"]
+                        }
+                    },
+                    "required": ["type"]
+                }
+            ]
+        },
+        "syncUpTarget": {
+            "allOf": [
+                { "$ref": "#/definitions/syncTarget" },
+                {
+                    "properties": {
+                        "createFieldlist": { "$ref": "#/definitions/fieldlist" },
+                        "updateFieldlist": { "$ref": "#/definitions/fieldlist" }
+                    }
+                }
+            ]
+        },
+        "syncDown": {
+            "type": "object",
+            "properties": {
+                "syncName": {
+                    "type": "string"
+                },
+                "soupName": {
+                    "type": "string"
+                },
+                "syncType": {
+                    "const": "syncDown"
+                },
+                "target": { "$ref": "#/definitions/syncDownTarget"},
+                "options": { "$ref": "#/definitions/syncDownOptions"}
+            },
+            "required": ["syncName", "soupName", "syncType", "target", "options"]
+        },
+        "syncUp": {
+            "type": "object",
+            "properties": {
+                "syncName": {
+                    "type": "string"
+                },
+                "soupName": {
+                    "type": "string"
+                },
+                "syncType": {
+                    "const": "syncUp"
+                },
+                "target": { "$ref": "#/definitions/syncUpTarget"},
+                "options": { "$ref": "#/definitions/syncUpOptions"}
+            },
+            "required": ["syncName", "soupName", "syncType", "target", "options"]
+        }
+    },
+
     "type": "object",
     "properties": {
         "syncs": {
             "type": "array",
             "items": {
-                "title": "Configuration for sync",
-                "type": "object",
-                "properties": {
-                    "syncName": {
-                        "title": "Name of sync",
-                        "type": "string"
-                    },
-                    "syncType": {
-                        "title": "Type of sync",
-                        "type": "string",
-                        "enum": ["syncDown", "syncUp"]
-                    },
-                    "soupName": {
-                        "title": "Name of soup",
-                        "type": "string"
-                    },
-                    "target": {
-                        "title": "Target of sync",
-                        "type": "object"
-                    },
-                    "options": {
-                        "title": "Options of sync",
-                        "type": "object",
-                        "properties": {
-                            "mergeMode": {
-                                "type": "string",
-                                "enum": ["LEAVE_IF_CHANGED", "OVERWRITE"]
-                            }
-                        }
-                    }
-                },
-                "required": ["syncName", "soupName", "target", "options"]
+                "oneOf": [
+                    { "$ref": "#/definitions/syncDown" },
+                    { "$ref": "#/definitions/syncUp" }
+                ]
             }
         }
     },

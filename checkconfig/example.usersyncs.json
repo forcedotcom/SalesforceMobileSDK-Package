@@ -13,6 +13,64 @@
             "soupName": "accounts",
             "target": {"createFieldlist":["Name"]},
             "options": {"fieldlist":["Id", "Name", "LastModifiedDate"], "mergeMode":"LEAVE_IF_CHANGED"}
-        }
+        },
+        {
+            "syncName": "userSync3",
+            "syncType": "syncDown",
+            "soupName": "accounts",
+            "target": {
+                "parent" : {
+                    "idFieldName" : "Id",
+                    "sobjectType" : "Account",
+                    "modificationDateFieldName" : "LastModifiedDate",
+                    "soupName" : "accounts"
+                },
+                "parentFieldlist" : ["Id", "Name", "Description"],
+                "children" : {
+                    "parentIdFieldName" : "AccountId",
+                    "idFieldName" : "Id",
+                    "sobjectType" : "Contact",
+                    "modificationDateFieldName" : "LastModifiedDate",
+                    "soupName" : "contacts",
+                    "sobjectTypePlural" : "Contacts"
+                },
+                "childrenFieldlist" : [
+                    "LastName",
+                    "AccountId"
+                ],
+                "relationshipType" : "MASTER_DETAIL",
+                "parentSoqlFilter" : "",
+                "type" : "parent_children"
+            },
+            "options": {"mergeMode":"OVERWRITE"}
+        },
+        {
+            "syncName": "userSync4",
+            "syncType": "syncUp",
+            "soupName": "accounts",
+            "target": {
+                "iOSImpl" : "SFParentChildrenSyncUpTarget",
+                "parent" : {
+                    "idFieldName" : "Id",
+                    "sobjectType" : "Account",
+                    "modificationDateFieldName" : "LastModifiedDate",
+                    "soupName" : "accounts"
+                },
+                "parentCreateFieldlist" : ["Id", "Name", "Description"],
+                "parentUpdateFieldlist" : ["Name", "Description"],
+                "children" : {
+                    "parentIdFieldName" : "AccountId",
+                    "idFieldName" : "Id",
+                    "sobjectType" : "Contact",
+                    "modificationDateFieldName" : "LastModifiedDate",
+                    "soupName" : "contacts",
+                    "sobjectTypePlural" : "Contacts"
+                },
+                "childrenCreateFieldlist" : ["LastName", "AccountId"],
+                "childrenUpdateFieldlist" : ["LastName", "AccountId"],
+                "relationshipType" : "MASTER_DETAIL"
+            },
+            "options": {"mergeMode":"LEAVE_IF_CHANGED"}
+        }        
     ]
 }
