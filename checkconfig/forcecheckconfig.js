@@ -28,20 +28,20 @@
  */
 
 // Dependencies
-var spawnSync = utils = require('../shared/utils'),
-    commandLineUtils = require('../shared/commandLineUtils'),
+var spawnSync = utils = require('./shared/utils'),
+    commandLineUtils = require('./shared/commandLineUtils'),
     fs = require('fs'),
     path = require('path'),
-    SDK = require('../shared/constants'),
-    COLOR = require('../shared/outputColors'),
+    SDK = require('./shared/constants'),
+    COLOR = require('./shared/outputColors'),
     Ajv = require('ajv'),
     jsonlint = require('jsonlint')
 ;
 
 // Config type to schema map
 var SCHEMA = {
-    store: 'store.schema.json',
-    syncs: 'syncs.schema.json'
+    store: './checkconfig/store.schema.json',
+    syncs: './checkconfig/syncs.schema.json'
 };
 
 
@@ -126,7 +126,7 @@ function checkConfig(configPath, configType) {
 //
 function readJsonFile(filePath) {
     try {
-        var content = fs.readFileSync(path.resolve(filePath), "UTF-8");
+        var content = fs.readFileSync(filePath, "UTF-8");
         var json = jsonlint.parse(content);
         return json;
     } catch (error) {
