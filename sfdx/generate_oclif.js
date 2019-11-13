@@ -6,52 +6,6 @@ var fs = require('fs'),
     SDK = require('../shared/constants'),
     configHelper = require('../shared/configHelper');
 
-function generateOclifManifest() {
-    var commands = {};
-    for (var cliName in SDK.forceclis) {
-        var cli = SDK.forceclis[cliName];
-        cli.commands.map(commandName => {
-            var command = configHelper.getCommandExpanded(cli, commandName);
-            var key = `mobilesdk:${cli.topic}:${command.name}`;
-
-            // Computing flags
-            var flags = {}
-            command.args.map(arg => {
-                flag = {
-                    name: arg.name,
-                    type: arg.type,
-                    'char': arg['char'],
-                    description: arg.description,
-                    required: !!arg.required,
-                    hidden: !!arg.hidden
-                };
-
-                if (arg.hidden) flag.hidden = true;
-                flags[arg.name] = flag
-            })
-
-            // Computing command
-            commands[key] = {
-                id: key,
-                description: command.description + '\n\n' + command.help,
-                pluginName: 'sfdx-mobilesdk-plugin',
-                pluginType: 'core',
-                aliases: [],
-                flags: flags,
-                args: []
-            }
-        })
-    }
-
-    // Computing manifest
-    var manifest = {
-        versin: SDK.version,
-        commands: commands
-    };
-
-    fs.writeFileSync(path.resolve(__dirname, 'oclif.manifest.json'), JSON.stringify(manifest, null, 2))
-}
-
 function generateCommandClasses() {
 
     for (var cliName in SDK.forceclis) {
@@ -127,7 +81,6 @@ function capitalize(s) {
 
 // Main
 function main() {
-    generateOclifManifest();
     generateCommandClasses();
 }
 
