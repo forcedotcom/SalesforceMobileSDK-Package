@@ -32,7 +32,10 @@ function main(args) {
     }
     // Sfdx plugin packing
     else if (sfdxPluginRequested) {
-        pack('sfdx-mobilesdk-plugin', 'sfdx');
+        pack('sfdx-mobilesdk-plugin', 'sfdx', function(dir) {
+            utils.runProcessThrowError('npm install @oclif/dev-cli', dir);
+            utils.runProcessThrowError('node generate_oclif.js', dir); 
+        });
     }
     // CLI packing
     else {
@@ -48,7 +51,7 @@ function main(args) {
 //
 // Create package with name from dir
 //
-function pack(name, relativeDir) {
+function pack(name, relativeDir, prePack) {
     var packageName = name + '-' + SDK.version + '.tgz';
 
     utils.logInfo('Creating ' + packageName, COLOR.green);
@@ -61,7 +64,7 @@ function pack(name, relativeDir) {
     // npm pack doesn't following links
     utils.removeFile(sharedDir);
     shelljs.cp('-R', path.join(packageRepoDir, 'shared'), dir);
-    utils.runProcessThrowError('npm install @oclif/dev-cli', dir);// This is needed for npm prepack
+    if (typeof prePack === 'function') prePack(dir);
     utils.runProcessThrowError('npm pack', dir);
     utils.removeFile(sharedDir);
     shelljs.ln('-s', path.join('..', 'shared'), sharedDir);
