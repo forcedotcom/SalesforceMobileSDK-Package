@@ -60,6 +60,13 @@ forcehybrid listtemplates
 
  OR 
 
+# validate store or syncs configuration
+forcehybrid checkconfig
+    --configpath=path to store or syncs config to validate
+    --configtype=type of config to validate (store or syncs)
+
+ OR 
+
 # show version of Mobile SDK
 forcehybrid version
 

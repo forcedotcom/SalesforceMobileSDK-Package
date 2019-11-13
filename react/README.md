@@ -58,6 +58,13 @@ forcereact listtemplates
 
  OR 
 
+# validate store or syncs configuration
+forcereact checkconfig
+    --configpath=path to store or syncs config to validate
+    --configtype=type of config to validate (store or syncs)
+
+ OR 
+
 # show version of Mobile SDK
 forcereact version
 

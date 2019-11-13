@@ -10,7 +10,9 @@
 	],
 	"bin" : { "forcereact" : "forcereact.js" },
     "dependencies": {
-        "shelljs": "0.8.3"
+        "shelljs": "0.8.3",
+        "ajv": "^6.10.2",
+		"jsonlint": "^1.6.3"
     },
 	"repository": {
 		"type" : "git",

@@ -84,7 +84,7 @@ module.exports = {
                 'native': 'iOSNativeTemplate',
                 'native_swift': 'iOSNativeSwiftTemplate'
             },
-            commands: ['create', 'createwithtemplate', 'version', 'listtemplates']
+            commands: ['create', 'createwithtemplate', 'version', 'listtemplates', 'checkconfig']
         },
         forcedroid: {
             name: 'forcedroid',
@@ -98,7 +98,7 @@ module.exports = {
                 'native': 'AndroidNativeTemplate',
                 'native_kotlin': 'AndroidNativeKotlinTemplate'
             },
-            commands: ['create', 'createwithtemplate', 'version', 'listtemplates']
+            commands: ['create', 'createwithtemplate', 'version', 'listtemplates', 'checkconfig']
         },
         forcehybrid: {
             name: 'forcehybrid',
@@ -112,7 +112,7 @@ module.exports = {
                 'hybrid_local': 'HybridLocalTemplate',
                 'hybrid_remote': 'HybridRemoteTemplate'
             },
-            commands: ['create', 'createwithtemplate', 'version', 'listtemplates']
+            commands: ['create', 'createwithtemplate', 'version', 'listtemplates', 'checkconfig']
         },
         forcereact: {
             name: 'forcereact',
@@ -125,7 +125,7 @@ module.exports = {
             appTypesToPath: {
                 'react_native': 'ReactNativeTemplate'
             },
-            commands: ['create', 'createwithtemplate', 'version', 'listtemplates']
+            commands: ['create', 'createwithtemplate', 'version', 'listtemplates', 'checkconfig']
         }
     },
 
@@ -214,6 +214,28 @@ module.exports = {
             promptIf: otherArgs => otherArgs.apptype === 'hybrid_remote',
             type: 'string'
         },
+        configPath: {
+            name:'configpath',
+            'char': 'c',
+            description:'path to store or syncs config to validate',
+            longDescription:'Path to the store or syncs config file to validate.',
+            error: cli => val => 'Config file not found: \'' + val + '\'.',
+            prompt: 'Enter the path of the store or syncs config to validate:',
+            validate: cli => val => shelljs.test('-e', path.resolve(val)),
+            required: true,
+            type: 'string'
+        },
+        configType: {
+            name:'configtype',
+            'char': 'y',
+            description:'type of config to validate (store or syncs)',
+            longDescription:'Type of config to validate (store or syncs).',
+            error: cli => val => 'Invalid config type: \'' + val + '\'.',
+            prompt: 'Enter the type of the config to validate (store or syncs):',
+            validate: cli => val => val === 'store' || val === 'syncs',
+            required: true,
+            type: 'string'
+        },
         // Private args
         verbose: {
             name: 'verbose',
@@ -282,6 +304,13 @@ module.exports = {
             description: cli => 'list available Mobile SDK templates to create ' + cli.purpose,
             longDescription: cli => 'List available Mobile SDK templates to create ' + cli.purpose + '.',
             help: 'This command displays the list of available Mobile SDK templates. You can copy repo paths from the output for use with the createwithtemplate command.'
+        },
+        checkconfig: {
+            name: 'checkconfig',
+            args: ['configPath', 'configType'],
+            description: 'validate store or syncs configuration',
+            longDescription: 'Validate store or syncs configuration against their JSON schema.',
+            help: 'This command checks whether the given store or syncs configuration is valid according to its JSON schema.'
         }
     }
 };

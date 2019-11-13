@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 /*
  * Copyright (c) 2019-present, salesforce.com, inc.
  * All rights reserved.
@@ -28,90 +26,27 @@
  */
 
 // Dependencies
-var spawnSync = utils = require('./shared/utils'),
-    commandLineUtils = require('./shared/commandLineUtils'),
-    fs = require('fs'),
+var fs = require('fs'),
     path = require('path'),
-    SDK = require('./shared/constants'),
-    COLOR = require('./shared/outputColors'),
+    COLOR = require('./outputColors'),
+    utils = require('./utils'),
     Ajv = require('ajv'),
     jsonlint = require('jsonlint')
 ;
 
 // Config type to schema map
 var SCHEMA = {
-    store: './checkconfig/store.schema.json',
-    syncs: './checkconfig/syncs.schema.json'
+    store: './shared/store.schema.json',
+    syncs: './shared/syncs.schema.json'
 };
-
-
-// Calling main
-main(process.argv);
-
-//
-// Main function
-//
-function main(args) {
-    var commandLineArgs = process.argv.slice(2, args.length);
-    var parsedArgs = commandLineUtils.parseArgs(commandLineArgs);
-
-    // Args extraction
-    var usageRequested = parsedArgs.hasOwnProperty('usage');
-    var configPath = parsedArgs.path;
-    var configType = parsedArgs.type;
-
-    // Show usage if requested
-    if (usageRequested) {
-        usage(0);
-    }
-
-    // Show error and usage if no path or type specified
-    if (!configPath || !configType) {
-        utils.logError('You need to specify a config path and type\n');
-        usage(1);
-    }
-
-    // Show error if invalid path specified
-    if (!fs.existsSync(configPath)) {
-        utils.logError(`You specified a config file [${configPath}] that does not exist\n`);
-        process.exit(1);
-    }
-
-    // Show error if invalid
-    if (!SCHEMA.hasOwnProperty(configType)) {
-        utils.logError(`You specified a config type [${configType}] that does not exist\n`);
-        process.exit(1);
-    }
-
-    // Check specified config file
-    checkConfig(configPath, configType);
-}
-
-//
-// Usage function
-//
-function usage(exitCode) {
-    utils.logInfo('Usage:\n',  COLOR.cyan);
-    utils.logInfo('  forcecheckconfig --usage', COLOR.magenta);
-    utils.logInfo('\n OR \n', COLOR.cyan);
-    utils.logInfo('  forcecheckconfig --path=configPath --type=configType', COLOR.magenta);
-    utils.logInfo('  Where:', COLOR.cyan);
-    utils.logInfo('  - configPath is the path to a store config or a syncs config', COLOR.cyan);
-    utils.logInfo('  - configType is: store or syncs', COLOR.cyan);
-    utils.logInfo('', COLOR.cyan);
-
-    if (typeof(exitCode) !== 'undefined') {
-        process.exit(exitCode);
-    }
-}
 
 
 //
 // Validate config against schema
 //
-function checkConfig(configPath, configType) {
+function validateJson(configPath, configType) {
     var config = readJsonFile(configPath)
-    var schema = readJsonFile(SCHEMA[configType])
+    var schema = readJsonFile(path.resolve(SCHEMA[configType]))
     var ajv = new Ajv({allErrors: true});
     var valid = ajv.validate(schema, config);
     if (!valid) {
@@ -134,3 +69,7 @@ function readJsonFile(filePath) {
         process.exit(1);
     }
 }
+
+module.exports = {
+    validateJson
+};
