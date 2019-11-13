@@ -42,7 +42,9 @@ The most reliable way to install a previous version of the CLI is via npm.
 
 3. Install npm modules: \`npm install\`
 
-4. Link the plugin: \`sfdx plugins:link sfdx\`
+4. Generate oclif command classes \`./sfdx/generate_oclif.js\`
+
+5. Link the plugin: \`sfdx plugins:link sfdx\`
 
 ### Install as plugin
 
@@ -61,6 +63,8 @@ print "### List available native iOS templates"
 run 'sfdx mobilesdk:ios:listtemplates --help'
 print "### Create iOS application from template"
 run 'sfdx mobilesdk:ios:createwithtemplate --help'
+print "### Check store or syncs config"
+run 'sfdx mobilesdk:ios:checkconfig --help'
 
 print "## Create a native Android application "
 print "### Help for Android"
@@ -71,6 +75,8 @@ print "### List available native Android templates"
 run 'sfdx mobilesdk:android:listtemplates --help'
 print "### Create Android application from template"
 run 'sfdx mobilesdk:android:createwithtemplate --help'
+print "### Check store or syncs config"
+run 'sfdx mobilesdk:android:checkconfig --help'
 
 print "## Create an hybrid application "
 print "### Help for hybrid"
@@ -81,6 +87,8 @@ print "### List available hybrid templates"
 run 'sfdx mobilesdk:hybrid:listtemplates --help'
 print "### Create hybrid application from template"
 run 'sfdx mobilesdk:hybrid:createwithtemplate --help'
+print "### Check store or syncs config"
+run 'sfdx mobilesdk:hybrid:checkconfig --help'
 
 print "## Create a React Native application"
 print "### Help for React Native"
@@ -91,4 +99,6 @@ print "### List available React Native templates"
 run 'sfdx mobilesdk:reactnative:listtemplates --help'
 print "### Create React Native application from template"
 run 'sfdx mobilesdk:reactnative:createwithtemplate --help'
+print "### Check store or syncs config"
+run 'sfdx mobilesdk:reactnative:checkconfig --help'
 

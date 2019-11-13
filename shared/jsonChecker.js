@@ -36,8 +36,8 @@ var fs = require('fs'),
 
 // Config type to schema map
 var SCHEMA = {
-    store: './shared/store.schema.json',
-    syncs: './shared/syncs.schema.json'
+    store: path.resolve(__dirname, 'store.schema.json'),
+    syncs: path.resolve(__dirname, 'syncs.schema.json')
 };
 
 
@@ -46,7 +46,7 @@ var SCHEMA = {
 //
 function validateJson(configPath, configType) {
     var config = readJsonFile(configPath)
-    var schema = readJsonFile(path.resolve(SCHEMA[configType]))
+    var schema = readJsonFile(SCHEMA[configType])
     var ajv = new Ajv({allErrors: true});
     var valid = ajv.validate(schema, config);
     if (!valid) {
