@@ -33,7 +33,7 @@
         "shelljs": "0.8.3"
     },
     "devDependencies": {
-        "@oclif/dev-cli": "^1.22.0"
+        "@oclif/dev-cli": "^1.22.2"
     },
     "repository": {
         "type": "git",
