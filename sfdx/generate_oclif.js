@@ -49,15 +49,15 @@ function generateOclifManifest() {
         commands: commands
     };
 
-    fs.writeFileSync(path.resolve('oclif.manifest.json'), JSON.stringify(manifest, null, 2))
+    fs.writeFileSync(path.resolve(__dirname, 'oclif.manifest.json'), JSON.stringify(manifest, null, 2))
 }
 
-function generateCommandFiles() {
+function generateCommandClasses() {
 
     for (var cliName in SDK.forceclis) {
         var cli = SDK.forceclis[cliName];
-        var dirPath = path.resolve('oclif', 'mobilesdk', cli.topic);
-        fs.mkdirSync(dirPath, true);
+        var dirPath = path.resolve(__dirname, 'oclif', 'mobilesdk', cli.topic);
+        fs.mkdirSync(dirPath, {recursive: true});
         cli.commands.map(commandName => {
             generateCommmandClass(cli, commandName);
         })
@@ -66,7 +66,7 @@ function generateCommandFiles() {
 
 function generateCommmandClass(cli, commandName) {
     var className = capitalize(cli.topic) + capitalize(commandName) + 'Command';
-    var classPath = path.resolve('oclif', 'mobilesdk', cli.topic, commandName + '.new.js');
+    var classPath = path.resolve(__dirname, 'oclif', 'mobilesdk', cli.topic, commandName + '.js');
     var classContent = [
         `/*`,
         ` * Copyright (c) 2019-present, salesforce.com, inc.`,
@@ -105,7 +105,7 @@ function generateCommmandClass(cli, commandName) {
         `    }`,
         ``,
         `    async run() {`,
-        `        this.execute(SDK.forceclis.forcedroid, ${className});`,
+        `        this.execute(SDK.forceclis.${cli.name}, ${className});`,
         `    }`,
         `}`,
         ``,
@@ -116,16 +116,21 @@ function generateCommmandClass(cli, commandName) {
         `${className}.hidden = ${className}.command.hidden;`,
         `${className}.flags = OclifAdapter.toFlags(${className}.command.args);`,
         ``,
-        `exports.${className} = ${className};`,
-        ``,
-        `}`
+        `exports.${className} = ${className};`
     ].join('\n');
     fs.writeFileSync(classPath, classContent);
 }
 
 function capitalize(s) {
-    return s.charAt(0).toUpperCase() + name.slice(1);
+    return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
 // Main
-generateOclifManifest();
+function main() {
+    generateOclifManifest();
+    generateCommandClasses();
+}
+
+main()
+
+
