@@ -32,8 +32,8 @@ var path = require('path'),
     COLOR = require('./outputColors'),
     commandLineUtils = require('./commandLineUtils'),
     logInfo = require('./utils').logInfo,
-    getTemplates = require('./templateHelper').getTemplates;
-
+    getTemplates = require('./templateHelper').getTemplates,
+    validateJson = require('./jsonChecker').validateJson;
 
 function applyCli(f, cli) {
     return typeof f === 'function' ? f(cli): f;
@@ -87,7 +87,14 @@ function readConfig(args, cli, handler) {
         break;
     case SDK.commands.create.name:
     case SDK.commands.createwithtemplate.name:
-        processorList = createArgsProcessorList(cli, commandName);
+        processorList = buildArgsProcessorList(cli, commandName);
+        commandLineUtils.processArgsInteractive(commandLineArgs, processorList, handler);
+        break;
+    case SDK.commands.checkconfig.name:
+        processorList = buildArgsProcessorList(cli, commandName);
+        commandLineUtils.processArgsInteractive(commandLineArgs, processorList, function (config) {
+            validateJson(config.configpath, config.configtype);
+        });
         break;
     case SDK.commands.listtemplates.name:
         listTemplates(cli);
@@ -98,7 +105,7 @@ function readConfig(args, cli, handler) {
         process.exit(1);
     };
 
-    commandLineUtils.processArgsInteractive(commandLineArgs, processorList, handler);
+
 }
 
 function printVersion(cli) {
@@ -157,7 +164,7 @@ function usage(cli) {
 //
 // Processor list
 //
-function createArgsProcessorList(cli, commandName) {
+function buildArgsProcessorList(cli, commandName) {
     var argProcessorList = new commandLineUtils.ArgProcessorList();
 
     for (var arg of getArgsExpanded(cli, commandName)) {

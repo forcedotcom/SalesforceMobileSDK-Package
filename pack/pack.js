@@ -22,22 +22,17 @@ function main(args) {
     // Args extraction
     var usageRequested = parsedArgs.hasOwnProperty('usage');
     var sfdxPluginRequested = parsedArgs.hasOwnProperty('sfdx-plugin');
-    var checkConfigRequested = parsedArgs.hasOwnProperty('check-config');
     var chosenClis = cleanSplit(parsedArgs.cli, ',');
     var cliPackingRequested = chosenClis.some(cli=>Object.keys(SDK.forceclis).indexOf(cli) >= 0);
 
     // Usage
-    if (usageRequested || (!sfdxPluginRequested && !checkConfigRequested && !cliPackingRequested)) {
+    if (usageRequested || (!sfdxPluginRequested && !cliPackingRequested)) {
         usage();
         process.exit(1);
     }
     // Sfdx plugin packing
     else if (sfdxPluginRequested) {
         pack('sfdx-mobilesdk-plugin', 'sfdx');
-    }
-    // Check config packing
-    else if (checkConfigRequested) {
-        pack('forcecheckconfig', 'checkconfig');
     }
     // CLI packing
     else {
@@ -100,6 +95,4 @@ function usage() {
     utils.logInfo('      where cliN is one of: ' + Object.keys(SDK.forceclis).join(', '), COLOR.magenta);
     utils.logInfo('    OR', COLOR.magenta);
     utils.logInfo('    --sfdx-plugin', COLOR.magenta);
-    utils.logInfo('    OR', COLOR.magenta);
-    utils.logInfo('    --check-config', COLOR.magenta);
 }
