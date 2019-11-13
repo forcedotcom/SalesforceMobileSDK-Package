@@ -42,7 +42,9 @@ The most reliable way to install a previous version of the CLI is via npm.
 
 3. Install npm modules: \`npm install\`
 
-4. Link the plugin: \`sfdx plugins:link sfdx\`
+4. Generate oclif manifest and command class `./sfdx/generate_oclif.js`
+
+5. Link the plugin: `sfdx plugins:link sfdx`
 
 ### Install as plugin
 

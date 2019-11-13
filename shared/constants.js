@@ -216,7 +216,7 @@ module.exports = {
         },
         configPath: {
             name:'configpath',
-            'char': 'c',
+            'char': 'p',
             description:'path to store or syncs config to validate',
             longDescription:'Path to the store or syncs config file to validate.',
             error: cli => val => 'Config file not found: \'' + val + '\'.',
@@ -227,7 +227,7 @@ module.exports = {
         },
         configType: {
             name:'configtype',
-            'char': 'y',
+            'char': 't',
             description:'type of config to validate (store or syncs)',
             longDescription:'Type of config to validate (store or syncs).',
             error: cli => val => 'Invalid config type: \'' + val + '\'.',
