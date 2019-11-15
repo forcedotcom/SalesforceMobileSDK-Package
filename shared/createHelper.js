@@ -31,6 +31,7 @@ var path = require('path'),
     utils = require('./utils'),
     configHelper = require('./configHelper'),
     prepareTemplate = require('./templateHelper').prepareTemplate,
+    getSDKTemplateURI = require('./templateHelper').getSDKTemplateURI,
     fs = require('fs');
 
 //
@@ -253,9 +254,16 @@ function actuallyCreateApp(forcecli, config) {
         
         // Figuring out template repo uri and path
         if (config.templaterepouri) {
-            var templateUriParsed = utils.separateRepoUrlPathBranch(config.templaterepouri);
-            config.templaterepouri = templateUriParsed.repo + '#' + templateUriParsed.branch;
-            config.templatepath = templateUriParsed.path;
+            if (!config.templaterepouri.startsWith("https://")) {
+                // Given a Mobile SDK template name
+                config.templatepath = config.templaterepouri;
+                config.templaterepouri = SDK.templatesRepoUri;
+            } else {
+                // Given a full URI
+                var templateUriParsed = utils.separateRepoUrlPathBranch(config.templaterepouri);
+                config.templaterepouri = templateUriParsed.repo + '#' + templateUriParsed.branch;
+                config.templatepath = templateUriParsed.path;
+            }
         }
         else {
             config.templaterepouri = SDK.templatesRepoUri;
