@@ -67,8 +67,10 @@ USAGE
 COMMANDS
   mobilesdk:ios:checkconfig         validate store or syncs configuration
   mobilesdk:ios:create              create an iOS native mobile application
-  mobilesdk:ios:createwithtemplate  create an iOS native mobile application from a template
-  mobilesdk:ios:listtemplates       list available Mobile SDK templates to create an iOS native mobile application
+  mobilesdk:ios:createwithtemplate  create an iOS native mobile application from
+                                    a template
+  mobilesdk:ios:listtemplates       list available Mobile SDK templates to
+                                    create an iOS native mobile application
   mobilesdk:ios:version             show version of Mobile SDK
 
 ```
@@ -82,14 +84,23 @@ USAGE
   $ sfdx mobilesdk:ios:create
 
 OPTIONS
-  -d, --outputdir=outputdir        output directory (leave empty for current directory)
-  -k, --packagename=packagename    (required) app package identifier (e.g. com.mycompany.myapp)
+  -d, --outputdir=outputdir        output directory (leave empty for current
+                                   directory)
+
+  -k, --packagename=packagename    (required) app package identifier (e.g.
+                                   com.mycompany.myapp)
+
   -n, --appname=appname            (required) application name
-  -o, --organization=organization  (required) organization name (your company's/organization's name)
-  -t, --apptype=apptype            application type (native_swift or native, leave empty for native_swift)
+
+  -o, --organization=organization  (required) organization name (your
+                                   company's/organization's name)
+
+  -t, --apptype=apptype            application type (native_swift or native,
+                                   leave empty for native_swift)
 
 DESCRIPTION
-  This command initiates creation of a new app based on the standard Mobile SDK template.
+  This command initiates creation of a new app based on the standard Mobile SDK 
+  template.
 
 ```
 
@@ -102,7 +113,8 @@ USAGE
   $ sfdx mobilesdk:ios:listtemplates
 
 DESCRIPTION
-  This command displays the list of available Mobile SDK templates. You can copy repo paths from the output for use with the createwithtemplate command.
+  This command displays the list of available Mobile SDK templates. You can copy 
+  repo paths from the output for use with the createwithtemplate command.
 
 ```
 
@@ -115,15 +127,26 @@ USAGE
   $ sfdx mobilesdk:ios:createwithtemplate
 
 OPTIONS
-  -d, --outputdir=outputdir              output directory (leave empty for current directory)
-  -k, --packagename=packagename          (required) app package identifier (e.g. com.mycompany.myapp)
+  -d, --outputdir=outputdir              output directory (leave empty for
+                                         current directory)
+
+  -k, --packagename=packagename          (required) app package identifier (e.g.
+                                         com.mycompany.myapp)
+
   -n, --appname=appname                  (required) application name
-  -o, --organization=organization        (required) organization name (your company's/organization's name)
+
+  -o, --organization=organization        (required) organization name (your
+                                         company's/organization's name)
+
   -r, --templaterepouri=templaterepouri  (required) template repo URI
 
 DESCRIPTION
-  This command initiates creation of a new app based on the Mobile SDK template that you specify. The template can be a specialized app for your app type that Mobile SDK provides, or your own custom app that you've configured to use as a template. See 
-  https://developer.salesforce.com/docs/atlas.en-us.mobile_sdk.meta/mobile_sdk/ios_new_project_template.htm for information on custom templates.
+  This command initiates creation of a new app based on the Mobile SDK template 
+  that you specify. The template can be a specialized app for your app type that 
+  Mobile SDK provides, or your own custom app that you've configured to use as a 
+  template. See 
+  https://developer.salesforce.com/docs/atlas.en-us.mobile_sdk.meta/mobile_sdk/i
+  os_new_project_template.htm for information on custom templates.
 
 ```
 
@@ -136,11 +159,15 @@ USAGE
   $ sfdx mobilesdk:ios:checkconfig
 
 OPTIONS
-  -p, --configpath=configpath  (required) path to store or syncs config to validate
-  -t, --configtype=configtype  (required) type of config to validate (store or syncs)
+  -c, --configpath=configpath  (required) path to store or syncs config to
+                               validate
+
+  -y, --configtype=configtype  (required) type of config to validate (store or
+                               syncs)
 
 DESCRIPTION
-  This command checks whether the given store or syncs configuration is valid according to its JSON schema.
+  This command checks whether the given store or syncs configuration is valid 
+  according to its JSON schema.
 
 ```
 
@@ -155,9 +182,13 @@ USAGE
 
 COMMANDS
   mobilesdk:android:checkconfig         validate store or syncs configuration
-  mobilesdk:android:create              create an Android native mobile application
-  mobilesdk:android:createwithtemplate  create an Android native mobile application from a template
-  mobilesdk:android:listtemplates       list available Mobile SDK templates to create an Android native mobile application
+  mobilesdk:android:create              create an Android native mobile
+                                        application
+  mobilesdk:android:createwithtemplate  create an Android native mobile
+                                        application from a template
+  mobilesdk:android:listtemplates       list available Mobile SDK templates to
+                                        create an Android native mobile
+                                        application
   mobilesdk:android:version             show version of Mobile SDK
 
 ```
@@ -171,14 +202,23 @@ USAGE
   $ sfdx mobilesdk:android:create
 
 OPTIONS
-  -d, --outputdir=outputdir        output directory (leave empty for current directory)
-  -k, --packagename=packagename    (required) app package identifier (e.g. com.mycompany.myapp)
+  -d, --outputdir=outputdir        output directory (leave empty for current
+                                   directory)
+
+  -k, --packagename=packagename    (required) app package identifier (e.g.
+                                   com.mycompany.myapp)
+
   -n, --appname=appname            (required) application name
-  -o, --organization=organization  (required) organization name (your company's/organization's name)
-  -t, --apptype=apptype            application type (native_kotlin or native, leave empty for native_kotlin)
+
+  -o, --organization=organization  (required) organization name (your
+                                   company's/organization's name)
+
+  -t, --apptype=apptype            application type (native_kotlin or native,
+                                   leave empty for native_kotlin)
 
 DESCRIPTION
-  This command initiates creation of a new app based on the standard Mobile SDK template.
+  This command initiates creation of a new app based on the standard Mobile SDK 
+  template.
 
 ```
 
@@ -191,7 +231,8 @@ USAGE
   $ sfdx mobilesdk:android:listtemplates
 
 DESCRIPTION
-  This command displays the list of available Mobile SDK templates. You can copy repo paths from the output for use with the createwithtemplate command.
+  This command displays the list of available Mobile SDK templates. You can copy 
+  repo paths from the output for use with the createwithtemplate command.
 
 ```
 
@@ -204,15 +245,26 @@ USAGE
   $ sfdx mobilesdk:android:createwithtemplate
 
 OPTIONS
-  -d, --outputdir=outputdir              output directory (leave empty for current directory)
-  -k, --packagename=packagename          (required) app package identifier (e.g. com.mycompany.myapp)
+  -d, --outputdir=outputdir              output directory (leave empty for
+                                         current directory)
+
+  -k, --packagename=packagename          (required) app package identifier (e.g.
+                                         com.mycompany.myapp)
+
   -n, --appname=appname                  (required) application name
-  -o, --organization=organization        (required) organization name (your company's/organization's name)
+
+  -o, --organization=organization        (required) organization name (your
+                                         company's/organization's name)
+
   -r, --templaterepouri=templaterepouri  (required) template repo URI
 
 DESCRIPTION
-  This command initiates creation of a new app based on the Mobile SDK template that you specify. The template can be a specialized app for your app type that Mobile SDK provides, or your own custom app that you've configured to use as a template. See 
-  https://developer.salesforce.com/docs/atlas.en-us.mobile_sdk.meta/mobile_sdk/ios_new_project_template.htm for information on custom templates.
+  This command initiates creation of a new app based on the Mobile SDK template 
+  that you specify. The template can be a specialized app for your app type that 
+  Mobile SDK provides, or your own custom app that you've configured to use as a 
+  template. See 
+  https://developer.salesforce.com/docs/atlas.en-us.mobile_sdk.meta/mobile_sdk/i
+  os_new_project_template.htm for information on custom templates.
 
 ```
 
@@ -225,11 +277,15 @@ USAGE
   $ sfdx mobilesdk:android:checkconfig
 
 OPTIONS
-  -p, --configpath=configpath  (required) path to store or syncs config to validate
-  -t, --configtype=configtype  (required) type of config to validate (store or syncs)
+  -c, --configpath=configpath  (required) path to store or syncs config to
+                               validate
+
+  -y, --configtype=configtype  (required) type of config to validate (store or
+                               syncs)
 
 DESCRIPTION
-  This command checks whether the given store or syncs configuration is valid according to its JSON schema.
+  This command checks whether the given store or syncs configuration is valid 
+  according to its JSON schema.
 
 ```
 
@@ -245,8 +301,10 @@ USAGE
 COMMANDS
   mobilesdk:hybrid:checkconfig         validate store or syncs configuration
   mobilesdk:hybrid:create              create a hybrid mobile application
-  mobilesdk:hybrid:createwithtemplate  create a hybrid mobile application from a template
-  mobilesdk:hybrid:listtemplates       list available Mobile SDK templates to create a hybrid mobile application
+  mobilesdk:hybrid:createwithtemplate  create a hybrid mobile application from a
+                                       template
+  mobilesdk:hybrid:listtemplates       list available Mobile SDK templates to
+                                       create a hybrid mobile application
   mobilesdk:hybrid:version             show version of Mobile SDK
 
 ```
@@ -260,16 +318,29 @@ USAGE
   $ sfdx mobilesdk:hybrid:create
 
 OPTIONS
-  -d, --outputdir=outputdir        output directory (leave empty for current directory)
-  -k, --packagename=packagename    (required) app package identifier (e.g. com.mycompany.myapp)
+  -d, --outputdir=outputdir        output directory (leave empty for current
+                                   directory)
+
+  -k, --packagename=packagename    (required) app package identifier (e.g.
+                                   com.mycompany.myapp)
+
   -n, --appname=appname            (required) application name
-  -o, --organization=organization  (required) organization name (your company's/organization's name)
-  -p, --platform=platform          (required) comma-separated list of platforms (ios, android)
-  -s, --startpage=startpage        app start page (the start page of your remote app; required for hybrid_remote apps only)
-  -t, --apptype=apptype            application type (hybrid_local or hybrid_remote, leave empty for hybrid_local)
+
+  -o, --organization=organization  (required) organization name (your
+                                   company's/organization's name)
+
+  -p, --platform=platform          (required) comma-separated list of platforms
+                                   (ios, android)
+
+  -s, --startpage=startpage        app start page (the start page of your remote
+                                   app; required for hybrid_remote apps only)
+
+  -t, --apptype=apptype            application type (hybrid_local or
+                                   hybrid_remote, leave empty for hybrid_local)
 
 DESCRIPTION
-  This command initiates creation of a new app based on the standard Mobile SDK template.
+  This command initiates creation of a new app based on the standard Mobile SDK 
+  template.
 
 ```
 
@@ -282,7 +353,8 @@ USAGE
   $ sfdx mobilesdk:hybrid:listtemplates
 
 DESCRIPTION
-  This command displays the list of available Mobile SDK templates. You can copy repo paths from the output for use with the createwithtemplate command.
+  This command displays the list of available Mobile SDK templates. You can copy 
+  repo paths from the output for use with the createwithtemplate command.
 
 ```
 
@@ -295,17 +367,33 @@ USAGE
   $ sfdx mobilesdk:hybrid:createwithtemplate
 
 OPTIONS
-  -d, --outputdir=outputdir              output directory (leave empty for current directory)
-  -k, --packagename=packagename          (required) app package identifier (e.g. com.mycompany.myapp)
+  -d, --outputdir=outputdir              output directory (leave empty for
+                                         current directory)
+
+  -k, --packagename=packagename          (required) app package identifier (e.g.
+                                         com.mycompany.myapp)
+
   -n, --appname=appname                  (required) application name
-  -o, --organization=organization        (required) organization name (your company's/organization's name)
-  -p, --platform=platform                (required) comma-separated list of platforms (ios, android)
+
+  -o, --organization=organization        (required) organization name (your
+                                         company's/organization's name)
+
+  -p, --platform=platform                (required) comma-separated list of
+                                         platforms (ios, android)
+
   -r, --templaterepouri=templaterepouri  (required) template repo URI
-  -s, --startpage=startpage              app start page (the start page of your remote app; required for hybrid_remote apps only)
+
+  -s, --startpage=startpage              app start page (the start page of your
+                                         remote app; required for hybrid_remote
+                                         apps only)
 
 DESCRIPTION
-  This command initiates creation of a new app based on the Mobile SDK template that you specify. The template can be a specialized app for your app type that Mobile SDK provides, or your own custom app that you've configured to use as a template. See 
-  https://developer.salesforce.com/docs/atlas.en-us.mobile_sdk.meta/mobile_sdk/ios_new_project_template.htm for information on custom templates.
+  This command initiates creation of a new app based on the Mobile SDK template 
+  that you specify. The template can be a specialized app for your app type that 
+  Mobile SDK provides, or your own custom app that you've configured to use as a 
+  template. See 
+  https://developer.salesforce.com/docs/atlas.en-us.mobile_sdk.meta/mobile_sdk/i
+  os_new_project_template.htm for information on custom templates.
 
 ```
 
@@ -318,11 +406,15 @@ USAGE
   $ sfdx mobilesdk:hybrid:checkconfig
 
 OPTIONS
-  -p, --configpath=configpath  (required) path to store or syncs config to validate
-  -t, --configtype=configtype  (required) type of config to validate (store or syncs)
+  -c, --configpath=configpath  (required) path to store or syncs config to
+                               validate
+
+  -y, --configtype=configtype  (required) type of config to validate (store or
+                               syncs)
 
 DESCRIPTION
-  This command checks whether the given store or syncs configuration is valid according to its JSON schema.
+  This command checks whether the given store or syncs configuration is valid 
+  according to its JSON schema.
 
 ```
 
@@ -336,10 +428,15 @@ USAGE
   $ sfdx mobilesdk:reactnative:COMMAND
 
 COMMANDS
-  mobilesdk:reactnative:checkconfig         validate store or syncs configuration
-  mobilesdk:reactnative:create              create a React Native mobile application
-  mobilesdk:reactnative:createwithtemplate  create a React Native mobile application from a template
-  mobilesdk:reactnative:listtemplates       list available Mobile SDK templates to create a React Native mobile application
+  mobilesdk:reactnative:checkconfig         validate store or syncs
+                                            configuration
+  mobilesdk:reactnative:create              create a React Native mobile
+                                            application
+  mobilesdk:reactnative:createwithtemplate  create a React Native mobile
+                                            application from a template
+  mobilesdk:reactnative:listtemplates       list available Mobile SDK templates
+                                            to create a React Native mobile
+                                            application
   mobilesdk:reactnative:version             show version of Mobile SDK
 
 ```
@@ -353,14 +450,23 @@ USAGE
   $ sfdx mobilesdk:reactnative:create
 
 OPTIONS
-  -d, --outputdir=outputdir        output directory (leave empty for current directory)
-  -k, --packagename=packagename    (required) app package identifier (e.g. com.mycompany.myapp)
+  -d, --outputdir=outputdir        output directory (leave empty for current
+                                   directory)
+
+  -k, --packagename=packagename    (required) app package identifier (e.g.
+                                   com.mycompany.myapp)
+
   -n, --appname=appname            (required) application name
-  -o, --organization=organization  (required) organization name (your company's/organization's name)
-  -p, --platform=platform          (required) comma-separated list of platforms (ios, android)
+
+  -o, --organization=organization  (required) organization name (your
+                                   company's/organization's name)
+
+  -p, --platform=platform          (required) comma-separated list of platforms
+                                   (ios, android)
 
 DESCRIPTION
-  This command initiates creation of a new app based on the standard Mobile SDK template.
+  This command initiates creation of a new app based on the standard Mobile SDK 
+  template.
 
 ```
 
@@ -373,7 +479,8 @@ USAGE
   $ sfdx mobilesdk:reactnative:listtemplates
 
 DESCRIPTION
-  This command displays the list of available Mobile SDK templates. You can copy repo paths from the output for use with the createwithtemplate command.
+  This command displays the list of available Mobile SDK templates. You can copy 
+  repo paths from the output for use with the createwithtemplate command.
 
 ```
 
@@ -386,16 +493,29 @@ USAGE
   $ sfdx mobilesdk:reactnative:createwithtemplate
 
 OPTIONS
-  -d, --outputdir=outputdir              output directory (leave empty for current directory)
-  -k, --packagename=packagename          (required) app package identifier (e.g. com.mycompany.myapp)
+  -d, --outputdir=outputdir              output directory (leave empty for
+                                         current directory)
+
+  -k, --packagename=packagename          (required) app package identifier (e.g.
+                                         com.mycompany.myapp)
+
   -n, --appname=appname                  (required) application name
-  -o, --organization=organization        (required) organization name (your company's/organization's name)
-  -p, --platform=platform                (required) comma-separated list of platforms (ios, android)
+
+  -o, --organization=organization        (required) organization name (your
+                                         company's/organization's name)
+
+  -p, --platform=platform                (required) comma-separated list of
+                                         platforms (ios, android)
+
   -r, --templaterepouri=templaterepouri  (required) template repo URI
 
 DESCRIPTION
-  This command initiates creation of a new app based on the Mobile SDK template that you specify. The template can be a specialized app for your app type that Mobile SDK provides, or your own custom app that you've configured to use as a template. See 
-  https://developer.salesforce.com/docs/atlas.en-us.mobile_sdk.meta/mobile_sdk/ios_new_project_template.htm for information on custom templates.
+  This command initiates creation of a new app based on the Mobile SDK template 
+  that you specify. The template can be a specialized app for your app type that 
+  Mobile SDK provides, or your own custom app that you've configured to use as a 
+  template. See 
+  https://developer.salesforce.com/docs/atlas.en-us.mobile_sdk.meta/mobile_sdk/i
+  os_new_project_template.htm for information on custom templates.
 
 ```
 
@@ -408,11 +528,15 @@ USAGE
   $ sfdx mobilesdk:reactnative:checkconfig
 
 OPTIONS
-  -p, --configpath=configpath  (required) path to store or syncs config to validate
-  -t, --configtype=configtype  (required) type of config to validate (store or syncs)
+  -c, --configpath=configpath  (required) path to store or syncs config to
+                               validate
+
+  -y, --configtype=configtype  (required) type of config to validate (store or
+                               syncs)
 
 DESCRIPTION
-  This command checks whether the given store or syncs configuration is valid according to its JSON schema.
+  This command checks whether the given store or syncs configuration is valid 
+  according to its JSON schema.
 
 ```
 

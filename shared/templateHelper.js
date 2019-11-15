@@ -53,20 +53,13 @@ function getTemplates(cli) {
 
         // Cloning template repo
         var repoDir = utils.cloneRepo(tmpDir, SDK.templatesRepoUri);
-        var parts = SDK.templatesRepoUri.split('#');
-        var repoUrl = parts[0];
-        var branch = parts.length > 1 ? parts[1] : 'master';
 
         // Getting list of templates
         var templates = require(path.join(repoDir, 'templates.json'));
 
         // Keeping only applicable templates, adding full template url
         var applicableTemplates = templates
-            .filter(template => cli.appTypes.includes(template.appType) && cli.platforms.filter(platform => template.platforms.includes(platform)).length > 0)
-            .map(template => {
-                template.url = repoUrl + '/' + template.path + '#' + branch;
-                return template;
-            });
+            .filter(template => cli.appTypes.includes(template.appType) && cli.platforms.filter(platform => template.platforms.includes(platform)).length > 0);
 
         // Cleanup
         utils.removeFile(tmpDir);

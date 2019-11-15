@@ -154,9 +154,9 @@ module.exports = {
         templateRepoUri: {
             name:'templaterepouri',
             'char': 'r',
-            description:'template repo URI',
-            longDescription: 'The URI of a repository that contains the template application to be used as the basis of your new app. See https://developer.salesforce.com/docs/atlas.en-us.mobile_sdk.meta/mobile_sdk/ios_new_project_template.htm for information on creating templates.',
-            prompt: 'Enter URI of repo containing template application:',
+            description:'template repo URI or Mobile SDK template name',
+            longDescription: 'The URI of a repository that contains the template application to be used as the basis of your new app or simply the name of a Mobile SDK template.',
+            prompt: 'Enter URI of repo containing template application or a Mobile SDK template name:',
             error: cli => val => 'Invalid value for template repo uri: \'' + val + '\'.',
             validate: cli => val => /^\S+$/.test(val),
             type: 'string'

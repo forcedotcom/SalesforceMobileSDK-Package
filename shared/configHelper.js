@@ -126,7 +126,7 @@ function listTemplates(cli) {
     for (var i=0; i<applicableTemplates.length; i++) {
         var template = applicableTemplates[i];
         logInfo((i+1) + ') ' + template.description, COLOR.cyan);
-        logInfo(cliName + ' ' + SDK.commands.createwithtemplate.name + ' --' + SDK.args.templateRepoUri.name + '=' + template.url, COLOR.magenta);
+        logInfo(cliName + ' ' + SDK.commands.createwithtemplate.name + ' --' + SDK.args.templateRepoUri.name + '=' + template.path, COLOR.magenta);
     }
     logInfo('');
 }
