@@ -53,7 +53,7 @@ class OclifAdapter extends Command {
             const template = applicableTemplates[i];
             logInfo((i+1) + ') ' + template.description, COLOR.cyan);
             logInfo('sfdx ' +  [namespace, cli.topic, SDK.commands.createwithtemplate.name].join(':') + ' --' +
-                SDK.args.templateRepoUri.name + '=' + template.url, COLOR.magenta);
+                SDK.args.templateRepoUri.name + '=' + template.path, COLOR.magenta);
         }
         logInfo('');
     }
