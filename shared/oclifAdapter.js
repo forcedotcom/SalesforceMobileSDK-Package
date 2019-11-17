@@ -30,6 +30,7 @@ const SDK = require('./constants');
 const configHelper = require('./configHelper');
 const createHelper = require('./createHelper');
 const templateHelper = require('./templateHelper');
+const jsonChecker = require('./jsonChecker');
 const logInfo = require('./utils').logInfo;
 const logError = require('./utils').logError;
 const os = require('os');
@@ -53,7 +54,7 @@ class OclifAdapter extends Command {
             const template = applicableTemplates[i];
             logInfo((i+1) + ') ' + template.description, COLOR.cyan);
             logInfo('sfdx ' +  [namespace, cli.topic, SDK.commands.createwithtemplate.name].join(':') + ' --' +
-                SDK.args.templateRepoUri.name + '=' + template.url, COLOR.magenta);
+                SDK.args.templateRepoUri.name + '=' + template.path, COLOR.magenta);
         }
         logInfo('');
     }
@@ -70,6 +71,9 @@ class OclifAdapter extends Command {
             case SDK.commands.listtemplates.name:
                 OclifAdapter.listTemplates(cli);
                 process.exit(0);
+                break;
+            case SDK.commands.checkconfig.name:
+                jsonChecker.validateJson(vals.configpath, vals.configtype);
                 break;
         }
     }
