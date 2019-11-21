@@ -184,7 +184,8 @@
                 "iOSImpl" : { "const": "SFSyncUpTarget" },
                 "androidImpl": { "const": "com.salesforce.androidsdk.mobilesync.target.SyncUpTarget" },
                 "createFieldlist": { "$ref": "#/definitions/fieldlist" },
-                "updateFieldlist": { "$ref": "#/definitions/fieldlist" }
+                "updateFieldlist": { "$ref": "#/definitions/fieldlist" },
+                "externalIdFieldName": { "$ref": "#/definitions/fieldName" }
             },
             "required": ["iOSImpl", "androidImpl"]            
         },
@@ -192,7 +193,8 @@
             "type": "object",
             "properties": {
                 "createFieldlist": { "$ref": "#/definitions/fieldlist" },
-                "updateFieldlist": { "$ref": "#/definitions/fieldlist" }
+                "updateFieldlist": { "$ref": "#/definitions/fieldlist" },
+                "externalIdFieldName": { "$ref": "#/definitions/fieldName" }
             }
         },
         "parentChildrenSyncUpTarget": {
