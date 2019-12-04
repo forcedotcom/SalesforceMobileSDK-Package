@@ -157,7 +157,8 @@ function main(args) {
 
             if (testingWithTemplate) {
                 // NB: chosenAppTypes[0] is appType from template
-                createCompileApp(tmpDir, os, chosenAppTypes[0], templateRepoUri, pluginRepoUri, useSfdxRequested);
+                var appType = chosenAppTypes.length > 0 ? chosenAppTypes[0] : [templateHelper.getAppTypeFromTemplate(templateRepoUri)];
+                createCompileApp(tmpDir, os, appType, templateRepoUri, pluginRepoUri, useSfdxRequested);
             }
         }
     }
@@ -276,7 +277,8 @@ function updatePluginRepo(tmpDir, os, pluginRepoDir, sdkBranch) {
 //
 function createCompileApp(tmpDir, os, actualAppType, templateRepoUri, pluginRepoUri, useSfdxRequested) {
     var execArgs = '';
-    var isNative = actualAppType.indexOf('native') == 0;
+    var isNative = actualAppType == APP_TYPE.native || actualAppType == APP_TYPE.native_swift || actualAppType == APP_TYPE.native_kotlin; 
+    var isReactNative = actualAppType === APP_TYPE.react_native;
     var isReactNative = actualAppType === APP_TYPE.react_native;
     var isHybrid = actualAppType.indexOf('hybrid') == 0;
     var isHybridRemote = actualAppType === APP_TYPE.hybrid_remote;
