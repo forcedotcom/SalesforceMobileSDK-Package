@@ -26,7 +26,9 @@ The most reliable way to install a previous version of the CLI is via npm.
 
 3. Install npm modules: `npm install`
 
-4. Link the plugin: `sfdx plugins:link sfdx`
+4. Generate oclif command classes `./sfdx/generate_oclif.js`
+
+5. Link the plugin: `sfdx plugins:link sfdx`
 
 ### Install as plugin
 
@@ -35,15 +37,10 @@ The most reliable way to install a previous version of the CLI is via npm.
 ## Help
 ```
 -> sfdx mobilesdk --help
-create an Android native mobile application
+create mobile apps based on the Salesforce Mobile SDK
 
 USAGE
   $ sfdx mobilesdk:COMMAND
-
-DESCRIPTION
-
-  This command initiates creation of a new app based on the standard Mobile SDK 
-  template.
 
 COMMANDS
 
@@ -67,12 +64,8 @@ create an iOS native mobile application
 USAGE
   $ sfdx mobilesdk:ios:COMMAND
 
-DESCRIPTION
-
-  This command initiates creation of a new app based on the standard Mobile SDK 
-  template.
-
 COMMANDS
+  mobilesdk:ios:checkconfig         validate store or syncs configuration
   mobilesdk:ios:create              create an iOS native mobile application
   mobilesdk:ios:createwithtemplate  create an iOS native mobile application from
                                     a template
@@ -157,6 +150,27 @@ DESCRIPTION
 
 ```
 
+### Check store or syncs config
+```
+-> sfdx mobilesdk:ios:checkconfig --help
+validate store or syncs configuration
+
+USAGE
+  $ sfdx mobilesdk:ios:checkconfig
+
+OPTIONS
+  -c, --configpath=configpath  (required) path to store or syncs config to
+                               validate
+
+  -y, --configtype=configtype  (required) type of config to validate (store or
+                               syncs)
+
+DESCRIPTION
+  This command checks whether the given store or syncs configuration is valid 
+  according to its JSON schema.
+
+```
+
 ## Create a native Android application 
 ### Help for Android
 ```
@@ -166,12 +180,8 @@ create an Android native mobile application
 USAGE
   $ sfdx mobilesdk:android:COMMAND
 
-DESCRIPTION
-
-  This command initiates creation of a new app based on the standard Mobile SDK 
-  template.
-
 COMMANDS
+  mobilesdk:android:checkconfig         validate store or syncs configuration
   mobilesdk:android:create              create an Android native mobile
                                         application
   mobilesdk:android:createwithtemplate  create an Android native mobile
@@ -258,6 +268,27 @@ DESCRIPTION
 
 ```
 
+### Check store or syncs config
+```
+-> sfdx mobilesdk:android:checkconfig --help
+validate store or syncs configuration
+
+USAGE
+  $ sfdx mobilesdk:android:checkconfig
+
+OPTIONS
+  -c, --configpath=configpath  (required) path to store or syncs config to
+                               validate
+
+  -y, --configtype=configtype  (required) type of config to validate (store or
+                               syncs)
+
+DESCRIPTION
+  This command checks whether the given store or syncs configuration is valid 
+  according to its JSON schema.
+
+```
+
 ## Create an hybrid application 
 ### Help for hybrid
 ```
@@ -267,12 +298,8 @@ create a hybrid mobile application
 USAGE
   $ sfdx mobilesdk:hybrid:COMMAND
 
-DESCRIPTION
-
-  This command initiates creation of a new app based on the standard Mobile SDK 
-  template.
-
 COMMANDS
+  mobilesdk:hybrid:checkconfig         validate store or syncs configuration
   mobilesdk:hybrid:create              create a hybrid mobile application
   mobilesdk:hybrid:createwithtemplate  create a hybrid mobile application from a
                                        template
@@ -370,6 +397,27 @@ DESCRIPTION
 
 ```
 
+### Check store or syncs config
+```
+-> sfdx mobilesdk:hybrid:checkconfig --help
+validate store or syncs configuration
+
+USAGE
+  $ sfdx mobilesdk:hybrid:checkconfig
+
+OPTIONS
+  -c, --configpath=configpath  (required) path to store or syncs config to
+                               validate
+
+  -y, --configtype=configtype  (required) type of config to validate (store or
+                               syncs)
+
+DESCRIPTION
+  This command checks whether the given store or syncs configuration is valid 
+  according to its JSON schema.
+
+```
+
 ## Create a React Native application
 ### Help for React Native
 ```
@@ -379,12 +427,9 @@ create a React Native mobile application
 USAGE
   $ sfdx mobilesdk:reactnative:COMMAND
 
-DESCRIPTION
-
-  This command initiates creation of a new app based on the standard Mobile SDK 
-  template.
-
 COMMANDS
+  mobilesdk:reactnative:checkconfig         validate store or syncs
+                                            configuration
   mobilesdk:reactnative:create              create a React Native mobile
                                             application
   mobilesdk:reactnative:createwithtemplate  create a React Native mobile
@@ -471,6 +516,27 @@ DESCRIPTION
   template. See 
   https://developer.salesforce.com/docs/atlas.en-us.mobile_sdk.meta/mobile_sdk/i
   os_new_project_template.htm for information on custom templates.
+
+```
+
+### Check store or syncs config
+```
+-> sfdx mobilesdk:reactnative:checkconfig --help
+validate store or syncs configuration
+
+USAGE
+  $ sfdx mobilesdk:reactnative:checkconfig
+
+OPTIONS
+  -c, --configpath=configpath  (required) path to store or syncs config to
+                               validate
+
+  -y, --configtype=configtype  (required) type of config to validate (store or
+                               syncs)
+
+DESCRIPTION
+  This command checks whether the given store or syncs configuration is valid 
+  according to its JSON schema.
 
 ```
 

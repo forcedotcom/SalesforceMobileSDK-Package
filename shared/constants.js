@@ -28,7 +28,7 @@
 var path = require('path'),
     shelljs = require('shelljs');
 
-var VERSION= '7.3.0';
+var VERSION= '8.0.0';
 
 module.exports = {
     version: VERSION,
@@ -53,12 +53,12 @@ module.exports = {
         },
         cordova: {
             checkCmd: 'cordova -v',
-//            pluginRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-CordovaPlugin#dev',    // dev
+            pluginRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-CordovaPlugin#dev',    // dev
             minVersion: '8.1.2',
-             pluginRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-CordovaPlugin#v' + VERSION, // GA
+//             pluginRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-CordovaPlugin#v' + VERSION, // GA
             platformVersion: {
                 ios: '5.0.0',
-                android: '8.0.0'
+                android: '8.1.0'
             }
         }
     },
@@ -68,8 +68,8 @@ module.exports = {
         android: 'Android Studio'
     },
 
-//    templatesRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-Templates#dev',    // dev
-     templatesRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-Templates#v' + VERSION, // GA
+    templatesRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-Templates#dev',    // dev
+//     templatesRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-Templates#v' + VERSION, // GA
 
     forceclis: {
         forceios: {
@@ -84,7 +84,7 @@ module.exports = {
                 'native': 'iOSNativeTemplate',
                 'native_swift': 'iOSNativeSwiftTemplate'
             },
-            commands: ['create', 'createwithtemplate', 'version', 'listtemplates']
+            commands: ['create', 'createwithtemplate', 'version', 'listtemplates', 'checkconfig']
         },
         forcedroid: {
             name: 'forcedroid',
@@ -98,7 +98,7 @@ module.exports = {
                 'native': 'AndroidNativeTemplate',
                 'native_kotlin': 'AndroidNativeKotlinTemplate'
             },
-            commands: ['create', 'createwithtemplate', 'version', 'listtemplates']
+            commands: ['create', 'createwithtemplate', 'version', 'listtemplates', 'checkconfig']
         },
         forcehybrid: {
             name: 'forcehybrid',
@@ -112,7 +112,7 @@ module.exports = {
                 'hybrid_local': 'HybridLocalTemplate',
                 'hybrid_remote': 'HybridRemoteTemplate'
             },
-            commands: ['create', 'createwithtemplate', 'version', 'listtemplates']
+            commands: ['create', 'createwithtemplate', 'version', 'listtemplates', 'checkconfig']
         },
         forcereact: {
             name: 'forcereact',
@@ -125,7 +125,7 @@ module.exports = {
             appTypesToPath: {
                 'react_native': 'ReactNativeTemplate'
             },
-            commands: ['create', 'createwithtemplate', 'version', 'listtemplates']
+            commands: ['create', 'createwithtemplate', 'version', 'listtemplates', 'checkconfig']
         }
     },
 
@@ -154,9 +154,9 @@ module.exports = {
         templateRepoUri: {
             name:'templaterepouri',
             'char': 'r',
-            description:'template repo URI',
-            longDescription: 'The URI of a repository that contains the template application to be used as the basis of your new app. See https://developer.salesforce.com/docs/atlas.en-us.mobile_sdk.meta/mobile_sdk/ios_new_project_template.htm for information on creating templates.',
-            prompt: 'Enter URI of repo containing template application:',
+            description:'template repo URI or Mobile SDK template name',
+            longDescription: 'The URI of a repository that contains the template application to be used as the basis of your new app or simply the name of a Mobile SDK template.',
+            prompt: 'Enter URI of repo containing template application or a Mobile SDK template name:',
             error: cli => val => 'Invalid value for template repo uri: \'' + val + '\'.',
             validate: cli => val => /^\S+$/.test(val),
             type: 'string'
@@ -212,6 +212,28 @@ module.exports = {
             validate: cli => val => /\S+/.test(val),
             required: false,
             promptIf: otherArgs => otherArgs.apptype === 'hybrid_remote',
+            type: 'string'
+        },
+        configPath: {
+            name:'configpath',
+            'char': 'p',
+            description:'path to store or syncs config to validate',
+            longDescription:'Path to the store or syncs config file to validate.',
+            error: cli => val => 'Config file not found: \'' + val + '\'.',
+            prompt: 'Enter the path of the store or syncs config to validate:',
+            validate: cli => val => shelljs.test('-e', path.resolve(val)),
+            required: true,
+            type: 'string'
+        },
+        configType: {
+            name:'configtype',
+            'char': 't',
+            description:'type of config to validate (store or syncs)',
+            longDescription:'Type of config to validate (store or syncs).',
+            error: cli => val => 'Invalid config type: \'' + val + '\'.',
+            prompt: 'Enter the type of the config to validate (store or syncs):',
+            validate: cli => val => val === 'store' || val === 'syncs',
+            required: true,
             type: 'string'
         },
         // Private args
@@ -282,6 +304,13 @@ module.exports = {
             description: cli => 'list available Mobile SDK templates to create ' + cli.purpose,
             longDescription: cli => 'List available Mobile SDK templates to create ' + cli.purpose + '.',
             help: 'This command displays the list of available Mobile SDK templates. You can copy repo paths from the output for use with the createwithtemplate command.'
+        },
+        checkconfig: {
+            name: 'checkconfig',
+            args: ['configPath', 'configType'],
+            description: 'validate store or syncs configuration',
+            longDescription: 'Validate store or syncs configuration against their JSON schema.',
+            help: 'This command checks whether the given store or syncs configuration is valid according to its JSON schema.'
         }
     }
 };

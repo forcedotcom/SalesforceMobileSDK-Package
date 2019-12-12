@@ -44,7 +44,7 @@ forcedroid create
 
 # create an Android native mobile application from a template
 forcedroid createwithtemplate
-    --templaterepouri=template repo URI
+    --templaterepouri=template repo URI or Mobile SDK template name
     --appname=application name
     --packagename=app package identifier (e.g. com.mycompany.myapp)
     --organization=organization name (your company's/organization's name)
@@ -56,6 +56,13 @@ forcedroid createwithtemplate
 forcedroid listtemplates
 
  OR 
+
+# validate store or syncs configuration
+forcedroid checkconfig
+    --configpath=path to store or syncs config to validate
+    --configtype=type of config to validate (store or syncs)
+
+ OR
 
 # show version of Mobile SDK
 forcedroid version

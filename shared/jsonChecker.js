@@ -24,26 +24,52 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-const path = require('path');
 
-const OclifAdapter = require('../../../shared/oclifAdapter');
-const SDK = require('../../../shared/constants');
+// Dependencies
+var fs = require('fs'),
+    path = require('path'),
+    COLOR = require('./outputColors'),
+    utils = require('./utils'),
+    Ajv = require('ajv'),
+    jsonlint = require('jsonlint')
+;
 
-class AndroidListTemplatesCommand extends OclifAdapter {
-    static get command() {
-        return OclifAdapter.getCommand.call(this, SDK.forceclis.forcedroid, path.parse(__filename).name);
-    }
+// Config type to schema map
+var SCHEMA = {
+    store: path.resolve(__dirname, 'store.schema.json'),
+    syncs: path.resolve(__dirname, 'syncs.schema.json')
+};
 
-    async run() {
-        this.execute(SDK.forceclis.forcedroid, AndroidListTemplatesCommand);
+
+//
+// Validate config against schema
+//
+function validateJson(configPath, configType) {
+    var config = readJsonFile(configPath)
+    var schema = readJsonFile(SCHEMA[configType])
+    var ajv = new Ajv({allErrors: true});
+    var valid = ajv.validate(schema, config);
+    if (!valid) {
+        utils.logError(JSON.stringify(ajv.errors, null, "  "))
+    } else {
+        utils.logInfo(`${configPath} conforms to ${configType} schema\n`, COLOR.green)
     }
 }
 
-AndroidListTemplatesCommand.description = OclifAdapter.formatDescription(AndroidListTemplatesCommand.command.description,
-    AndroidListTemplatesCommand.command.help);
+//
+// Read json from file and validates that is valid json
+//
+function readJsonFile(filePath) {
+    try {
+        var content = fs.readFileSync(filePath, "UTF-8");
+        var json = jsonlint.parse(content);
+        return json;
+    } catch (error) {
+        utils.logError(`Error parsing ${filePath}: ${error}\n`);
+        process.exit(1);
+    }
+}
 
-AndroidListTemplatesCommand.longDescription = AndroidListTemplatesCommand.command.longDescription;
-AndroidListTemplatesCommand.hidden = AndroidListTemplatesCommand.command.hidden;
-AndroidListTemplatesCommand.flags = OclifAdapter.toFlags(AndroidListTemplatesCommand.command.args);
-
-exports.AndroidListTemplatesCommand = AndroidListTemplatesCommand;
+module.exports = {
+    validateJson
+};

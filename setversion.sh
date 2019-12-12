@@ -71,6 +71,7 @@ update_package_json "./sfdx/package.json" "${OPT_VERSION}"
 update_package_json "./react/package.json" "${OPT_VERSION}"
 update_package_json "./hybrid/package.json" "${OPT_VERSION}"
 
+
 echo "*** Updating constants.js ***"
 update_constants_js "./shared/constants.js" "${OPT_VERSION}" "${OPT_IS_DEV}"
 

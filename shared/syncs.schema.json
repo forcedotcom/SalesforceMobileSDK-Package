@@ -1,0 +1,274 @@
+{
+    "title" : "Syncs configuration schema",
+    "description" : "Use this schema to validate usersyncs.json or globalsyncs.json",
+    "definitions": {
+        "mergeMode": {
+            "type": "string",
+            "enum": ["LEAVE_IF_CHANGED", "OVERWRITE"]
+        },
+        "fieldlist": {
+            "type": "array",
+            "items": { "type": "string"}
+        },
+        "query": {
+            "type": "string"
+        },
+        "sobjectType": {
+            "type": "string"
+        },
+        "sobjectTypePlural": {
+            "type": "string"
+        },
+        "layoutType": {
+            "type": "string"
+        },
+        "syncName": {
+            "type": "string"
+        },
+        "soupName": {
+            "type": "string"
+        },
+        "fieldName": {
+            "type": "string"
+        },
+        "impl": {
+            "type": "string"
+        },
+        "soqlFilter": {
+            "type": "string"
+        },
+        "relationshipType": {
+            "type": "string",
+            "enum": ["MASTER_DETAIL", "LOOKUP"]
+        },
+        "parentInfo": {
+            "type": "object",
+            "properties": {
+                "idFieldName": { "$ref": "#/definitions/fieldName" },
+                "modificationDateFieldName": { "$ref": "#/definitions/fieldName" },
+                "sobjectType": { "$ref": "#/definitions/sobjectType" },
+                "soupName": { "$ref": "#/definitions/soupName" }
+            },
+            "required": ["sobjectType", "soupName"]
+        },
+        "childrenInfo": {
+            "type": "object",
+            "properties": {
+                "idFieldName": { "$ref": "#/definitions/fieldName" },
+                "modificationDateFieldName": { "$ref": "#/definitions/fieldName" },
+                "sobjectType": { "$ref": "#/definitions/sobjectType" },
+                "soupName": { "$ref": "#/definitions/soupName" },
+                "sobjectTypePlural": { "$ref": "#/definitions/sobjectTypePlural" },
+                "parentFieldName": { "$ref": "#/definitions/fieldName" }
+            },
+            "required": ["sobjectType", "soupName", "sobjectTypePlural", "parentFieldName"]
+        },
+        "syncDownOptions": {
+            "type": "object",
+            "properties": {
+                "mergeMode": { "$ref": "#/definitions/mergeMode" }
+            },
+            "required": ["mergeMode"]
+        },
+        "syncUpOptions": {
+            "type": "object",
+            "properties": {
+                "mergeMode": { "$ref": "#/definitions/mergeMode" },
+                "fieldlist": { "$ref": "#/definitions/fieldlist" }
+            },
+            "required": ["mergeMode", "fieldlist"]
+        },
+        "soqlSyncDownTarget": {
+            "type": "object",
+            "properties": {
+                "type": { "const": "soql" },
+                "query": { "$ref": "#/definitions/query" },
+                "idFieldName": { "$ref": "#/definitions/fieldName" },
+                "modificationDateFieldName": { "$ref": "#/definitions/fieldName" }
+            },
+            "required": ["type", "query"]
+        },
+        "soslSyncDownTarget": {
+            "type": "object",
+            "properties": {
+                "type": { "const": "sosl" },
+                "query": { "$ref": "#/definitions/query" },
+                "idFieldName": { "$ref": "#/definitions/fieldName" },
+                "modificationDateFieldName": { "$ref": "#/definitions/fieldName" }
+            },
+            "required": ["type", "query"]
+        },
+        "mruSyncDownTarget": {
+            "type": "object",
+            "properties": {
+                "type": { "const": "mru" },
+                "sobjectType": { "$ref": "#/definitions/sobjectType" },
+                "fieldlist": { "$ref": "#/definitions/fieldlist" },
+                "idFieldName": { "$ref": "#/definitions/fieldName" },
+                "modificationDateFieldName": { "$ref": "#/definitions/fieldName" }
+            },
+            "required": ["type", "sobjectType", "fieldlist"]
+        },
+        "refreshSyncDownTarget": {
+            "type": "object",
+            "properties": {
+                "type": { "const": "refresh" },
+                "sobjectType": { "$ref": "#/definitions/sobjectType" },
+                "fieldlist": { "$ref": "#/definitions/fieldlist" },
+                "soupName": { "$ref": "#/definitions/soupName" },
+                "idFieldName": { "$ref": "#/definitions/fieldName" },
+                "modificationDateFieldName": { "$ref": "#/definitions/fieldName" }
+            },
+            "required": ["type", "sobjectType", "fieldlist", "soupName"]
+        },
+        "layoutSyncDownTarget": {
+            "type": "object",
+            "properties": {
+                "type": { "const": "layout" },
+                "sobjectType": { "$ref": "#/definitions/sobjectType" },
+                "layoutType": { "$ref": "#/definitions/layoutType" },
+                "idFieldName": { "$ref": "#/definitions/fieldName" },
+                "modificationDateFieldName": { "$ref": "#/definitions/fieldName" }
+            },
+            "required": ["type", "sobjectType", "layoutType"]
+        },
+        "metadataSyncDownTarget": {
+            "type": "object",
+            "properties": {
+                "type": { "const": "metadata" },
+                "sobjectType": { "$ref": "#/definitions/sobjectType" },
+                "idFieldName": { "$ref": "#/definitions/fieldName" },
+                "modificationDateFieldName": { "$ref": "#/definitions/fieldName" }
+            },
+            "required": ["type", "sobjectType"]
+        },
+        "parentChildrenSyncDownTarget": {
+            "type": "object",
+            "properties": {
+                "type": { "const": "parent_children" },
+                "parent": { "$ref": "#/definitions/parentInfo" },
+                "parentFieldlist": { "$ref": "#/definitions/fieldlist" },
+                "children": { "$ref": "#/definitions/parentInfo" },
+                "childrenFieldlist": { "$ref": "#/definitions/fieldlist" },
+                "relationshipType": { "$ref": "#/definitions/relationshipType" },
+                "parentSoqlFilter": { "$ref": "#/definitions/soqlFilter" }
+            },
+            "required": ["type", "parent", "parentFieldlist", "children", "childrenFieldlist", "relationshipType"]
+        },
+        "customSyncDownTarget": {
+            "type": "object",
+            "properties": {
+                "type": { "const": "custom" },
+                "iOSImpl" : { "$ref": "#/definitions/impl" },
+                "androidImpl" : { "$ref": "#/definitions/impl" },
+                "idFieldName": { "$ref": "#/definitions/fieldName" },
+                "modificationDateFieldName": { "$ref": "#/definitions/fieldName" }
+            },
+            "required": ["type", "iOSImpl", "androidImpl"]
+        },
+        "syncDownTarget": {
+            "anyOf": [
+                { "$ref": "#/definitions/soqlSyncDownTarget" },
+                { "$ref": "#/definitions/soslSyncDownTarget" },
+                { "$ref": "#/definitions/mruSyncDownTarget" },
+                { "$ref": "#/definitions/refreshSyncDownTarget" },
+                { "$ref": "#/definitions/layoutSyncDownTarget" },
+                { "$ref": "#/definitions/metadataSyncDownTarget" },
+                { "$ref": "#/definitions/parentChildrenSyncDownTarget" },
+                { "$ref": "#/definitions/customSyncDownTarget" }
+            ]
+        },
+        "noBatchSyncUpTarget": {
+            "type": "object",
+            "properties": {
+                "iOSImpl" : { "const": "SFSyncUpTarget" },
+                "androidImpl": { "const": "com.salesforce.androidsdk.mobilesync.target.SyncUpTarget" },
+                "createFieldlist": { "$ref": "#/definitions/fieldlist" },
+                "updateFieldlist": { "$ref": "#/definitions/fieldlist" },
+                "externalIdFieldName": { "$ref": "#/definitions/fieldName" }
+            },
+            "required": ["iOSImpl", "androidImpl"]            
+        },
+        "batchSyncUpTarget": {
+            "type": "object",
+            "properties": {
+                "createFieldlist": { "$ref": "#/definitions/fieldlist" },
+                "updateFieldlist": { "$ref": "#/definitions/fieldlist" },
+                "externalIdFieldName": { "$ref": "#/definitions/fieldName" }
+            }
+        },
+        "parentChildrenSyncUpTarget": {
+            "type": "object",
+            "properties": {
+                "iOSImpl" : { "const": "SFParentChildrenSyncUpTarget" },
+                "androidImpl": { "const": "com.salesforce.androidsdk.mobilesync.target.ParentChildrenSyncUpTarget" },
+                "parent": { "$ref": "#/definitions/parentInfo" },
+                "createFieldlist": { "$ref": "#/definitions/fieldlist" },
+                "updateFieldlist": { "$ref": "#/definitions/fieldlist" },
+                "children": { "$ref": "#/definitions/parentInfo" },
+                "childrenCreateFieldlist": { "$ref": "#/definitions/fieldlist" },
+                "childrenUpdateFieldlist": { "$ref": "#/definitions/fieldlist" },
+                "relationshipType": { "$ref": "#/definitions/relationshipType" }
+            },
+            "required": ["iOSImpl", "androidImpl",
+                         "parent", "createFieldlist", "updateFieldlist",
+                         "children", "childrenCreateFieldlist", "childrenUpdateFieldlist",
+                         "relationshipType"]
+        },
+        "customSyncUpTarget": {
+            "type": "object",
+            "properties": {
+                "iOSImpl" : { "$ref": "#/definitions/impl" },
+                "androidImpl" : { "$ref": "#/definitions/impl" },
+                "createFieldlist": { "$ref": "#/definitions/fieldlist" },
+                "updateFieldlist": { "$ref": "#/definitions/fieldlist" }
+            },
+            "required": ["iOSImpl", "androidImpl"]
+        },
+        "syncUpTarget": {
+            "anyOf": [
+                { "$ref": "#/definitions/parentChildrenSyncUpTarget" },
+                { "$ref": "#/definitions/noBatchSyncUpTarget" },
+                { "$ref": "#/definitions/customSyncUpTarget" },
+                { "$ref": "#/definitions/batchSyncUpTarget" }
+            ]
+        },
+        "syncDown": {
+            "type": "object",
+            "properties": {
+                "syncName": { "$ref": "#/definitions/syncName" },
+                "soupName": { "$ref": "#/definitions/soupName" },
+                "syncType": { "const": "syncDown" },
+                "target": { "$ref": "#/definitions/syncDownTarget" },
+                "options": { "$ref": "#/definitions/syncDownOptions"}
+            },
+            "required": ["syncName", "soupName", "syncType", "target", "options"]
+        },
+        "syncUp": {
+            "type": "object",
+            "properties": {
+                "syncName": { "$ref": "#/definitions/syncName" },
+                "soupName": { "$ref": "#/definitions/soupName" },
+                "syncType": { "const": "syncUp" },
+                "target": { "$ref": "#/definitions/syncUpTarget" },
+                "options": { "$ref": "#/definitions/syncUpOptions"}
+            },
+            "required": ["syncName", "soupName", "syncType", "target", "options"]
+        },
+        "sync": {
+            "oneOf": [
+                { "$ref": "#/definitions/syncDown" },
+                { "$ref": "#/definitions/syncUp" }
+            ]
+        }
+    },
+
+    "type": "object",
+    "properties": {
+        "syncs": {
+            "type": "array",
+            "items": { "$ref": "#/definitions/sync" }
+        }
+    },
+    "required": ["syncs"]
+}

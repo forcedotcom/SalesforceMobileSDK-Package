@@ -48,16 +48,18 @@ const testVersionDefault = VERSION
 
 const templatesPackageJsons = [
     './AndroidIDPTemplate/package.json',
-    './SmartSyncExplorerReactNative/package.json',
     './AndroidNativeKotlinTemplate/package.json',
-    './SmartSyncExplorerSwift/package.json',
     './AndroidNativeTemplate/package.json',
-    './iOSIDPTemplate/package.json',
     './HybridLocalTemplate/package.json',
-    './iOSNativeSwiftTemplate/package.json',
     './HybridRemoteTemplate/package.json',
-    './iOSNativeTemplate/package.json',
-    './ReactNativeTemplate/package.json'
+    './MobileSyncExplorerReactNative/package.json',
+    './MobileSyncExplorerSwift/package.json',
+    './ReactNativeTemplate/package.json',
+    './iOS13NativeSwiftTemplate/package.json',
+    './iOSIDPTemplate/package.json',
+    './iOSNativeSwiftEncryptedNotificationTemplate/package.json',
+    './iOSNativeSwiftTemplate/package.json',
+    './iOSNativeTemplate/package.json'
 ]
 
 // Questions

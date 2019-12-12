@@ -1,6 +1,6 @@
 {
     "name": "sfdx-mobilesdk-plugin",
-    "version": "7.3.0",
+    "version": "8.0.0",
     "description": "Sfdx plugin for creating mobile apps based on the Salesforce Mobile SDK",
     "keywords": [
         "mobilesdk",
@@ -30,10 +30,12 @@
         "@oclif/plugin-help": "2",
         "@salesforce/core": "^1.1.2",
         "globby": "^9.0.0",
-        "shelljs": "0.8.3"
+        "shelljs": "0.8.3",
+        "ajv": "^6.10.2",
+        "jsonlint": "^1.6.3"
     },
     "devDependencies": {
-        "@oclif/dev-cli": "^1.22.0"
+        "@oclif/dev-cli": "^1.22.2"
     },
     "repository": {
         "type": "git",
@@ -55,7 +57,24 @@
         "/bin"
     ],
     "oclif": {
-        "commands": "./oclif"
+        "commands": "./oclif",
+        "topics": {
+            "mobilesdk": {
+                "description": "create mobile apps based on the Salesforce Mobile SDK"
+            },
+            "mobilesdk:ios": {
+                "description": "create an iOS native mobile application"
+            },
+            "mobilesdk:android": {
+                "description": "create an Android native mobile application"
+            },
+            "mobilesdk:hybrid": {
+                "description": "create a hybrid mobile application"
+            },
+            "mobilesdk:reactnative": {
+                "description": "create a React Native mobile application"
+            }
+        }
     },
     "scripts": {
         "prepack": "node_modules/.bin/oclif-dev manifest"

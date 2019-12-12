@@ -139,7 +139,7 @@ function main(args) {
                 for (var k=0; k<template.platforms.length; k++) {
                     var os = template.platforms[k];
                     if (chosenOperatingSystems.length == 0 || chosenOperatingSystems.indexOf(os) >= 0) {
-                        createCompileApp(tmpDir, os, template.appType, template.url, pluginRepoUri, useSfdxRequested);
+                        createCompileApp(tmpDir, os, template.appType, template.path, pluginRepoUri, useSfdxRequested);
                     }
                 }
             }
@@ -157,7 +157,8 @@ function main(args) {
 
             if (testingWithTemplate) {
                 // NB: chosenAppTypes[0] is appType from template
-                createCompileApp(tmpDir, os, chosenAppTypes[0], templateRepoUri, pluginRepoUri, useSfdxRequested);
+                var appType = chosenAppTypes.length > 0 ? chosenAppTypes[0] : [templateHelper.getAppTypeFromTemplate(templateRepoUri)];
+                createCompileApp(tmpDir, os, appType, templateRepoUri, pluginRepoUri, useSfdxRequested);
             }
         }
     }
@@ -182,7 +183,7 @@ function shortUsage(exitCode) {
     utils.logInfo('  - osX is : ios or android', COLOR.cyan);
     utils.logInfo('  - cliX is : forceios or forcedroid or forcehybrid or forcereact', COLOR.cyan);
     utils.logInfo('  - appTypeX is: native, native_swift, native_kotlin, react_native, hybrid_local or hybrid_remote', COLOR.cyan);
-    utils.logInfo('  - templaterepouri is a template repo uri e.g. https://github.com/forcedotcom/SalesforceMobileSDK-Templates/SmartSyncExplorerReactNative#dev', COLOR.cyan);
+    utils.logInfo('  - templaterepouri is a template repo uri or a Mobile SDK template name', COLOR.cyan);
     utils.logInfo('', COLOR.cyan);
 
     if (typeof(exitCode) !== 'undefined') {
@@ -276,7 +277,8 @@ function updatePluginRepo(tmpDir, os, pluginRepoDir, sdkBranch) {
 //
 function createCompileApp(tmpDir, os, actualAppType, templateRepoUri, pluginRepoUri, useSfdxRequested) {
     var execArgs = '';
-    var isNative = actualAppType.indexOf('native') == 0;
+    var isNative = actualAppType == APP_TYPE.native || actualAppType == APP_TYPE.native_swift || actualAppType == APP_TYPE.native_kotlin; 
+    var isReactNative = actualAppType === APP_TYPE.react_native;
     var isReactNative = actualAppType === APP_TYPE.react_native;
     var isHybrid = actualAppType.indexOf('hybrid') == 0;
     var isHybridRemote = actualAppType === APP_TYPE.hybrid_remote;

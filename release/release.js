@@ -46,8 +46,8 @@ const masterBranchDefault = "master2"
 const devBranchDefault = "dev2"
 const docBranchDefault = "gh-pages2"
 const versionReleasedDefault = VERSION
-const versionCodeReleasedDefault = 66
-const nextVersionDefault = "8.0.0"
+const versionCodeReleasedDefault = 67
+const nextVersionDefault = "8.1.0"
 
 // Questions
 const QUESTIONS = [
@@ -175,7 +175,7 @@ async function start() {
         `  ./gradlew :libs:SalesforceAnalytics:bintrayUpload`,
         `  ./gradlew :libs:SalesforceSDK:bintrayUpload`,
         `  ./gradlew :libs:SmartStore:bintrayUpload`,
-        `  ./gradlew :libs:SmartSync:bintrayUpload`,
+        `  ./gradlew :libs:MobileSync:bintrayUpload`,
         `  ./gradlew :libs:SalesforceHybrid:bintrayUpload`,
         ``,
         `Do NOT publish until absolutely certain.`,

@@ -45,7 +45,7 @@ forcereact create
 # create a React Native mobile application from a template
 forcereact createwithtemplate
     --platform=comma-separated list of platforms (ios, android)
-    --templaterepouri=template repo URI
+    --templaterepouri=template repo URI or Mobile SDK template name
     --appname=application name
     --packagename=app package identifier (e.g. com.mycompany.myapp)
     --organization=organization name (your company's/organization's name)
@@ -55,6 +55,13 @@ forcereact createwithtemplate
 
 # list available Mobile SDK templates
 forcereact listtemplates
+
+ OR 
+
+# validate store or syncs configuration
+forcereact checkconfig
+    --configpath=path to store or syncs config to validate
+    --configtype=type of config to validate (store or syncs)
 
  OR 
 
