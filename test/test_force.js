@@ -278,10 +278,9 @@ function updatePluginRepo(tmpDir, os, pluginRepoDir, sdkBranch) {
 function createCompileApp(tmpDir, os, actualAppType, templateRepoUri, pluginRepoUri, useSfdxRequested) {
     var execArgs = '';
     var isNative = actualAppType == APP_TYPE.native || actualAppType == APP_TYPE.native_swift || actualAppType == APP_TYPE.native_kotlin; 
-    var isReactNative = actualAppType === APP_TYPE.react_native;
-    var isReactNative = actualAppType === APP_TYPE.react_native;
+    var isReactNative = actualAppType == APP_TYPE.react_native;
     var isHybrid = actualAppType.indexOf('hybrid') == 0;
-    var isHybridRemote = actualAppType === APP_TYPE.hybrid_remote;
+    var isHybridRemote = actualAppType == APP_TYPE.hybrid_remote;
     if (isHybridRemote) {
         // XXX createwithtemplate doesn't work for hybrid remote template
         //     because the arg validation only accept startpage if apptype is available as an arg
