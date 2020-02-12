@@ -1,6 +1,6 @@
 {
     "name": "sfdx-mobilesdk-plugin",
-    "version": "8.0.0",
+    "version": "8.1.0",
     "description": "Sfdx plugin for creating mobile apps based on the Salesforce Mobile SDK",
     "keywords": [
         "mobilesdk",
