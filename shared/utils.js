@@ -70,15 +70,16 @@ function setLogLevel(logLevel) {
  */
 function getVersionNumberFromString(versionString) {
 	// Only supporting major/minor version checking at this point.
-    var versionRegex = new RegExp(/^[^\d]*(\d+)(\.(\d+))?.*$/, 'm');
-	var matchArray = versionString.match(versionRegex);
+    var versionRegex = new RegExp(/^[^\d]*(\d+)(\.(\d+))(\.(\d+))?.*$/, 'm');
+    var matchArray = versionString.match(versionRegex);
 	if (matchArray === null) {
-		log(LOG_LEVELS.WARN, 'Invalid version string "' + versionString + '". Should be in the format x[.y[.ignored]]');
+		log(LOG_LEVELS.WARN, 'Invalid version string "' + versionString + '". Should be in the format x[.y[.z[.ignored]]]');
 		return 0;
 	} else {
-		var majorVersion = parseInt(matchArray[1]);
-		var minorVersion = (matchArray[3] === undefined ? 0 : parseInt(matchArray[3]));
-		var combinedVersion = (1000 * majorVersion) + minorVersion;
+        var majorVersion = parseInt(matchArray[1]);
+        var minorVersion = (matchArray[3] === undefined ? 0 : parseInt(matchArray[3]));
+        var patchVersion = (matchArray[5] === undefined ? 0 : parseInt(matchArray[5]));
+        var combinedVersion = (1000000 * majorVersion) + (1000 * minorVersion) + patchVersion;
 		return combinedVersion;
 	}
 }
