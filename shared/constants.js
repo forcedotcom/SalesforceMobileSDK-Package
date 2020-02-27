@@ -48,8 +48,8 @@ module.exports = {
         },
         pod: {
             checkCmd: 'pod --version',
-            minVersion: '1.7',
-            maxVersion: '1.8'
+            minVersion: '1.7.2',
+            maxVersion: '1.9'
         },
         cordova: {
             checkCmd: 'cordova -v',
