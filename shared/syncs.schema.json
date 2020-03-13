@@ -20,13 +20,16 @@
             "type": "string"
         },
         "formFactor": {
-            "type": "string"
+            "type": "string",
+            "enum": ["Large", "Medium", "Small"]
         },
         "layoutType": {
-            "type": "string"
+            "type": "string",
+            "enum": ["Compact", "Full"]
         },
         "mode": {
-            "type": "string"
+            "type": "string",
+            "enum": ["Create", "Edit", "View"]
         },
         "recordTypeId": {
             "type": "string"
