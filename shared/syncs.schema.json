@@ -19,7 +19,19 @@
         "sobjectTypePlural": {
             "type": "string"
         },
+        "formFactor": {
+            "type": "string",
+            "enum": ["Large", "Medium", "Small"]
+        },
         "layoutType": {
+            "type": "string",
+            "enum": ["Compact", "Full"]
+        },
+        "mode": {
+            "type": "string",
+            "enum": ["Create", "Edit", "View"]
+        },
+        "recordTypeId": {
             "type": "string"
         },
         "syncName": {
@@ -126,7 +138,10 @@
             "properties": {
                 "type": { "const": "layout" },
                 "sobjectType": { "$ref": "#/definitions/sobjectType" },
+                "formFactor": { "$ref": "#/definitions/formFactor" },
                 "layoutType": { "$ref": "#/definitions/layoutType" },
+                "mode": { "$ref": "#/definitions/mode" },
+                "recordTypeId": { "$ref": "#/definitions/recordTypeId" },
                 "idFieldName": { "$ref": "#/definitions/fieldName" },
                 "modificationDateFieldName": { "$ref": "#/definitions/fieldName" }
             },
