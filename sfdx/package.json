@@ -1,82 +1,86 @@
 {
-    "name": "sfdx-mobilesdk-plugin",
-    "version": "8.1.0",
-    "description": "Sfdx plugin for creating mobile apps based on the Salesforce Mobile SDK",
-    "keywords": [
-        "mobilesdk",
-        "salesforce",
-        "mobile",
-        "sdk",
-        "salesforcedx",
-        "salesforce-dx",
-        "oclif-plugin",
-        "sfdx-plugin"
-    ],
-    "homepage": "https://github.com/forcedotcom/SalesforceMobileSDK-Package",
-    "bugs": "https://github.com/forcedotcom/SalesforceMobileSDK-Package/issues",
-    "licenses": [
-        {
-            "type": "Salesforce.com Mobile SDK License",
-            "url": "https://github.com/forcedotcom/SalesforceMobileSDK-iOS/blob/master/LICENSE.md"
-        }
-    ],
-    "engines": {
-        "node": ">=8.10.0"
-    },
-    "dependencies": {
-        "@oclif/command": "1",
-        "@oclif/config": "1",
-        "@oclif/errors": "1",
-        "@oclif/plugin-help": "2",
-        "@salesforce/core": "^1.1.2",
-        "globby": "^9.0.0",
-        "shelljs": "0.8.3",
-        "ajv": "^6.10.2",
-        "jsonlint": "^1.6.3"
-    },
-    "devDependencies": {
-        "@oclif/dev-cli": "^1.22.2"
-    },
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/forcedotcom/SalesforceMobileSDK-Package.git"
-    },
-    "author": {
-        "name": "Wolfgang Mathurin",
-        "email": "wmathurin@salesforce.com"
-    },
-    "contributors": [
-        {
-            "name": "Bharath Hariharan",
-            "email": "bhariharan@salesforce.com"
-        }
-    ],
-    "files": [
-        "/shared/**/*.js",
-        "/oclif/**/*.js",
-        "/bin"
-    ],
-    "oclif": {
-        "commands": "./oclif",
-        "topics": {
-            "mobilesdk": {
-                "description": "create mobile apps based on the Salesforce Mobile SDK"
-            },
-            "mobilesdk:ios": {
-                "description": "create an iOS native mobile application"
-            },
-            "mobilesdk:android": {
-                "description": "create an Android native mobile application"
-            },
-            "mobilesdk:hybrid": {
-                "description": "create a hybrid mobile application"
-            },
-            "mobilesdk:reactnative": {
-                "description": "create a React Native mobile application"
-            }
-        }
-    },
-    "scripts": {
-        "prepack": "node_modules/.bin/oclif-dev manifest"
+  "name": "sfdx-mobilesdk-plugin",
+  "version": "8.1.0",
+  "description": "Sfdx plugin for creating mobile apps based on the Salesforce Mobile SDK",
+  "keywords": [
+    "mobilesdk",
+    "salesforce",
+    "mobile",
+    "sdk",
+    "salesforcedx",
+    "salesforce-dx",
+    "oclif-plugin",
+    "sfdx-plugin"
+  ],
+  "homepage": "https://github.com/forcedotcom/SalesforceMobileSDK-Package",
+  "bugs": "https://github.com/forcedotcom/SalesforceMobileSDK-Package/issues",
+  "licenses": [
+    {
+      "type": "Salesforce.com Mobile SDK License",
+      "url": "https://github.com/forcedotcom/SalesforceMobileSDK-iOS/blob/master/LICENSE.md"
     }
+  ],
+  "engines": {
+    "node": ">=8.10.0"
+  },
+  "dependencies": {
+    "@oclif/command": "1",
+    "@oclif/config": "1",
+    "@oclif/errors": "1",
+    "@oclif/plugin-help": "2",
+    "@salesforce/core": "^1.1.2",
+    "globby": "^9.0.0",
+    "shelljs": "0.8.3",
+    "ajv": "^6.10.2",
+    "jsonlint": "^1.6.3",
+    "snyk": "^1.316.1"
+  },
+  "devDependencies": {
+    "@oclif/dev-cli": "^1.22.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/forcedotcom/SalesforceMobileSDK-Package.git"
+  },
+  "author": {
+    "name": "Wolfgang Mathurin",
+    "email": "wmathurin@salesforce.com"
+  },
+  "contributors": [
+    {
+      "name": "Bharath Hariharan",
+      "email": "bhariharan@salesforce.com"
+    }
+  ],
+  "files": [
+    "/shared/**/*.js",
+    "/oclif/**/*.js",
+    "/bin"
+  ],
+  "oclif": {
+    "commands": "./oclif",
+    "topics": {
+      "mobilesdk": {
+        "description": "create mobile apps based on the Salesforce Mobile SDK"
+      },
+      "mobilesdk:ios": {
+        "description": "create an iOS native mobile application"
+      },
+      "mobilesdk:android": {
+        "description": "create an Android native mobile application"
+      },
+      "mobilesdk:hybrid": {
+        "description": "create a hybrid mobile application"
+      },
+      "mobilesdk:reactnative": {
+        "description": "create a React Native mobile application"
+      }
+    }
+  },
+  "scripts": {
+    "prepack": "node_modules/.bin/oclif-dev manifest",
+    "snyk-protect": "snyk protect",
+    "prepublish": "npm run snyk-protect"
+  },
+  "snyk": true
 }
