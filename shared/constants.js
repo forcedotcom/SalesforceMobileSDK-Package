@@ -49,7 +49,7 @@ module.exports = {
         pod: {
             checkCmd: 'pod --version',
             minVersion: '1.7.2',
-            maxVersion: '1.9'
+            maxVersion: '1.9.1'
         },
         cordova: {
             checkCmd: 'cordova -v',
