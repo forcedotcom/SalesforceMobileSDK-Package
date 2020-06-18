@@ -229,7 +229,9 @@ function mkTmpDir() {
  * @param {string} Path of directory to create
 */
 function mkDirIfNeeded(dir) {
-    shelljs.mkdir('-p', dir);
+    if (dir != '') {
+        shelljs.mkdir('-p', dir);
+    }
 }
 
 /**
@@ -255,7 +257,7 @@ function replaceInFiles(from, to, files) {
  */
 function moveFile(from, to) {
     logDebug('Moving: ' + from + ' to ' + to);
-    shelljs.mkdir('-p', path.parse(to).dir);
+    mkDirIfNeeded('-p', path.parse(to).dir);
     shelljs.mv(from, to);
 }
 
