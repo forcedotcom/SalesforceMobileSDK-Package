@@ -86,6 +86,27 @@ function createHybridApp(config) {
     // Cleanup
     utils.removeFile(path.join(webDir, 'template.js'));
 
+
+    // Create sfdx project if apptype is hybrid_lwc in a 'server' directory
+    if (config.apptype === 'hybrid_lwc') {
+        var serverDirName = 'server'
+        config.serverDir = path.join(config.projectDir, serverDirName)
+        utils.runProcessThrowError('sfdx force:project:create -n ' + serverDirName, config.projectDir);
+
+        // Copy cordova js to static resources
+        for (var platform of config.platform.split(',')) {
+            var cordovaStaticResourcesDir = path.join(config.serverDir, 'force-app', 'main', 'default', 'staticresources', 'cordova' + platform);
+            utils.mkDirIfNeeded(cordovaStaticResourcesDir);
+            utils.copyFile(path.join(config.projectDir, 'platforms', platform, 'platform_www', '*'), cordovaStaticResourcesDir);
+        }
+
+        // Merge server files from templates
+        utils.mergeFile(path.join(webDir, 'force-app'), path.join(config.serverDir, 'force-app'));
+
+        // Remove server files from www
+        utils.removeFile(path.join(webDir, 'force-app'));
+    }
+
     // Run cordova prepare
     utils.runProcessThrowError('cordova prepare', config.projectDir);
 

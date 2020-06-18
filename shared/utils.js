@@ -265,12 +265,31 @@ function moveFile(from, to) {
 /**
  * Copy recursively.
  *
- * @param {String} from Path of file or directory to move.
+ * @param {String} from Path of file or directory to copy.
  * @param {String} to New path for file or directory.
  */
 function copyFile(from, to) {
     logDebug('Copying: ' + from + ' to ' + to);
     shelljs.cp('-R', from, to);
+}
+
+/**
+ * Merge recursively. 
+ * Like copyFile except that it will merge into existing directories.
+ *
+ * @param {String} from Path of file or directory to move.
+ * @param {String} to New path for file or directory.
+ */
+function mergeFile(from, to) {
+    logDebug('Merging: ' + from + ' to ' + to);
+    shelljs.find(from).forEach(function(srcPath) {
+        var relativePath = path.relative(from, srcPath)
+        if(fs.lstatSync(srcPath).isFile()) {
+            shelljs.cp(path.join(from, relativePath), path.join(to, relativePath));
+        } else {
+            shelljs.mkdir('-p', path.join(to, relativePath));            
+        }
+    })
 }
 
 
@@ -411,6 +430,7 @@ module.exports = {
     logError,
     logInfo,
     logParagraph,
+    mergeFile,
     mkTmpDir,
     mkDirIfNeeded,
     moveFile,
