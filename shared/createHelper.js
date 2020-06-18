@@ -93,7 +93,7 @@ function createHybridApp(config) {
     // Create a fresh sfdx project
     // Add cordova js and plugins at static resources
     // Merge files from template into it
-    if (utils.dirExists(path.join(webDir, 'force-app'))) {
+    if (utils.dirExists(path.join(webDir, SERVER_PROJECT_DIR))) {
         config.serverDir = path.join(config.projectDir, SERVER_PROJECT_DIR)
         utils.runProcessThrowError('sfdx force:project:create -n ' + SERVER_PROJECT_DIR, config.projectDir);
 
@@ -105,10 +105,10 @@ function createHybridApp(config) {
         }
 
         // Merge server files from templates
-        utils.mergeFile(path.join(webDir, 'force-app'), path.join(config.serverDir, 'force-app'));
+        utils.mergeFile(path.join(webDir, SERVER_PROJECT_DIR), config.serverDir);
 
         // Remove server files from www
-        utils.removeFile(path.join(webDir, 'force-app'));
+        utils.removeFile(path.join(webDir, SERVER_PROJECT_DIR));
     }
 
     // Run cordova prepare
