@@ -255,12 +255,17 @@ function replaceInFiles(from, to, files) {
  */
 function moveFile(from, to) {
     logDebug('Moving: ' + from + ' to ' + to);
-    var targetDir = path.parse(to).dir;
-    if (targetDir && !shelljs.test('-e', targetDir)) {
-        shelljs.mkdir('-p', targetDir);
-    }
+    shelljs.mkdir('-p', path.parse(to).dir);
     shelljs.mv(from, to);
 }
+
+/**
+ * Check there is a directory with given path
+ * @param {String} path of dir
+ */
+ function dirExists(path) {
+   return shelljs.test('-d', path);
+ }
 
 /**
  * Copy recursively.
@@ -284,7 +289,7 @@ function mergeFile(from, to) {
     logDebug('Merging: ' + from + ' to ' + to);
     shelljs.find(from).forEach(function(srcPath) {
         var relativePath = path.relative(from, srcPath)
-        if(fs.lstatSync(srcPath).isFile()) {
+        if(shelljs.test('-f', srcPath)) {
             shelljs.cp(path.join(from, relativePath), path.join(to, relativePath));
         } else {
             shelljs.mkdir('-p', path.join(to, relativePath));            
@@ -424,6 +429,7 @@ module.exports = {
     checkToolVersion,
     cloneRepo,
     copyFile,
+    dirExists,
     getVersionNumberFromString,
     log,
     logDebug,
