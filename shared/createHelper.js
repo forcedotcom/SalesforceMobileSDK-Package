@@ -213,9 +213,18 @@ function printNextStepsForServerProjectIfNeeded(projectPath) {
         // Extra steps if there is a server project
     if (hasServerProject) {
         utils.logParagraph(['Your application also has a server project in ' + serverProjectPath + '.',
-                            'Make sure to deploy it to your org before running your application.'
+                            'Make sure to deploy it to your org before running your application.',
+                            '',
+                            'From ' + projectPath + ' do the following to setup a scratch org, push the server code:',
+                            '   - sfdx force:org:create -f server/config/project-scratch-def.json -a MyOrg',
+                            '   - cd server',
+                            '   - sfdx force:source:push -u MyOrg',
+                            'You also need a password to login to the scratch org from the mobile app:',
+                            '   - sfdx force:user:password:generate -u MyOrg'                            
                             ]);
     }
+
+
 }
 
 //

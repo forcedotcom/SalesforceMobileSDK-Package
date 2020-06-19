@@ -257,7 +257,7 @@ function replaceInFiles(from, to, files) {
  */
 function moveFile(from, to) {
     logDebug('Moving: ' + from + ' to ' + to);
-    mkDirIfNeeded('-p', path.parse(to).dir);
+    mkDirIfNeeded(path.parse(to).dir);
     shelljs.mv(from, to);
 }
 
