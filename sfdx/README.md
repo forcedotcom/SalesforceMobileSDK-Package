@@ -42,12 +42,7 @@ create mobile apps based on the Salesforce Mobile SDK
 USAGE
   $ sfdx mobilesdk:COMMAND
 
-COMMANDS
-
-
 TOPICS
-  Run help for each topic below to view subcommands
-
   mobilesdk:android      create an Android native mobile application
   mobilesdk:hybrid       create a hybrid mobile application
   mobilesdk:ios          create an iOS native mobile application
@@ -138,7 +133,8 @@ OPTIONS
   -o, --organization=organization        (required) organization name (your
                                          company's/organization's name)
 
-  -r, --templaterepouri=templaterepouri  (required) template repo URI
+  -r, --templaterepouri=templaterepouri  (required) template repo URI or Mobile
+                                         SDK template name
 
 DESCRIPTION
   This command initiates creation of a new app based on the Mobile SDK template 
@@ -159,10 +155,10 @@ USAGE
   $ sfdx mobilesdk:ios:checkconfig
 
 OPTIONS
-  -c, --configpath=configpath  (required) path to store or syncs config to
+  -p, --configpath=configpath  (required) path to store or syncs config to
                                validate
 
-  -y, --configtype=configtype  (required) type of config to validate (store or
+  -t, --configtype=configtype  (required) type of config to validate (store or
                                syncs)
 
 DESCRIPTION
@@ -256,7 +252,8 @@ OPTIONS
   -o, --organization=organization        (required) organization name (your
                                          company's/organization's name)
 
-  -r, --templaterepouri=templaterepouri  (required) template repo URI
+  -r, --templaterepouri=templaterepouri  (required) template repo URI or Mobile
+                                         SDK template name
 
 DESCRIPTION
   This command initiates creation of a new app based on the Mobile SDK template 
@@ -277,10 +274,10 @@ USAGE
   $ sfdx mobilesdk:android:checkconfig
 
 OPTIONS
-  -c, --configpath=configpath  (required) path to store or syncs config to
+  -p, --configpath=configpath  (required) path to store or syncs config to
                                validate
 
-  -y, --configtype=configtype  (required) type of config to validate (store or
+  -t, --configtype=configtype  (required) type of config to validate (store or
                                syncs)
 
 DESCRIPTION
@@ -336,7 +333,8 @@ OPTIONS
                                    app; required for hybrid_remote apps only)
 
   -t, --apptype=apptype            application type (hybrid_local or
-                                   hybrid_remote, leave empty for hybrid_local)
+                                   hybrid_remote or hybrid_lwc, leave empty for
+                                   hybrid_local)
 
 DESCRIPTION
   This command initiates creation of a new app based on the standard Mobile SDK 
@@ -381,7 +379,8 @@ OPTIONS
   -p, --platform=platform                (required) comma-separated list of
                                          platforms (ios, android)
 
-  -r, --templaterepouri=templaterepouri  (required) template repo URI
+  -r, --templaterepouri=templaterepouri  (required) template repo URI or Mobile
+                                         SDK template name
 
   -s, --startpage=startpage              app start page (the start page of your
                                          remote app; required for hybrid_remote
@@ -406,10 +405,10 @@ USAGE
   $ sfdx mobilesdk:hybrid:checkconfig
 
 OPTIONS
-  -c, --configpath=configpath  (required) path to store or syncs config to
+  -p, --configpath=configpath  (required) path to store or syncs config to
                                validate
 
-  -y, --configtype=configtype  (required) type of config to validate (store or
+  -t, --configtype=configtype  (required) type of config to validate (store or
                                syncs)
 
 DESCRIPTION
@@ -507,7 +506,8 @@ OPTIONS
   -p, --platform=platform                (required) comma-separated list of
                                          platforms (ios, android)
 
-  -r, --templaterepouri=templaterepouri  (required) template repo URI
+  -r, --templaterepouri=templaterepouri  (required) template repo URI or Mobile
+                                         SDK template name
 
 DESCRIPTION
   This command initiates creation of a new app based on the Mobile SDK template 
@@ -528,10 +528,10 @@ USAGE
   $ sfdx mobilesdk:reactnative:checkconfig
 
 OPTIONS
-  -c, --configpath=configpath  (required) path to store or syncs config to
+  -p, --configpath=configpath  (required) path to store or syncs config to
                                validate
 
-  -y, --configtype=configtype  (required) type of config to validate (store or
+  -t, --configtype=configtype  (required) type of config to validate (store or
                                syncs)
 
 DESCRIPTION

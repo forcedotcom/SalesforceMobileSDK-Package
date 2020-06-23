@@ -229,7 +229,9 @@ function mkTmpDir() {
  * @param {string} Path of directory to create
 */
 function mkDirIfNeeded(dir) {
-    shelljs.mkdir('-p', dir);
+    if (dir != '') {
+        shelljs.mkdir('-p', dir);
+    }
 }
 
 /**
@@ -255,22 +257,46 @@ function replaceInFiles(from, to, files) {
  */
 function moveFile(from, to) {
     logDebug('Moving: ' + from + ' to ' + to);
-    var targetDir = path.parse(to).dir;
-    if (targetDir && !shelljs.test('-e', targetDir)) {
-        shelljs.mkdir('-p', targetDir);
-    }
+    mkDirIfNeeded(path.parse(to).dir);
     shelljs.mv(from, to);
 }
 
 /**
+ * Check there is a directory with given path
+ * @param {String} path of dir
+ */
+ function dirExists(path) {
+   return shelljs.test('-d', path);
+ }
+
+/**
  * Copy recursively.
  *
- * @param {String} from Path of file or directory to move.
+ * @param {String} from Path of file or directory to copy.
  * @param {String} to New path for file or directory.
  */
 function copyFile(from, to) {
     logDebug('Copying: ' + from + ' to ' + to);
     shelljs.cp('-R', from, to);
+}
+
+/**
+ * Merge recursively. 
+ * Like copyFile except that it will merge into existing directories.
+ *
+ * @param {String} from Path of file or directory to move.
+ * @param {String} to New path for file or directory.
+ */
+function mergeFile(from, to) {
+    logDebug('Merging: ' + from + ' to ' + to);
+    shelljs.find(from).forEach(function(srcPath) {
+        var relativePath = path.relative(from, srcPath)
+        if(shelljs.test('-f', srcPath)) {
+            shelljs.cp(path.join(from, relativePath), path.join(to, relativePath));
+        } else {
+            shelljs.mkdir('-p', path.join(to, relativePath));            
+        }
+    })
 }
 
 
@@ -405,12 +431,14 @@ module.exports = {
     checkToolVersion,
     cloneRepo,
     copyFile,
+    dirExists,
     getVersionNumberFromString,
     log,
     logDebug,
     logError,
     logInfo,
     logParagraph,
+    mergeFile,
     mkTmpDir,
     mkDirIfNeeded,
     moveFile,
