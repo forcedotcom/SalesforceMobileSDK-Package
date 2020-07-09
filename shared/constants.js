@@ -60,7 +60,11 @@ module.exports = {
                 ios: '5.1.1',
                 android: '8.1.0'
             }
-        }
+        },
+        sfdx: {
+            checkCmd: 'sfdx -v',
+            minVersion: '6.0.0'
+        }    
     },
 
     ides: {
@@ -106,7 +110,7 @@ module.exports = {
             purpose: 'a hybrid mobile application',
             dir: 'hybrid',
             platforms: ['ios', 'android'],
-            toolNames: ['git', 'node', 'npm', 'cordova'],
+            toolNames: ['git', 'node', 'npm', 'cordova', 'sfdx'],
             appTypes: ['hybrid_local', 'hybrid_remote', 'hybrid_lwc'],
             appTypesToPath: {
                 'hybrid_local': 'HybridLocalTemplate',
