@@ -70,7 +70,7 @@ function setLogLevel(logLevel) {
  */
 function getVersionNumberFromString(versionString) {
 	// Only supporting major/minor version checking at this point.
-    var versionRegex = new RegExp(/^[^\d]*(\d+)(\.(\d+))(\.(\d+))?.*$/, 'm');
+    var versionRegex = new RegExp(/^[^\d]*(\d+)(\.(\d+))?(\.(\d+))?/, 'm');
     var matchArray = versionString.match(versionRegex);
 	if (matchArray === null) {
 		log(LOG_LEVELS.WARN, 'Invalid version string "' + versionString + '". Should be in the format x[.y[.z[.ignored]]]');
