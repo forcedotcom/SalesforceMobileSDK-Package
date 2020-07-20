@@ -96,6 +96,7 @@ jobs:
       - run: *upgrade-git
       - run: *setup
       - run: *android-cordova
+      - run: *install-sfdx
       - run:
           name: Building all android hybrid templates
           command: ./test/test_force.js --exit-on-failure --cli=forcehybrid --os=android --no-plugin-update
@@ -164,6 +165,7 @@ jobs:
       - checkout
       - run: *setup
       - run: *ios-cordova
+      - run: *install-sfdx
       - run:
           name: Building all ios hybrid templates
           command: ./test/test_force.js --exit-on-failure --cli=forcehybrid --os=ios --no-plugin-update

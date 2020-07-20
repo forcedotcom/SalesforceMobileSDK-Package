@@ -28,7 +28,7 @@
 var path = require('path'),
     shelljs = require('shelljs');
 
-var VERSION= '8.1.0';
+var VERSION= '8.2.0';
 
 module.exports = {
     version: VERSION,
@@ -48,19 +48,22 @@ module.exports = {
         },
         pod: {
             checkCmd: 'pod --version',
-            minVersion: '1.7',
-            maxVersion: '1.8'
+            minVersion: '1.7.2'
         },
         cordova: {
             checkCmd: 'cordova -v',
-//            pluginRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-CordovaPlugin#dev',    // dev
+            pluginRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-CordovaPlugin#dev',    // dev
             minVersion: '8.1.2',
-             pluginRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-CordovaPlugin#v' + VERSION, // GA
+//             pluginRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-CordovaPlugin#v' + VERSION, // GA
             platformVersion: {
                 ios: '5.1.1',
                 android: '8.1.0'
             }
-        }
+        },
+        sfdx: {
+            checkCmd: 'sfdx -v',
+            minVersion: '6.0.0'
+        }    
     },
 
     ides: {
@@ -68,8 +71,8 @@ module.exports = {
         android: 'Android Studio'
     },
 
-//    templatesRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-Templates#dev',    // dev
-     templatesRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-Templates#v' + VERSION, // GA
+    templatesRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-Templates#dev',    // dev
+//     templatesRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-Templates#v' + VERSION, // GA
 
     forceclis: {
         forceios: {
@@ -106,11 +109,12 @@ module.exports = {
             purpose: 'a hybrid mobile application',
             dir: 'hybrid',
             platforms: ['ios', 'android'],
-            toolNames: ['git', 'node', 'npm', 'cordova'],
-            appTypes: ['hybrid_local', 'hybrid_remote'],
+            toolNames: ['git', 'node', 'npm', 'cordova', 'sfdx'],
+            appTypes: ['hybrid_local', 'hybrid_remote', 'hybrid_lwc'],
             appTypesToPath: {
                 'hybrid_local': 'HybridLocalTemplate',
-                'hybrid_remote': 'HybridRemoteTemplate'
+                'hybrid_remote': 'HybridRemoteTemplate',
+                'hybrid_lwc': 'HybridLwcTemplate'
             },
             commands: ['create', 'createwithtemplate', 'version', 'listtemplates', 'checkconfig']
         },

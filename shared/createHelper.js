@@ -34,6 +34,9 @@ var path = require('path'),
     getSDKTemplateURI = require('./templateHelper').getSDKTemplateURI,
     fs = require('fs');
 
+// Constant
+var SERVER_PROJECT_DIR = 'server';    
+
 //
 // Helper for native application creation
 //
@@ -85,6 +88,28 @@ function createHybridApp(config) {
 
     // Cleanup
     utils.removeFile(path.join(webDir, 'template.js'));
+
+    // If template includes server side files
+    // Create a fresh sfdx project
+    // Add cordova js and plugins at static resources
+    // Merge files from template into it
+    if (utils.dirExists(path.join(webDir, SERVER_PROJECT_DIR))) {
+        config.serverDir = path.join(config.projectDir, SERVER_PROJECT_DIR)
+        utils.runProcessThrowError('sfdx force:project:create -n ' + SERVER_PROJECT_DIR, config.projectDir);
+
+        // Copy cordova js to static resources
+        for (var platform of config.platform.split(',')) {
+            var cordovaStaticResourcesDir = path.join(config.serverDir, 'force-app', 'main', 'default', 'staticresources', 'cordova' + platform);
+            utils.mkDirIfNeeded(cordovaStaticResourcesDir);
+            utils.copyFile(path.join(config.projectDir, 'platforms', platform, 'platform_www', '*'), cordovaStaticResourcesDir);
+        }
+
+        // Merge server files from templates
+        utils.mergeFile(path.join(webDir, SERVER_PROJECT_DIR), config.serverDir);
+
+        // Remove server files from www
+        utils.removeFile(path.join(webDir, SERVER_PROJECT_DIR));
+    }
 
     // Run cordova prepare
     utils.runProcessThrowError('cordova prepare', config.projectDir);
@@ -165,7 +190,7 @@ function printDetails(config) {
 function printNextSteps(ide, projectPath, result) {
     var workspacePath = path.join(projectPath, result.workspacePath);
     var bootconfigFile =  path.join(projectPath, result.bootconfigFile);
-    
+
     // Printing out next steps
     utils.logParagraph(['Next steps' + (result.platform ? ' for ' + result.platform : '') + ':',
                         '',
@@ -173,9 +198,34 @@ function printNextSteps(ide, projectPath, result) {
                         'To use your new application in ' + ide + ', do the following:', 
                         '   - open ' + workspacePath + ' in ' + ide, 
                         '   - build and run', 
-                        'Before you ship, make sure to plug your OAuth Client ID and Callback URI, and OAuth Scopes into ' + bootconfigFile
+                        'Before you ship, make sure to plug your OAuth Client ID and Callback URI,',
+                        'and OAuth Scopes into ' + bootconfigFile,
                        ]);
+
 };    
+
+//
+// Print next steps for server project if present
+//
+function printNextStepsForServerProjectIfNeeded(projectPath) {
+    var serverProjectPath = path.join(projectPath, SERVER_PROJECT_DIR);
+    var hasServerProject = utils.dirExists(serverProjectPath);
+        // Extra steps if there is a server project
+    if (hasServerProject) {
+        utils.logParagraph(['Your application also has a server project in ' + serverProjectPath + '.',
+                            'Make sure to deploy it to your org before running your application.',
+                            '',
+                            'From ' + projectPath + ' do the following to setup a scratch org, push the server code:',
+                            '   - sfdx force:org:create -f server/config/project-scratch-def.json -a MyOrg',
+                            '   - cd server',
+                            '   - sfdx force:source:push -u MyOrg',
+                            'You also need a password to login to the scratch org from the mobile app:',
+                            '   - sfdx force:user:password:generate -u MyOrg'                            
+                            ]);
+    }
+
+
+}
 
 //
 // Check tools
@@ -302,6 +352,8 @@ function actuallyCreateApp(forcecli, config) {
             var ide = SDK.ides[result.platform || config.platform.split(',')[0]];
             printNextSteps(ide, config.projectPath, result);
         }
+        printNextStepsForServerProjectIfNeeded(config.projectPath);
+
     }
     catch (error) {
         utils.logError(forcecli.name + ' failed\n', error);
