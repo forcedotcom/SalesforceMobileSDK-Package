@@ -498,7 +498,7 @@ function computeAppName(os, actualAppType, templateRepoUri) {
 // Compute target description
 // 
 function computeTargetDescription(os, actualAppType, templateRepoUri) {
-    if (templateRepoUri.indexOf("https://") == -1) {
+    if (templateRepoUri != null && templateRepoUri.indexOf("https://") == -1) {
         // we allow template name in place of a uri
         // in that case, let's build full URI so that generated target description is correct
         var templateUriParsed = utils.separateRepoUrlPathBranch(SDK.templatesRepoUri);
