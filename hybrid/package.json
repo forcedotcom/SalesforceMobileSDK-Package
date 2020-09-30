@@ -1,6 +1,6 @@
 {
 	"name": "forcehybrid",
-	"version": "8.3.0",
+	"version": "9.0.0",
 	"description": "Utilities for creating hybrid mobile apps based on the Salesforce Mobile SDK for iOS and Android",
 	"keywords": [ "mobilesdk", "ios", "android", "hybrid", "salesforce", "mobile", "sdk" ],
 	"homepage": "https://github.com/forcedotcom/SalesforceMobileSDK-Package",
