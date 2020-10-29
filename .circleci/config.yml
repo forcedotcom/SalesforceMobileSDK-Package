@@ -30,13 +30,13 @@ aliases:
   - &ios-cordova
     name: Install Cordova
     command:  |
-      npm install -g cordova@8.1.2
+      npm install -g cordova@10.0.0
       cordova telemetry off
 
   - &android-cordova
     name: Install Cordova
     command:  |
-      sudo npm install -g cordova@8.1.2
+      sudo npm install -g cordova@10.0.0
       sudo cordova telemetry off
 
   - &install-sfdx
