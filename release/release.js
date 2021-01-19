@@ -322,8 +322,8 @@ function checkoutMasterAndMergeDev() {
     return {
         msg: `Merging ${config.devBranch} to ${config.masterBranch}`,
         cmds: [
-            `git checkout ${config.devBranch}`,
             `git checkout ${config.masterBranch}`,
+            `git clean -fdxf`, // NB: need double -f to remove deleted submodule directory - see https://stackoverflow.com/a/10761699
             `git submodule sync`,
             `git submodule update --init`,
             `git merge --no-ff -m "Merging ${config.devBranch} into ${config.masterBranch}" ${config.devBranch}`,
@@ -389,6 +389,7 @@ function checkoutDevAndMergeMaster() {
         msg: `Merging ${config.masterBranch} back to ${config.devBranch}`,
         cmds: [
             `git checkout ${config.devBranch}`,
+            `git clean -fdxf`, // NB: need double -f to remove deleted submodule directory - see https://stackoverflow.com/a/10761699
             `git submodule sync`,
             `git submodule update`,
             `git merge --no-ff -m "Merging ${config.masterBranch} into ${config.devBranch}" ${config.masterBranch}`,
