@@ -57,6 +57,7 @@ const templatesPackageJsons = [
     './MobileSyncExplorerSwift/package.json',
     './ReactNativeDeferredTemplate/package.json',
     './ReactNativeTemplate/package.json',
+    './ReactNativeTypeScriptTemplate/package.json',
     './iOSIDPTemplate/package.json',
     './iOSNativeSwiftEncryptedNotificationTemplate/package.json',
     './iOSNativeSwiftTemplate/package.json',
