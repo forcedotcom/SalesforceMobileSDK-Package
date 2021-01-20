@@ -53,7 +53,7 @@ aliases:
 linux: &linux
   working_directory: ~/SalesforceMobileSDK-Package
   docker:
-    - image: circleci/android:api-28-node
+    - image: circleci/android:api-30-node
   environment:
     - TERM: "dumb"
     - GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx2048m -XX:+HeapDumpOnOutOfMemoryError"'
@@ -61,7 +61,7 @@ linux: &linux
 mac: &mac
   working_directory: ~/SalesforceMobileSDK-Package
   macos:
-    xcode: "11.0.0"
+    xcode: "12.3.0"
   shell: /bin/bash --login -eo pipefail
 
 version: 2
