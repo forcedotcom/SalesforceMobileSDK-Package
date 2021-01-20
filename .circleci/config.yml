@@ -33,11 +33,17 @@ aliases:
       npm install -g cordova@10.0.0
       cordova telemetry off
 
-  - &android-cordova
+  - &install-cordova
     name: Install Cordova
     command:  |
-      sudo npm install -g cordova@10.0.0
+      if [[ "$OSTYPE" == "linux-gnu" ]]; then
+        sudo npm install -g cordova@10.0.0
+      else 
+        npm update -g
+        npm install -g cordova@10.0.0
+      fi
       sudo cordova telemetry off
+    when: always
 
   - &install-sfdx
     name: Install SFDX
@@ -47,6 +53,16 @@ aliases:
         sudo chown -R `whoami` $HOME/.config/
       else 
         npm install -g sfdx-cli@6
+      fi
+    when: always
+
+  - &install-typescript
+    name: Install Typescript
+    command: |
+      if [[ "$OSTYPE" == "linux-gnu" ]]; then
+        sudo npm install -g typescript
+      else 
+        npm install -g typescript
       fi
     when: always
 
@@ -95,7 +111,7 @@ jobs:
       - checkout
       - run: *upgrade-git
       - run: *setup
-      - run: *android-cordova
+      - run: *install-cordova
       - run: *install-sfdx
       - run:
           name: Building all android hybrid templates
@@ -108,7 +124,7 @@ jobs:
       - checkout
       - run: *upgrade-git
       - run: *setup
-      - run: *android-cordova
+      - run: *install-cordova
       - run: *install-sfdx
       - run:
           name: Building all android hybrid templates with SFDX
@@ -121,6 +137,7 @@ jobs:
       - checkout
       - run: *upgrade-git
       - run: *setup
+      - run: *install-typescript
       - run:
           name: Building all android react native templates
           command: ./test/test_force.js --exit-on-failure --cli=forcereact --os=android
@@ -133,6 +150,7 @@ jobs:
       - run: *upgrade-git
       - run: *setup
       - run: *install-sfdx
+      - run: *install-typescript
       - run:
           name: Building all android react native templates with SFDX
           command: ./test/test_force.js --exit-on-failure --cli=forcereact --os=android --use-sfdx
@@ -164,7 +182,7 @@ jobs:
     steps:
       - checkout
       - run: *setup
-      - run: *ios-cordova
+      - run: *install-cordova
       - run: *install-sfdx
       - run:
           name: Building all ios hybrid templates
@@ -176,7 +194,7 @@ jobs:
     steps:
       - checkout
       - run: *setup
-      - run: *ios-cordova
+      - run: *install-cordova
       - run: *install-sfdx
       - run:
           name: Building all ios hybrid templates with SFDX
@@ -188,6 +206,7 @@ jobs:
     steps:
       - checkout
       - run: *setup
+      - run: *install-typescript
       - run:
           name: Building all ios react native templates
           command: ./test/test_force.js --exit-on-failure --cli=forcereact --os=ios
@@ -199,6 +218,7 @@ jobs:
       - checkout
       - run: *setup
       - run: *install-sfdx
+      - run: *install-typescript
       - run:
           name: Building all ios react native templates with SFDX
           command: ./test/test_force.js --exit-on-failure --cli=forcereact --os=ios --use-sfdx
