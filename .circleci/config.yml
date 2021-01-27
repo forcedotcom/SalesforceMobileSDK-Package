@@ -35,7 +35,6 @@ aliases:
       else 
         npm update -g
         npm install -g cordova@10.0.0
-        sudo chown -R `whoami` /Users/`whoami`/Library/Preferences/
       fi
       sudo cordova telemetry off
     when: always
@@ -181,7 +180,9 @@ jobs:
       - run: *install-sfdx
       - run:
           name: Building all ios hybrid templates
-          command: ./test/test_force.js --exit-on-failure --cli=forcehybrid --os=ios --no-plugin-update
+          command:  |
+              sudo chown -R `whoami` /Users/`whoami`/Library/Preferences/
+              ./test/test_force.js --exit-on-failure --cli=forcehybrid --os=ios --no-plugin-update
           when: always
 
   forcehybrid-ios-sfdx:
@@ -193,7 +194,9 @@ jobs:
       - run: *install-sfdx
       - run:
           name: Building all ios hybrid templates with SFDX
-          command: ./test/test_force.js --exit-on-failure --cli=forcehybrid --os=ios --use-sfdx --no-plugin-update
+          command:  |
+              sudo chown -R `whoami` /Users/`whoami`/Library/Preferences/
+              ./test/test_force.js --exit-on-failure --cli=forcehybrid --os=ios --use-sfdx --no-plugin-update
           when: always
 
   forcereact-ios:
