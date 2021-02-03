@@ -129,9 +129,10 @@ module.exports = {
             dir: 'react',
             platforms: ['ios', 'android'],
             toolNames: ['git', 'node', 'yarn', 'pod'],
-            appTypes: ['react_native'],
+            appTypes: ['react_native_typescript', 'react_native'],
             appTypesToPath: {
-                'react_native': 'ReactNativeTemplate'
+                'react_native': 'ReactNativeTemplate',
+                'react_native_typescript': 'ReactNativeTypeScriptTemplate'
             },
             commands: ['create', 'createwithtemplate', 'version', 'listtemplates', 'checkconfig']
         }
