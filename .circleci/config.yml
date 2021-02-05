@@ -22,6 +22,11 @@ aliases:
       sudo make && sudo make install
       git --version
 
+  - &upgrade-cocoapods
+    name: Upgrade Cocoapods
+    command:  |
+      sudo gem install cocoapods -v 1.10.1
+
   - &setup
     name: Setup
     command: node ./install.js
@@ -143,6 +148,7 @@ jobs:
     steps:
       - checkout
       - run: *setup
+      - run: *upgrade-cocoapods
       - run:
           name: Building all ios native templates
           command:  ./test/test_force.js --exit-on-failure --cli=forceios
@@ -153,6 +159,7 @@ jobs:
     steps:
       - checkout
       - run: *setup
+      - run: *upgrade-cocoapods
       - run: *install-sfdx
       - run:
           name: Building all ios native templates with SFDX
@@ -164,6 +171,7 @@ jobs:
     steps:
       - checkout
       - run: *setup
+      - run: *upgrade-cocoapods
       - run: *ios-cordova
       - run: *install-sfdx
       - run:
@@ -176,6 +184,7 @@ jobs:
     steps:
       - checkout
       - run: *setup
+      - run: *upgrade-cocoapods
       - run: *ios-cordova
       - run: *install-sfdx
       - run:
@@ -188,6 +197,7 @@ jobs:
     steps:
       - checkout
       - run: *setup
+      - run: *upgrade-cocoapods
       - run:
           name: Building all ios react native templates
           command: ./test/test_force.js --exit-on-failure --cli=forcereact --os=ios
@@ -198,6 +208,7 @@ jobs:
     steps:
       - checkout
       - run: *setup
+      - run: *upgrade-cocoapods
       - run: *install-sfdx
       - run:
           name: Building all ios react native templates with SFDX
