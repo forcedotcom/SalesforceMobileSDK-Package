@@ -50,6 +50,10 @@ module.exports = {
             checkCmd: 'yarn -v',
             minVersion: '1.22'
         },
+        tsc: {
+            checkCmd: 'tsc  -v',
+            minVersion: '4.1.2'
+        },
         pod: {
             checkCmd: 'pod --version',
             minVersion: '1.8.0'
@@ -128,7 +132,7 @@ module.exports = {
             purpose: 'a React Native mobile application',
             dir: 'react',
             platforms: ['ios', 'android'],
-            toolNames: ['git', 'node', 'yarn', 'pod'],
+            toolNames: ['git', 'node', 'yarn', 'tsc', 'pod'],
             appTypes: ['react_native_typescript', 'react_native'],
             appTypesToPath: {
                 'react_native': 'ReactNativeTemplate',
