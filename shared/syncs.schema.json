@@ -57,6 +57,7 @@
             "type": "object",
             "properties": {
                 "idFieldName": { "$ref": "#/definitions/fieldName" },
+                "externalIdFieldName": { "$ref": "#/definitions/fieldName" },
                 "modificationDateFieldName": { "$ref": "#/definitions/fieldName" },
                 "sobjectType": { "$ref": "#/definitions/sobjectType" },
                 "soupName": { "$ref": "#/definitions/soupName" }
@@ -67,6 +68,7 @@
             "type": "object",
             "properties": {
                 "idFieldName": { "$ref": "#/definitions/fieldName" },
+                "externalIdFieldName": { "$ref": "#/definitions/fieldName" },
                 "modificationDateFieldName": { "$ref": "#/definitions/fieldName" },
                 "sobjectType": { "$ref": "#/definitions/sobjectType" },
                 "soupName": { "$ref": "#/definitions/soupName" },

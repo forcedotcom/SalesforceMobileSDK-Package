@@ -46,8 +46,8 @@ const masterBranchDefault = "master2"
 const devBranchDefault = "dev2"
 const docBranchDefault = "gh-pages2"
 const versionReleasedDefault = VERSION
-const versionCodeReleasedDefault = 70
-const nextVersionDefault = "9.0.0"
+const versionCodeReleasedDefault = 71
+const nextVersionDefault = "9.1.0"
 
 // Questions
 const QUESTIONS = [
@@ -322,8 +322,8 @@ function checkoutMasterAndMergeDev() {
     return {
         msg: `Merging ${config.devBranch} to ${config.masterBranch}`,
         cmds: [
-            `git checkout ${config.devBranch}`,
             `git checkout ${config.masterBranch}`,
+            `git clean -fdxf`, // NB: need double -f to remove deleted submodule directory - see https://stackoverflow.com/a/10761699
             `git submodule sync`,
             `git submodule update --init`,
             `git merge --no-ff -m "Merging ${config.devBranch} into ${config.masterBranch}" ${config.devBranch}`,
@@ -389,6 +389,7 @@ function checkoutDevAndMergeMaster() {
         msg: `Merging ${config.masterBranch} back to ${config.devBranch}`,
         cmds: [
             `git checkout ${config.devBranch}`,
+            `git clean -fdxf`, // NB: need double -f to remove deleted submodule directory - see https://stackoverflow.com/a/10761699
             `git submodule sync`,
             `git submodule update`,
             `git merge --no-ff -m "Merging ${config.masterBranch} into ${config.devBranch}" ${config.masterBranch}`,

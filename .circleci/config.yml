@@ -22,22 +22,27 @@ aliases:
       sudo make && sudo make install
       git --version
 
+  - &upgrade-cocoapods
+    name: Upgrade Cocoapods
+    command:  |
+      sudo gem install cocoapods -v 1.10.1
+
   - &setup
     name: Setup
     command: node ./install.js
     when: always
 
-  - &ios-cordova
+  - &install-cordova
     name: Install Cordova
     command:  |
-      npm install -g cordova@8.1.2
-      cordova telemetry off
-
-  - &android-cordova
-    name: Install Cordova
-    command:  |
-      sudo npm install -g cordova@8.1.2
+      if [[ "$OSTYPE" == "linux-gnu" ]]; then
+        sudo npm install -g cordova@10.0.0
+      else 
+        npm update -g
+        npm install -g cordova@10.0.0
+      fi
       sudo cordova telemetry off
+    when: always
 
   - &install-sfdx
     name: Install SFDX
@@ -50,10 +55,20 @@ aliases:
       fi
     when: always
 
+  - &install-typescript
+    name: Install Typescript
+    command: |
+      if [[ "$OSTYPE" == "linux-gnu" ]]; then
+        sudo npm install -g typescript
+      else 
+        npm install -g typescript
+      fi
+    when: always
+
 linux: &linux
   working_directory: ~/SalesforceMobileSDK-Package
   docker:
-    - image: circleci/android:api-28-node
+    - image: circleci/android:api-30-node
   environment:
     - TERM: "dumb"
     - GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx2048m -XX:+HeapDumpOnOutOfMemoryError"'
@@ -61,7 +76,7 @@ linux: &linux
 mac: &mac
   working_directory: ~/SalesforceMobileSDK-Package
   macos:
-    xcode: "11.0.0"
+    xcode: "12.3.0"
   shell: /bin/bash --login -eo pipefail
 
 version: 2
@@ -95,7 +110,7 @@ jobs:
       - checkout
       - run: *upgrade-git
       - run: *setup
-      - run: *android-cordova
+      - run: *install-cordova
       - run: *install-sfdx
       - run:
           name: Building all android hybrid templates
@@ -108,7 +123,7 @@ jobs:
       - checkout
       - run: *upgrade-git
       - run: *setup
-      - run: *android-cordova
+      - run: *install-cordova
       - run: *install-sfdx
       - run:
           name: Building all android hybrid templates with SFDX
@@ -121,6 +136,7 @@ jobs:
       - checkout
       - run: *upgrade-git
       - run: *setup
+      - run: *install-typescript
       - run:
           name: Building all android react native templates
           command: ./test/test_force.js --exit-on-failure --cli=forcereact --os=android
@@ -133,6 +149,7 @@ jobs:
       - run: *upgrade-git
       - run: *setup
       - run: *install-sfdx
+      - run: *install-typescript
       - run:
           name: Building all android react native templates with SFDX
           command: ./test/test_force.js --exit-on-failure --cli=forcereact --os=android --use-sfdx
@@ -143,6 +160,7 @@ jobs:
     steps:
       - checkout
       - run: *setup
+      - run: *upgrade-cocoapods
       - run:
           name: Building all ios native templates
           command:  ./test/test_force.js --exit-on-failure --cli=forceios
@@ -153,6 +171,7 @@ jobs:
     steps:
       - checkout
       - run: *setup
+      - run: *upgrade-cocoapods
       - run: *install-sfdx
       - run:
           name: Building all ios native templates with SFDX
@@ -164,11 +183,14 @@ jobs:
     steps:
       - checkout
       - run: *setup
-      - run: *ios-cordova
+      - run: *upgrade-cocoapods
+      - run: *install-cordova
       - run: *install-sfdx
       - run:
           name: Building all ios hybrid templates
-          command: ./test/test_force.js --exit-on-failure --cli=forcehybrid --os=ios --no-plugin-update
+          command:  |
+              sudo chown -R `whoami` /Users/`whoami`/Library/Preferences/
+              ./test/test_force.js --exit-on-failure --cli=forcehybrid --os=ios --no-plugin-update
           when: always
 
   forcehybrid-ios-sfdx:
@@ -176,11 +198,14 @@ jobs:
     steps:
       - checkout
       - run: *setup
-      - run: *ios-cordova
+      - run: *upgrade-cocoapods
+      - run: *install-cordova
       - run: *install-sfdx
       - run:
           name: Building all ios hybrid templates with SFDX
-          command: ./test/test_force.js --exit-on-failure --cli=forcehybrid --os=ios --use-sfdx --no-plugin-update
+          command:  |
+              sudo chown -R `whoami` /Users/`whoami`/Library/Preferences/
+              ./test/test_force.js --exit-on-failure --cli=forcehybrid --os=ios --use-sfdx --no-plugin-update
           when: always
 
   forcereact-ios:
@@ -188,6 +213,8 @@ jobs:
     steps:
       - checkout
       - run: *setup
+      - run: *upgrade-cocoapods
+      - run: *install-typescript
       - run:
           name: Building all ios react native templates
           command: ./test/test_force.js --exit-on-failure --cli=forcereact --os=ios
@@ -198,7 +225,9 @@ jobs:
     steps:
       - checkout
       - run: *setup
+      - run: *upgrade-cocoapods
       - run: *install-sfdx
+      - run: *install-typescript
       - run:
           name: Building all ios react native templates with SFDX
           command: ./test/test_force.js --exit-on-failure --cli=forcereact --os=ios --use-sfdx
