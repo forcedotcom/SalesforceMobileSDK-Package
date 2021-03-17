@@ -5,7 +5,7 @@
     },
     "dependencies": {
         "prompts": "^2.1.0",
-        "shelljs": "0.8.3"
+        "shelljs": "0.8.4"
     },
     "author": {
         "name": "Wolfgang Mathurin",
