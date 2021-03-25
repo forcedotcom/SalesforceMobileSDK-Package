@@ -49,6 +49,9 @@
         "soqlFilter": {
             "type": "string"
         },
+        "maxBatchSize": {
+            "type": "integer"
+        },
         "relationshipType": {
             "type": "string",
             "enum": ["MASTER_DETAIL", "LOOKUP"]
@@ -98,7 +101,8 @@
                 "type": { "const": "soql" },
                 "query": { "$ref": "#/definitions/query" },
                 "idFieldName": { "$ref": "#/definitions/fieldName" },
-                "modificationDateFieldName": { "$ref": "#/definitions/fieldName" }
+                "modificationDateFieldName": { "$ref": "#/definitions/fieldName" }, 
+                "maxBatchSize": { "$ref": "#/definitions/maxBatchSize" }
             },
             "required": ["type", "query"]
         },
