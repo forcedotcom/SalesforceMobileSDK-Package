@@ -169,17 +169,7 @@ async function start() {
         `  npm publish forcehybrid-${config.versionReleased}.tgz`,
         `  npm publish forcereact-${config.versionReleased}.tgz`,
         `  npm publish sfdx-mobilesdk-plugin-${config.versionReleased}.tgz`,
-        ``,
-        `To publish to Bintray jCenter, perform the following steps:`,
-        `  cd ${path.join(config.tmpDir, REPO.android)}`,
-        `  ./gradlew :libs:SalesforceAnalytics:bintrayUpload`,
-        `  ./gradlew :libs:SalesforceSDK:bintrayUpload`,
-        `  ./gradlew :libs:SmartStore:bintrayUpload`,
-        `  ./gradlew :libs:MobileSync:bintrayUpload`,
-        `  ./gradlew :libs:SalesforceHybrid:bintrayUpload`,
-        ``,
-        `Do NOT publish until absolutely certain.`,
-        `There’s no going back from here.`
+        ``
     ], COLOR.magenta)
 
 }
@@ -444,5 +434,4 @@ function generateNpmPackages() {
             `git checkout -- .`
         ]
     }
-}
-    
+} 
