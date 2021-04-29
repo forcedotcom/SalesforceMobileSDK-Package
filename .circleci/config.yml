@@ -48,10 +48,10 @@ aliases:
     name: Install SFDX
     command: |
       if [[ "$OSTYPE" == "linux-gnu" ]]; then
-        sudo npm install -g sfdx-cli@6
+        sudo npm install -g sfdx-cli@7
         sudo chown -R `whoami` $HOME/.config/
       else 
-        npm install -g sfdx-cli@6
+        npm install -g sfdx-cli@7
       fi
     when: always
 
