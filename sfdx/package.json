@@ -29,10 +29,10 @@
         "@oclif/errors": "1",
         "@oclif/plugin-help": "2",
         "@salesforce/core": "^1.1.2",
-        "globby": "^9.0.0",
-        "shelljs": "0.8.3",
         "ajv": "^6.10.2",
-        "jsonlint": "^1.6.3"
+        "globby": "^9.0.0",
+        "jsonlint": "^1.6.3",
+        "shelljs": "0.8.4"
     },
     "devDependencies": {
         "@oclif/dev-cli": "^1.26.0"
