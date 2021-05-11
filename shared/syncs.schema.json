@@ -76,9 +76,9 @@
                 "sobjectType": { "$ref": "#/definitions/sobjectType" },
                 "soupName": { "$ref": "#/definitions/soupName" },
                 "sobjectTypePlural": { "$ref": "#/definitions/sobjectTypePlural" },
-                "parentFieldName": { "$ref": "#/definitions/fieldName" }
+                "parentIdFieldName": { "$ref": "#/definitions/fieldName" }
             },
-            "required": ["sobjectType", "soupName", "sobjectTypePlural", "parentFieldName"]
+            "required": ["sobjectType", "soupName", "sobjectTypePlural", "parentIdFieldName"]
         },
         "syncDownOptions": {
             "type": "object",
@@ -169,7 +169,7 @@
                 "type": { "const": "parent_children" },
                 "parent": { "$ref": "#/definitions/parentInfo" },
                 "parentFieldlist": { "$ref": "#/definitions/fieldlist" },
-                "children": { "$ref": "#/definitions/parentInfo" },
+                "children": { "$ref": "#/definitions/childrenInfo" },
                 "childrenFieldlist": { "$ref": "#/definitions/fieldlist" },
                 "relationshipType": { "$ref": "#/definitions/relationshipType" },
                 "parentSoqlFilter": { "$ref": "#/definitions/soqlFilter" }
