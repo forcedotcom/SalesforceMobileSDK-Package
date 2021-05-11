@@ -226,7 +226,7 @@
                 "parent": { "$ref": "#/definitions/parentInfo" },
                 "createFieldlist": { "$ref": "#/definitions/fieldlist" },
                 "updateFieldlist": { "$ref": "#/definitions/fieldlist" },
-                "children": { "$ref": "#/definitions/parentInfo" },
+                "children": { "$ref": "#/definitions/childrenInfo" },
                 "childrenCreateFieldlist": { "$ref": "#/definitions/fieldlist" },
                 "childrenUpdateFieldlist": { "$ref": "#/definitions/fieldlist" },
                 "relationshipType": { "$ref": "#/definitions/relationshipType" }
