@@ -46,8 +46,8 @@ const masterBranchDefault = "master2"
 const devBranchDefault = "dev2"
 const docBranchDefault = "gh-pages2"
 const versionReleasedDefault = VERSION
-const versionCodeReleasedDefault = 71
-const nextVersionDefault = "9.1.0"
+const versionCodeReleasedDefault = 72
+const nextVersionDefault = "9.2.0"
 
 // Questions
 const QUESTIONS = [
@@ -169,17 +169,7 @@ async function start() {
         `  npm publish forcehybrid-${config.versionReleased}.tgz`,
         `  npm publish forcereact-${config.versionReleased}.tgz`,
         `  npm publish sfdx-mobilesdk-plugin-${config.versionReleased}.tgz`,
-        ``,
-        `To publish to Bintray jCenter, perform the following steps:`,
-        `  cd ${path.join(config.tmpDir, REPO.android)}`,
-        `  ./gradlew :libs:SalesforceAnalytics:bintrayUpload`,
-        `  ./gradlew :libs:SalesforceSDK:bintrayUpload`,
-        `  ./gradlew :libs:SmartStore:bintrayUpload`,
-        `  ./gradlew :libs:MobileSync:bintrayUpload`,
-        `  ./gradlew :libs:SalesforceHybrid:bintrayUpload`,
-        ``,
-        `Do NOT publish until absolutely certain.`,
-        `There’s no going back from here.`
+        ``
     ], COLOR.magenta)
 
 }
@@ -444,5 +434,4 @@ function generateNpmPackages() {
             `git checkout -- .`
         ]
     }
-}
-    
+} 
