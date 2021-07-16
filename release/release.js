@@ -173,7 +173,7 @@ async function start() {
         ``,
         `To publish to Maven Central, do the following:`,
         `  cd ${config.tmpDir}/${REPO.android}`,
-        ` ./publish/publish.sh`,
+        `  ./publish/publish.sh`,
         ``
     ], COLOR.magenta)
 
