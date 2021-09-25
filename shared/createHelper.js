@@ -143,7 +143,9 @@ function useLegacyBuild(config, iosSubDir) {
         '<plist version="1.0">\n' + 
         '<dict>\n'  +
         '<key>BuildSystemType</key>\n' + 
-        '<string>Original</string>\n' + 
+        '<string>Original</string>\n' +
+        '<key>DisableBuildSystemDeprecationDiagnostic</key>\n' + 
+	    '<true/>\n' +
         '</dict>\n' + 
         '</plist>\n';
     utils.logInfo('Creating WorkspaceSettings.xcsettings for project. Setting the BuildSystemType to original in ' + xcSettingsFile);
