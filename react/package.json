@@ -1,6 +1,6 @@
 {
 	"name": "forcereact",
-	"version": "9.1.1",
+	"version": "9.2.0",
 	"description": "Utilities for creating react native mobile apps based on the Salesforce Mobile SDK for iOS and Android",
 	"keywords": [ "mobilesdk", "ios", "android", "react", "salesforce", "mobile", "sdk" ],
 	"homepage": "https://github.com/forcedotcom/SalesforceMobileSDK-Package",

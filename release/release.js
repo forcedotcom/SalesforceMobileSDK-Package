@@ -46,8 +46,8 @@ const masterBranchDefault = "master2"
 const devBranchDefault = "dev2"
 const docBranchDefault = "gh-pages2"
 const versionReleasedDefault = VERSION
-const nextVersionDefault = "9.2.0"
-const versionCodeReleasedDefault = 73
+const nextVersionDefault = "10.0.0"
+const versionCodeReleasedDefault = 74
 
 // Questions
 const QUESTIONS = [
@@ -157,18 +157,23 @@ async function start() {
     utils.logParagraph([
         ` NEXT STEPS: TEST then PUBLISH`,
         ``,
-        `To test the NPM packages, go to ${config.tmpDir}/${REPO.pkg} and do:`,
+        `To test the NPM packages, do the following:`,
+        `  cd ${config.tmpDir}/${REPO.pkg}`,
         `  ./test/test_force.js --cli=forceios,forcedroid,forcereact,forcehybrid`,
         `  ./test/test_force.js --cli=forceios,forcedroid,forcereact,forcehybrid --use-sfdx`,
         `You should also open and run the generated apps in XCode / Android Studio.`,
         ``,
-        `To publish to NPM, perform the following steps:`,
+        `To publish to NPM, do the following:`,
         `  cd ${config.tmpDir}`,
         `  npm publish forceios-${config.versionReleased}.tgz`,
         `  npm publish forcedroid-${config.versionReleased}.tgz`,
         `  npm publish forcehybrid-${config.versionReleased}.tgz`,
         `  npm publish forcereact-${config.versionReleased}.tgz`,
         `  npm publish sfdx-mobilesdk-plugin-${config.versionReleased}.tgz`,
+        ``,
+        `To publish to Maven Central, do the following:`,
+        `  cd ${config.tmpDir}/${REPO.android}`,
+        `  ./publish/publish.sh`,
         ``
     ], COLOR.magenta)
 
