@@ -140,8 +140,8 @@ async function start() {
     utils.logParagraph([
         ` SETTING UP TEST BRANCHES FOR RELEASE TESTING `,
         ``,
-        `Will drop ${config.testMasterBranch} ` + (config.cleanupOnly ? "" : ` and recreate it off of master on all repos in ${config.testOrg}`),
-        `Will drop ${config.testDevBranch} ` + (config.cleanupOnly ? "" : ` and recreate it off of dev on all applicable repos`),
+        `Will drop ${config.testMasterBranch} ` + (config.cleanupOnly ? "" : `and recreate it off of master on all repos in ${config.testOrg}`),
+        `Will drop ${config.testDevBranch} ` + (config.cleanupOnly ? "" : `and recreate it off of dev on all applicable repos`),
         `Will drop tag v${config.testVersion}`
     ], COLOR.magenta)
 
@@ -176,9 +176,9 @@ async function prepareRepo(repo, params) {
                 msg: `Cleaning up test branches/tag in ${repo}`,
                 cmds: [
                     deleteBranch(config.testMasterBranch),
-                    params.noDev ? null : deleteBranch(config.testDevBranch),
-                    !params.hasDoc ? null : deleteBranch(config.testDocBranch),
-                    params.noTag ? null : deleteTag(config.testVersion)
+                    !params.noDev ? deleteBranch(config.testDevBranch) : null,
+                    params.hasDoc ? deleteBranch(config.testDocBranch) : null,
+                    !params.noTag ? deleteTag(config.testVersion) : null
                 ]
             },
             config.cleanupOnly ? null : {
@@ -188,18 +188,18 @@ async function prepareRepo(repo, params) {
                         msg: `Setting up ${config.testMasterBranch}`,
                         cmds: [
                             createBranch(config.testMasterBranch, 'master'), 
-                            params.noDev && params.filesWithOrg ? pointToFork(config.testMasterBranch, params) : null,
-                            params.submodulePaths && config.isPatch ? updateSubmodules(config.testMasterBranch, params) : null  // only fixing submodules / package.json files for patch simulation otherwise it conflicts on merge
+                            (params.noDev || config.isPatch) && params.filesWithOrg ? pointToFork(config.testMasterBranch, params) : null,
+                            config.isPatch && params.submodulePaths ? updateSubmodules(config.testMasterBranch, params) : null  
                         ]
                     },
-                    !params.hasDoc ? null : createBranch(config.testDocBranch, 'gh-pages'),
+                    params.hasDoc ? createBranch(config.testDocBranch, 'gh-pages') : null,
                     params.noDev ? null : {
                         msg: `Setting up ${config.testDevBranch}`,
                         cmds: [
                             createBranch(config.testDevBranch, 'dev'),
                             mergeMasterToDev(),
-                            !params.filesWithOrg ? null : pointToFork(config.testDevBranch, params),
-                            !params.submodulePaths ? null : updateSubmodules(config.testDevBranch, params)
+                            params.filesWithOrg ? pointToFork(config.testDevBranch, params) : null,
+                            params.submodulePaths ? updateSubmodules(config.testDevBranch, params) : null
                         ]
                     }
                 ]
@@ -252,7 +252,7 @@ function mergeMasterToDev() {
             `git checkout ${config.testDevBranch}`,
             `git submodule sync`,
             `git submodule update --init`,
-            `git merge -m "Merge from ${config.testMasterBranch}" ${config.testMasterBranch}`,
+            `git merge -Xours -m "Merge from ${config.testMasterBranch}" ${config.testMasterBranch}`,
             `git push origin ${config.testDevBranch}`
         ]
     }

@@ -397,7 +397,7 @@ function checkoutDevAndMergeMaster() {
             `git clean -fdxf`, // NB: need double -f to remove deleted submodule directory - see https://stackoverflow.com/a/10761699
             `git submodule sync`,
             `git submodule update`,
-            `git merge -Xours --no-ff -m "Merging ${config.masterBranch} into ${config.devBranch}" ${config.masterBranch}`,
+            `git merge -Xours --no-ff -m "Merging ${config.masterBranch} into ${config.devBranch}" ${config.masterBranch}`
         ]
     }
 }
