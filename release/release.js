@@ -47,7 +47,7 @@ const devBranchDefault = "dev2"
 const docBranchDefault = "gh-pages2"
 const versionReleasedDefault = VERSION
 const nextVersionDefault = "10.0.0"
-const versionCodeReleasedDefault = 74
+const versionCodeReleasedDefault = 75
 
 // Questions
 const QUESTIONS = [
@@ -63,6 +63,12 @@ const QUESTIONS = [
         message: 'Organization ?',
         initial: orgDefault
     },
+    {
+        type:'confirm',
+        name: 'isPatch',
+        message: `Is patch release? (no merge from dev, changes already in master)`,
+        initial: false
+    },    
     {
         type: 'text',
         name: 'masterBranch',
@@ -127,7 +133,9 @@ async function start() {
     utils.logParagraph([
         ` RELEASING version ${config.versionReleased} (code ${config.versionCodeReleased} on Android) `,
         ``,
-        `Will merge ${config.devBranch} to ${config.masterBranch} on ${config.org}`,
+        config.isPatch
+            ? `Will cut release from ${config.masterBranch} on ${config.org} - will NOT merge ${config.devBranch} into it`
+            : `Will merge ${config.devBranch} to ${config.masterBranch} on ${config.org}`,
         `Will apply tag v${config.versionReleased}`,
         `New doc will be published to ${config.docBranch}`,
         `Afterwards ${config.devBranch} will be for version ${config.nextVersion} (code ${config.nextVersionCode} on Android)`
@@ -286,7 +294,7 @@ async function releaseRepo(repo, params) {
             {
                 msg: `Working on ${config.masterBranch}`,
                 cmds: [
-                    checkoutMasterAndMergeDev(),
+                    checkoutMaster(!config.isPatch /* merge dev if NOT a patch */),
                     params.masterPostMergeCmd,
                     setVersion(config.versionReleased, false, config.versionCodeReleased),
                     updateSubmodules(config.masterBranch, params.submodulePaths),
@@ -313,15 +321,17 @@ async function releaseRepo(repo, params) {
     await runCmds(path.join(config.tmpDir, repo), cmds)
 }
 
-function checkoutMasterAndMergeDev() {
+function checkoutMaster(mergeDev) {
     return {
-        msg: `Merging ${config.devBranch} to ${config.masterBranch}`,
+        msg: mergeDev
+            ? `Checking out ${config.masterBranch} and merging ${config.devBranch} into it`
+            : `Checking out ${config.masterBranch}`,
         cmds: [
             `git checkout ${config.masterBranch}`,
             `git clean -fdxf`, // NB: need double -f to remove deleted submodule directory - see https://stackoverflow.com/a/10761699
             `git submodule sync`,
             `git submodule update --init`,
-            `git merge --no-ff -m "Merging ${config.devBranch} into ${config.masterBranch}" ${config.devBranch}`,
+            mergeDev ? `git merge --no-ff -m "Merging ${config.devBranch} into ${config.masterBranch}" ${config.devBranch}` : null, 
         ]
     }
 }
@@ -387,7 +397,7 @@ function checkoutDevAndMergeMaster() {
             `git clean -fdxf`, // NB: need double -f to remove deleted submodule directory - see https://stackoverflow.com/a/10761699
             `git submodule sync`,
             `git submodule update`,
-            `git merge --no-ff -m "Merging ${config.masterBranch} into ${config.devBranch}" ${config.masterBranch}`,
+            `git merge -Xours --no-ff -m "Merging ${config.masterBranch} into ${config.devBranch}" ${config.masterBranch}`,
         ]
     }
 }

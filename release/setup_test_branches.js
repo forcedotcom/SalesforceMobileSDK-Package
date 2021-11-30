@@ -79,6 +79,12 @@ const QUESTIONS = [
         initial: testOrgDefault
     },
     {
+        type:'confirm',
+        name: 'isPatch',
+        message: `Is for patch release? (no merge from dev, changes already in master)`,
+        initial: false
+    },    
+    {
         type: 'text',
         name: 'testMasterBranch',
         message: 'Name of test master branch ?',
@@ -134,8 +140,8 @@ async function start() {
     utils.logParagraph([
         ` SETTING UP TEST BRANCHES FOR RELEASE TESTING `,
         ``,
-        `Will drop and recreate ${config.testMasterBranch} off of master on all repos in ${config.testOrg}`,
-        `Will drop and recreate ${config.testDevBranch} off of dev on all applicable repos`,
+        `Will drop ${config.testMasterBranch} ` + (config.cleanupOnly ? "" : ` and recreate it off of master on all repos in ${config.testOrg}`),
+        `Will drop ${config.testDevBranch} ` + (config.cleanupOnly ? "" : ` and recreate it off of dev on all applicable repos`),
         `Will drop tag v${config.testVersion}`
     ], COLOR.magenta)
 
@@ -181,8 +187,9 @@ async function prepareRepo(repo, params) {
                     {
                         msg: `Setting up ${config.testMasterBranch}`,
                         cmds: [
-                            createBranch(config.testMasterBranch, 'master'), // not fixing submodules / package.json files so it's doesn't conflict on merge
-                            params.noDev && params.filesWithOrg ? pointToFork(config.testMasterBranch, params) : null
+                            createBranch(config.testMasterBranch, 'master'), 
+                            params.noDev && params.filesWithOrg ? pointToFork(config.testMasterBranch, params) : null,
+                            params.submodulePaths && config.isPatch ? updateSubmodules(config.testMasterBranch, params) : null  // only fixing submodules / package.json files for patch simulation otherwise it conflicts on merge
                         ]
                     },
                     !params.hasDoc ? null : createBranch(config.testDocBranch, 'gh-pages'),
@@ -322,6 +329,8 @@ function validateConfig() {
         process.exit(1)
     }
 
+    console.log(`${config.testVersion} < ${VERSION}`)
+    
     if (config.testVersion < VERSION) {
         utils.logError(`You can't use ${config.testVersion} for testing`)
         process.exit(1)
