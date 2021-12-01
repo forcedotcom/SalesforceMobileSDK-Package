@@ -332,8 +332,6 @@ function validateConfig() {
         utils.logError(`You can't use ${config.testDocBranch} for testing`)
         process.exit(1)
     }
-
-    console.log(`${config.testVersion} < ${VERSION}`)
     
     if (config.testVersion < VERSION) {
         utils.logError(`You can't use ${config.testVersion} for testing`)
