@@ -187,7 +187,9 @@ async function prepareRepo(repo, params) {
                     {
                         msg: `Setting up ${config.testMasterBranch}`,
                         cmds: [
-                            createBranch(config.testMasterBranch, 'master'), 
+                            createBranch(config.testMasterBranch, 'master'),
+                            // leaving submodule alone during regular release
+                            // otherwise merge from dev to master will confict (git does not do any merge operations on submodule versions)
                             (params.noDev || config.isPatch) && params.filesWithOrg ? pointToFork(config.testMasterBranch, params) : null,
                             config.isPatch && params.submodulePaths ? updateSubmodules(config.testMasterBranch, params) : null  
                         ]
@@ -198,8 +200,10 @@ async function prepareRepo(repo, params) {
                         cmds: [
                             createBranch(config.testDevBranch, 'dev'),
                             mergeMasterToDev(),
-                            params.filesWithOrg ? pointToFork(config.testDevBranch, params) : null,
-                            params.submodulePaths ? updateSubmodules(config.testDevBranch, params) : null
+                            // leaving submodule alone for patch release
+                            // otherwise merge from master to dev will confict (git does not do any merge operations on submodule versions)
+                            !config.isPatch && params.filesWithOrg ? pointToFork(config.testDevBranch, params) : null,
+                            !config.isPatch && params.submodulePaths ? updateSubmodules(config.testDevBranch, params) : null
                         ]
                     }
                 ]

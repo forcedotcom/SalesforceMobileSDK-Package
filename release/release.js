@@ -138,7 +138,9 @@ async function start() {
             : `Will merge ${config.devBranch} to ${config.masterBranch} on ${config.org}`,
         `Will apply tag v${config.versionReleased}`,
         `New doc will be published to ${config.docBranch}`,
-        `Afterwards ${config.devBranch} will be for version ${config.nextVersion} (code ${config.nextVersionCode} on Android)`
+        `Afterwards ${config.devBranch} will be for version ${config.nextVersion} (code ${config.nextVersionCode} on Android)`,
+        ``,
+        ` !! MAKE SURE TO USE JDK 8 TO SUCCESSFULLY GENERATE JAVADOC !!`
     ], COLOR.magenta)
     if (!await proceedPrompt()) {
         process.exit(0)
@@ -294,7 +296,8 @@ async function releaseRepo(repo, params) {
             {
                 msg: `Working on ${config.masterBranch}`,
                 cmds: [
-                    checkoutMaster(!config.isPatch /* merge dev if NOT a patch */),
+                    checkoutBranch(config.masterBranch),
+                    config.isPatch ? null : mergeBranch(config.devBranch, config.masterBranch, params.submodulePaths),
                     params.masterPostMergeCmd,
                     setVersion(config.versionReleased, false, config.versionCodeReleased),
                     updateSubmodules(config.masterBranch, params.submodulePaths),
@@ -307,7 +310,8 @@ async function releaseRepo(repo, params) {
             {
                 msg: `Working on ${config.devBranch}`,
                 cmds: [
-                    checkoutDevAndMergeMaster(),
+                    checkoutBranch(config.devBranch),
+                    mergeBranch(config.masterBranch, config.devBranch, params.submodulePaths),
                     params.devPostMergeCmd,
                     setVersion(config.nextVersion, true, config.nextVersionCode),
                     updateSubmodules(config.devBranch, params.submodulePaths),
@@ -319,21 +323,6 @@ async function releaseRepo(repo, params) {
         ]
     }
     await runCmds(path.join(config.tmpDir, repo), cmds)
-}
-
-function checkoutMaster(mergeDev) {
-    return {
-        msg: mergeDev
-            ? `Checking out ${config.masterBranch} and merging ${config.devBranch} into it`
-            : `Checking out ${config.masterBranch}`,
-        cmds: [
-            `git checkout ${config.masterBranch}`,
-            `git clean -fdxf`, // NB: need double -f to remove deleted submodule directory - see https://stackoverflow.com/a/10761699
-            `git submodule sync`,
-            `git submodule update --init`,
-            mergeDev ? `git merge --no-ff -m "Merging ${config.devBranch} into ${config.masterBranch}" ${config.devBranch}` : null, 
-        ]
-    }
 }
 
 function setVersion(version, isDev, code) {
@@ -389,16 +378,34 @@ function commitAndPushDev() {
     }
 }
 
-function checkoutDevAndMergeMaster() {
+function checkoutBranch(branchToCheckout) {
     return {
-        msg: `Merging ${config.masterBranch} back to ${config.devBranch}`,
+        msg: `Checking out ${branchToCheckout}`,
         cmds: [
-            `git checkout ${config.devBranch}`,
+            `git checkout ${branchToCheckout}`,
             `git clean -fdxf`, // NB: need double -f to remove deleted submodule directory - see https://stackoverflow.com/a/10761699
             `git submodule sync`,
             `git submodule update`,
-            `git merge -Xours --no-ff -m "Merging ${config.masterBranch} into ${config.devBranch}" ${config.masterBranch}`
         ]
+    }
+}
+
+function mergeBranch(branchToMergeFrom, branchToMergeInto, submodulePaths) {
+    const msg = `Merging ${branchToMergeFrom} into ${branchToMergeInto}`
+    return {
+        msg: msg,
+        cmd: `git merge -Xours --no-ff -m "${msg}" ${branchToMergeFrom}`,
+        cmdIfError: !submodulePaths
+            ? null
+            : {
+                // git does not do any merge operations on submodule version
+                // if there is a submodule conflict keep ours
+                msg: `Attempting to address merge error`,
+                cmds: [
+                    ... submodulePaths.map(path => { return `git add ${path}`}),
+                    {cmd: `git commit -m "${msg}"`, ignoreError: true}
+                ]
+            }
     }
 }
 
