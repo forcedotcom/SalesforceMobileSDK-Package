@@ -394,7 +394,7 @@ function mergeBranch(branchToMergeFrom, branchToMergeInto, submodulePaths) {
     const msg = `Merging ${branchToMergeFrom} into ${branchToMergeInto}`
     return {
         msg: msg,
-        cmd: `git merge -Xours --no-ff -m "${msg}" ${branchToMergeFrom}`,
+        cmd: `git merge -Xours --no-ff -m "${msg}" origin/${branchToMergeFrom}`,
         cmdIfError: !submodulePaths
             ? null
             : {
