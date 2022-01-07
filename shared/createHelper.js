@@ -67,7 +67,7 @@ function createHybridApp(config) {
 
     // Create app with cordova
     utils.runProcessThrowError('cordova create "' + config.projectDir + '" ' + config.packagename + ' ' + config.appname);
-    utils.runProcessThrowError('npm install shelljs@0.7.0', config.projectDir);
+    utils.runProcessThrowError('npm install shelljs@0.8.4', config.projectDir);
 
     for (var platform of config.platform.split(',')) {
         utils.runProcessThrowError('cordova platform add ' + platform + '@' + SDK.tools.cordova.platformVersion[platform], config.projectDir);
