@@ -36,10 +36,10 @@ aliases:
     name: Install Cordova
     command:  |
       if [[ "$OSTYPE" == "linux-gnu" ]]; then
-        sudo npm install -g cordova@10.0.0
+        sudo npm install -g cordova@11.0.0
       else 
         npm update -g
-        npm install -g cordova@10.0.0
+        npm install -g cordova@11.0.0
       fi
       sudo cordova telemetry off
     when: always

@@ -40,7 +40,7 @@ module.exports = {
         },
         node: {
             checkCmd: 'node --version',
-            minVersion: '6.9'
+            minVersion: '12.0'
         },
         npm: {
             checkCmd: 'npm -v',
@@ -61,11 +61,11 @@ module.exports = {
         cordova: {
             checkCmd: 'cordova -v',
             pluginRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-CordovaPlugin#dev',    // dev
-            minVersion: '10.0.0',
+            minVersion: '11.0.0',
 //             pluginRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-CordovaPlugin#v' + VERSION, // GA
             platformVersion: {
                 ios: '6.2.0',
-                android: '10.1.0'
+                android: '10.1.1'
             }
         },
         sfdx: {
