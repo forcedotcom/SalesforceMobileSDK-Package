@@ -1,27 +1,4 @@
 aliases:
-  - &upgrade-git
-    name: Update Git
-    command:  |
-      git --version
-      sudo apt-get update
-      sudo apt-get install \
-        build-essential flex bison \
-        libreadline6-dev zlib1g-dev \
-        libssl-dev \
-        libcurl4-gnutls-dev \
-        libexpat1-dev \
-        tcl tk \
-        tcl-dev gettext \
-        asciidoc \
-        docbook2x
-
-      wget https://www.kernel.org/pub/software/scm/git/git-2.13.0.tar.gz
-      tar -xvzf git-2.13.0.tar.gz
-      cd git-2.13.0
-      sudo ./configure
-      sudo make && sudo make install
-      git --version
-
   - &upgrade-cocoapods
     name: Upgrade Cocoapods
     command:  |
@@ -48,10 +25,10 @@ aliases:
     name: Install SFDX
     command: |
       if [[ "$OSTYPE" == "linux-gnu" ]]; then
-        sudo npm install -g sfdx-cli@7
+        sudo npm install -g sfdx-cli
         sudo chown -R `whoami` $HOME/.config/
       else 
-        npm install -g sfdx-cli@7
+        npm install -g sfdx-cli
       fi
     when: always
 
@@ -76,7 +53,7 @@ linux: &linux
 mac: &mac
   working_directory: ~/SalesforceMobileSDK-Package
   macos:
-    xcode: "12.3.0"
+    xcode: "13.2.1"
   shell: /bin/bash --login -eo pipefail
 
 version: 2
@@ -85,7 +62,6 @@ jobs:
     <<: *linux
     steps:
       - checkout
-      - run: *upgrade-git
       - run: *setup
       - run:
           name: Building all android native templates
@@ -96,7 +72,6 @@ jobs:
     <<: *linux
     steps:
       - checkout
-      - run: *upgrade-git
       - run: *setup
       - run: *install-sfdx
       - run:
@@ -108,7 +83,6 @@ jobs:
     <<: *linux
     steps:
       - checkout
-      - run: *upgrade-git
       - run: *setup
       - run: *install-cordova
       - run: *install-sfdx
@@ -121,7 +95,6 @@ jobs:
     <<: *linux
     steps:
       - checkout
-      - run: *upgrade-git
       - run: *setup
       - run: *install-cordova
       - run: *install-sfdx
@@ -134,7 +107,6 @@ jobs:
     <<: *linux
     steps:
       - checkout
-      - run: *upgrade-git
       - run: *setup
       - run: *install-typescript
       - run:
@@ -146,7 +118,6 @@ jobs:
     <<: *linux
     steps:
       - checkout
-      - run: *upgrade-git
       - run: *setup
       - run: *install-sfdx
       - run: *install-typescript
