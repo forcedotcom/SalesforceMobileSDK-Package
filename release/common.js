@@ -84,7 +84,7 @@ async function runCmds(dir, cmds, depth) {
                   : (cmd.reldir
                      ? path.join(dir, cmd.reldir)
                      : dir)
-            await runCmd(cmdDir, cmd.cmd, i+1, count, depth, cmd.ignoreError)
+            await runCmd(cmdDir, cmd.cmd, i+1, count, depth, cmd.ignoreError, cmd.cmdIfError)
         } else if (cmd.cmds) {
             print(cmd.msg, i+1, count, depth)
             await runCmds(dir, cmd, depth + 1)
@@ -107,12 +107,14 @@ async function proceedPrompt(msg) {
 }
 
 
-async function runCmd(dir, cmd, index, count, depth, ignoreError) {
+async function runCmd(dir, cmd, index, count, depth, ignoreError, cmdIfError) {
     print(`${dir} > ${cmd}`, index, count, depth)
     try {
         utils.runProcessThrowError(cmd, dir)
     } catch (e) {
-        if (!ignoreError && !await proceedPrompt('An error occurred. Continue?')) {
+        if (cmdIfError) {
+            await runCmds(dir, cmdIfError, depth+1)
+        } else if (!ignoreError && !await proceedPrompt('An error occurred. Continue?')) {
             process.exit(1);
         }
     }
