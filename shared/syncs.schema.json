@@ -80,6 +80,22 @@
             },
             "required": ["sobjectType", "soupName", "sobjectTypePlural", "parentIdFieldName"]
         },
+        "briefcaseInfo": {
+            "type": "object",
+            "properties": {
+                "sobjectType": { "$ref": "#/definitions/sobjectType" },
+                "fieldlist": { "$ref": "#/definitions/fieldlist" },
+                "soupName": { "$ref": "#/definitions/soupName" },
+                "idFieldName": { "$ref": "#/definitions/fieldName" },
+                "modificationDateFieldName": { "$ref": "#/definitions/fieldName" }
+            },
+            "required": ["sobjectType", "fieldlist", "soupName"]
+        },
+        "briefcaseInfos": {
+            "type": "array",
+            "items": { "$ref": "#/definitions/briefcaseInfo" },
+            "minItems": 1          
+        },        
         "syncDownOptions": {
             "type": "object",
             "properties": {
@@ -176,6 +192,14 @@
             },
             "required": ["type", "parent", "parentFieldlist", "children", "childrenFieldlist", "relationshipType"]
         },
+        "briefcaseSyncDownTarget": {
+            "type": "object",
+            "properties": {
+                "type": { "const": "briefcase" },
+                "infos": { "$ref": "#/definitions/briefcaseInfos"}
+            },
+            "required": ["type", "infos"]
+        },
         "customSyncDownTarget": {
             "type": "object",
             "properties": {
@@ -196,6 +220,7 @@
                 { "$ref": "#/definitions/layoutSyncDownTarget" },
                 { "$ref": "#/definitions/metadataSyncDownTarget" },
                 { "$ref": "#/definitions/parentChildrenSyncDownTarget" },
+                { "$ref": "#/definitions/briefcaseSyncDownTarget" },
                 { "$ref": "#/definitions/customSyncDownTarget" }
             ]
         },
