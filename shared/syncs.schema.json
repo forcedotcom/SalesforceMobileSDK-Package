@@ -224,7 +224,7 @@
                 { "$ref": "#/definitions/customSyncDownTarget" }
             ]
         },
-        "noBatchSyncUpTarget": {
+        "singleRecordSyncUpTarget": {
             "type": "object",
             "properties": {
                 "iOSImpl" : { "const": "SFSyncUpTarget" },
@@ -236,6 +236,17 @@
             "required": ["iOSImpl", "androidImpl"]            
         },
         "batchSyncUpTarget": {
+            "type": "object",
+            "properties": {
+                "iOSImpl" : { "const": "SFBatchSyncUpTarget" },
+                "androidImpl": { "const": "com.salesforce.androidsdk.mobilesync.target.BatchSyncUpTarget" },
+                "createFieldlist": { "$ref": "#/definitions/fieldlist" },
+                "updateFieldlist": { "$ref": "#/definitions/fieldlist" },
+                "externalIdFieldName": { "$ref": "#/definitions/fieldName" }
+            },
+            "required": ["iOSImpl", "androidImpl"]            
+        },
+        "collectionSyncUpTarget": {
             "type": "object",
             "properties": {
                 "createFieldlist": { "$ref": "#/definitions/fieldlist" },
@@ -274,9 +285,10 @@
         "syncUpTarget": {
             "anyOf": [
                 { "$ref": "#/definitions/parentChildrenSyncUpTarget" },
-                { "$ref": "#/definitions/noBatchSyncUpTarget" },
+                { "$ref": "#/definitions/singleRecordSyncUpTarget" },
+                { "$ref": "#/definitions/batchSyncUpTarget" },
                 { "$ref": "#/definitions/customSyncUpTarget" },
-                { "$ref": "#/definitions/batchSyncUpTarget" }
+                { "$ref": "#/definitions/collectionSyncUpTarget" }
             ]
         },
         "syncDown": {
