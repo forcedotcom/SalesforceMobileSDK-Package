@@ -80,6 +80,22 @@
             },
             "required": ["sobjectType", "soupName", "sobjectTypePlural", "parentIdFieldName"]
         },
+        "briefcaseInfo": {
+            "type": "object",
+            "properties": {
+                "sobjectType": { "$ref": "#/definitions/sobjectType" },
+                "fieldlist": { "$ref": "#/definitions/fieldlist" },
+                "soupName": { "$ref": "#/definitions/soupName" },
+                "idFieldName": { "$ref": "#/definitions/fieldName" },
+                "modificationDateFieldName": { "$ref": "#/definitions/fieldName" }
+            },
+            "required": ["sobjectType", "fieldlist", "soupName"]
+        },
+        "briefcaseInfos": {
+            "type": "array",
+            "items": { "$ref": "#/definitions/briefcaseInfo" },
+            "minItems": 1          
+        },        
         "syncDownOptions": {
             "type": "object",
             "properties": {
@@ -176,6 +192,14 @@
             },
             "required": ["type", "parent", "parentFieldlist", "children", "childrenFieldlist", "relationshipType"]
         },
+        "briefcaseSyncDownTarget": {
+            "type": "object",
+            "properties": {
+                "type": { "const": "briefcase" },
+                "infos": { "$ref": "#/definitions/briefcaseInfos"}
+            },
+            "required": ["type", "infos"]
+        },
         "customSyncDownTarget": {
             "type": "object",
             "properties": {
@@ -196,10 +220,11 @@
                 { "$ref": "#/definitions/layoutSyncDownTarget" },
                 { "$ref": "#/definitions/metadataSyncDownTarget" },
                 { "$ref": "#/definitions/parentChildrenSyncDownTarget" },
+                { "$ref": "#/definitions/briefcaseSyncDownTarget" },
                 { "$ref": "#/definitions/customSyncDownTarget" }
             ]
         },
-        "noBatchSyncUpTarget": {
+        "singleRecordSyncUpTarget": {
             "type": "object",
             "properties": {
                 "iOSImpl" : { "const": "SFSyncUpTarget" },
@@ -211,6 +236,17 @@
             "required": ["iOSImpl", "androidImpl"]            
         },
         "batchSyncUpTarget": {
+            "type": "object",
+            "properties": {
+                "iOSImpl" : { "const": "SFBatchSyncUpTarget" },
+                "androidImpl": { "const": "com.salesforce.androidsdk.mobilesync.target.BatchSyncUpTarget" },
+                "createFieldlist": { "$ref": "#/definitions/fieldlist" },
+                "updateFieldlist": { "$ref": "#/definitions/fieldlist" },
+                "externalIdFieldName": { "$ref": "#/definitions/fieldName" }
+            },
+            "required": ["iOSImpl", "androidImpl"]            
+        },
+        "collectionSyncUpTarget": {
             "type": "object",
             "properties": {
                 "createFieldlist": { "$ref": "#/definitions/fieldlist" },
@@ -249,9 +285,10 @@
         "syncUpTarget": {
             "anyOf": [
                 { "$ref": "#/definitions/parentChildrenSyncUpTarget" },
-                { "$ref": "#/definitions/noBatchSyncUpTarget" },
+                { "$ref": "#/definitions/singleRecordSyncUpTarget" },
+                { "$ref": "#/definitions/batchSyncUpTarget" },
                 { "$ref": "#/definitions/customSyncUpTarget" },
-                { "$ref": "#/definitions/batchSyncUpTarget" }
+                { "$ref": "#/definitions/collectionSyncUpTarget" }
             ]
         },
         "syncDown": {
