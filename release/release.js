@@ -180,6 +180,7 @@ async function start() {
         `  npm publish forcehybrid-${config.versionReleased}.tgz`,
         `  npm publish forcereact-${config.versionReleased}.tgz`,
         `  npm publish sfdx-mobilesdk-plugin-${config.versionReleased}.tgz`,
+        `  npm publish SalesforceMobileSDK-CordovaPlugin-${config.versionReleased}.tgz`,
         ``,
         `To publish to Maven Central, do the following:`,
         `  cd ${config.tmpDir}/${REPO.android}`,
@@ -256,6 +257,7 @@ async function releaseIOSSpecs() {
 async function releaseCordovaPlugin() {
     await releaseRepo(REPO.cordovaplugin, {
         masterPostMergeCmd:`./tools/update.sh -b ${config.masterBranch}`,
+        postReleaseGenerateCmd: generateNpmPackageForCordovaPlugin(),
         devPostMergeCmd:`./tools/update.sh -b ${config.devBranch}`
     })
 }
@@ -439,6 +441,18 @@ function generateDocAndroid() {
             `git add *`,
             `git commit -m "Java doc for Mobile SDK ${config.versionReleased}"`,
             `git push origin ${config.docBranch}`
+        ]
+    }
+}
+
+function generateNpmPackageForCordovaPlugin() {
+    return {
+        msg: `Generating npm package`,
+        cmds: [
+            `git checkout ${config.masterBranch}`,
+            `npm pack`,
+            `mv ./SalesforceMobileSDK-CordovaPlugin*.tgz ../`,
+            `git checkout -- .`
         ]
     }
 }
