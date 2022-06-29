@@ -45,7 +45,7 @@ aliases:
 linux: &linux
   working_directory: ~/SalesforceMobileSDK-Package
   docker:
-    - image: circleci/android:api-30-node
+    - image: cimg/android:2022.06.1-node
   environment:
     - TERM: "dumb"
     - GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx2048m -XX:+HeapDumpOnOutOfMemoryError"'
