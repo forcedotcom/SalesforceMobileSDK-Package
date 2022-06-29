@@ -53,7 +53,7 @@ update_constants_js ()
     gsed -i "s/^\([ ]*\)[/][/]\(.*RepoUri\)/\1\2/g" ${file}    # uncomment uri's
     if [ $isDev == "yes" ]
     then
-        gsed -i "s/^\(.*RepoUri.*#v\)/\/\/\1/g" ${file}      # comment uri's pointing to tag
+        gsed -i "s/^\(.*RepoUri.*[@#]v\)/\/\/\1/g" ${file}      # comment uri's pointing to tag
     else
         gsed -i "s/^\(.*RepoUri.*#dev\)/\/\/\1/g" ${file}    # comment uri's pointing to dev
     fi
