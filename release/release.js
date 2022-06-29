@@ -180,7 +180,7 @@ async function start() {
         `  npm publish forcehybrid-${config.versionReleased}.tgz`,
         `  npm publish forcereact-${config.versionReleased}.tgz`,
         `  npm publish sfdx-mobilesdk-plugin-${config.versionReleased}.tgz`,
-        `  npm publish SalesforceMobileSDK-CordovaPlugin-${config.versionReleased}.tgz`,
+        `  npm publish salesforce-mobilesdk-cordova-plugin-${config.versionReleased}.tgz`,
         ``,
         `To publish to Maven Central, do the following:`,
         `  cd ${config.tmpDir}/${REPO.android}`,
@@ -451,7 +451,7 @@ function generateNpmPackageForCordovaPlugin() {
         cmds: [
             `git checkout ${config.masterBranch}`,
             `npm pack`,
-            `mv ./SalesforceMobileSDK-CordovaPlugin*.tgz ../`,
+            `mv ./salesforce-mobilesdk-cordova-plugin*.tgz ../`,
             `git checkout -- .`
         ]
     }
