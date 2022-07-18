@@ -26,7 +26,6 @@ aliases:
     command: |
       if [[ "$OSTYPE" == "linux-gnu" ]]; then
         sudo npm install -g sfdx-cli
-        sudo chown -R `whoami` $HOME/.config/
       else 
         npm install -g sfdx-cli
       fi
