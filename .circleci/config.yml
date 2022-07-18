@@ -26,7 +26,6 @@ aliases:
     command: |
       if [[ "$OSTYPE" == "linux-gnu" ]]; then
         sudo npm install -g sfdx-cli
-        sudo chown -R `whoami` $HOME/.config/
       else 
         npm install -g sfdx-cli
       fi
@@ -45,7 +44,7 @@ aliases:
 linux: &linux
   working_directory: ~/SalesforceMobileSDK-Package
   docker:
-    - image: circleci/android:api-30-node
+    - image: cimg/android:2022.03.1-node
   environment:
     - TERM: "dumb"
     - GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx2048m -XX:+HeapDumpOnOutOfMemoryError"'
