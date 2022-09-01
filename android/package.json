@@ -13,7 +13,7 @@
         "node": ">=7.0.0"
     },
     "dependencies": {
-        "shelljs": "0.8.4",
+        "shelljs": "0.8.5",
         "ajv": "^6.10.2",
 		"jsonlint": "^1.6.3"
     },
