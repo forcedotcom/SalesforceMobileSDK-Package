@@ -41,6 +41,10 @@ aliases:
       fi
     when: always
 
+  - &install-android-build-tools-32
+    name: Install Android Build Tools 32.0.0
+    command: sdkmanager --install "build-tools;32.0.0"
+
 version: 2.1
 executors:
   linux:
@@ -95,6 +99,7 @@ jobs:
       - run: *setup
       - run: *install-cordova
       - run: *install-sfdx
+      - run: *install-android-build-tools-32
       - run:
           name: Building all android hybrid templates
           command: ./test/test_force.js --exit-on-failure --cli=forcehybrid --os=android --no-plugin-update
@@ -107,6 +112,7 @@ jobs:
       - run: *setup
       - run: *install-cordova
       - run: *install-sfdx
+      - run: *install-android-build-tools-32
       - run:
           name: Building all android hybrid templates with SFDX
           command: ./test/test_force.js --exit-on-failure --cli=forcehybrid --os=android --use-sfdx --no-plugin-update
