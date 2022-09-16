@@ -237,11 +237,11 @@ workflows:
 
   # Build everything at 8:00 PM PST Wednesday and Sunday
   weekly-build-all-apps:
-    when: 
-      not:
-        and:
-          - << pipeline.parameters.xcode >>
-          - equal: [ "webhook", << pipeline.trigger_source >> ]
+    when:
+      and:
+        - not: << pipeline.parameters.xcode >>
+        - not: 
+            equal: [ "webhook", << pipeline.trigger_source >> ]
     jobs:
       - forceios
       - forcehybrid-ios
