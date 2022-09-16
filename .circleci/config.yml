@@ -2,7 +2,8 @@ aliases:
 #  Xcode version announcments can be found here: https://discuss.circleci.com/c/announcements/
 #  Each post contains a full image manifest, including iOS runtimes, devices, CocoaPods version, etc.
   - &latest-xcode "13.4.1"
-  - &beta-xcode "14.0.0"
+  - &latest-android  "cimg/android:2022.09.2-node"
+  - &invalid      ""
 
   - &setup
     name: Setup
@@ -45,30 +46,25 @@ aliases:
     name: Install Android Build Tools 32.0.0
     command: sdkmanager --install "build-tools;32.0.0"
 
+  - &mac-env
+    parameters:
+      xcode: 
+        type: string
+        default: *latest-xcode
+    macos: 
+      xcode: << parameters.xcode >>
+    working_directory: ~/SalesforceMobileSDK-Package
+    environment:
+      FASTLANE_SKIP_UPDATE_CHECK: "true"
+
 version: 2.1
 executors:
   linux:
     working_directory: ~/SalesforceMobileSDK-Package
     docker:
-      - image: cimg/android:2022.08.1-node
+      - image: *latest-android
     environment:
       GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx2048m -XX:+HeapDumpOnOutOfMemoryError"'
-  mac:
-    working_directory: ~/SalesforceMobileSDK-Package
-    macos:
-      xcode: *latest-xcode
-    shell: /bin/bash --login -eo pipefail
-    environment:
-      BASH_ENV: ~/.bashrc
-      FASTLANE_SKIP_UPDATE_CHECK: "true"
-  mac-beta:
-    working_directory: ~/SalesforceMobileSDK-Package
-    macos:
-      xcode: *beta-xcode
-    shell: /bin/bash --login -eo pipefail
-    environment:
-      BASH_ENV: ~/.bashrc
-      FASTLANE_SKIP_UPDATE_CHECK: "true"
 
 jobs:
   forcedroid:
@@ -142,11 +138,7 @@ jobs:
           when: always
 
   forceios:
-    parameters:
-      env:
-        type: string
-        default: "mac"
-    executor: << parameters.env >>
+    <<: *mac-env
     steps:
       - checkout
       - run: *setup
@@ -156,11 +148,7 @@ jobs:
           when: always
 
   forceios-sfdx:
-    parameters:
-      env:
-        type: string
-        default: "mac"
-    executor: << parameters.env >>
+    <<: *mac-env
     steps:
       - checkout
       - run: *setup
@@ -171,11 +159,7 @@ jobs:
           when: always
 
   forcehybrid-ios:
-    parameters:
-      env:
-        type: string
-        default: "mac"
-    executor: << parameters.env >>
+    <<: *mac-env
     steps:
       - checkout
       - run: *setup
@@ -189,11 +173,7 @@ jobs:
           when: always
 
   forcehybrid-ios-sfdx:
-    parameters:
-      env:
-        type: string
-        default: "mac"
-    executor: << parameters.env >>
+    <<: *mac-env
     steps:
       - checkout
       - run: *setup
@@ -207,11 +187,7 @@ jobs:
           when: always
 
   forcereact-ios:
-    parameters:
-      env:
-        type: string
-        default: "mac"
-    executor: << parameters.env >>
+    <<: *mac-env
     steps:
       - checkout
       - run: *setup
@@ -222,11 +198,7 @@ jobs:
           when: always
 
   forcereact-ios-sfdx:
-    parameters:
-      env:
-        type: string
-        default: "mac"
-    executor: << parameters.env >>
+    <<: *mac-env
     steps:
       - checkout
       - run: *setup
@@ -239,9 +211,9 @@ jobs:
 
 #  Potential parameters that can come from the project GUI Triggers
 parameters:
-  beta:
-    type: boolean
-    default: false
+  xcode:
+    type: string
+    default: *invalid
 
 workflows:
   version: 2
@@ -267,7 +239,9 @@ workflows:
   weekly-build-all-apps:
     when: 
       not:
-        equal: [ "webhook", << pipeline.trigger_source >> ]
+        and:
+          - << pipeline.parameters.xcode >>
+          - equal: [ "webhook", << pipeline.trigger_source >> ]
     jobs:
       - forceios
       - forcehybrid-ios
@@ -286,19 +260,19 @@ workflows:
   weekly-build-all-apps-ios-beta:
     when: 
       and:
-        - << pipeline.parameters.beta >>
+        - << pipeline.parameters.xcode >>
         - not:
             equal: [ "webhook", << pipeline.trigger_source >> ]
     jobs:
       - forceios:
-          env: "mac-beta"
+          xcode: << pipeline.parameters.xcode >>
       - forcehybrid-ios:
-          env: "mac-beta"
+          xcode: << pipeline.parameters.xcode >>
       - forcereact-ios:
-          env: "mac-beta"
+          xcode: << pipeline.parameters.xcode >>
       - forceios-sfdx:
-          env: "mac-beta"
+          xcode: << pipeline.parameters.xcode >>
       - forcehybrid-ios-sfdx:
-          env: "mac-beta"
+          xcode: << pipeline.parameters.xcode >>
       - forcereact-ios-sfdx:
-          env: "mac-beta"
+          xcode: << pipeline.parameters.xcode >>
