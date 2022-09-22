@@ -48,11 +48,6 @@ function createNativeApp(config) {
     // Run prepare function of template
     var prepareResult = prepareTemplate(config, config.projectDir);
 
-    if (config.platform === 'ios' && config.apptype === 'react_native') {
-        // Use legacy build
-        useLegacyBuild(config, 'ios');
-    }
-
     // Cleanup
     utils.removeFile(path.join(config.projectDir, 'template.js'));
 
