@@ -15,7 +15,7 @@
 	"bin" : { "forceios" : "forceios.js" },
     "dependencies": {
         "shelljs": "0.8.5",
-        "ajv": "^6.10.2",
+        "ajv": "^8.11.0",
 		"jsonlint": "^1.6.3"
     },
 	"repository": {
