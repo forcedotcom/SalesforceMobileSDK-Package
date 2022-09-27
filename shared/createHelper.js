@@ -48,6 +48,12 @@ function createNativeApp(config) {
     // Run prepare function of template
     var prepareResult = prepareTemplate(config, config.projectDir);
 
+    if (config.platform === 'ios' && config.apptype === 'react_native') {
+        // Use legacy build
+	// - needed in Xcode 13
+	// - no-op in Xcode 14 (legacy build system is gone in Xcode 14)
+        useLegacyBuild(config, 'ios');
+    }
     // Cleanup
     utils.removeFile(path.join(config.projectDir, 'template.js'));
 
