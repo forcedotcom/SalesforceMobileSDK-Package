@@ -29,13 +29,13 @@
         "@oclif/errors": "1",
         "@oclif/plugin-help": "2",
         "@salesforce/core": "^1.1.2",
-        "ajv": "^6.10.2",
+        "ajv": "^8.11.0",
         "globby": "^9.0.0",
         "jsonlint": "^1.6.3",
         "shelljs": "0.8.5"
     },
     "devDependencies": {
-        "@oclif/dev-cli": "^1.26.0"
+        "@oclif/dev-cli": "^1.26.10"
     },
     "repository": {
         "type": "git",
