@@ -110,8 +110,23 @@ function createHybridApp(config) {
     utils.runProcessThrowError('cordova prepare', config.projectDir);
 
     if (config.platform === 'ios') {
-        // Patch podfile 
-        fixPods(config, path.join('platforms', 'ios'));
+	if (utils.getToolVersion('xcodebuild -version') < 14000000) {
+            // Use legacy build for xcode 13 and older
+	    useLegacyBuild(config, path.join('platforms', 'ios'));
+
+            // Removing libCordova.a from build (it causes issues e.g. CDVWKWebViewEngine won't register as plugin because it won't be recognized as a kind of CDVPlugin)
+            utils.logInfo('Updating xcode project file');
+            var xcodeProjectFile = path.join(config.projectDir,'platforms', 'ios', config.appname + '.xcodeproj', 'project.pbxproj')
+            var xcodeProjectFileContent = fs.readFileSync(xcodeProjectFile, 'utf8');
+            var newXcodeProjectFileContent = xcodeProjectFileContent.split('\n').filter(line => line.indexOf('libCordova.a in Frameworks') == -1).join('\n');
+            fs.writeFileSync(xcodeProjectFile, newXcodeProjectFileContent);
+            utils.logInfo('Updated  xcode project file');
+
+	} else {
+            // Patch podfile for xcode 14
+            fixPods(config, path.join('platforms', 'ios'));
+	}
+
     }
    
     // Done
@@ -120,7 +135,29 @@ function createHybridApp(config) {
 }
 
 //
-// Patch pod file for hybrid apps 
+// Use legacy build system in XCode
+//
+function useLegacyBuild(config, iosSubDir) {
+    var xcSettingsDir = path.join(config.projectDir, iosSubDir, config.appname + '.xcworkspace', 'xcshareddata')
+    var xcSettingsFile = path.join(xcSettingsDir, 'WorkspaceSettings.xcsettings');
+    var plistFileContent = '<?xml version="1.0" encoding="UTF-8"?>\n' +
+        '<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">\n' +
+        '<plist version="1.0">\n' + 
+        '<dict>\n'  +
+        '<key>BuildSystemType</key>\n' + 
+        '<string>Original</string>\n' +
+        '<key>DisableBuildSystemDeprecationDiagnostic</key>\n' + 
+	    '<true/>\n' +
+        '</dict>\n' + 
+        '</plist>\n';
+    utils.logInfo('Creating WorkspaceSettings.xcsettings for project. Setting the BuildSystemType to original in ' + xcSettingsFile);
+    utils.mkDirIfNeeded(xcSettingsDir)
+    fs.writeFileSync(xcSettingsFile,plistFileContent,'utf8');
+    utils.logInfo('Created WorkspaceSettings.xcsettings for project ' + config.appname);
+}
+
+//
+// Patch pod file for hybrid apps on xcode 14
 //
 function fixPods(config, iosSubDir) {
     var iosDir = path.join(config.projectDir, iosSubDir)
