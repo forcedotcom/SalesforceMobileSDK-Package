@@ -85,7 +85,7 @@ function getVersionNumberFromString(versionString) {
 }
 
 /**
- * Checks the the version of a tool by running the given command
+ * Checks the version of a tool by running the given command
  *
  * @param {String} cmd Command to run to get the tool version
  * @param {String} minVersionRequired Minimum version required
@@ -94,17 +94,7 @@ function getVersionNumberFromString(versionString) {
  * @throws {Error} if tool not found or version too low
  */
 function checkToolVersion(cmd, minVersionRequired, maxVersionSupported) {
-    var toolName = cmd.split(' ')[0];
-    var toolVersion;
-    try {
-	    var result = runProcessThrowError(cmd, null, true /* return output */);
-        toolVersion = result.replace(/\r?\n|\r/, '').replace(/[^0-9\.]*/, '');
-    }
-    catch (error) {
-        throw new Error(toolName + ' is required but could not be found. Please install ' + toolName + '.');
-    }
-
-    var toolVersionNum = getVersionNumberFromString(toolVersion);
+    var toolVersionNum = getToolVersion(cmd);
     var minVersionRequiredNum = getVersionNumberFromString(minVersionRequired);
 
     if (toolVersionNum < minVersionRequiredNum) {
@@ -119,6 +109,27 @@ function checkToolVersion(cmd, minVersionRequired, maxVersionSupported) {
                             + maxVersionSupported + ').  Please downgrade your version of ' + toolName + '.');
         }
     }
+}
+
+/**
+ * Returns the version of a tool as a number by running the given command
+ *
+ * @param {String} cmd Command to run to get the tool version
+ * @return {Number} The numeric version number, or 0 if the version string isn't a valid format.
+ */
+function getToolVersion(cmd) {
+    var toolName = cmd.split(' ')[0];
+    var toolVersion;
+    try {
+	 var result = runProcessThrowError(cmd, null, true /* return output */);
+        toolVersion = result.replace(/\r?\n|\r/, '').replace(/[^0-9\.]*/, '');
+    }
+    catch (error) {
+        throw new Error(toolName + ' is required but could not be found. Please install ' + toolName + '.');
+    }
+
+    var toolVersionNum = getVersionNumberFromString(toolVersion);
+    return toolVersionNum;
 }
 
 
@@ -432,6 +443,7 @@ module.exports = {
     cloneRepo,
     copyFile,
     dirExists,
+    getToolVersion,
     getVersionNumberFromString,
     log,
     logDebug,

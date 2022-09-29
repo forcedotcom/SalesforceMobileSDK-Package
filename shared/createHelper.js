@@ -48,12 +48,6 @@ function createNativeApp(config) {
     // Run prepare function of template
     var prepareResult = prepareTemplate(config, config.projectDir);
 
-    if (config.platform === 'ios' && config.apptype === 'react_native') {
-        // Use legacy build
-	// - needed in Xcode 13
-	// - no-op in Xcode 14 (legacy build system is gone in Xcode 14)
-        useLegacyBuild(config, 'ios');
-    }
     // Cleanup
     utils.removeFile(path.join(config.projectDir, 'template.js'));
 
@@ -116,16 +110,23 @@ function createHybridApp(config) {
     utils.runProcessThrowError('cordova prepare', config.projectDir);
 
     if (config.platform === 'ios') {
-        // Use legacy build
-        useLegacyBuild(config, path.join('platforms', 'ios'));
+	if (utils.getToolVersion('xcodebuild -version') < 14000000) {
+            // Use legacy build for xcode 13 and older
+	    useLegacyBuild(config, path.join('platforms', 'ios'));
 
-        // Removing libCordova.a from build (it causes issues e.g. CDVWKWebViewEngine won't register as plugin because it won't be recognized as a kind of CDVPlugin)
-        utils.logInfo('Updating xcode project file');
-        var xcodeProjectFile = path.join(config.projectDir,'platforms', 'ios', config.appname + '.xcodeproj', 'project.pbxproj')
-        var xcodeProjectFileContent = fs.readFileSync(xcodeProjectFile, 'utf8');
-        var newXcodeProjectFileContent = xcodeProjectFileContent.split('\n').filter(line => line.indexOf('libCordova.a in Frameworks') == -1).join('\n');
-        fs.writeFileSync(xcodeProjectFile, newXcodeProjectFileContent);
-        utils.logInfo('Updated  xcode project file');
+            // Removing libCordova.a from build (it causes issues e.g. CDVWKWebViewEngine won't register as plugin because it won't be recognized as a kind of CDVPlugin)
+            utils.logInfo('Updating xcode project file');
+            var xcodeProjectFile = path.join(config.projectDir,'platforms', 'ios', config.appname + '.xcodeproj', 'project.pbxproj')
+            var xcodeProjectFileContent = fs.readFileSync(xcodeProjectFile, 'utf8');
+            var newXcodeProjectFileContent = xcodeProjectFileContent.split('\n').filter(line => line.indexOf('libCordova.a in Frameworks') == -1).join('\n');
+            fs.writeFileSync(xcodeProjectFile, newXcodeProjectFileContent);
+            utils.logInfo('Updated  xcode project file');
+
+	} else {
+            // Patch podfile for xcode 14
+            fixPods(config, path.join('platforms', 'ios'));
+	}
+
     }
    
     // Done
@@ -153,6 +154,31 @@ function useLegacyBuild(config, iosSubDir) {
     utils.mkDirIfNeeded(xcSettingsDir)
     fs.writeFileSync(xcSettingsFile,plistFileContent,'utf8');
     utils.logInfo('Created WorkspaceSettings.xcsettings for project ' + config.appname);
+}
+
+//
+// Patch pod file for hybrid apps on xcode 14
+//
+function fixPods(config, iosSubDir) {
+    var iosDir = path.join(config.projectDir, iosSubDir)
+    var podfilePath = path.join(iosDir, 'Podfile');
+    var originalPodfileContent = fs.readFileSync(podfilePath, 'utf8');
+    var preInstallCode = "\n" +
+	"$dynamic_framework = ['SalesforceAnalytics', 'SalesforceSDKCore', 'SalesforceSDKCommon', 'SmartStore', 'FMDB', 'SQLCipher', 'MobileSync']\n" +
+	"pre_install do |installer|\n" +
+	"  installer.pod_targets.each do |pod|\n" +
+	"    if $dynamic_framework.include?(pod.name)\n" +
+	"      def pod.build_type\n" +
+	"        Pod::BuildType.dynamic_framework\n" +
+	"      end\n" +
+	"    end\n" +
+	"  end\n" +
+	"end"
+
+
+    utils.logInfo('Updating Podfile for project ' + config.appname);
+    fs.writeFileSync(podfilePath, originalPodfileContent.replace("use_frameworks!","") + preInstallCode);
+    utils.runProcessThrowError('pod update', iosDir);
 }
 
 //
