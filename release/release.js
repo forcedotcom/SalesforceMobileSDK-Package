@@ -34,6 +34,7 @@ const path = require('path'),
       proceedPrompt = require('./common.js').proceedPrompt,
       runCmds = require('./common.js').runCmds,
       cloneOrClean = require('./common.js').cloneOrClean,
+      urlForRepo = require('./common.js').urlForRepo,
       setAutoYesForPrompts = require('./common.js').setAutoYesForPrompts,
       REPO = require('./common.js').REPO,
       VERSION = require('../shared/constants.js').version,
@@ -145,7 +146,8 @@ async function start() {
     if (!await proceedPrompt()) {
         process.exit(0)
     }
-    
+
+    if (false) {    
     // Release!!
     if (config.tmpDir == tmpDirDefault) {
         config.tmpDir = utils.mkTmpDir()
@@ -153,7 +155,6 @@ async function start() {
         utils.mkDirIfNeeded(config.tmpDir)
     }
 
-        
     await releaseShared()
     await releaseAndroid()
     await releaseIOS()
@@ -162,15 +163,20 @@ async function start() {
     await releaseCordovaPlugin()
     await releaseReactNative()
     await releaseTemplates()
-    await releasePackage()
+	await releasePackage()
+    }
 
+    // We are testing before publishing to npmjs.org
+    // So we need to use the github plugin repo uri (not the npmjs package name that's in constants.js)
+    pluginRepoUri = `${urlForRepo(config.org, REPO.cordovaplugin)}#v${config.versionReleased}`
+    
     utils.logParagraph([
         ` NEXT STEPS: TEST then PUBLISH`,
         ``,
         `To test the NPM packages, do the following:`,
         `  cd ${config.tmpDir}/${REPO.pkg}`,
-        `  ./test/test_force.js --cli=forceios,forcedroid,forcereact,forcehybrid`,
-        `  ./test/test_force.js --cli=forceios,forcedroid,forcereact,forcehybrid --use-sfdx`,
+        `  ./test/test_force.js --cli=forceios,forcedroid,forcereact,forcehybrid --pluginrepouri=${pluginRepoUri}`,
+        `  ./test/test_force.js --cli=forceios,forcedroid,forcereact,forcehybrid --use-sfdx --pluginrepouri=${pluginRepoUri}`,
         `You should also open and run the generated apps in XCode / Android Studio.`,
         ``,
         `To publish to NPM, do the following:`,
