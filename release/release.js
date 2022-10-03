@@ -147,7 +147,6 @@ async function start() {
         process.exit(0)
     }
 
-    if (false) {    
     // Release!!
     if (config.tmpDir == tmpDirDefault) {
         config.tmpDir = utils.mkTmpDir()
@@ -163,8 +162,7 @@ async function start() {
     await releaseCordovaPlugin()
     await releaseReactNative()
     await releaseTemplates()
-	await releasePackage()
-    }
+    await releasePackage()
 
     // We are testing before publishing to npmjs.org
     // So we need to use the github plugin repo uri (not the npmjs package name that's in constants.js)
