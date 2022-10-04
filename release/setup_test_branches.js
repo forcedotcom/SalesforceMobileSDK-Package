@@ -53,6 +53,7 @@ const templatesPackageJsons = [
     './HybridLocalTemplate/package.json',
     './HybridLwcTemplate/package.json',
     './HybridRemoteTemplate/package.json',
+    './MobileSyncExplorerKotlinTemplate/package.json',
     './MobileSyncExplorerReactNative/package.json',
     './MobileSyncExplorerSwift/package.json',
     './ReactNativeDeferredTemplate/package.json',

@@ -34,6 +34,7 @@ const path = require('path'),
       proceedPrompt = require('./common.js').proceedPrompt,
       runCmds = require('./common.js').runCmds,
       cloneOrClean = require('./common.js').cloneOrClean,
+      urlForRepo = require('./common.js').urlForRepo,
       setAutoYesForPrompts = require('./common.js').setAutoYesForPrompts,
       REPO = require('./common.js').REPO,
       VERSION = require('../shared/constants.js').version,
@@ -46,8 +47,8 @@ const masterBranchDefault = "master2"
 const devBranchDefault = "dev2"
 const docBranchDefault = "gh-pages2"
 const versionReleasedDefault = VERSION
-const nextVersionDefault = "10.2.0"
-const versionCodeReleasedDefault = 77
+const nextVersionDefault = "11.0.0"
+const versionCodeReleasedDefault = 79
 
 // Questions
 const QUESTIONS = [
@@ -145,7 +146,7 @@ async function start() {
     if (!await proceedPrompt()) {
         process.exit(0)
     }
-    
+
     // Release!!
     if (config.tmpDir == tmpDirDefault) {
         config.tmpDir = utils.mkTmpDir()
@@ -153,7 +154,6 @@ async function start() {
         utils.mkDirIfNeeded(config.tmpDir)
     }
 
-        
     await releaseShared()
     await releaseAndroid()
     await releaseIOS()
@@ -164,13 +164,17 @@ async function start() {
     await releaseTemplates()
     await releasePackage()
 
+    // We are testing before publishing to npmjs.org
+    // So we need to use the github plugin repo uri (not the npmjs package name that's in constants.js)
+    pluginRepoUri = `${urlForRepo(config.org, REPO.cordovaplugin)}#v${config.versionReleased}`
+    
     utils.logParagraph([
         ` NEXT STEPS: TEST then PUBLISH`,
         ``,
         `To test the NPM packages, do the following:`,
         `  cd ${config.tmpDir}/${REPO.pkg}`,
-        `  ./test/test_force.js --cli=forceios,forcedroid,forcereact,forcehybrid`,
-        `  ./test/test_force.js --cli=forceios,forcedroid,forcereact,forcehybrid --use-sfdx`,
+        `  ./test/test_force.js --cli=forceios,forcedroid,forcereact,forcehybrid --pluginrepouri=${pluginRepoUri}`,
+        `  ./test/test_force.js --cli=forceios,forcedroid,forcereact,forcehybrid --use-sfdx --pluginrepouri=${pluginRepoUri}`,
         `You should also open and run the generated apps in XCode / Android Studio.`,
         ``,
         `To publish to NPM, do the following:`,
@@ -180,6 +184,7 @@ async function start() {
         `  npm publish forcehybrid-${config.versionReleased}.tgz`,
         `  npm publish forcereact-${config.versionReleased}.tgz`,
         `  npm publish sfdx-mobilesdk-plugin-${config.versionReleased}.tgz`,
+        `  npm publish salesforce-mobilesdk-cordova-plugin-${config.versionReleased}.tgz`,
         ``,
         `To publish to Maven Central, do the following:`,
         `  cd ${config.tmpDir}/${REPO.android}`,
@@ -256,6 +261,7 @@ async function releaseIOSSpecs() {
 async function releaseCordovaPlugin() {
     await releaseRepo(REPO.cordovaplugin, {
         masterPostMergeCmd:`./tools/update.sh -b ${config.masterBranch}`,
+        postReleaseGenerateCmd: generateNpmPackageForCordovaPlugin(),
         devPostMergeCmd:`./tools/update.sh -b ${config.devBranch}`
     })
 }
@@ -439,6 +445,18 @@ function generateDocAndroid() {
             `git add *`,
             `git commit -m "Java doc for Mobile SDK ${config.versionReleased}"`,
             `git push origin ${config.docBranch}`
+        ]
+    }
+}
+
+function generateNpmPackageForCordovaPlugin() {
+    return {
+        msg: `Generating npm package`,
+        cmds: [
+            `git checkout ${config.masterBranch}`,
+            `npm pack`,
+            `mv ./salesforce-mobilesdk-cordova-plugin*.tgz ../`,
+            `git checkout -- .`
         ]
     }
 }

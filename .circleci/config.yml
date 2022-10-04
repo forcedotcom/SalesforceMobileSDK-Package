@@ -1,8 +1,9 @@
 aliases:
-  - &upgrade-cocoapods
-    name: Upgrade Cocoapods
-    command:  |
-      sudo gem install cocoapods -v 1.10.1
+#  Xcode version announcments can be found here: https://discuss.circleci.com/c/announcements/
+#  Each post contains a full image manifest, including iOS runtimes, devices, CocoaPods version, etc.
+  - &latest-xcode "13.4.1"
+  - &latest-android  "cimg/android:2022.09.2-node"
+  - &invalid      ""
 
   - &setup
     name: Setup
@@ -26,7 +27,6 @@ aliases:
     command: |
       if [[ "$OSTYPE" == "linux-gnu" ]]; then
         sudo npm install -g sfdx-cli
-        sudo chown -R `whoami` $HOME/.config/
       else 
         npm install -g sfdx-cli
       fi
@@ -42,24 +42,33 @@ aliases:
       fi
     when: always
 
-linux: &linux
-  working_directory: ~/SalesforceMobileSDK-Package
-  docker:
-    - image: circleci/android:api-30-node
-  environment:
-    - TERM: "dumb"
-    - GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx2048m -XX:+HeapDumpOnOutOfMemoryError"'
+  - &install-android-build-tools-32
+    name: Install Android Build Tools 32.0.0
+    command: sdkmanager --install "build-tools;32.0.0"
 
-mac: &mac
-  working_directory: ~/SalesforceMobileSDK-Package
-  macos:
-    xcode: "13.2.1"
-  shell: /bin/bash --login -eo pipefail
+  - &mac-env
+    parameters:
+      xcode: 
+        type: string
+        default: *latest-xcode
+    macos: 
+      xcode: << parameters.xcode >>
+    working_directory: ~/SalesforceMobileSDK-Package
+    environment:
+      FASTLANE_SKIP_UPDATE_CHECK: "true"
 
-version: 2
+version: 2.1
+executors:
+  linux:
+    working_directory: ~/SalesforceMobileSDK-Package
+    docker:
+      - image: *latest-android
+    environment:
+      GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx2048m -XX:+HeapDumpOnOutOfMemoryError"'
+
 jobs:
   forcedroid:
-    <<: *linux
+    executor: linux
     steps:
       - checkout
       - run: *setup
@@ -69,7 +78,7 @@ jobs:
           when: always
 
   forcedroid-sfdx:
-    <<: *linux
+    executor: linux
     steps:
       - checkout
       - run: *setup
@@ -80,31 +89,33 @@ jobs:
           when: always
 
   forcehybrid-android:
-    <<: *linux
+    executor: linux
     steps:
       - checkout
       - run: *setup
       - run: *install-cordova
       - run: *install-sfdx
+      - run: *install-android-build-tools-32
       - run:
           name: Building all android hybrid templates
           command: ./test/test_force.js --exit-on-failure --cli=forcehybrid --os=android --no-plugin-update
           when: always
 
   forcehybrid-android-sfdx:
-    <<: *linux
+    executor: linux
     steps:
       - checkout
       - run: *setup
       - run: *install-cordova
       - run: *install-sfdx
+      - run: *install-android-build-tools-32
       - run:
           name: Building all android hybrid templates with SFDX
           command: ./test/test_force.js --exit-on-failure --cli=forcehybrid --os=android --use-sfdx --no-plugin-update
           when: always
 
   forcereact-android:
-    <<: *linux
+    executor: linux
     steps:
       - checkout
       - run: *setup
@@ -115,7 +126,7 @@ jobs:
           when: always
 
   forcereact-android-sfdx:
-    <<: *linux
+    executor: linux
     steps:
       - checkout
       - run: *setup
@@ -127,22 +138,20 @@ jobs:
           when: always
 
   forceios:
-    <<: *mac
+    <<: *mac-env
     steps:
       - checkout
       - run: *setup
-      - run: *upgrade-cocoapods
       - run:
           name: Building all ios native templates
           command:  ./test/test_force.js --exit-on-failure --cli=forceios
           when: always
 
   forceios-sfdx:
-    <<: *mac
+    <<: *mac-env
     steps:
       - checkout
       - run: *setup
-      - run: *upgrade-cocoapods
       - run: *install-sfdx
       - run:
           name: Building all ios native templates with SFDX
@@ -150,11 +159,10 @@ jobs:
           when: always
 
   forcehybrid-ios:
-    <<: *mac
+    <<: *mac-env
     steps:
       - checkout
       - run: *setup
-      - run: *upgrade-cocoapods
       - run: *install-cordova
       - run: *install-sfdx
       - run:
@@ -165,11 +173,10 @@ jobs:
           when: always
 
   forcehybrid-ios-sfdx:
-    <<: *mac
+    <<: *mac-env
     steps:
       - checkout
       - run: *setup
-      - run: *upgrade-cocoapods
       - run: *install-cordova
       - run: *install-sfdx
       - run:
@@ -180,11 +187,10 @@ jobs:
           when: always
 
   forcereact-ios:
-    <<: *mac
+    <<: *mac-env
     steps:
       - checkout
       - run: *setup
-      - run: *upgrade-cocoapods
       - run: *install-typescript
       - run:
           name: Building all ios react native templates
@@ -192,11 +198,10 @@ jobs:
           when: always
 
   forcereact-ios-sfdx:
-    <<: *mac
+    <<: *mac-env
     steps:
       - checkout
       - run: *setup
-      - run: *upgrade-cocoapods
       - run: *install-sfdx
       - run: *install-typescript
       - run:
@@ -204,10 +209,18 @@ jobs:
           command: ./test/test_force.js --exit-on-failure --cli=forcereact --os=ios --use-sfdx
           when: always
 
+#  Potential parameters that can come from the project GUI Triggers
+parameters:
+  xcode:
+    type: string
+    default: *invalid
+
 workflows:
   version: 2
 
   pr-build-all-apps:
+    when: 
+      equal: [ "webhook", << pipeline.trigger_source >> ]
     jobs:
       - forceios
       - forcehybrid-ios
@@ -222,16 +235,13 @@ workflows:
       - forcehybrid-android-sfdx
       - forcereact-android-sfdx
 
-  # Cron are on a timezone 8 hours ahead of PST
-  # Build everything at ~8:30pm Sunday/Wednesday Nights
+  # Build everything at 8:00 PM PST Wednesday and Sunday
   weekly-build-all-apps:
-    triggers:
-      - schedule:
-          cron: "30 4 * * 2,4,6"
-          filters:
-            branches:
-              only:
-                - dev
+    when:
+      and:
+        - not: << pipeline.parameters.xcode >>
+        - not: 
+            equal: [ "webhook", << pipeline.trigger_source >> ]
     jobs:
       - forceios
       - forcehybrid-ios
@@ -245,3 +255,24 @@ workflows:
       - forcedroid-sfdx
       - forcehybrid-android-sfdx
       - forcereact-android-sfdx
+
+  # Build everything iOS wtih Beta Xcode at 9:00 PM PST Wednesday and Sunday
+  weekly-build-all-apps-ios-beta:
+    when: 
+      and:
+        - << pipeline.parameters.xcode >>
+        - not:
+            equal: [ "webhook", << pipeline.trigger_source >> ]
+    jobs:
+      - forceios:
+          xcode: << pipeline.parameters.xcode >>
+      - forcehybrid-ios:
+          xcode: << pipeline.parameters.xcode >>
+      - forcereact-ios:
+          xcode: << pipeline.parameters.xcode >>
+      - forceios-sfdx:
+          xcode: << pipeline.parameters.xcode >>
+      - forcehybrid-ios-sfdx:
+          xcode: << pipeline.parameters.xcode >>
+      - forcereact-ios-sfdx:
+          xcode: << pipeline.parameters.xcode >>
