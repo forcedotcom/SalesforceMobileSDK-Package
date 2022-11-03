@@ -109,7 +109,7 @@ function createHybridApp(config) {
     // Run cordova prepare
     utils.runProcessThrowError('cordova prepare', config.projectDir);
 
-    if (config.platform === 'ios') {
+    if (config.platform.split(',').indexOf('ios') != -1) {
 	if (utils.getToolVersion('xcodebuild -version') < 14000000) {
             // Use legacy build for xcode 13 and older
 	    useLegacyBuild(config, path.join('platforms', 'ios'));
