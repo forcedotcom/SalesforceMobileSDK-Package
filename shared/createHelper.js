@@ -173,8 +173,17 @@ function fixPods(config, iosSubDir) {
 	"      end\n" +
 	"    end\n" +
 	"  end\n" +
+	"end" +
+	"\n" +
+	"post_install do |installer|\n" + 
+	"  installer.pods_project.targets.each do |target|\n" + 
+	"    if target.deployment_target[/\d+/].to_i < 9\n" + 
+	"      target.build_configurations.each do |config|\n" + 
+	"        config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '9.0'\n" + 
+	"      end\n" + 
+	"    end\n" + 
+	"  end\n" + 
 	"end"
-
 
     utils.logInfo('Updating Podfile for project ' + config.appname);
     fs.writeFileSync(podfilePath, originalPodfileContent.replace("use_frameworks!","") + preInstallCode);
