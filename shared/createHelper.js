@@ -177,7 +177,7 @@ function fixPods(config, iosSubDir) {
 	"\n" +
 	"post_install do |installer|\n" + 
 	"  installer.pods_project.targets.each do |target|\n" + 
-	"    if target.deployment_target[/\d+/].to_i < 9\n" + 
+	"    if target.deployment_target.to_i < 9\n" + 
 	"      target.build_configurations.each do |config|\n" + 
 	"        config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '9.0'\n" + 
 	"      end\n" + 
