@@ -2,7 +2,7 @@ aliases:
 #  Xcode version announcments can be found here: https://discuss.circleci.com/c/announcements/
 #  Each post contains a full image manifest, including iOS runtimes, devices, CocoaPods version, etc.
   - &latest-xcode "13.4.1"
-  - &latest-android  "cimg/android:2022.09.2-node"
+  - &latest-android  "cimg/android:2023.05.1-node"
   - &invalid      ""
 
   - &setup
