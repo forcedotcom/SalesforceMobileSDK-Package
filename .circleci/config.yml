@@ -2,7 +2,7 @@ aliases:
 #  Xcode version announcments can be found here: https://discuss.circleci.com/c/announcements/
 #  Each post contains a full image manifest, including iOS runtimes, devices, CocoaPods version, etc.
   - &latest-xcode "14.3.1"
-  - &latest-android "cimg/android:2022.09.2-node"  
+  - &latest-android "cimg/android:2022.09.2-node"
   - &invalid      ""
 
   - &setup
@@ -65,7 +65,7 @@ executors:
     docker:
       - image: *latest-android
     environment:
-      GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx2048m -XX:+HeapDumpOnOutOfMemoryError" -Dorg.gradle.daemon=false -Dfile.encoding=utf-8'    
+      GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx2048m -XX:+HeapDumpOnOutOfMemoryError" -Dorg.gradle.daemon=false -Dfile.encoding=utf-8'
 
 jobs:
   forcedroid:
