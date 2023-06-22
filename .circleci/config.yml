@@ -1,8 +1,8 @@
 aliases:
 #  Xcode version announcments can be found here: https://discuss.circleci.com/c/announcements/
 #  Each post contains a full image manifest, including iOS runtimes, devices, CocoaPods version, etc.
-  - &latest-xcode "13.4.1"
-  - &latest-android  "cimg/android:2022.09.2-node"
+  - &latest-xcode "14.3.1"
+  - &latest-android "cimg/android:2022.09.2-node"
   - &invalid      ""
 
   - &setup
@@ -14,10 +14,10 @@ aliases:
     name: Install Cordova
     command:  |
       if [[ "$OSTYPE" == "linux-gnu" ]]; then
-        sudo npm install -g cordova@11.0.0
+        sudo npm install -g cordova@12.0.0
       else 
         npm update -g
-        npm install -g cordova@11.0.0
+        npm install -g cordova@12.0.0
       fi
       sudo cordova telemetry off
     when: always
@@ -53,6 +53,7 @@ aliases:
         default: *latest-xcode
     macos: 
       xcode: << parameters.xcode >>
+    resource_class: macos.x86.medium.gen2
     working_directory: ~/SalesforceMobileSDK-Package
     environment:
       FASTLANE_SKIP_UPDATE_CHECK: "true"
@@ -64,7 +65,7 @@ executors:
     docker:
       - image: *latest-android
     environment:
-      GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx2048m -XX:+HeapDumpOnOutOfMemoryError"'
+      GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx2048m -XX:+HeapDumpOnOutOfMemoryError" -Dorg.gradle.daemon=false -Dfile.encoding=utf-8'
 
 jobs:
   forcedroid:
