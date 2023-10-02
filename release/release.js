@@ -159,6 +159,7 @@ async function start() {
     await releaseIOS()
     await releaseIOSHybrid()
     await releaseIOSSpecs()
+    await releaseIOSSpm()
     await releaseCordovaPlugin()
     await releaseReactNative()
     await releaseTemplates()
@@ -242,7 +243,7 @@ async function releaseIOSHybrid() {
 // Release function for iOS-Specs repo
 //
 async function releaseIOSSpecs() {
-    const repo = REPO.iospecs
+    const repo = REPO.iosspecs
     const cmds = {
         msg: `PROCESSING ${repo}`,
         cmds: [
@@ -250,6 +251,24 @@ async function releaseIOSSpecs() {
             `git checkout ${config.masterBranch}`,
             `./update.sh -b ${config.masterBranch} -v ${config.versionReleased}`,
             commitAndPushMaster()
+        ]
+    }
+    await runCmds(path.join(config.tmpDir, repo), cmds)
+}
+
+//
+// Release function for iOS-Spm repo
+//
+async function releaseIOSSpm() {
+    const repo = REPO.iosspecs
+    const cmds = {
+        msg: `PROCESSING ${repo}`,
+        cmds: [
+            cloneOrClean(config.org, repo, config.tmpDir),
+            `git checkout ${config.masterBranch}`,
+	    `build_xcframeworks.sh -r {config.org} -b ${config.masterBranch}`,
+            commitAndPushMaster(),
+	    tagMaster()
         ]
     }
     await runCmds(path.join(config.tmpDir, repo), cmds)
