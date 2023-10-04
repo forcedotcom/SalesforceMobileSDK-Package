@@ -268,7 +268,7 @@ async function releaseIOSSpm() {
             `git checkout ${config.masterBranch}`,
 	    `build_xcframeworks.sh -r {config.org} -b ${config.masterBranch}`,
             commitAndPushMaster(),
-	    tagMaster()
+	    tagMaster(true) // SPM needs versions of the form X.Y.Z (where X, Y, Z are integers)
         ]
     }
     await runCmds(path.join(config.tmpDir, repo), cmds)
@@ -382,11 +382,12 @@ function commitAndPushMaster() {
     }
 }
 
-function tagMaster() {
+function tagMaster(noTagPrefix) {
+    const tagPrefix = noTagPrefix ? '' : 'v'
     return {
-        msg: `Tagging ${config.masterBranch} with v${config.versionReleased}`,
+        msg: `Tagging ${config.masterBranch} with ${tagPrefix}${config.versionReleased}`,
         cmds: [
-            `git tag v${config.versionReleased}`,
+            `git tag ${tagPrefix}${config.versionReleased}`,
             `git push origin ${config.masterBranch} --tag`,
         ]
     }

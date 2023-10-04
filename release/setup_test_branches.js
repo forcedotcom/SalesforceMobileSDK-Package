@@ -155,7 +155,7 @@ async function start() {
     await prepareRepo(REPO.ios, {hasDoc:true})
     await prepareRepo(REPO.ioshybrid, {filesWithOrg: ['.gitmodules'], submodulePaths:['./external/shared', './external/SalesforceMobileSDK-iOS']})
     await prepareRepo(REPO.iosspecs, {noTag: true, noDev: true, filesWithOrg:['update.sh']})
-    await prepareRepo(REPO.iosspm, {noTag: true, noDev: true})
+    await prepareRepo(REPO.iosspm, {noTagPrefix: true, noDev: true})
     await prepareRepo(REPO.cordovaplugin, {filesWithOrg:['./plugin.xml','./tools/update.sh']})
     await prepareRepo(REPO.reactnative)
     await prepareRepo(REPO.templates, {filesWithOrg:templatesPackageJsons})
@@ -174,7 +174,7 @@ async function prepareRepo(repo, params) {
                     deleteBranch(config.testMasterBranch),
                     !params.noDev ? deleteBranch(config.testDevBranch) : null,
                     params.hasDoc ? deleteBranch(config.testDocBranch) : null,
-                    !params.noTag ? deleteTag(config.testVersion) : null
+                    !params.noTag ? deleteTag(`${config.noTagPrefix ? '' : 'v'}${config.testVersion}`) : null
                 ]
             },
             config.cleanupOnly ? null : {
