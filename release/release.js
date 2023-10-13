@@ -47,8 +47,8 @@ const masterBranchDefault = "master2"
 const devBranchDefault = "dev2"
 const docBranchDefault = "gh-pages2"
 const versionReleasedDefault = VERSION
-const nextVersionDefault = "11.1.0"
-const versionCodeReleasedDefault = 80
+const nextVersionDefault = "12.0.0"
+const versionCodeReleasedDefault = 82
 
 // Questions
 const QUESTIONS = [
@@ -159,6 +159,7 @@ async function start() {
     await releaseIOS()
     await releaseIOSHybrid()
     await releaseIOSSpecs()
+    await releaseIOSSpm()
     await releaseCordovaPlugin()
     await releaseReactNative()
     await releaseTemplates()
@@ -242,7 +243,7 @@ async function releaseIOSHybrid() {
 // Release function for iOS-Specs repo
 //
 async function releaseIOSSpecs() {
-    const repo = REPO.iospecs
+    const repo = REPO.iosspecs
     const cmds = {
         msg: `PROCESSING ${repo}`,
         cmds: [
@@ -250,6 +251,24 @@ async function releaseIOSSpecs() {
             `git checkout ${config.masterBranch}`,
             `./update.sh -b ${config.masterBranch} -v ${config.versionReleased}`,
             commitAndPushMaster()
+        ]
+    }
+    await runCmds(path.join(config.tmpDir, repo), cmds)
+}
+
+//
+// Release function for iOS-Spm repo
+//
+async function releaseIOSSpm() {
+    const repo = REPO.iosspm
+    const cmds = {
+        msg: `PROCESSING ${repo}`,
+        cmds: [
+            cloneOrClean(config.org, repo, config.tmpDir),
+            `git checkout ${config.masterBranch}`,
+	    `./build_xcframeworks.sh -r ${config.org} -b ${config.masterBranch}`,
+            commitAndPushMaster(),
+	    tagMaster(true) // SPM needs versions of the form X.Y.Z (where X, Y, Z are integers)
         ]
     }
     await runCmds(path.join(config.tmpDir, repo), cmds)
@@ -363,11 +382,12 @@ function commitAndPushMaster() {
     }
 }
 
-function tagMaster() {
+function tagMaster(noTagPrefix) {
+    const tagPrefix = noTagPrefix ? '' : 'v'
     return {
-        msg: `Tagging ${config.masterBranch} with v${config.versionReleased}`,
+        msg: `Tagging ${config.masterBranch} with ${tagPrefix}${config.versionReleased}`,
         cmds: [
-            `git tag v${config.versionReleased}`,
+            `git tag ${tagPrefix}${config.versionReleased}`,
             `git push origin ${config.masterBranch} --tag`,
         ]
     }
