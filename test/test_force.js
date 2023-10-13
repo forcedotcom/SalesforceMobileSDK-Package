@@ -32,7 +32,11 @@ var APP_TYPE = {
 var defaultStartPage = '/apex/testPage';
 
 // Calling main
-main(process.argv);
+try {
+    main(process.argv);
+} catch (error) {
+    utils.logError(`Error in main:`, error);
+}
 
 //
 // Main function
