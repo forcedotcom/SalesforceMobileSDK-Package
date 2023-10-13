@@ -79,7 +79,7 @@ module.exports = {
         android: 'Android Studio'
     },
 
-    templatesRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-Templates#dev',    // dev
+    templatesRepoUri: 'https://github.com/wmathurin/SalesforceMobileSDK-Templates#spm',    // dev
 //     templatesRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-Templates#v' + VERSION, // GA
 
     forceclis: {
