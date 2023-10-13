@@ -174,7 +174,7 @@ async function prepareRepo(repo, params) {
                     deleteBranch(config.testMasterBranch),
                     !params.noDev ? deleteBranch(config.testDevBranch) : null,
                     params.hasDoc ? deleteBranch(config.testDocBranch) : null,
-                    !params.noTag ? deleteTag(`${config.noTagPrefix ? '' : 'v'}${config.testVersion}`) : null
+                    !params.noTag ? deleteTag(config.testVersion, config.noTagPrefix) : null
                 ]
             },
             config.cleanupOnly ? null : {
@@ -220,12 +220,13 @@ function deleteBranch(branch) {
     }
 }
 
-function deleteTag(tag) {
+function deleteTag(tag, noTagPrefix) {
+    const fullTag = `${noTagPrefix ? '' : 'v'}${tag}`
     return {
-        msg: `Deleting v${tag} tag`,
+        msg: `Deleting ${fullTag} tag`,
         cmds: [
-            {cmd: `git tag -d v${tag}`, ignoreError: true},
-            {cmd: `git push --delete origin v${tag}`, ignoreError: true}
+            {cmd: `git tag -d ${fullTag}`, ignoreError: true},
+            {cmd: `git push --delete origin ${fullTag}`, ignoreError: true}
         ]
     }
 }
