@@ -47,8 +47,8 @@ const masterBranchDefault = "master2"
 const devBranchDefault = "dev2"
 const docBranchDefault = "gh-pages2"
 const versionReleasedDefault = VERSION
-const nextVersionDefault = "11.1.0"
-const versionCodeReleasedDefault = 80
+const nextVersionDefault = "12.0.0"
+const versionCodeReleasedDefault = 82
 
 // Questions
 const QUESTIONS = [
@@ -260,13 +260,13 @@ async function releaseIOSSpecs() {
 // Release function for iOS-Spm repo
 //
 async function releaseIOSSpm() {
-    const repo = REPO.iosspecs
+    const repo = REPO.iosspm
     const cmds = {
         msg: `PROCESSING ${repo}`,
         cmds: [
             cloneOrClean(config.org, repo, config.tmpDir),
             `git checkout ${config.masterBranch}`,
-	    `build_xcframeworks.sh -r {config.org} -b ${config.masterBranch}`,
+	    `./build_xcframeworks.sh -r ${config.org} -b ${config.masterBranch}`,
             commitAndPushMaster(),
 	    tagMaster(true) // SPM needs versions of the form X.Y.Z (where X, Y, Z are integers)
         ]
