@@ -174,7 +174,7 @@ async function prepareRepo(repo, params) {
                     deleteBranch(config.testMasterBranch),
                     !params.noDev ? deleteBranch(config.testDevBranch) : null,
                     params.hasDoc ? deleteBranch(config.testDocBranch) : null,
-                    !params.noTag ? deleteTag(config.testVersion, config.noTagPrefix) : null
+                    !params.noTag ? deleteTag(config.testVersion, params.noTagPrefix) : null
                 ]
             },
             config.cleanupOnly ? null : {
