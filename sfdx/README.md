@@ -4,17 +4,7 @@ A plugin for the Salesforce CLI to create mobile applications to interface with 
 
 ## Special Note Regarding SFDX and Oclif
 
-SFDX now supports the Heroku "O"pen "CLI" "F"ramework and sfdx-mobilesdk-plugin v7.1.0 has been updated to be compatible. The new plugin will run in both version 6 and version 7 instances of the SFDX cli. However, older versions of the mobilesdk plugin will not work in the Oclif version of the CLI. 
-
-If there is a need to use an older plugin one must first uninstall V7 of the CLI and install a V6 instance.
-
-To determine the latest version of v6 go here:
-
-https://www.npmjs.com/package/sfdx-cli?activeTab=versions
-
-The most reliable way to install a previous version of the CLI is via npm.
-
-`npm install sfdx-cli@<V6 version from npmjs> -g`
+The Salesforce CLI now supports the Heroku "O"pen "CLI" "F"ramework and sfdx-mobilesdk-plugin v7.1.0 has been updated to be compatible. 
 
 ## Setup
 
@@ -28,55 +18,55 @@ The most reliable way to install a previous version of the CLI is via npm.
 
 4. Generate oclif command classes `./sfdx/generate_oclif.js`
 
-5. Link the plugin: `sfdx plugins:link sfdx`
+5. Link the plugin: `sf plugins link sfdx`
 
 ### Install as plugin
 
-1. Install plugin: `sfdx plugins:install sfdx-mobilesdk-plugin`
+1. Install plugin: `sf plugins install sfdx-mobilesdk-plugin`
 
 ## Help
 ```
--> sfdx mobilesdk --help
+-> sf mobilesdk --help
 create mobile apps based on the Salesforce Mobile SDK
 
 USAGE
-  $ sfdx mobilesdk:COMMAND
+  $ sf mobilesdk COMMAND
 
 TOPICS
-  mobilesdk:android      create an Android native mobile application
-  mobilesdk:hybrid       create a hybrid mobile application
-  mobilesdk:ios          create an iOS native mobile application
-  mobilesdk:reactnative  create a React Native mobile application
+  mobilesdk android      create an Android native mobile application
+  mobilesdk hybrid       create a hybrid mobile application
+  mobilesdk ios          create an iOS native mobile application
+  mobilesdk reactnative  create a React Native mobile application
 
 ```
 
 ## Create a native iOS application 
 ### Help for iOS
 ```
--> sfdx mobilesdk:ios --help
+-> sf mobilesdk ios --help
 create an iOS native mobile application
 
 USAGE
-  $ sfdx mobilesdk:ios:COMMAND
+  $ sf mobilesdk ios COMMAND
 
 COMMANDS
-  mobilesdk:ios:checkconfig         validate store or syncs configuration
-  mobilesdk:ios:create              create an iOS native mobile application
-  mobilesdk:ios:createwithtemplate  create an iOS native mobile application from
+  mobilesdk ios checkconfig         validate store or syncs configuration
+  mobilesdk ios create              create an iOS native mobile application
+  mobilesdk ios createwithtemplate  create an iOS native mobile application from
                                     a template
-  mobilesdk:ios:listtemplates       list available Mobile SDK templates to
+  mobilesdk ios listtemplates       list available Mobile SDK templates to
                                     create an iOS native mobile application
-  mobilesdk:ios:version             show version of Mobile SDK
+  mobilesdk ios version             show version of Mobile SDK
 
 ```
 
 ### Create Objective-C (native) or Swift (native_swift) application
 ```
--> sfdx mobilesdk:ios:create --help
+-> sf mobilesdk ios create --help
 create an iOS native mobile application
 
 USAGE
-  $ sfdx mobilesdk:ios:create
+  $ sf mobilesdk ios create
 
 OPTIONS
   -d, --outputdir=outputdir        output directory (leave empty for current
@@ -101,11 +91,11 @@ DESCRIPTION
 
 ### List available native iOS templates
 ```
--> sfdx mobilesdk:ios:listtemplates --help
+-> sf mobilesdk ios listtemplates --help
 list available Mobile SDK templates to create an iOS native mobile application
 
 USAGE
-  $ sfdx mobilesdk:ios:listtemplates
+  $ sf mobilesdk ios listtemplates
 
 DESCRIPTION
   This command displays the list of available Mobile SDK templates. You can copy 
@@ -115,11 +105,11 @@ DESCRIPTION
 
 ### Create iOS application from template
 ```
--> sfdx mobilesdk:ios:createwithtemplate --help
+-> sf mobilesdk ios createwithtemplate --help
 create an iOS native mobile application from a template
 
 USAGE
-  $ sfdx mobilesdk:ios:createwithtemplate
+  $ sf mobilesdk ios createwithtemplate
 
 OPTIONS
   -d, --outputdir=outputdir              output directory (leave empty for
@@ -148,11 +138,11 @@ DESCRIPTION
 
 ### Check store or syncs config
 ```
--> sfdx mobilesdk:ios:checkconfig --help
+-> sf mobilesdk ios checkconfig --help
 validate store or syncs configuration
 
 USAGE
-  $ sfdx mobilesdk:ios:checkconfig
+  $ sf mobilesdk ios checkconfig
 
 OPTIONS
   -p, --configpath=configpath  (required) path to store or syncs config to
@@ -170,32 +160,32 @@ DESCRIPTION
 ## Create a native Android application 
 ### Help for Android
 ```
--> sfdx mobilesdk:android --help
+-> sf mobilesdk android --help
 create an Android native mobile application
 
 USAGE
-  $ sfdx mobilesdk:android:COMMAND
+  $ sf mobilesdk android COMMAND
 
 COMMANDS
-  mobilesdk:android:checkconfig         validate store or syncs configuration
-  mobilesdk:android:create              create an Android native mobile
+  mobilesdk android checkconfig         validate store or syncs configuration
+  mobilesdk android create              create an Android native mobile
                                         application
-  mobilesdk:android:createwithtemplate  create an Android native mobile
+  mobilesdk android createwithtemplate  create an Android native mobile
                                         application from a template
-  mobilesdk:android:listtemplates       list available Mobile SDK templates to
+  mobilesdk android listtemplates       list available Mobile SDK templates to
                                         create an Android native mobile
                                         application
-  mobilesdk:android:version             show version of Mobile SDK
+  mobilesdk android version             show version of Mobile SDK
 
 ```
 
 ### Create Java (native) or Kotlin (native_kotlin) application
 ```
--> sfdx mobilesdk:android:create --help
+-> sf mobilesdk android create --help
 create an Android native mobile application
 
 USAGE
-  $ sfdx mobilesdk:android:create
+  $ sf mobilesdk android create
 
 OPTIONS
   -d, --outputdir=outputdir        output directory (leave empty for current
@@ -220,11 +210,11 @@ DESCRIPTION
 
 ### List available native Android templates
 ```
--> sfdx mobilesdk:android:listtemplates --help
+-> sf mobilesdk android listtemplates --help
 list available Mobile SDK templates to create an Android native mobile application
 
 USAGE
-  $ sfdx mobilesdk:android:listtemplates
+  $ sf mobilesdk android listtemplates
 
 DESCRIPTION
   This command displays the list of available Mobile SDK templates. You can copy 
@@ -234,11 +224,11 @@ DESCRIPTION
 
 ### Create Android application from template
 ```
--> sfdx mobilesdk:android:createwithtemplate --help
+-> sf mobilesdk android createwithtemplate --help
 create an Android native mobile application from a template
 
 USAGE
-  $ sfdx mobilesdk:android:createwithtemplate
+  $ sf mobilesdk android createwithtemplate
 
 OPTIONS
   -d, --outputdir=outputdir              output directory (leave empty for
@@ -267,11 +257,11 @@ DESCRIPTION
 
 ### Check store or syncs config
 ```
--> sfdx mobilesdk:android:checkconfig --help
+-> sf mobilesdk android checkconfig --help
 validate store or syncs configuration
 
 USAGE
-  $ sfdx mobilesdk:android:checkconfig
+  $ sf mobilesdk android checkconfig
 
 OPTIONS
   -p, --configpath=configpath  (required) path to store or syncs config to
@@ -289,30 +279,30 @@ DESCRIPTION
 ## Create an hybrid application 
 ### Help for hybrid
 ```
--> sfdx mobilesdk:hybrid --help
+-> sf mobilesdk hybrid --help
 create a hybrid mobile application
 
 USAGE
-  $ sfdx mobilesdk:hybrid:COMMAND
+  $ sf mobilesdk hybrid COMMAND
 
 COMMANDS
-  mobilesdk:hybrid:checkconfig         validate store or syncs configuration
-  mobilesdk:hybrid:create              create a hybrid mobile application
-  mobilesdk:hybrid:createwithtemplate  create a hybrid mobile application from a
+  mobilesdk hybrid checkconfig         validate store or syncs configuration
+  mobilesdk hybrid create              create a hybrid mobile application
+  mobilesdk hybrid createwithtemplate  create a hybrid mobile application from a
                                        template
-  mobilesdk:hybrid:listtemplates       list available Mobile SDK templates to
+  mobilesdk hybrid listtemplates       list available Mobile SDK templates to
                                        create a hybrid mobile application
-  mobilesdk:hybrid:version             show version of Mobile SDK
+  mobilesdk hybrid version             show version of Mobile SDK
 
 ```
 
 ### Create hybrid application
 ```
--> sfdx mobilesdk:hybrid:create --help
+-> sf mobilesdk hybrid create --help
 create a hybrid mobile application
 
 USAGE
-  $ sfdx mobilesdk:hybrid:create
+  $ sf mobilesdk hybrid create
 
 OPTIONS
   -d, --outputdir=outputdir        output directory (leave empty for current
@@ -344,11 +334,11 @@ DESCRIPTION
 
 ### List available hybrid templates
 ```
--> sfdx mobilesdk:hybrid:listtemplates --help
+-> sf mobilesdk hybrid listtemplates --help
 list available Mobile SDK templates to create a hybrid mobile application
 
 USAGE
-  $ sfdx mobilesdk:hybrid:listtemplates
+  $ sf mobilesdk hybrid listtemplates
 
 DESCRIPTION
   This command displays the list of available Mobile SDK templates. You can copy 
@@ -358,11 +348,11 @@ DESCRIPTION
 
 ### Create hybrid application from template
 ```
--> sfdx mobilesdk:hybrid:createwithtemplate --help
+-> sf mobilesdk hybrid createwithtemplate --help
 create a hybrid mobile application from a template
 
 USAGE
-  $ sfdx mobilesdk:hybrid:createwithtemplate
+  $ sf mobilesdk hybrid createwithtemplate
 
 OPTIONS
   -d, --outputdir=outputdir              output directory (leave empty for
@@ -398,11 +388,11 @@ DESCRIPTION
 
 ### Check store or syncs config
 ```
--> sfdx mobilesdk:hybrid:checkconfig --help
+-> sf mobilesdk hybrid checkconfig --help
 validate store or syncs configuration
 
 USAGE
-  $ sfdx mobilesdk:hybrid:checkconfig
+  $ sf mobilesdk hybrid checkconfig
 
 OPTIONS
   -p, --configpath=configpath  (required) path to store or syncs config to
@@ -420,33 +410,33 @@ DESCRIPTION
 ## Create a React Native application
 ### Help for React Native
 ```
--> sfdx mobilesdk:reactnative --help
+-> sf mobilesdk reactnative --help
 create a React Native mobile application
 
 USAGE
-  $ sfdx mobilesdk:reactnative:COMMAND
+  $ sf mobilesdk reactnative COMMAND
 
 COMMANDS
-  mobilesdk:reactnative:checkconfig         validate store or syncs
+  mobilesdk reactnative checkconfig         validate store or syncs
                                             configuration
-  mobilesdk:reactnative:create              create a React Native mobile
+  mobilesdk reactnative create              create a React Native mobile
                                             application
-  mobilesdk:reactnative:createwithtemplate  create a React Native mobile
+  mobilesdk reactnative createwithtemplate  create a React Native mobile
                                             application from a template
-  mobilesdk:reactnative:listtemplates       list available Mobile SDK templates
+  mobilesdk reactnative listtemplates       list available Mobile SDK templates
                                             to create a React Native mobile
                                             application
-  mobilesdk:reactnative:version             show version of Mobile SDK
+  mobilesdk reactnative version             show version of Mobile SDK
 
 ```
 
 ### Create React Native application
 ```
--> sfdx mobilesdk:reactnative:create --help
+-> sf mobilesdk reactnative create --help
 create a React Native mobile application
 
 USAGE
-  $ sfdx mobilesdk:reactnative:create
+  $ sf mobilesdk reactnative create
 
 OPTIONS
   -d, --outputdir=outputdir        output directory (leave empty for current
@@ -471,11 +461,11 @@ DESCRIPTION
 
 ### List available React Native templates
 ```
--> sfdx mobilesdk:reactnative:listtemplates --help
+-> sf mobilesdk reactnative listtemplates --help
 list available Mobile SDK templates to create a React Native mobile application
 
 USAGE
-  $ sfdx mobilesdk:reactnative:listtemplates
+  $ sf mobilesdk reactnative listtemplates
 
 DESCRIPTION
   This command displays the list of available Mobile SDK templates. You can copy 
@@ -485,11 +475,11 @@ DESCRIPTION
 
 ### Create React Native application from template
 ```
--> sfdx mobilesdk:reactnative:createwithtemplate --help
+-> sf mobilesdk reactnative createwithtemplate --help
 create a React Native mobile application from a template
 
 USAGE
-  $ sfdx mobilesdk:reactnative:createwithtemplate
+  $ sf mobilesdk reactnative createwithtemplate
 
 OPTIONS
   -d, --outputdir=outputdir              output directory (leave empty for
@@ -521,11 +511,11 @@ DESCRIPTION
 
 ### Check store or syncs config
 ```
--> sfdx mobilesdk:reactnative:checkconfig --help
+-> sf mobilesdk reactnative checkconfig --help
 validate store or syncs configuration
 
 USAGE
-  $ sfdx mobilesdk:reactnative:checkconfig
+  $ sf mobilesdk reactnative checkconfig
 
 OPTIONS
   -p, --configpath=configpath  (required) path to store or syncs config to
