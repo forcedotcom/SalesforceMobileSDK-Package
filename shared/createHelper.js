@@ -270,7 +270,7 @@ function checkTools(toolNames) {
     try {
         utils.log("Checking tools");
         for (var toolName of toolNames) {
-            utils.checkToolVersion(SDK.tools[toolName].checkCmd, SDK.tools[toolName].minVersion, SDK.tools[toolName].maxVersion);
+            utils.checkToolVersion(SDK.tools[toolName].checkCmd, SDK.tools[toolName].minVersion, SDK.tools[toolName].maxVersion, toolName);
         }
     }
     catch (error) {
