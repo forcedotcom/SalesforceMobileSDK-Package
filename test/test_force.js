@@ -2,6 +2,7 @@
 
 // Dependencies
 var spawnSync = require('child_process').spawnSync,
+    existsSync = require('fs').existsSync,
     path = require('path'),
     shelljs = require('shelljs'),
     commandLineUtils = require('../shared/commandLineUtils'),
@@ -31,7 +32,11 @@ var APP_TYPE = {
 var defaultStartPage = '/apex/testPage';
 
 // Calling main
-main(process.argv);
+try {
+    main(process.argv);
+} catch (error) {
+    utils.logError(`Error in main:`, error);
+}
 
 //
 // Main function
@@ -369,10 +374,14 @@ function createCompileApp(tmpDir, os, actualAppType, templateRepoUri, pluginRepo
 }
 
 function buildForiOS(target, workspaceDir, appName) {
-    utils.runProcessCatchError('xcodebuild -workspace ' + path.join(workspaceDir, appName + '.xcworkspace')
-                               + ' -scheme ' + appName
-                               + ' clean build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO',
-                               'COMPILING ' + target);
+    const workspacePath = path.join(workspaceDir, appName + '.xcworkspace');
+    const projectPath = path.join(workspaceDir, appName + '.xcodeproj');
+    const buildTarget = existsSync(workspacePath)
+	  ? `-workspace ${workspacePath} -scheme ${appName}`
+	  : `-project ${projectPath}`;
+    
+    utils.runProcessCatchError(`xcodebuild ${buildTarget} clean build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO`,
+			       `COMPILING ${target}`);
 }
 
 function buildForAndroid(target, workspaceDir) {
