@@ -237,8 +237,29 @@ function printNextSteps(ide, projectPath, result) {
                         'Before you ship, make sure to plug your OAuth Client ID and Callback URI,',
                         'and OAuth Scopes into ' + bootconfigFile,
                        ]);
-
 };    
+
+//
+// Print next steps for Native Login
+// 
+function printNextStepsForNativeLogin(ide, projectPath, result) {
+    var workspacePath = path.join(projectPath, result.workspacePath);
+    var bootconfigFile =  path.join(projectPath, result.bootconfigFile);
+    var entryFile = (ide === 'XCode') ? 'SceneDelegate' : 'MainApplication';  
+
+    // Printing out next steps
+    utils.logParagraph(['Next steps' + (result.platform ? ' for ' + result.platform : '') + ':',
+                        '',
+                        'Your application project is ready in ' + projectPath + '.',
+                        'To use your new application in ' + ide + ', do the following:', 
+                        '   - open ' + workspacePath + ' in ' + ide, 
+                        '   - Update the OAuth Client ID, Callback URI, and Community URL in ' + entryFile + ' class.',
+                        '   - build and run', 
+                        'Before you ship, make sure to plug your OAuth Client ID and Callback URI,',
+                        'and OAuth Scopes into ' + bootconfigFile + ', since it is still used for',
+                        'authentication if we fallback on the webview.'
+                       ]);
+}
 
 //
 // Print next steps for server project if present
@@ -259,8 +280,6 @@ function printNextStepsForServerProjectIfNeeded(projectPath) {
                             '   - sfdx force:user:password:generate -u MyOrg'                            
                             ]);
     }
-
-
 }
 
 //
@@ -386,7 +405,12 @@ function actuallyCreateApp(forcecli, config) {
         if (!(results instanceof Array)) { results = [results] };
         for (var result of results) {
             var ide = SDK.ides[result.platform || config.platform.split(',')[0]];
-            printNextSteps(ide, config.projectPath, result);
+
+            if (config.templatepath != undefined && config.templatepath.includes('NativeLogin')) {
+                printNextStepsForNativeLogin(ide, config.projectPath, result);
+            } else {
+                printNextSteps(ide, config.projectPath, result);
+            }
         }
         printNextStepsForServerProjectIfNeeded(config.projectPath);
 
