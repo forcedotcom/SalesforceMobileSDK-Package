@@ -14,11 +14,11 @@ A plugin for the Salesforce CLI to create mobile applications to interface with 
 
 4. Generate oclif command classes `./sfdx/generate_oclif.js`
 
-5. Link the plugin: `sf plugins:link sfdx`
+5. Link the plugin: `sf plugins link sfdx`
 
 ### Install as plugin
 
-1. Install plugin: `sf plugins:install sfdx-mobilesdk-plugin`
+1. Install plugin: `sf plugins install sfdx-mobilesdk-plugin`
 
 ## Help
 ```
@@ -39,7 +39,7 @@ TOPICS
 ## Create a native iOS application 
 ### Help for iOS
 ```
--> sf mobilesdk:ios --help
+-> sf mobilesdk ios --help
 create an iOS native mobile application
 
 USAGE
@@ -58,7 +58,7 @@ COMMANDS
 
 ### Create Objective-C (native) or Swift (native_swift) application
 ```
--> sf mobilesdk:ios:create --help
+-> sf mobilesdk ios create --help
 create an iOS native mobile application
 
 USAGE
@@ -86,7 +86,7 @@ DESCRIPTION
 
 ### List available native iOS templates
 ```
--> sf mobilesdk:ios:listtemplates --help
+-> sf mobilesdk ios listtemplates --help
 list available Mobile SDK templates to create an iOS native mobile application
 
 USAGE
@@ -102,7 +102,7 @@ DESCRIPTION
 
 ### Create iOS application from template
 ```
--> sf mobilesdk:ios:createwithtemplate --help
+-> sf mobilesdk ios createwithtemplate --help
 create an iOS native mobile application from a template
 
 USAGE
@@ -133,7 +133,7 @@ DESCRIPTION
 
 ### Check store or syncs config
 ```
--> sf mobilesdk:ios:checkconfig --help
+-> sf mobilesdk ios checkconfig --help
 validate store or syncs configuration
 
 USAGE
@@ -155,7 +155,7 @@ DESCRIPTION
 ## Create a native Android application 
 ### Help for Android
 ```
--> sf mobilesdk:android --help
+-> sf mobilesdk android --help
 create an Android native mobile application
 
 USAGE
@@ -176,7 +176,7 @@ COMMANDS
 
 ### Create Java (native) or Kotlin (native_kotlin) application
 ```
--> sf mobilesdk:android:create --help
+-> sf mobilesdk android create --help
 create an Android native mobile application
 
 USAGE
@@ -204,7 +204,7 @@ DESCRIPTION
 
 ### List available native Android templates
 ```
--> sf mobilesdk:android:listtemplates --help
+-> sf mobilesdk android listtemplates --help
 list available Mobile SDK templates to create an Android native mobile application
 
 USAGE
@@ -221,7 +221,7 @@ DESCRIPTION
 
 ### Create Android application from template
 ```
--> sf mobilesdk:android:createwithtemplate --help
+-> sf mobilesdk android createwithtemplate --help
 create an Android native mobile application from a template
 
 USAGE
@@ -252,7 +252,7 @@ DESCRIPTION
 
 ### Check store or syncs config
 ```
--> sf mobilesdk:android:checkconfig --help
+-> sf mobilesdk android checkconfig --help
 validate store or syncs configuration
 
 USAGE
@@ -274,7 +274,7 @@ DESCRIPTION
 ## Create an hybrid application 
 ### Help for hybrid
 ```
--> sf mobilesdk:hybrid --help
+-> sf mobilesdk hybrid --help
 create a hybrid mobile application
 
 USAGE
@@ -293,7 +293,7 @@ COMMANDS
 
 ### Create hybrid application
 ```
--> sf mobilesdk:hybrid:create --help
+-> sf mobilesdk hybrid create --help
 create a hybrid mobile application
 
 USAGE
@@ -325,7 +325,7 @@ DESCRIPTION
 
 ### List available hybrid templates
 ```
--> sf mobilesdk:hybrid:listtemplates --help
+-> sf mobilesdk hybrid listtemplates --help
 list available Mobile SDK templates to create a hybrid mobile application
 
 USAGE
@@ -341,7 +341,7 @@ DESCRIPTION
 
 ### Create hybrid application from template
 ```
--> sf mobilesdk:hybrid:createwithtemplate --help
+-> sf mobilesdk hybrid createwithtemplate --help
 create a hybrid mobile application from a template
 
 USAGE
@@ -376,7 +376,7 @@ DESCRIPTION
 
 ### Check store or syncs config
 ```
--> sf mobilesdk:hybrid:checkconfig --help
+-> sf mobilesdk hybrid checkconfig --help
 validate store or syncs configuration
 
 USAGE
@@ -398,7 +398,7 @@ DESCRIPTION
 ## Create a React Native application
 ### Help for React Native
 ```
--> sf mobilesdk:reactnative --help
+-> sf mobilesdk reactnative --help
 create a React Native mobile application
 
 USAGE
@@ -420,7 +420,7 @@ COMMANDS
 
 ### Create React Native application
 ```
--> sf mobilesdk:reactnative:create --help
+-> sf mobilesdk reactnative create --help
 create a React Native mobile application
 
 USAGE
@@ -451,7 +451,7 @@ DESCRIPTION
 
 ### List available React Native templates
 ```
--> sf mobilesdk:reactnative:listtemplates --help
+-> sf mobilesdk reactnative listtemplates --help
 list available Mobile SDK templates to create a React Native mobile application
 
 USAGE
@@ -468,7 +468,7 @@ DESCRIPTION
 
 ### Create React Native application from template
 ```
--> sf mobilesdk:reactnative:createwithtemplate --help
+-> sf mobilesdk reactnative createwithtemplate --help
 create a React Native mobile application from a template
 
 USAGE
@@ -501,7 +501,7 @@ DESCRIPTION
 
 ### Check store or syncs config
 ```
--> sf mobilesdk:reactnative:checkconfig --help
+-> sf mobilesdk reactnative checkconfig --help
 validate store or syncs configuration
 
 USAGE
