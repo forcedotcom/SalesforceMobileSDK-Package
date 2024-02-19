@@ -90,7 +90,7 @@ function createHybridApp(config) {
     // Merge files from template into it
     if (utils.dirExists(path.join(webDir, SERVER_PROJECT_DIR))) {
         config.serverDir = path.join(config.projectDir, SERVER_PROJECT_DIR)
-        utils.runProcessThrowError('sfdx force:project:create -n ' + SERVER_PROJECT_DIR, config.projectDir);
+        utils.runProcessThrowError('sf force project create -n ' + SERVER_PROJECT_DIR, config.projectDir);
 
         // Copy cordova js to static resources
         for (var platform of config.platform.split(',')) {
@@ -273,11 +273,11 @@ function printNextStepsForServerProjectIfNeeded(projectPath) {
                             'Make sure to deploy it to your org before running your application.',
                             '',
                             'From ' + projectPath + ' do the following to setup a scratch org, push the server code:',
-                            '   - sfdx force:org:create -f server/config/project-scratch-def.json -a MyOrg',
+                            '   - sf force org create -f server/config/project-scratch-def.json -a MyOrg',
                             '   - cd server',
-                            '   - sfdx force:source:push -u MyOrg',
+                            '   - sf force source push -u MyOrg',
                             'You also need a password to login to the scratch org from the mobile app:',
-                            '   - sfdx force:user:password:generate -u MyOrg'                            
+                            '   - sf force user password generate -u MyOrg'                            
                             ]);
     }
 }
