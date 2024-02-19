@@ -70,7 +70,7 @@ module.exports = {
         },
         sfdx: {
             checkCmd: 'sfdx -v',
-            minVersion: '6.0.0'
+            minVersion: '2.0.0'
         }    
     },
 
