@@ -26,9 +26,9 @@ aliases:
     name: Install SFDX
     command: |
       if [[ "$OSTYPE" == "linux-gnu" ]]; then
-        sudo npm install -g sfdx-cli
+        sudo npm install -g @salesforce/cli
       else 
-        npm install -g sfdx-cli
+        npm install -g @salesforce/cli
       fi
     when: always
 

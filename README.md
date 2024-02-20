@@ -1,7 +1,7 @@
 [![CircleCI](https://circleci.com/gh/forcedotcom/SalesforceMobileSDK-Package/tree/dev.svg?style=svg)](https://circleci.com/gh/forcedotcom/SalesforceMobileSDK-Package/tree/dev)
 
 # SalesforceMobileSDK-Package
-Repo for forceios/forcedroid/forcehybrid/forcereact and the sfdx plugin.
+Repo for forceios/forcedroid/forcehybrid/forcereact and the Salesforce CLI plugin.
 
 ## To get started do the following from the root directory
 ``` shell
@@ -28,25 +28,25 @@ node ./install.js
 ./react/forcereact.js
 ```
 
-## To load the sfdx plugin from source do
+## To load the sf plugin from source do
 ```shell
-sfdx plugins:link sfdx
+sf plugins link sfdx
 ```
 
-## To run the sfdx plugin do
+## To run the Salesforce CLI plugin do
 ```shell
-sfdx mobilesdk:ios --help 
-sfdx mobilesdk:android --help 
-sfdx mobilesdk:hybrid --help 
-sfdx mobilesdk:reactnative --help
+sf mobilesdk ios --help 
+sf mobilesdk android --help 
+sf mobilesdk hybrid --help 
+sf mobilesdk reactnative --help
 ```
 
-## To test forceios, forcedroid, forcehybrid, forcereact or the sfdx plugin do
+## To test forceios, forcedroid, forcehybrid, forcereact or the Salesforce CLI plugin do
 ```shell
 ./test/test_force.js
 ```
 
-## To npm pack forceios, forcedroid, forcehybrid, forcereact or the sfx plugin do
+## To npm pack forceios, forcedroid, forcehybrid, forcereact or the Salesforce CLI plugin do
 ```shell
 ./pack/pack.js
 ```
