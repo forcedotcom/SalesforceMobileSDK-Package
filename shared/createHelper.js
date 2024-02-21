@@ -110,13 +110,7 @@ function createHybridApp(config) {
     utils.runProcessThrowError('cordova prepare', config.projectDir);
 
     if (config.platform.split(',').indexOf('ios') != -1) {
-        if (utils.getToolVersion('xcodebuild -version') < 14000000) {
-                // Use legacy build for xcode 13 and older
-            useLegacyBuild(config, path.join('platforms', 'ios'));
-        } else {
-            // Patch podfile for xcode 14
-            fixPods(config, path.join('platforms', 'ios'));
-        }
+        fixPods(config, path.join('platforms', 'ios'));
 
         // Remove libCordova.a from build 
         utils.logInfo('Updating xcode project file');
@@ -129,7 +123,6 @@ function createHybridApp(config) {
    
     // Done
     return prepareResult;
-
 }
 
 //
