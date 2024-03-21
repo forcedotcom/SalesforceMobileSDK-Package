@@ -2,7 +2,7 @@ aliases:
 #  Xcode version announcments can be found here: https://discuss.circleci.com/c/announcements/
 #  Each post contains a full image manifest, including iOS runtimes, devices, CocoaPods version, etc.
   - &latest-xcode "15.2"
-  - &latest-android "cimg/android:2023.08.1-node"
+  - &latest-android "cimg/android:2024.01.1-node"
   - &invalid      ""
 
   - &setup
@@ -42,9 +42,9 @@ aliases:
       fi
     when: always
 
-  - &install-android-build-tools-32
-    name: Install Android Build Tools 32.0.0
-    command: sdkmanager --install "build-tools;32.0.0"
+  - &install-android-build-tools-34
+    name: Install Android Build Tools 34.0.0
+    command: sdkmanager --install "build-tools;34.0.0"
 
   - &mac-env
     parameters:
