@@ -100,7 +100,7 @@ jobs:
       - run: *install-android-build-tools-34
       - run:
           name: Building all android hybrid templates
-          command: ./test/test_force.js --exit-on-failure --cli=forcehybrid --os=android
+          command: ./test/test_force.js --exit-on-failure --cli=forcehybrid --os=android --no-plugin-update
           when: always
 
   forcehybrid-android-sfdx:
@@ -113,7 +113,7 @@ jobs:
       - run: *install-android-build-tools-34
       - run:
           name: Building all android hybrid templates with SFDX
-          command: ./test/test_force.js --exit-on-failure --cli=forcehybrid --os=android --use-sfdx
+          command: ./test/test_force.js --exit-on-failure --cli=forcehybrid --os=android --use-sfdx --no-plugin-update
           when: always
 
   forcereact-android:
@@ -171,7 +171,7 @@ jobs:
           name: Building all ios hybrid templates
           command:  |
               sudo chown -R `whoami` /Users/`whoami`/Library/Preferences/
-              ./test/test_force.js --exit-on-failure --cli=forcehybrid --os=ios
+              ./test/test_force.js --exit-on-failure --cli=forcehybrid --os=ios --no-plugin-update
           when: always
 
   forcehybrid-ios-sfdx:
@@ -185,7 +185,7 @@ jobs:
           name: Building all ios hybrid templates with SFDX
           command:  |
               sudo chown -R `whoami` /Users/`whoami`/Library/Preferences/
-              ./test/test_force.js --exit-on-failure --cli=forcehybrid --os=ios --use-sfdx
+              ./test/test_force.js --exit-on-failure --cli=forcehybrid --os=ios --use-sfdx --no-plugin-update
           when: always
 
   forcereact-ios:
@@ -231,11 +231,7 @@ workflows:
       - forcehybrid-android
       - forcereact-android
       - forceios-sfdx
-      - forcehybrid-ios-sfdx
-      - forcereact-ios-sfdx
       - forcedroid-sfdx
-      - forcehybrid-android-sfdx
-      - forcereact-android-sfdx
 
   # Build everything at 8:00 PM PST Wednesday and Sunday
   weekly-build-all-apps:
@@ -252,29 +248,4 @@ workflows:
       - forcehybrid-android
       - forcereact-android
       - forceios-sfdx
-      - forcehybrid-ios-sfdx
-      - forcereact-ios-sfdx
       - forcedroid-sfdx
-      - forcehybrid-android-sfdx
-      - forcereact-android-sfdx
-
-  # Build everything iOS wtih Beta Xcode at 9:00 PM PST Wednesday and Sunday
-  weekly-build-all-apps-ios-beta:
-    when: 
-      and:
-        - << pipeline.parameters.xcode >>
-        - not:
-            equal: [ "webhook", << pipeline.trigger_source >> ]
-    jobs:
-      - forceios:
-          xcode: << pipeline.parameters.xcode >>
-      - forcehybrid-ios:
-          xcode: << pipeline.parameters.xcode >>
-      - forcereact-ios:
-          xcode: << pipeline.parameters.xcode >>
-      - forceios-sfdx:
-          xcode: << pipeline.parameters.xcode >>
-      - forcehybrid-ios-sfdx:
-          xcode: << pipeline.parameters.xcode >>
-      - forcereact-ios-sfdx:
-          xcode: << pipeline.parameters.xcode >>
