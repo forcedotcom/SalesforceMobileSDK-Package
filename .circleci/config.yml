@@ -99,7 +99,7 @@ jobs:
       - run: *install-android-build-tools-32
       - run:
           name: Building all android hybrid templates
-          command: ./test/test_force.js --exit-on-failure --cli=forcehybrid --os=android --no-plugin-update
+          command: ./test/test_force.js --exit-on-failure --cli=forcehybrid --os=android
           when: always
 
   forcehybrid-android-sfdx:
@@ -112,7 +112,7 @@ jobs:
       - run: *install-android-build-tools-32
       - run:
           name: Building all android hybrid templates with SFDX
-          command: ./test/test_force.js --exit-on-failure --cli=forcehybrid --os=android --use-sfdx --no-plugin-update
+          command: ./test/test_force.js --exit-on-failure --cli=forcehybrid --os=android --use-sfdx
           when: always
 
   forcereact-android:
@@ -170,7 +170,7 @@ jobs:
           name: Building all ios hybrid templates
           command:  |
               sudo chown -R `whoami` /Users/`whoami`/Library/Preferences/
-              ./test/test_force.js --exit-on-failure --cli=forcehybrid --os=ios --no-plugin-update
+              ./test/test_force.js --exit-on-failure --cli=forcehybrid --os=ios
           when: always
 
   forcehybrid-ios-sfdx:
@@ -184,7 +184,7 @@ jobs:
           name: Building all ios hybrid templates with SFDX
           command:  |
               sudo chown -R `whoami` /Users/`whoami`/Library/Preferences/
-              ./test/test_force.js --exit-on-failure --cli=forcehybrid --os=ios --use-sfdx --no-plugin-update
+              ./test/test_force.js --exit-on-failure --cli=forcehybrid --os=ios --use-sfdx
           when: always
 
   forcereact-ios:
