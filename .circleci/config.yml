@@ -96,7 +96,7 @@ jobs:
       - run: *setup
       - run: *install-cordova
       - run: *install-sfdx
-      - run: *install-android-build-tools-32
+      - run: *install-android-build-tools-34
       - run:
           name: Building all android hybrid templates
           command: ./test/test_force.js --exit-on-failure --cli=forcehybrid --os=android
@@ -109,7 +109,7 @@ jobs:
       - run: *setup
       - run: *install-cordova
       - run: *install-sfdx
-      - run: *install-android-build-tools-32
+      - run: *install-android-build-tools-34
       - run:
           name: Building all android hybrid templates with SFDX
           command: ./test/test_force.js --exit-on-failure --cli=forcehybrid --os=android --use-sfdx
