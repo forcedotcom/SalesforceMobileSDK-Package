@@ -65,7 +65,7 @@ executors:
     docker:
       - image: *latest-android
     environment:
-      GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx2048m -XX:MaxMetaspaceSize=1g -XX:+HeapDumpOnOutOfMemoryError" -Dorg.gradle.daemon=false -Dfile.encoding=utf-8'
+      GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx3g -XX:MaxMetaspaceSize=1g -XX:+HeapDumpOnOutOfMemoryError" -Dorg.gradle.daemon=false -Dfile.encoding=utf-8'
 
 jobs:
   forcedroid:
