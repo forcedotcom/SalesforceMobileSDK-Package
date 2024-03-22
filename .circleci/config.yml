@@ -230,8 +230,8 @@ workflows:
       - forcedroid
       - forcehybrid-android
       - forcereact-android
-      - forceios-sfdx
-      - forcedroid-sfdx
+      - forcehybrid-android-sfdx
+      - forcehybrid-ios-sfdx
 
   # Build everything at 8:00 PM PST Wednesday and Sunday
   weekly-build-all-apps:
@@ -247,5 +247,20 @@ workflows:
       - forcedroid
       - forcehybrid-android
       - forcereact-android
-      - forceios-sfdx
-      - forcedroid-sfdx
+      - forcehybrid-android-sfdx
+      - forcehybrid-ios-sfdx
+
+  # Build everything iOS wtih Beta Xcode at 9:00 PM PST Wednesday and Sunday
+  weekly-build-all-apps-ios-beta:
+    when: 
+      and:
+        - << pipeline.parameters.xcode >>
+        - not:
+            equal: [ "webhook", << pipeline.trigger_source >> ]
+    jobs:
+      - forceios:
+          xcode: << pipeline.parameters.xcode >>
+      - forcehybrid-ios:
+          xcode: << pipeline.parameters.xcode >>
+      - forcereact-ios:
+          xcode: << pipeline.parameters.xcode >>
