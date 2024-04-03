@@ -2,7 +2,7 @@ aliases:
 #  Xcode version announcments can be found here: https://discuss.circleci.com/c/announcements/
 #  Each post contains a full image manifest, including iOS runtimes, devices, CocoaPods version, etc.
   - &latest-xcode "15.2"
-  - &latest-android "cimg/android:2023.08.1-node"
+  - &latest-android "cimg/android:2024.01.1-node"
   - &invalid      ""
 
   - &setup
@@ -42,9 +42,9 @@ aliases:
       fi
     when: always
 
-  - &install-android-build-tools-32
-    name: Install Android Build Tools 32.0.0
-    command: sdkmanager --install "build-tools;32.0.0"
+  - &install-android-build-tools-34
+    name: Install Android Build Tools 34.0.0
+    command: sdkmanager --install "build-tools;34.0.0"
 
   - &mac-env
     parameters:
@@ -64,8 +64,9 @@ executors:
     working_directory: ~/SalesforceMobileSDK-Package
     docker:
       - image: *latest-android
+    resource_class: medium+
     environment:
-      GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx2048m -XX:+HeapDumpOnOutOfMemoryError" -Dorg.gradle.daemon=false -Dfile.encoding=utf-8'
+      GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx2g -XX:MaxMetaspaceSize=1g -XX:+HeapDumpOnOutOfMemoryError" -Dorg.gradle.daemon=false -Dfile.encoding=utf-8'
 
 jobs:
   forcedroid:
@@ -96,7 +97,7 @@ jobs:
       - run: *setup
       - run: *install-cordova
       - run: *install-sfdx
-      - run: *install-android-build-tools-32
+      - run: *install-android-build-tools-34
       - run:
           name: Building all android hybrid templates
           command: ./test/test_force.js --exit-on-failure --cli=forcehybrid --os=android --no-plugin-update
@@ -109,7 +110,7 @@ jobs:
       - run: *setup
       - run: *install-cordova
       - run: *install-sfdx
-      - run: *install-android-build-tools-32
+      - run: *install-android-build-tools-34
       - run:
           name: Building all android hybrid templates with SFDX
           command: ./test/test_force.js --exit-on-failure --cli=forcehybrid --os=android --use-sfdx --no-plugin-update
@@ -229,12 +230,8 @@ workflows:
       - forcedroid
       - forcehybrid-android
       - forcereact-android
-      - forceios-sfdx
-      - forcehybrid-ios-sfdx
-      - forcereact-ios-sfdx
-      - forcedroid-sfdx
       - forcehybrid-android-sfdx
-      - forcereact-android-sfdx
+      - forcehybrid-ios-sfdx
 
   # Build everything at 8:00 PM PST Wednesday and Sunday
   weekly-build-all-apps:
@@ -250,12 +247,8 @@ workflows:
       - forcedroid
       - forcehybrid-android
       - forcereact-android
-      - forceios-sfdx
-      - forcehybrid-ios-sfdx
-      - forcereact-ios-sfdx
-      - forcedroid-sfdx
       - forcehybrid-android-sfdx
-      - forcereact-android-sfdx
+      - forcehybrid-ios-sfdx
 
   # Build everything iOS wtih Beta Xcode at 9:00 PM PST Wednesday and Sunday
   weekly-build-all-apps-ios-beta:
@@ -270,10 +263,4 @@ workflows:
       - forcehybrid-ios:
           xcode: << pipeline.parameters.xcode >>
       - forcereact-ios:
-          xcode: << pipeline.parameters.xcode >>
-      - forceios-sfdx:
-          xcode: << pipeline.parameters.xcode >>
-      - forcehybrid-ios-sfdx:
-          xcode: << pipeline.parameters.xcode >>
-      - forcereact-ios-sfdx:
           xcode: << pipeline.parameters.xcode >>
