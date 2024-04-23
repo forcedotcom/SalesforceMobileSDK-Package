@@ -126,28 +126,6 @@ function createHybridApp(config) {
 }
 
 //
-// Use legacy build system in XCode
-//
-function useLegacyBuild(config, iosSubDir) {
-    var xcSettingsDir = path.join(config.projectDir, iosSubDir, config.appname + '.xcworkspace', 'xcshareddata')
-    var xcSettingsFile = path.join(xcSettingsDir, 'WorkspaceSettings.xcsettings');
-    var plistFileContent = '<?xml version="1.0" encoding="UTF-8"?>\n' +
-        '<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">\n' +
-        '<plist version="1.0">\n' + 
-        '<dict>\n'  +
-        '<key>BuildSystemType</key>\n' + 
-        '<string>Original</string>\n' +
-        '<key>DisableBuildSystemDeprecationDiagnostic</key>\n' + 
-	    '<true/>\n' +
-        '</dict>\n' + 
-        '</plist>\n';
-    utils.logInfo('Creating WorkspaceSettings.xcsettings for project. Setting the BuildSystemType to original in ' + xcSettingsFile);
-    utils.mkDirIfNeeded(xcSettingsDir)
-    fs.writeFileSync(xcSettingsFile,plistFileContent,'utf8');
-    utils.logInfo('Created WorkspaceSettings.xcsettings for project ' + config.appname);
-}
-
-//
 // Patch pod file for hybrid apps on xcode 14
 //
 function fixPods(config, iosSubDir) {
