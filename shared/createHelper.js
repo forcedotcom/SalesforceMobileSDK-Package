@@ -90,7 +90,7 @@ function createHybridApp(config) {
     // Merge files from template into it
     if (utils.dirExists(path.join(webDir, SERVER_PROJECT_DIR))) {
         config.serverDir = path.join(config.projectDir, SERVER_PROJECT_DIR)
-        utils.runProcessThrowError('sfdx force:project:create -n ' + SERVER_PROJECT_DIR, config.projectDir);
+        utils.runProcessThrowError('sf force project create -n ' + SERVER_PROJECT_DIR, config.projectDir);
 
         // Copy cordova js to static resources
         for (var platform of config.platform.split(',')) {
@@ -110,13 +110,7 @@ function createHybridApp(config) {
     utils.runProcessThrowError('cordova prepare', config.projectDir);
 
     if (config.platform.split(',').indexOf('ios') != -1) {
-        if (utils.getToolVersion('xcodebuild -version') < 14000000) {
-                // Use legacy build for xcode 13 and older
-            useLegacyBuild(config, path.join('platforms', 'ios'));
-        } else {
-            // Patch podfile for xcode 14
-            fixPods(config, path.join('platforms', 'ios'));
-        }
+        fixPods(config, path.join('platforms', 'ios'));
 
         // Remove libCordova.a from build 
         utils.logInfo('Updating xcode project file');
@@ -129,29 +123,6 @@ function createHybridApp(config) {
    
     // Done
     return prepareResult;
-
-}
-
-//
-// Use legacy build system in XCode
-//
-function useLegacyBuild(config, iosSubDir) {
-    var xcSettingsDir = path.join(config.projectDir, iosSubDir, config.appname + '.xcworkspace', 'xcshareddata')
-    var xcSettingsFile = path.join(xcSettingsDir, 'WorkspaceSettings.xcsettings');
-    var plistFileContent = '<?xml version="1.0" encoding="UTF-8"?>\n' +
-        '<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">\n' +
-        '<plist version="1.0">\n' + 
-        '<dict>\n'  +
-        '<key>BuildSystemType</key>\n' + 
-        '<string>Original</string>\n' +
-        '<key>DisableBuildSystemDeprecationDiagnostic</key>\n' + 
-	    '<true/>\n' +
-        '</dict>\n' + 
-        '</plist>\n';
-    utils.logInfo('Creating WorkspaceSettings.xcsettings for project. Setting the BuildSystemType to original in ' + xcSettingsFile);
-    utils.mkDirIfNeeded(xcSettingsDir)
-    fs.writeFileSync(xcSettingsFile,plistFileContent,'utf8');
-    utils.logInfo('Created WorkspaceSettings.xcsettings for project ' + config.appname);
 }
 
 //
@@ -237,8 +208,29 @@ function printNextSteps(ide, projectPath, result) {
                         'Before you ship, make sure to plug your OAuth Client ID and Callback URI,',
                         'and OAuth Scopes into ' + bootconfigFile,
                        ]);
-
 };    
+
+//
+// Print next steps for Native Login
+// 
+function printNextStepsForNativeLogin(ide, projectPath, result) {
+    var workspacePath = path.join(projectPath, result.workspacePath);
+    var bootconfigFile =  path.join(projectPath, result.bootconfigFile);
+    var entryFile = (ide === 'XCode') ? 'SceneDelegate' : 'MainApplication';  
+
+    // Printing out next steps
+    utils.logParagraph(['Next steps' + (result.platform ? ' for ' + result.platform : '') + ':',
+                        '',
+                        'Your application project is ready in ' + projectPath + '.',
+                        'To use your new application in ' + ide + ', do the following:', 
+                        '   - open ' + workspacePath + ' in ' + ide, 
+                        '   - Update the OAuth Client ID, Callback URI, and Community URL in ' + entryFile + ' class.',
+                        '   - build and run', 
+                        'Before you ship, make sure to plug your OAuth Client ID and Callback URI,',
+                        'and OAuth Scopes into ' + bootconfigFile + ', since it is still used for',
+                        'authentication if we fallback on the webview.'
+                       ]);
+}
 
 //
 // Print next steps for server project if present
@@ -252,15 +244,13 @@ function printNextStepsForServerProjectIfNeeded(projectPath) {
                             'Make sure to deploy it to your org before running your application.',
                             '',
                             'From ' + projectPath + ' do the following to setup a scratch org, push the server code:',
-                            '   - sfdx force:org:create -f server/config/project-scratch-def.json -a MyOrg',
+                            '   - sf force org create -f server/config/project-scratch-def.json -a MyOrg',
                             '   - cd server',
-                            '   - sfdx force:source:push -u MyOrg',
+                            '   - sf force source push -u MyOrg',
                             'You also need a password to login to the scratch org from the mobile app:',
-                            '   - sfdx force:user:password:generate -u MyOrg'                            
+                            '   - sf force user password generate -u MyOrg'                            
                             ]);
     }
-
-
 }
 
 //
@@ -386,7 +376,12 @@ function actuallyCreateApp(forcecli, config) {
         if (!(results instanceof Array)) { results = [results] };
         for (var result of results) {
             var ide = SDK.ides[result.platform || config.platform.split(',')[0]];
-            printNextSteps(ide, config.projectPath, result);
+
+            if (config.templatepath != undefined && config.templatepath.includes('NativeLogin')) {
+                printNextStepsForNativeLogin(ide, config.projectPath, result);
+            } else {
+                printNextSteps(ide, config.projectPath, result);
+            }
         }
         printNextStepsForServerProjectIfNeeded(config.projectPath);
 

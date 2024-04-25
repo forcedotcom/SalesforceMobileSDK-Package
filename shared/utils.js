@@ -123,7 +123,8 @@ function getToolVersion(cmd) {
     var toolVersion;
     try {
 	 var result = runProcessThrowError(cmd, null, true /* return output */);
-        toolVersion = result.replace(/\r?\n|\r/, '').replace(/[^0-9\.]*/, '');
+        // Remove @salesforce/cli/ from the beginning of sf cli version.
+        toolVersion = result.replace(/\r?\n|\r/, '').replace(/[^0-9\.]*/, '').replace('@salesforce/cli/', '');
     }
     catch (error) {
         throw new Error(toolName + ' is required but could not be found. Please install ' + toolName + '.');

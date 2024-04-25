@@ -28,7 +28,7 @@
 var path = require('path'),
     shelljs = require('shelljs');
 
-var VERSION= '11.1.0';
+var VERSION= '12.0.0';
 
 module.exports = {
     version: VERSION,
@@ -60,17 +60,17 @@ module.exports = {
         },
         cordova: {
             checkCmd: 'cordova -v',
-//            pluginRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-CordovaPlugin#dev',    // dev
+            pluginRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-CordovaPlugin#dev',    // dev
             minVersion: '12.0.0',
-             pluginRepoUri: 'salesforce-mobilesdk-cordova-plugin@v' + VERSION, // GA
+//             pluginRepoUri: 'salesforce-mobilesdk-cordova-plugin@v' + VERSION, // GA
             platformVersion: {
-                ios: '7.0.1',
+                ios: '7.1.0',
                 android: '12.0.1'
             }
         },
-        sfdx: {
-            checkCmd: 'sfdx -v',
-            minVersion: '6.0.0'
+        sf: {
+            checkCmd: 'sf -v',
+            minVersion: '2.0.0'
         }    
     },
 
@@ -79,8 +79,8 @@ module.exports = {
         android: 'Android Studio'
     },
 
-//    templatesRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-Templates#dev',    // dev
-     templatesRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-Templates#v' + VERSION, // GA
+    templatesRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-Templates#dev',    // dev
+//     templatesRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-Templates#v' + VERSION, // GA
 
     forceclis: {
         forceios: {
@@ -117,7 +117,7 @@ module.exports = {
             purpose: 'a hybrid mobile application',
             dir: 'hybrid',
             platforms: ['ios', 'android'],
-            toolNames: ['git', 'node', 'npm', 'cordova', 'sfdx'],
+            toolNames: ['git', 'node', 'npm', 'cordova', 'sf'],
             appTypes: ['hybrid_local', 'hybrid_remote', 'hybrid_lwc'],
             appTypesToPath: {
                 'hybrid_local': 'HybridLocalTemplate',
