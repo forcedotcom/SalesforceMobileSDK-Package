@@ -65,7 +65,7 @@ module.exports = {
 //             pluginRepoUri: 'salesforce-mobilesdk-cordova-plugin@v' + VERSION, // GA
             platformVersion: {
                 ios: '7.1.0',
-                android: '12.0.1'
+                android: '13.0.0'
             }
         },
         sf: {
