@@ -1,9 +1,9 @@
 aliases:
 #  Xcode version announcments can be found here: https://discuss.circleci.com/c/announcements/
 #  Each post contains a full image manifest, including iOS runtimes, devices, CocoaPods version, etc.
-  - &latest-xcode "15.2"
-  - &latest-android "cimg/android:2024.01.1-node"
-  - &invalid      ""
+  - &latest-xcode    "15.3.0"
+  - &latest-android  "cimg/android:2024.07.1-node"
+  - &invalid         ""
 
   - &setup
     name: Setup
@@ -57,7 +57,7 @@ aliases:
         default: *latest-xcode
     macos: 
       xcode: << parameters.xcode >>
-    resource_class: macos.x86.medium.gen2
+    resource_class: macos.m1.medium.gen1
     working_directory: ~/SalesforceMobileSDK-Package
     environment:
       FASTLANE_SKIP_UPDATE_CHECK: "true"
