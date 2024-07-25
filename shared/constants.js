@@ -64,7 +64,7 @@ module.exports = {
             minVersion: '12.0.0',
 //             pluginRepoUri: 'salesforce-mobilesdk-cordova-plugin@v' + VERSION, // GA
             platformVersion: {
-                ios: '7.1.0',
+                ios: '7.1.1',
                 android: '13.0.0'
             }
         },
@@ -79,7 +79,7 @@ module.exports = {
         android: 'Android Studio'
     },
 
-    templatesRepoUri: 'https://github.com/wmathurin/SalesforceMobileSDK-Templates#rn74',    // dev
+    templatesRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-Templates#dev',    // dev
 //     templatesRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-Templates#v' + VERSION, // GA
 
     forceclis: {
