@@ -49,6 +49,7 @@ const testVersionDefault = VERSION
 const templatesPackageJsons = [
     './AndroidIDPTemplate/package.json',
     './AndroidNativeKotlinTemplate/package.json',
+    './AndroidNativeLoginTemplate/package.json',
     './AndroidNativeTemplate/package.json',
     './HybridLocalTemplate/package.json',
     './HybridLwcTemplate/package.json',
@@ -60,7 +61,9 @@ const templatesPackageJsons = [
     './ReactNativeTemplate/package.json',
     './ReactNativeTypeScriptTemplate/package.json',
     './iOSIDPTemplate/package.json',
+    './iOSNativeLoginTemplate/package.json',
     './iOSNativeSwiftEncryptedNotificationTemplate/package.json',
+    './iOSNativeSwiftPackageManagerTemplate/package.json',
     './iOSNativeSwiftTemplate/package.json',
     './iOSNativeTemplate/package.json'
 ]
