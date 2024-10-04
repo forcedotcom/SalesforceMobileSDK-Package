@@ -268,7 +268,17 @@ module.exports = {
             required: false,
             type: 'string',
             hidden: true
-        }
+        },
+	sdkDependencies: {
+            name: 'sdkdependencies',
+            description: 'override sdk dependencies',
+            'char': 'd',
+            error: cli => val => 'Invalid value for sdk dependencies: \'' + val + '\'.',
+            validate: cli => val => /.*/.test(val),
+            required: false,
+            type: 'string',
+            hidden: true
+	},
     },
 
     commands: {
@@ -282,7 +292,8 @@ module.exports = {
                           cli.appTypes.indexOf('hybrid_remote') >=0 ? 'startPage' : null,
                           'outputDir',
                           'verbose',
-                          cli.name === 'forcehybrid' ? 'pluginRepoUri' : null
+                          cli.name === 'forcehybrid' ? 'pluginRepoUri' : null,
+			  'sdkDependencies'
                          ].filter(x=>x!=null),
             description: cli => 'create ' + cli.purpose,
             longDescription: cli => 'Create ' + cli.purpose + '.',
@@ -298,7 +309,8 @@ module.exports = {
                           cli.appTypes.indexOf('hybrid_remote') >=0 ? 'startPage' : null,
                           'outputDir',
                           'verbose',
-                          cli.name === 'forcehybrid' ? 'pluginRepoUri' : null
+                          cli.name === 'forcehybrid' ? 'pluginRepoUri' : null,
+			  'sdkDependencies'			  
                          ].filter(x=>x!=null),
             description: cli => 'create ' + cli.purpose + ' from a template',
             longDescription: cli => 'Create ' + cli.purpose + ' from a template.',

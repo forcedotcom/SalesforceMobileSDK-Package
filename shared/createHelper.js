@@ -133,6 +133,10 @@ function printDetails(config) {
     }
             
 
+    if (config.sdkdependencies) {
+        details = details.concat(['       sdk dependencies:   ' + config.sdkdependencies]);
+    }
+            
     // Hybrid extra details
     if (config.apptype.indexOf('hybrid') >= 0) {
         if (config.apptype === 'hybrid_remote') {
@@ -253,6 +257,43 @@ function createApp(forcecli, config) {
 }
 
 //
+// Override sdk dependencies in package.json
+//
+function overrideSdkDependencies(packageJsonPath, sdkDependenciesString) {
+    try {
+        console.log("packageJsonPath =>" + packageJsonPath);
+        
+        // Parse sdkDependencies
+        let sdkDependencies = JSON.parse(sdkDependenciesString)
+        
+        // Read the package.json file
+        let originalContent = fs.readFileSync(packageJsonPath, 'utf8');
+        console.log("original content =>" + originalContent);
+        let packageJson = JSON.parse(originalContent)
+
+        // Ensure "sdkDependencies" exists in the package.json
+        if (!packageJson.sdkDependencies) {
+            packageJson.sdkDependencies = {};
+        }
+
+        // Merge the sdkDependencies argument into the packageJson.sdkDependencies
+        packageJson.sdkDependencies = { 
+            ...packageJson.sdkDependencies, 
+            ...sdkDependencies 
+        };
+
+        // Write the updated package.json back to file
+        let updatedContent = JSON.stringify(packageJson, null, 2);
+        console.log("updated content =>" + updatedContent);
+        fs.writeFileSync(packageJsonPath, updatedContent, 'utf8');
+        
+    } catch (err) {
+        console.error(`Failed to override sdk dependencies in package.json: ${err}`);
+    }
+}
+
+
+//
 // Actually create app
 //
 function actuallyCreateApp(forcecli, config) {
@@ -306,6 +347,11 @@ function actuallyCreateApp(forcecli, config) {
         // Cloning template repo
         var repoDir = utils.cloneRepo(tmpDir, config.templaterepouri);
         config.templateLocalPath = path.join(repoDir, config.templatepath);
+
+        // Override sdk dependencies in package.json if any were provided
+        if (config.sdkdependencies) {
+            overrideSdkDependencies(path.join(config.templateLocalPath, 'package.json'), config.sdkdependencies);
+        }
 
         // Getting apptype from template
         config.apptype = require(path.join(config.templateLocalPath, 'template.js')).appType;
