@@ -152,7 +152,7 @@ jobs:
       - run: *setup
       - run:
           name: Building all ios native templates
-          command:  ./test/test_force.js --exit-on-failure --cli=forceios --spm-update
+          command:  ./test/test_force.js --exit-on-failure --cli=forceios
           when: always
 
   forceios-sfdx:
@@ -163,7 +163,7 @@ jobs:
       - run: *install-sfdx
       - run:
           name: Building all ios native templates with SFDX
-          command: ./test/test_force.js --exit-on-failure --cli=forceios --use-sfdx --spm-update
+          command: ./test/test_force.js --exit-on-failure --cli=forceios --use-sfdx
           when: always
 
   forcehybrid-ios:
