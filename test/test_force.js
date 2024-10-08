@@ -401,7 +401,7 @@ function buildForiOS(target, workspaceDir, appName) {
           ? `-workspace ${workspacePath} -scheme ${appName}`
           : `-project ${projectPath}`;
     
-    utils.runProcessCatchError(`xcodebuild ${buildTarget} clean build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO`,
+    utils.runProcessCatchError(`xcodebuild ${buildTarget} clean build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO -destination generic/platform=iOS`,
                                `COMPILING ${target}`);
 }
 
