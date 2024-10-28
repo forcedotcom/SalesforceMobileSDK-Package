@@ -47,8 +47,8 @@ const masterBranchDefault = "master2"
 const devBranchDefault = "dev2"
 const docBranchDefault = "gh-pages2"
 const versionReleasedDefault = VERSION
-const nextVersionDefault = "12.2.0"
-const versionCodeReleasedDefault = 85
+const nextVersionDefault = "13.0.0"
+const versionCodeReleasedDefault = 87
 
 // Questions
 const QUESTIONS = [

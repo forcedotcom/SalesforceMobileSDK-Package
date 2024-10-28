@@ -109,54 +109,8 @@ function createHybridApp(config) {
     // Run cordova prepare
     utils.runProcessThrowError('cordova prepare', config.projectDir);
 
-    if (config.platform.split(',').indexOf('ios') != -1) {
-        fixPods(config, path.join('platforms', 'ios'));
-
-        // Remove libCordova.a from build 
-        utils.logInfo('Updating xcode project file');
-        var xcodeProjectFile = path.join(config.projectDir,'platforms', 'ios', config.appname + '.xcodeproj', 'project.pbxproj')
-        var xcodeProjectFileContent = fs.readFileSync(xcodeProjectFile, 'utf8');
-        var newXcodeProjectFileContent = xcodeProjectFileContent.split('\n').filter(line => line.indexOf('libCordova.a in Frameworks') == -1).join('\n');
-        fs.writeFileSync(xcodeProjectFile, newXcodeProjectFileContent);
-        utils.logInfo('Updated xcode project file');
-    }
-   
     // Done
     return prepareResult;
-}
-
-//
-// Patch pod file for hybrid apps on xcode 14
-//
-function fixPods(config, iosSubDir) {
-    var iosDir = path.join(config.projectDir, iosSubDir)
-    var podfilePath = path.join(iosDir, 'Podfile');
-    var originalPodfileContent = fs.readFileSync(podfilePath, 'utf8');
-    var preInstallCode = "\n" +
-	"$dynamic_framework = ['SalesforceAnalytics', 'SalesforceSDKCore', 'SalesforceSDKCommon', 'SmartStore', 'FMDB', 'SQLCipher', 'MobileSync']\n" +
-	"pre_install do |installer|\n" +
-	"  installer.pod_targets.each do |pod|\n" +
-	"    if $dynamic_framework.include?(pod.name)\n" +
-	"      def pod.build_type\n" +
-	"        Pod::BuildType.dynamic_framework\n" +
-	"      end\n" +
-	"    end\n" +
-	"  end\n" +
-	"end" +
-	"\n" +
-	"post_install do |installer|\n" + 
-	"  installer.pods_project.targets.each do |target|\n" + 
-	"    if target.deployment_target.to_i < 9\n" + 
-	"      target.build_configurations.each do |config|\n" + 
-	"        config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '9.0'\n" + 
-	"      end\n" + 
-	"    end\n" + 
-	"  end\n" + 
-	"end"
-
-    utils.logInfo('Updating Podfile for project ' + config.appname);
-    fs.writeFileSync(podfilePath, originalPodfileContent.replace("use_frameworks!","") + preInstallCode);
-    utils.runProcessThrowError('pod update', iosDir);
 }
 
 //
@@ -179,6 +133,10 @@ function printDetails(config) {
     }
             
 
+    if (config.sdkdependencies) {
+        details = details.concat(['       sdk dependencies:   ' + config.sdkdependencies]);
+    }
+            
     // Hybrid extra details
     if (config.apptype.indexOf('hybrid') >= 0) {
         if (config.apptype === 'hybrid_remote') {
@@ -299,6 +257,43 @@ function createApp(forcecli, config) {
 }
 
 //
+// Override sdk dependencies in package.json
+//
+function overrideSdkDependencies(packageJsonPath, sdkDependenciesString) {
+    try {
+        console.log("packageJsonPath =>" + packageJsonPath);
+        
+        // Parse sdkDependencies
+        let sdkDependencies = JSON.parse(sdkDependenciesString)
+        
+        // Read the package.json file
+        let originalContent = fs.readFileSync(packageJsonPath, 'utf8');
+        console.log("original content =>" + originalContent);
+        let packageJson = JSON.parse(originalContent)
+
+        // Ensure "sdkDependencies" exists in the package.json
+        if (!packageJson.sdkDependencies) {
+            packageJson.sdkDependencies = {};
+        }
+
+        // Merge the sdkDependencies argument into the packageJson.sdkDependencies
+        packageJson.sdkDependencies = { 
+            ...packageJson.sdkDependencies, 
+            ...sdkDependencies 
+        };
+
+        // Write the updated package.json back to file
+        let updatedContent = JSON.stringify(packageJson, null, 2);
+        console.log("updated content =>" + updatedContent);
+        fs.writeFileSync(packageJsonPath, updatedContent, 'utf8');
+        
+    } catch (err) {
+        console.error(`Failed to override sdk dependencies in package.json: ${err}`);
+    }
+}
+
+
+//
 // Actually create app
 //
 function actuallyCreateApp(forcecli, config) {
@@ -352,6 +347,11 @@ function actuallyCreateApp(forcecli, config) {
         // Cloning template repo
         var repoDir = utils.cloneRepo(tmpDir, config.templaterepouri);
         config.templateLocalPath = path.join(repoDir, config.templatepath);
+
+        // Override sdk dependencies in package.json if any were provided
+        if (config.sdkdependencies) {
+            overrideSdkDependencies(path.join(config.templateLocalPath, 'package.json'), config.sdkdependencies);
+        }
 
         // Getting apptype from template
         config.apptype = require(path.join(config.templateLocalPath, 'template.js')).appType;

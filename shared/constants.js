@@ -28,7 +28,7 @@
 var path = require('path'),
     shelljs = require('shelljs');
 
-var VERSION= '12.1.1';
+var VERSION= '12.2.0';
 
 module.exports = {
     version: VERSION,
@@ -60,9 +60,9 @@ module.exports = {
         },
         cordova: {
             checkCmd: 'cordova -v',
-//            pluginRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-CordovaPlugin#dev',    // dev
+            pluginRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-CordovaPlugin#dev',    // dev
             minVersion: '12.0.0',
-             pluginRepoUri: 'salesforce-mobilesdk-cordova-plugin@v' + VERSION, // GA
+//             pluginRepoUri: 'salesforce-mobilesdk-cordova-plugin@v' + VERSION, // GA
             platformVersion: {
                 ios: '7.1.1',
                 android: '13.0.0'
@@ -79,8 +79,8 @@ module.exports = {
         android: 'Android Studio'
     },
 
-//    templatesRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-Templates#dev',    // dev
-     templatesRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-Templates#v' + VERSION, // GA
+    templatesRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-Templates#dev',    // dev
+//     templatesRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-Templates#v' + VERSION, // GA
 
     forceclis: {
         forceios: {
@@ -268,7 +268,17 @@ module.exports = {
             required: false,
             type: 'string',
             hidden: true
-        }
+        },
+	sdkDependencies: {
+            name: 'sdkdependencies',
+            description: 'override sdk dependencies',
+            'char': 'd',
+            error: cli => val => 'Invalid value for sdk dependencies: \'' + val + '\'.',
+            validate: cli => val => /.*/.test(val),
+            required: false,
+            type: 'string',
+            hidden: true
+	},
     },
 
     commands: {
@@ -282,7 +292,8 @@ module.exports = {
                           cli.appTypes.indexOf('hybrid_remote') >=0 ? 'startPage' : null,
                           'outputDir',
                           'verbose',
-                          cli.name === 'forcehybrid' ? 'pluginRepoUri' : null
+                          cli.name === 'forcehybrid' ? 'pluginRepoUri' : null,
+			  'sdkDependencies'
                          ].filter(x=>x!=null),
             description: cli => 'create ' + cli.purpose,
             longDescription: cli => 'Create ' + cli.purpose + '.',
@@ -298,7 +309,8 @@ module.exports = {
                           cli.appTypes.indexOf('hybrid_remote') >=0 ? 'startPage' : null,
                           'outputDir',
                           'verbose',
-                          cli.name === 'forcehybrid' ? 'pluginRepoUri' : null
+                          cli.name === 'forcehybrid' ? 'pluginRepoUri' : null,
+			  'sdkDependencies'			  
                          ].filter(x=>x!=null),
             description: cli => 'create ' + cli.purpose + ' from a template',
             longDescription: cli => 'Create ' + cli.purpose + ' from a template.',

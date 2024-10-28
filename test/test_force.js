@@ -49,12 +49,15 @@ function main(args) {
     var usageRequested = parsedArgs.hasOwnProperty('usage');
     var useSfdxRequested = parsedArgs.hasOwnProperty('use-sfdx');
     var noPluginUpdate = parsedArgs.hasOwnProperty('no-plugin-update');
+    var spmUpdate = parsedArgs.hasOwnProperty('spm-update');
     var exitOnFailure = parsedArgs.hasOwnProperty('exit-on-failure');
     var chosenOperatingSystems = cleanSplit(parsedArgs.os, ',').map(function(s) { return s.toLowerCase(); });
     var templateRepoUri = parsedArgs.templaterepouri || '';
     var pluginRepoUri = parsedArgs.pluginrepouri || SDK.tools.cordova.pluginRepoUri;
+    var spmRepoUri = parsedArgs.spmrepouri || 'https://github.com/forcedotcom/SalesforceMobileSDK-iOS-SPM' // not in constants.js because it's for testing only
     var chosenAppTypes = cleanSplit(parsedArgs.apptype, ',');
     var chosenClis = cleanSplit(parsedArgs.cli, ',');
+    var sdkDependencies = parsedArgs.sdkdependencies;
 
     var testingWithOS = chosenOperatingSystems.length > 0;
     var testingWithClis = chosenClis.length > 0;
@@ -131,6 +134,17 @@ function main(args) {
         }
     }
 
+    // Clone spm repo and build it if spm-update requested
+    if (spmUpdate) {
+        var spmRepoDir = utils.cloneRepo(tmpDir, spmRepoUri);
+        utils.runProcessCatchError(`${spmRepoDir}/build_xcframeworks.sh`, 'Building xcframeworks for SPM');
+        // Prepare sdk dependencies override that points to local clone of SPM repo
+        if (!sdkDependencies) {
+            sdkDependencies = {}
+        }
+        sdkDependencies = {"SalesforceMobileSDK-iOS-SPM": spmRepoDir}
+    }
+
     // Set exit on failure to true
     if (exitOnFailure) {
         utils.setExitOnFailure(true);
@@ -146,7 +160,7 @@ function main(args) {
                 for (var k=0; k<template.platforms.length; k++) {
                     var os = template.platforms[k];
                     if (chosenOperatingSystems.length == 0 || chosenOperatingSystems.indexOf(os) >= 0) {
-                        createCompileApp(tmpDir, os, template.appType, template.path, pluginRepoUri, useSfdxRequested);
+                        createCompileApp(tmpDir, os, template.appType, template.path, pluginRepoUri, useSfdxRequested, sdkDependencies);
                     }
                 }
             }
@@ -158,14 +172,14 @@ function main(args) {
             if (testingWithAppType) {
                 for (var j=0; j<chosenAppTypes.length; j++) {
                     var appType = chosenAppTypes[j];
-                    createCompileApp(tmpDir, os, appType, null, pluginRepoUri, useSfdxRequested);
+                    createCompileApp(tmpDir, os, appType, null, pluginRepoUri, useSfdxRequested, sdkDependencies);
                 }
             }
 
             if (testingWithTemplate) {
                 // NB: chosenAppTypes[0] is appType from template
                 var appType = chosenAppTypes.length > 0 ? chosenAppTypes[0] : [templateHelper.getAppTypeFromTemplate(templateRepoUri)];
-                createCompileApp(tmpDir, os, appType, templateRepoUri, pluginRepoUri, useSfdxRequested);
+                createCompileApp(tmpDir, os, appType, templateRepoUri, pluginRepoUri, useSfdxRequested, sdkDependencies);
             }
         }
     }
@@ -185,6 +199,9 @@ function shortUsage(exitCode) {
     utils.logInfo('    [--exit-on-failure]', COLOR.magenta);
     utils.logInfo('    [--pluginrepouri=PLUGIN_REPO_URI (Defaults to uri in shared/constants.js)]', COLOR.magenta);
     utils.logInfo('    [--no-plugin-update]', COLOR.magenta);
+    utils.logInfo('    [--spm-update]', COLOR.magenta);
+    utils.logInfo('    [--spmrepouri=SPM_REPO_URI]', COLOR.magenta);
+    utils.logInfo('    [--sdkdependencies=SDK_DEPDENDENCIES_OVERRIDE]', COLOR.magenta);
     utils.logInfo('', COLOR.cyan);
     utils.logInfo('  Where:', COLOR.cyan);
     utils.logInfo('  - osX is : ios or android', COLOR.cyan);
@@ -282,7 +299,7 @@ function updatePluginRepo(tmpDir, os, pluginRepoDir, sdkBranch) {
 //
 // Create and compile app
 //
-function createCompileApp(tmpDir, os, actualAppType, templateRepoUri, pluginRepoUri, useSfdxRequested) {
+function createCompileApp(tmpDir, os, actualAppType, templateRepoUri, pluginRepoUri, useSfdxRequested, sdkDependencies) {
     var execArgs = '';
     var isNative = actualAppType == APP_TYPE.native || actualAppType == APP_TYPE.native_swift || actualAppType == APP_TYPE.native_kotlin; 
     var isReactNative = actualAppType == APP_TYPE.react_native || actualAppType == APP_TYPE.react_native_typescript;
@@ -343,6 +360,10 @@ function createCompileApp(tmpDir, os, actualAppType, templateRepoUri, pluginRepo
         + (isHybridRemote ? ' --startpage=' + defaultStartPage : '')
         + (isHybrid && pluginRepoUri ? ' --pluginrepouri=' + pluginRepoUri : '');
 
+    if (sdkDependencies) {
+        execArgs += ' --sdkDependencies=' + JSON.stringify(sdkDependencies).replace(/"/g, '\\"');
+    }
+
     // Generation
     var generationSucceeded = utils.runProcessCatchError(execPath + execArgs, 'GENERATING ' + target);
 
@@ -377,11 +398,11 @@ function buildForiOS(target, workspaceDir, appName) {
     const workspacePath = path.join(workspaceDir, appName + '.xcworkspace');
     const projectPath = path.join(workspaceDir, appName + '.xcodeproj');
     const buildTarget = existsSync(workspacePath)
-	  ? `-workspace ${workspacePath} -scheme ${appName}`
-	  : `-project ${projectPath}`;
+          ? `-workspace ${workspacePath} -scheme ${appName}`
+          : `-project ${projectPath}`;
     
-    utils.runProcessCatchError(`xcodebuild ${buildTarget} clean build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO`,
-			       `COMPILING ${target}`);
+    utils.runProcessCatchError(`xcodebuild ${buildTarget} clean build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO -destination generic/platform=iOS`,
+                               `COMPILING ${target}`);
 }
 
 function buildForAndroid(target, workspaceDir) {
@@ -528,4 +549,4 @@ function computePackageName(os, actualAppType, appName) {
     var isHybrid = actualAppType === APP_TYPE.hybrid_local || actualAppType === APP_TYPE.hybrid_remote;
     return 'com.salesforce' + (os === OS.ios && !isHybrid ? '' : '.' + appName);
 }
-    
+
