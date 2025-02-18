@@ -208,6 +208,7 @@ function shortUsage(exitCode) {
     utils.logInfo('  - cliX is : ' + Object.keys(SDK.forceclis).join(' or '), COLOR.cyan);
     utils.logInfo('  - appTypeX is: ' + Object.values(APP_TYPE).join(' or '), COLOR.cyan);
     utils.logInfo('  - templaterepouri is a template repo uri or a Mobile SDK template name', COLOR.cyan);
+    utils.logInfo('  - sdkdependencies is like {\"SalesforceMobileSDK-iOS\":\"https://github.com/somefork/SalesforceMobileSDK-iOS#somebranch\"}', COLOR.cyan);
     utils.logInfo('', COLOR.cyan);
 
     if (typeof(exitCode) !== 'undefined') {
