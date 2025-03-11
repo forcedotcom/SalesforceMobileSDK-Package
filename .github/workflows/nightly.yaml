@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  android-pr:
+  android-nightly:
     strategy:
       fail-fast: false
     uses: ./.github/workflows/android-reusable-workflow.yaml
