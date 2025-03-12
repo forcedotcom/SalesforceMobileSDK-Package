@@ -1,0 +1,187 @@
+on:
+  workflow_call:
+    inputs:
+      is_pr:
+        type: boolean
+        default: false
+
+jobs:
+  forcedroid:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        if: ${{ inputs.is_pr }}
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - uses: actions/checkout@v4
+        if: ${{ ! inputs.is_pr }}
+        with:
+          ref: ${{ github.head_ref }}
+      - name: Install Dependencies
+        run: node ./install.js
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '21'
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.7"
+          add-job-summary: on-failure
+          add-job-summary-as-pr-comment: on-failure
+      - name: Build all android native templates
+        run: ./test/test_force.js --exit-on-failure --cli=forcedroid
+
+  forcedroid-sfdx:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        if: ${{ inputs.is_pr }}
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - uses: actions/checkout@v4
+        if: ${{ ! inputs.is_pr }}
+        with:
+          ref: ${{ github.head_ref }}
+      - name: Install Dependencies
+        run: node ./install.js
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '21'
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.7"
+          add-job-summary: on-failure
+          add-job-summary-as-pr-comment: on-failure
+      - name: Install SFDX
+        run: npm install -g @salesforce/cli
+      - name: Build all android native templates wth SFDX
+        run: ./test/test_force.js --exit-on-failure --cli=forcedroid --use-sfdx 
+      
+  forcehybrid-android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        if: ${{ inputs.is_pr }}
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - uses: actions/checkout@v4
+        if: ${{ ! inputs.is_pr }}
+        with:
+          ref: ${{ github.head_ref }}
+      - name: Install Dependencies
+        run: node ./install.js
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '21'
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.7"
+          add-job-summary: on-failure
+          add-job-summary-as-pr-comment: on-failure
+      - name: Install SFDX
+        run: npm install -g @salesforce/cli
+      - name: Install Cordova
+        run: npm install -g cordova
+      - name: Build all android hybrid templates
+        run: ./test/test_force.js --exit-on-failure --cli=forcehybrid --os=android --no-plugin-update
+
+  forcehybrid-android-sfdx:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        if: ${{ inputs.is_pr }}
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - uses: actions/checkout@v4
+        if: ${{ ! inputs.is_pr }}
+        with:
+          ref: ${{ github.head_ref }}
+      - name: Install Dependencies
+        run: node ./install.js
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '21'
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.7"
+          add-job-summary: on-failure
+          add-job-summary-as-pr-comment: on-failure
+      - name: Install SFDX
+        run: npm install -g @salesforce/cli
+      - name: Install Cordova
+        run: npm install -g cordova
+      - name: Build all android hybrid templates with SFDX
+        run:  ./test/test_force.js --exit-on-failure --cli=forcehybrid --os=android --use-sfdx --no-plugin-update
+
+  forcereact-android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        if: ${{ inputs.is_pr }}
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - uses: actions/checkout@v4
+        if: ${{ ! inputs.is_pr }}
+        with:
+          ref: ${{ github.head_ref }}
+      - name: Install Dependencies
+        run: node ./install.js
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '21'
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.7"
+          add-job-summary: on-failure
+          add-job-summary-as-pr-comment: on-failure
+      - name: Install SFDX
+        run: npm install -g @salesforce/cli
+      - name: Install Typescript
+        run: npm install -g typescript
+      - name: Build all android react native templates with SFDX
+        run: ./test/test_force.js --exit-on-failure --cli=forcereact --os=android
+
+  forcereact-android-sfdx:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        if: ${{ inputs.is_pr }}
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - uses: actions/checkout@v4
+        if: ${{ ! inputs.is_pr }}
+        with:
+          ref: ${{ github.head_ref }}
+      - name: Install Dependencies
+        run: node ./install.js
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '21'
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.7"
+          add-job-summary: on-failure
+          add-job-summary-as-pr-comment: on-failure
+      - name: Install SFDX
+        run: npm install -g @salesforce/cli
+      - name: Install Typescript
+        run: npm install -g typescript
+      - name: Build all android react native templates with SFDX
+        run: ./test/test_force.js --exit-on-failure --cli=forcereact --os=android --use-sfdx

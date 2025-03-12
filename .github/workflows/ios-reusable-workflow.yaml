@@ -1,0 +1,123 @@
+on:
+  workflow_call:
+    inputs:
+      is_pr:
+        type: boolean
+        default: false
+      macos:
+        default: macos-15
+        required: false
+        type: string
+
+jobs:
+  forceios:
+    runs-on: ${{ inputs.macos }}
+    steps:
+      - uses: actions/checkout@v4
+        if: ${{ inputs.is_pr }}
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - uses: actions/checkout@v4
+        if: ${{ ! inputs.is_pr }}
+        with:
+          ref: ${{ github.head_ref }}
+      - name: Install Dependencies
+        run: node ./install.js
+      - name: Build all ios native templates
+        run: ./test/test_force.js --exit-on-failure --cli=forceios
+
+  forceios-sfdx:
+    runs-on: ${{ inputs.macos }}
+    steps:
+      - uses: actions/checkout@v4
+        if: ${{ inputs.is_pr }}
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - uses: actions/checkout@v4
+        if: ${{ ! inputs.is_pr }}
+        with:
+          ref: ${{ github.head_ref }}
+      - name: Install Dependencies
+        run: node ./install.js
+      - name: Install SFDX
+        run: npm install -g @salesforce/cli
+      - name: Build all ios native templates with SFDX
+        run: ./test/test_force.js --exit-on-failure --cli=forceios --use-sfdx
+
+  forcehybrid-ios:
+    runs-on: ${{ inputs.macos }}
+    steps:
+      - uses: actions/checkout@v4
+        if: ${{ inputs.is_pr }}
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - uses: actions/checkout@v4
+        if: ${{ ! inputs.is_pr }}
+        with:
+          ref: ${{ github.head_ref }}
+      - name: Install Dependencies
+        run: node ./install.js
+      - name: Install SFDX
+        run: npm install -g @salesforce/cli
+      - name: Install Cordova
+        run: npm install -g cordova
+      - name: Build all ios hybrid templates
+        run: ./test/test_force.js --exit-on-failure --cli=forcehybrid --os=ios --no-plugin-update
+
+  forcehybrid-ios-sfdx:
+    runs-on: ${{ inputs.macos }}
+    steps:
+      - uses: actions/checkout@v4
+        if: ${{ inputs.is_pr }}
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - uses: actions/checkout@v4
+        if: ${{ ! inputs.is_pr }}
+        with:
+          ref: ${{ github.head_ref }}
+      - name: Install Dependencies
+        run: node ./install.js
+      - name: Install SFDX
+        run: npm install -g @salesforce/cli
+      - name: Install Cordova
+        run: npm install -g cordova
+      - name: Build all ios hybrid templates with SFDX
+        run: ./test/test_force.js --exit-on-failure --cli=forcehybrid --os=ios --use-sfdx --no-plugin-update
+
+  forcereact-ios:
+    runs-on: ${{ inputs.macos }}
+    steps:
+      - uses: actions/checkout@v4
+        if: ${{ inputs.is_pr }}
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - uses: actions/checkout@v4
+        if: ${{ ! inputs.is_pr }}
+        with:
+          ref: ${{ github.head_ref }}
+      - name: Install Dependencies
+        run: node ./install.js
+      - name: Install Typescript
+        run: npm install -g typescript
+      - name: Build all ios react native templates
+        run: ./test/test_force.js --exit-on-failure --cli=forcereact --os=ios
+
+  forcereact-ios-sfdx:
+    runs-on: ${{ inputs.macos }}
+    steps:
+      - uses: actions/checkout@v4
+        if: ${{ inputs.is_pr }}
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - uses: actions/checkout@v4
+        if: ${{ ! inputs.is_pr }}
+        with:
+          ref: ${{ github.head_ref }}
+      - name: Install Dependencies
+        run: node ./install.js
+      - name: Install SFDX
+        run: npm install -g @salesforce/cli
+      - name: Install Typescript
+        run: npm install -g typescript
+      - name: Build all ios react native templates with SFDX
+        run: ./test/test_force.js --exit-on-failure --cli=forcereact --os=ios --use-sfdx
