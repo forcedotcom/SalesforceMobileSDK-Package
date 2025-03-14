@@ -312,8 +312,8 @@ FLAGS
                               android)
   -s, --startpage=<value>     app start page (the start page of your remote app;
                               required for hybrid_remote apps only)
-  -t, --apptype=<value>       application type (hybrid_local or hybrid_remote or
-                              hybrid_lwc, leave empty for hybrid_local)
+  -t, --apptype=<value>       application type (hybrid_local or hybrid_remote,
+                              leave empty for hybrid_local)
 
 DESCRIPTION
   create a hybrid mobile application

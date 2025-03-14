@@ -25,8 +25,7 @@ var APP_TYPE = {
     react_native: 'react_native',
     react_native_typescript: 'react_native_typescript',
     hybrid_local: 'hybrid_local',
-    hybrid_remote: 'hybrid_remote',
-    hybrid_lwc: 'hybrid_lwc'
+    hybrid_remote: 'hybrid_remote'
 };
 
 var defaultStartPage = '/apex/testPage';
@@ -304,7 +303,7 @@ function createCompileApp(tmpDir, os, actualAppType, templateRepoUri, pluginRepo
     var execArgs = '';
     var isNative = actualAppType == APP_TYPE.native || actualAppType == APP_TYPE.native_swift || actualAppType == APP_TYPE.native_kotlin; 
     var isReactNative = actualAppType == APP_TYPE.react_native || actualAppType == APP_TYPE.react_native_typescript;
-    var isHybrid = actualAppType == APP_TYPE.hybrid_local || actualAppType == APP_TYPE.hybrid_remote || actualAppType == APP_TYPE.hybrid_lwc;
+    var isHybrid = actualAppType == APP_TYPE.hybrid_local || actualAppType == APP_TYPE.hybrid_remote;
     var isHybridRemote = actualAppType == APP_TYPE.hybrid_remote;
     if (isHybridRemote) {
         // XXX createwithtemplate doesn't work for hybrid remote template

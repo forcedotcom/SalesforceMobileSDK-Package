@@ -118,11 +118,10 @@ module.exports = {
             dir: 'hybrid',
             platforms: ['ios', 'android'],
             toolNames: ['git', 'node', 'npm', 'cordova', 'sf'],
-            appTypes: ['hybrid_local', 'hybrid_remote', 'hybrid_lwc'],
+            appTypes: ['hybrid_local', 'hybrid_remote'],
             appTypesToPath: {
                 'hybrid_local': 'HybridLocalTemplate',
-                'hybrid_remote': 'HybridRemoteTemplate',
-                'hybrid_lwc': 'HybridLwcTemplate'
+                'hybrid_remote': 'HybridRemoteTemplate'
             },
             commands: ['create', 'createwithtemplate', 'version', 'listtemplates', 'checkconfig']
         },

@@ -52,7 +52,6 @@ const templatesPackageJsons = [
     './AndroidNativeLoginTemplate/package.json',
     './AndroidNativeTemplate/package.json',
     './HybridLocalTemplate/package.json',
-    './HybridLwcTemplate/package.json',
     './HybridRemoteTemplate/package.json',
     './MobileSyncExplorerKotlinTemplate/package.json',
     './MobileSyncExplorerReactNative/package.json',
