@@ -1,4 +1,4 @@
-[![CircleCI](https://circleci.com/gh/forcedotcom/SalesforceMobileSDK-Package/tree/dev.svg?style=svg)](https://circleci.com/gh/forcedotcom/SalesforceMobileSDK-Package/tree/dev)
+[![Build](https://github.com/forcedotcom/SalesforceMobileSDK-Package/actions/workflows/nightly.yaml/badge.svg)](https://github.com/forcedotcom/SalesforceMobileSDK-Package/actions/workflows/nightly.yaml)
 
 # SalesforceMobileSDK-Package
 Repo for forceios/forcedroid/forcehybrid/forcereact and the Salesforce CLI plugin.
