@@ -285,6 +285,44 @@ function createApp(forcecli, config) {
 }
 
 //
+// Pin dependency versions to fix known incompatibilities
+// 
+// React Naitve '0.79.3' requires react-native-screens between '4.11.1' and '4.18.0' 
+//
+function pinDependencyVersions(packageJsonPath) {
+    try {
+        // Known dependency version pins to fix incompatibilities
+        var versionPins = {
+            'react-native-screens': '4.11.1'  // Defaults to 4.20.0, which has codegen bug with 'environment' prop
+        };
+
+        // Read the package.json file
+        let originalContent = fs.readFileSync(packageJsonPath, 'utf8');
+        let packageJson = JSON.parse(originalContent);
+        let modified = false;
+
+        // Apply version pins to dependencies
+        if (packageJson.dependencies) {
+            for (var dep in versionPins) {
+                if (packageJson.dependencies[dep]) {
+                    packageJson.dependencies[dep] = versionPins[dep];
+                    modified = true;
+                    console.log('Pinned ' + dep + ' to version ' + versionPins[dep]);
+                }
+            }
+        }
+
+        // Write back if modified
+        if (modified) {
+            let updatedContent = JSON.stringify(packageJson, null, 2);
+            fs.writeFileSync(packageJsonPath, updatedContent, 'utf8');
+        }
+    } catch (err) {
+        console.error('Failed to pin dependency versions in package.json: ' + err);
+    }
+}
+
+//
 // Override sdk dependencies in package.json
 //
 function overrideSdkDependencies(packageJsonPath, sdkDependenciesString) {
@@ -412,6 +450,11 @@ function actuallyCreateApp(forcecli, config) {
         // Override sdk dependencies in package.json if any were provided
         if (config.sdkdependencies) {
             overrideSdkDependencies(path.join(config.templateLocalPath, 'package.json'), config.sdkdependencies);
+        }
+
+        // Pin dependency versions to fix known React Native incompatibilities
+        if (forcecli.name === 'forcereact') {
+            pinDependencyVersions(path.join(config.templateLocalPath, 'package.json'));
         }
 
         // Getting apptype from template
