@@ -5,54 +5,73 @@ on:
         type: boolean
         default: false
 
+permissions:
+  contents: read
+
 jobs:
   forcedroid:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4.3.1
         if: ${{ inputs.is_pr }}
         with:
+          persist-credentials: false
           ref: ${{ github.event.pull_request.head.sha }}
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4.3.1
         if: ${{ ! inputs.is_pr }}
         with:
+          persist-credentials: false
           ref: ${{ github.head_ref }}
       - name: Install Dependencies
         run: npm install
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@c1e323688fd81a25caa38c78aa6df2d33d3e20d9  # v4.8.0
         with:
           distribution: 'zulu'
           java-version: '21'
       - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-      - uses: gradle/actions/setup-gradle@v4
+        uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407  # v3.2.2
+      - uses: gradle/actions/setup-gradle@748248ddd2a24f49513d8f472f81c3a07d4d50e1  # v4.4.4
         with:
           gradle-version: "8.7"
           add-job-summary: on-failure
           add-job-summary-as-pr-comment: on-failure
       - name: Build all android native templates
-        run: ./test/test_force.js --exit-on-failure --cli=forcedroid
+        id: build
+        run: |
+          mkdir -p build_logs
+          set -o pipefail
+          ./test/test_force.js --exit-on-failure --cli=forcedroid 2>&1 | tee "build_logs/forcedroid.log"
+      - name: Archive build logs on failure
+        if: failure() && steps.build.outcome == 'failure'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4.6.2
+        with:
+          name: package-build-logs-${{ github.job }}
+          path: build_logs/
+          if-no-files-found: ignore
+          retention-days: 14
 
   forcedroid-sfdx:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4.3.1
         if: ${{ inputs.is_pr }}
         with:
+          persist-credentials: false
           ref: ${{ github.event.pull_request.head.sha }}
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4.3.1
         if: ${{ ! inputs.is_pr }}
         with:
+          persist-credentials: false
           ref: ${{ github.head_ref }}
       - name: Install Dependencies
         run: npm install
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@c1e323688fd81a25caa38c78aa6df2d33d3e20d9  # v4.8.0
         with:
           distribution: 'zulu'
           java-version: '21'
       - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-      - uses: gradle/actions/setup-gradle@v4
+        uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407  # v3.2.2
+      - uses: gradle/actions/setup-gradle@748248ddd2a24f49513d8f472f81c3a07d4d50e1  # v4.4.4
         with:
           gradle-version: "8.7"
           add-job-summary: on-failure
@@ -60,28 +79,42 @@ jobs:
       - name: Install SFDX
         run: npm install -g @salesforce/cli
       - name: Build all android native templates wth SFDX
-        run: ./test/test_force.js --exit-on-failure --cli=forcedroid --use-sfdx 
-      
+        id: build
+        run: |
+          mkdir -p build_logs
+          set -o pipefail
+          ./test/test_force.js --exit-on-failure --cli=forcedroid --use-sfdx 2>&1 | tee "build_logs/forcedroid-sfdx.log"
+      - name: Archive build logs on failure
+        if: failure() && steps.build.outcome == 'failure'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4.6.2
+        with:
+          name: package-build-logs-${{ github.job }}
+          path: build_logs/
+          if-no-files-found: ignore
+          retention-days: 14
+
   forcehybrid-android:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4.3.1
         if: ${{ inputs.is_pr }}
         with:
+          persist-credentials: false
           ref: ${{ github.event.pull_request.head.sha }}
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4.3.1
         if: ${{ ! inputs.is_pr }}
         with:
+          persist-credentials: false
           ref: ${{ github.head_ref }}
       - name: Install Dependencies
         run: npm install
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@c1e323688fd81a25caa38c78aa6df2d33d3e20d9  # v4.8.0
         with:
           distribution: 'zulu'
           java-version: '21'
       - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-      - uses: gradle/actions/setup-gradle@v4
+        uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407  # v3.2.2
+      - uses: gradle/actions/setup-gradle@748248ddd2a24f49513d8f472f81c3a07d4d50e1  # v4.4.4
         with:
           gradle-version: "8.7"
           add-job-summary: on-failure
@@ -91,28 +124,42 @@ jobs:
       - name: Install Cordova
         run: npm install -g cordova
       - name: Build all android hybrid templates
-        run: ./test/test_force.js --exit-on-failure --cli=forcehybrid --os=android --no-plugin-update
+        id: build
+        run: |
+          mkdir -p build_logs
+          set -o pipefail
+          ./test/test_force.js --exit-on-failure --cli=forcehybrid --os=android --no-plugin-update 2>&1 | tee "build_logs/forcehybrid-android.log"
+      - name: Archive build logs on failure
+        if: failure() && steps.build.outcome == 'failure'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4.6.2
+        with:
+          name: package-build-logs-${{ github.job }}
+          path: build_logs/
+          if-no-files-found: ignore
+          retention-days: 14
 
   forcehybrid-android-sfdx:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4.3.1
         if: ${{ inputs.is_pr }}
         with:
+          persist-credentials: false
           ref: ${{ github.event.pull_request.head.sha }}
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4.3.1
         if: ${{ ! inputs.is_pr }}
         with:
+          persist-credentials: false
           ref: ${{ github.head_ref }}
       - name: Install Dependencies
         run: npm install
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@c1e323688fd81a25caa38c78aa6df2d33d3e20d9  # v4.8.0
         with:
           distribution: 'zulu'
           java-version: '21'
       - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-      - uses: gradle/actions/setup-gradle@v4
+        uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407  # v3.2.2
+      - uses: gradle/actions/setup-gradle@748248ddd2a24f49513d8f472f81c3a07d4d50e1  # v4.4.4
         with:
           gradle-version: "8.7"
           add-job-summary: on-failure
@@ -122,28 +169,42 @@ jobs:
       - name: Install Cordova
         run: npm install -g cordova
       - name: Build all android hybrid templates with SFDX
-        run:  ./test/test_force.js --exit-on-failure --cli=forcehybrid --os=android --use-sfdx --no-plugin-update
+        id: build
+        run: |
+          mkdir -p build_logs
+          set -o pipefail
+          ./test/test_force.js --exit-on-failure --cli=forcehybrid --os=android --use-sfdx --no-plugin-update 2>&1 | tee "build_logs/forcehybrid-android-sfdx.log"
+      - name: Archive build logs on failure
+        if: failure() && steps.build.outcome == 'failure'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4.6.2
+        with:
+          name: package-build-logs-${{ github.job }}
+          path: build_logs/
+          if-no-files-found: ignore
+          retention-days: 14
 
   forcereact-android:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4.3.1
         if: ${{ inputs.is_pr }}
         with:
+          persist-credentials: false
           ref: ${{ github.event.pull_request.head.sha }}
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4.3.1
         if: ${{ ! inputs.is_pr }}
         with:
+          persist-credentials: false
           ref: ${{ github.head_ref }}
       - name: Install Dependencies
         run: npm install
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@c1e323688fd81a25caa38c78aa6df2d33d3e20d9  # v4.8.0
         with:
           distribution: 'zulu'
           java-version: '21'
       - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-      - uses: gradle/actions/setup-gradle@v4
+        uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407  # v3.2.2
+      - uses: gradle/actions/setup-gradle@748248ddd2a24f49513d8f472f81c3a07d4d50e1  # v4.4.4
         with:
           gradle-version: "8.7"
           add-job-summary: on-failure
@@ -153,28 +214,42 @@ jobs:
       - name: Install Typescript
         run: npm install -g typescript
       - name: Build all android react native templates with SFDX
-        run: ./test/test_force.js --exit-on-failure --cli=forcereact --os=android
+        id: build
+        run: |
+          mkdir -p build_logs
+          set -o pipefail
+          ./test/test_force.js --exit-on-failure --cli=forcereact --os=android 2>&1 | tee "build_logs/forcereact-android.log"
+      - name: Archive build logs on failure
+        if: failure() && steps.build.outcome == 'failure'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4.6.2
+        with:
+          name: package-build-logs-${{ github.job }}
+          path: build_logs/
+          if-no-files-found: ignore
+          retention-days: 14
 
   forcereact-android-sfdx:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4.3.1
         if: ${{ inputs.is_pr }}
         with:
+          persist-credentials: false
           ref: ${{ github.event.pull_request.head.sha }}
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4.3.1
         if: ${{ ! inputs.is_pr }}
         with:
+          persist-credentials: false
           ref: ${{ github.head_ref }}
       - name: Install Dependencies
         run: npm install
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@c1e323688fd81a25caa38c78aa6df2d33d3e20d9  # v4.8.0
         with:
           distribution: 'zulu'
           java-version: '21'
       - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-      - uses: gradle/actions/setup-gradle@v4
+        uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407  # v3.2.2
+      - uses: gradle/actions/setup-gradle@748248ddd2a24f49513d8f472f81c3a07d4d50e1  # v4.4.4
         with:
           gradle-version: "8.7"
           add-job-summary: on-failure
@@ -184,4 +259,16 @@ jobs:
       - name: Install Typescript
         run: npm install -g typescript
       - name: Build all android react native templates with SFDX
-        run: ./test/test_force.js --exit-on-failure --cli=forcereact --os=android --use-sfdx
+        id: build
+        run: |
+          mkdir -p build_logs
+          set -o pipefail
+          ./test/test_force.js --exit-on-failure --cli=forcereact --os=android --use-sfdx 2>&1 | tee "build_logs/forcereact-android-sfdx.log"
+      - name: Archive build logs on failure
+        if: failure() && steps.build.outcome == 'failure'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4.6.2
+        with:
+          name: package-build-logs-${{ github.job }}
+          path: build_logs/
+          if-no-files-found: ignore
+          retention-days: 14
