@@ -2,17 +2,24 @@ name: Nightly Tests
 
 on:
   schedule:
-    - cron: "0 3 * * 3"  # cron is UTC, this translates to 8 PM PST Wednesday.
+    - cron: "0 10 * * 2,4"  # cron is UTC; 2 AM PT Tue/Thu.
   # This lets us trigger the workflow from a browser.
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   android-nightly:
+    permissions:
+      contents: read
     strategy:
       fail-fast: false
     uses: ./.github/workflows/android-reusable-workflow.yaml
-    
+
   ios-nightly:
+    permissions:
+      contents: read
     strategy:
       fail-fast: false
     uses: ./.github/workflows/ios-reusable-workflow.yaml

@@ -9,51 +9,84 @@ on:
         required: false
         type: string
 
+permissions:
+  contents: read
+
 jobs:
   forceios:
     runs-on: ${{ inputs.macos }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4.3.1
         if: ${{ inputs.is_pr }}
         with:
+          persist-credentials: false
           ref: ${{ github.event.pull_request.head.sha }}
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4.3.1
         if: ${{ ! inputs.is_pr }}
         with:
+          persist-credentials: false
           ref: ${{ github.head_ref }}
       - name: Install Dependencies
         run: npm install
       - name: Build all ios native templates
-        run: ./test/test_force.js --exit-on-failure --cli=forceios
+        id: build
+        run: |
+          mkdir -p build_logs
+          set -o pipefail
+          ./test/test_force.js --exit-on-failure --cli=forceios 2>&1 | tee "build_logs/forceios.log"
+      - name: Archive build logs on failure
+        if: failure() && steps.build.outcome == 'failure'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4.6.2
+        with:
+          name: package-build-logs-${{ github.job }}
+          path: build_logs/
+          if-no-files-found: ignore
+          retention-days: 14
 
   forceios-sfdx:
     runs-on: ${{ inputs.macos }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4.3.1
         if: ${{ inputs.is_pr }}
         with:
+          persist-credentials: false
           ref: ${{ github.event.pull_request.head.sha }}
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4.3.1
         if: ${{ ! inputs.is_pr }}
         with:
+          persist-credentials: false
           ref: ${{ github.head_ref }}
       - name: Install Dependencies
         run: npm install
       - name: Install SFDX
         run: npm install -g @salesforce/cli
       - name: Build all ios native templates with SFDX
-        run: ./test/test_force.js --exit-on-failure --cli=forceios --use-sfdx
+        id: build
+        run: |
+          mkdir -p build_logs
+          set -o pipefail
+          ./test/test_force.js --exit-on-failure --cli=forceios --use-sfdx 2>&1 | tee "build_logs/forceios-sfdx.log"
+      - name: Archive build logs on failure
+        if: failure() && steps.build.outcome == 'failure'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4.6.2
+        with:
+          name: package-build-logs-${{ github.job }}
+          path: build_logs/
+          if-no-files-found: ignore
+          retention-days: 14
 
   forcehybrid-ios:
     runs-on: ${{ inputs.macos }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4.3.1
         if: ${{ inputs.is_pr }}
         with:
+          persist-credentials: false
           ref: ${{ github.event.pull_request.head.sha }}
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4.3.1
         if: ${{ ! inputs.is_pr }}
         with:
+          persist-credentials: false
           ref: ${{ github.head_ref }}
       - name: Install Dependencies
         run: npm install
@@ -62,18 +95,32 @@ jobs:
       - name: Install Cordova
         run: npm install -g cordova
       - name: Build all ios hybrid templates
-        run: ./test/test_force.js --exit-on-failure --cli=forcehybrid --os=ios --no-plugin-update
+        id: build
+        run: |
+          mkdir -p build_logs
+          set -o pipefail
+          ./test/test_force.js --exit-on-failure --cli=forcehybrid --os=ios --no-plugin-update 2>&1 | tee "build_logs/forcehybrid-ios.log"
+      - name: Archive build logs on failure
+        if: failure() && steps.build.outcome == 'failure'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4.6.2
+        with:
+          name: package-build-logs-${{ github.job }}
+          path: build_logs/
+          if-no-files-found: ignore
+          retention-days: 14
 
   forcehybrid-ios-sfdx:
     runs-on: ${{ inputs.macos }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4.3.1
         if: ${{ inputs.is_pr }}
         with:
+          persist-credentials: false
           ref: ${{ github.event.pull_request.head.sha }}
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4.3.1
         if: ${{ ! inputs.is_pr }}
         with:
+          persist-credentials: false
           ref: ${{ github.head_ref }}
       - name: Install Dependencies
         run: npm install
@@ -82,36 +129,64 @@ jobs:
       - name: Install Cordova
         run: npm install -g cordova
       - name: Build all ios hybrid templates with SFDX
-        run: ./test/test_force.js --exit-on-failure --cli=forcehybrid --os=ios --use-sfdx --no-plugin-update
+        id: build
+        run: |
+          mkdir -p build_logs
+          set -o pipefail
+          ./test/test_force.js --exit-on-failure --cli=forcehybrid --os=ios --use-sfdx --no-plugin-update 2>&1 | tee "build_logs/forcehybrid-ios-sfdx.log"
+      - name: Archive build logs on failure
+        if: failure() && steps.build.outcome == 'failure'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4.6.2
+        with:
+          name: package-build-logs-${{ github.job }}
+          path: build_logs/
+          if-no-files-found: ignore
+          retention-days: 14
 
   forcereact-ios:
     runs-on: ${{ inputs.macos }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4.3.1
         if: ${{ inputs.is_pr }}
         with:
+          persist-credentials: false
           ref: ${{ github.event.pull_request.head.sha }}
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4.3.1
         if: ${{ ! inputs.is_pr }}
         with:
+          persist-credentials: false
           ref: ${{ github.head_ref }}
       - name: Install Dependencies
         run: npm install
       - name: Install Typescript
         run: npm install -g typescript
       - name: Build all ios react native templates
-        run: ./test/test_force.js --exit-on-failure --cli=forcereact --os=ios
+        id: build
+        run: |
+          mkdir -p build_logs
+          set -o pipefail
+          ./test/test_force.js --exit-on-failure --cli=forcereact --os=ios 2>&1 | tee "build_logs/forcereact-ios.log"
+      - name: Archive build logs on failure
+        if: failure() && steps.build.outcome == 'failure'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4.6.2
+        with:
+          name: package-build-logs-${{ github.job }}
+          path: build_logs/
+          if-no-files-found: ignore
+          retention-days: 14
 
   forcereact-ios-sfdx:
     runs-on: ${{ inputs.macos }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4.3.1
         if: ${{ inputs.is_pr }}
         with:
+          persist-credentials: false
           ref: ${{ github.event.pull_request.head.sha }}
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4.3.1
         if: ${{ ! inputs.is_pr }}
         with:
+          persist-credentials: false
           ref: ${{ github.head_ref }}
       - name: Install Dependencies
         run: npm install
@@ -120,4 +195,16 @@ jobs:
       - name: Install Typescript
         run: npm install -g typescript
       - name: Build all ios react native templates with SFDX
-        run: ./test/test_force.js --exit-on-failure --cli=forcereact --os=ios --use-sfdx
+        id: build
+        run: |
+          mkdir -p build_logs
+          set -o pipefail
+          ./test/test_force.js --exit-on-failure --cli=forcereact --os=ios --use-sfdx 2>&1 | tee "build_logs/forcereact-ios-sfdx.log"
+      - name: Archive build logs on failure
+        if: failure() && steps.build.outcome == 'failure'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4.6.2
+        with:
+          name: package-build-logs-${{ github.job }}
+          path: build_logs/
+          if-no-files-found: ignore
+          retention-days: 14
