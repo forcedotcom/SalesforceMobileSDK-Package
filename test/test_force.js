@@ -2,6 +2,8 @@
 
 // Dependencies
 var spawnSync = require('child_process').spawnSync,
+    existsSync = require('fs').existsSync,
+    fs = require('fs'),
     path = require('path'),
     shelljs = require('shelljs'),
     commandLineUtils = require('../shared/commandLineUtils'),
@@ -376,6 +378,17 @@ function buildForiOS(target, workspaceDir, appName) {
 }
 
 function buildForAndroid(target, workspaceDir) {
+    // Ensure compileSdk is at least 36 to satisfy androidx.core:core:1.18.0 requirement
+    var gradlePropsPath = path.join(workspaceDir, 'gradle.properties');
+    if (existsSync(gradlePropsPath)) {
+        var content = fs.readFileSync(gradlePropsPath, 'utf8');
+        var match = content.match(/cdvCompileSdkVersion=(\d+)/);
+        if (match && parseInt(match[1]) < 36) {
+            content = content.replace(/cdvCompileSdkVersion=\d+/, 'cdvCompileSdkVersion=36');
+            fs.writeFileSync(gradlePropsPath, content, 'utf8');
+            utils.logInfo('Updated cdvCompileSdkVersion to 36 in gradle.properties', COLOR.green);
+        }
+    }
     var gradle = isWindows() ? '.\\gradlew.bat' : './gradlew';
     utils.runProcessCatchError(gradle + ' assembleDebug', 'COMPILING ' + target, workspaceDir);
 }
