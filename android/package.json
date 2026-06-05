@@ -10,7 +10,7 @@
     ],
     "bin" : { "forcedroid" : "forcedroid.js" },
     "engines": {
-        "node": ">=7.0.0"
+        "node": ">=22"
     },
     "dependencies": {
         "shelljs": "0.8.5",
