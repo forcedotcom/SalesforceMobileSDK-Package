@@ -10,7 +10,7 @@
     ],
     "os" : [ "darwin" ],
     "engines": {
-        "node": ">=7.0.0"
+        "node": ">=22"
     },
     "bin" : { "forceios" : "forceios.js" },
     "dependencies": {
