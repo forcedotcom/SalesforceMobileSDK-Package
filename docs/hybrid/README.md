@@ -65,10 +65,16 @@ module.exports = {
 
 ### Switching Between Dev and GA
 
-Each URI has two lines -- one for dev (pointing to the `#dev` branch) and one for GA (pointing to a version tag). To switch modes, comment out one and uncomment the other:
+The dev/GA toggle is managed automatically by `setversion.sh` — do not edit the comments in `constants.js` by hand:
 
-- **Dev mode** (default): Uses `#dev` branch of CordovaPlugin and Templates repos.
-- **GA mode**: Uses tagged versions like `salesforce-mobilesdk-cordova-plugin@v14.0.0` and `#v14.0.0`.
+```bash
+./setversion.sh -v 14.0.0 -d yes   # dev build: activates #dev URIs
+./setversion.sh -v 14.0.0 -d no    # GA build: activates versioned tag URIs
+```
+
+The script uncomments all `*RepoUri` lines, then comments out the ones that don't apply:
+- **Dev** (`-d yes`): comments out lines pointing to a version tag (`@#v`), leaving `#dev` active.
+- **GA** (`-d no`): comments out lines pointing to `#dev`, leaving versioned URIs like `salesforce-mobilesdk-cordova-plugin@v14.0.0` active.
 
 ## `createHybridApp()` Step-by-Step Workflow
 
