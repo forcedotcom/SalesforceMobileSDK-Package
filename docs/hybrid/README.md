@@ -24,6 +24,16 @@ createHelper.createApp(SDK.forceclis.forcehybrid);
 | `describetemplate` | Show details for a specific template |
 | `checkconfig` | Validate SmartStore/MobileSync config JSON |
 
+## Distribution
+
+`forcehybrid` is packaged and published to [npmjs.org](https://www.npmjs.com/package/forcehybrid) with every SDK release. Developers install it globally:
+
+```bash
+npm install -g forcehybrid
+```
+
+The packaging step is run by `pack/pack.js` in this repo, and the publish is performed manually as part of the release process driven by `release/release.js`.
+
 ## Version Configuration (`shared/constants.js`)
 
 All version pins live in `shared/constants.js`. This is the single source of truth:
