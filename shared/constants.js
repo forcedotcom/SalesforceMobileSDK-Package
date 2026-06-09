@@ -60,7 +60,7 @@ module.exports = {
         },
         cordova: {
             checkCmd: 'cordova -v',
-            pluginRepoUri: 'https://github.com/wmathurin/SalesforceMobileSDK-CordovaPlugin#W-21080629-cordova-ios-8',    // dev - REVERT BEFORE MERGING
+            pluginRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-CordovaPlugin#dev',    // dev
             minVersion: '13.0.0',
 //             pluginRepoUri: 'salesforce-mobilesdk-cordova-plugin@v' + VERSION, // GA
             platformVersion: {
@@ -79,7 +79,7 @@ module.exports = {
         android: 'Android Studio'
     },
 
-    templatesRepoUri: 'https://github.com/wmathurin/SalesforceMobileSDK-Templates#W-21080629-cordova-ios-8',    // dev - REVERT BEFORE MERGING
+    templatesRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-Templates#dev',    // dev
 //     templatesRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-Templates#v' + VERSION, // GA
 
     forceclis: {
