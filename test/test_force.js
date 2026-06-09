@@ -407,11 +407,18 @@ function createCompileApp(tmpDir, os, actualAppType, templateRepoUri, pluginRepo
 
 function buildForiOS(target, workspaceDir, appName) {
     const workspacePath = path.join(workspaceDir, appName + '.xcworkspace');
+    // cordova-ios 8.x uses fixed 'App' name instead of app name
+    const appWorkspacePath = path.join(workspaceDir, 'App.xcworkspace');
     const projectPath = path.join(workspaceDir, appName + '.xcodeproj');
+    const appProjectPath = path.join(workspaceDir, 'App.xcodeproj');
     const buildTarget = existsSync(workspacePath)
           ? `-workspace ${workspacePath} -scheme ${appName}`
-          : `-project ${projectPath} -scheme ${appName}`;
-    
+          : existsSync(appWorkspacePath)
+          ? `-workspace ${appWorkspacePath} -scheme App`
+          : existsSync(projectPath)
+          ? `-project ${projectPath} -scheme ${appName}`
+          : `-project ${appProjectPath} -scheme App`;
+
     utils.runProcessCatchError(`xcodebuild ${buildTarget} clean build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO -destination generic/platform=iOS`,
                                `COMPILING ${target}`);
 }
