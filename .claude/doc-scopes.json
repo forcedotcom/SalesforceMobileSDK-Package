@@ -12,42 +12,42 @@
     },
     {
       "doc": "test/README.md",
-      "scope": "test/",
+      "scope": "test",
       "description": "App generation and build test - test_force.js integration test for CLI tools and templates"
     },
     {
       "doc": "release/README.md",
-      "scope": "release/",
+      "scope": "release",
       "description": "Release scripts - full release orchestrator (release.js) for coordinating Mobile SDK releases"
     },
     {
       "doc": "ios/README.md",
-      "scope": "ios/",
+      "scope": "ios",
       "description": "forceios npm package - CLI tool for creating iOS mobile applications with Mobile SDK"
     },
     {
       "doc": "android/README.md",
-      "scope": "android/",
+      "scope": "android",
       "description": "forcedroid npm package - CLI tool for creating Android mobile applications with Mobile SDK"
     },
     {
       "doc": "hybrid/README.md",
-      "scope": "hybrid/",
+      "scope": "hybrid",
       "description": "forcehybrid npm package - CLI tool for creating hybrid iOS and Android mobile applications"
     },
     {
       "doc": "react/README.md",
-      "scope": "react/",
+      "scope": "react",
       "description": "forcereact npm package - CLI tool for creating React Native iOS and Android mobile applications"
     },
     {
       "doc": "sfdx/README.md",
-      "scope": "sfdx/",
+      "scope": "sfdx",
       "description": "sfdx-mobilesdk-plugin - Salesforce CLI plugin (sf mobilesdk commands) for Mobile SDK"
     },
     {
       "doc": "docs/hybrid/README.md",
-      "scope": "hybrid/",
+      "scope": "hybrid",
       "description": "Hybrid app creation documentation - how forcehybrid CLI tool creates Cordova-based apps"
     }
   ]
