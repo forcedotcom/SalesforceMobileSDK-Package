@@ -155,7 +155,7 @@ async function start() {
     await prepareRepo(REPO.ios, {hasDoc:true})
     await prepareRepo(REPO.ioshybrid, {filesWithOrg: ['.gitmodules'], submodulePaths:['./external/shared', './external/SalesforceMobileSDK-iOS']})
     await prepareRepo(REPO.iosspecs, {noTag: true, noDev: true, filesWithOrg:['update.sh']})
-    await prepareRepo(REPO.iosspm, {noTagPrefix: true, noDev: true})
+    await prepareRepo(REPO.iosspm, {noTagPrefix: true})
     await prepareRepo(REPO.cordovaplugin, {filesWithOrg:['./plugin.xml','./tools/update.sh']})
     await prepareRepo(REPO.reactnative)
     await prepareRepo(REPO.templates, {filesWithOrg:templatesPackageJsons})

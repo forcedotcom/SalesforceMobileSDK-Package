@@ -260,18 +260,11 @@ async function releaseIOSSpecs() {
 // Release function for iOS-Spm repo
 //
 async function releaseIOSSpm() {
-    const repo = REPO.iosspm
-    const cmds = {
-        msg: `PROCESSING ${repo}`,
-        cmds: [
-            cloneOrClean(config.org, repo, config.tmpDir),
-            `git checkout ${config.masterBranch}`,
-	    `./build_xcframeworks.sh -r ${config.org} -b ${config.masterBranch}`,
-            commitAndPushMaster(),
-	    tagMaster(true) // SPM needs versions of the form X.Y.Z (where X, Y, Z are integers)
-        ]
-    }
-    await runCmds(path.join(config.tmpDir, repo), cmds)
+    await releaseRepo(REPO.iosspm, {
+        masterPostMergeCmd: `./build_xcframeworks.sh -r ${config.org} -b ${config.masterBranch}`,
+        skipSetVersion: true,  // iOS-SPM has no setVersion.sh; version is the git tag only
+        noTagPrefix: true      // SPM requires X.Y.Z tags (no 'v' prefix)
+    })
 }
 
 //
@@ -324,10 +317,10 @@ async function releaseRepo(repo, params) {
                     checkoutBranch(config.masterBranch),
                     config.isPatch ? null : mergeBranch(config.devBranch, config.masterBranch, params.submodulePaths),
                     params.masterPostMergeCmd,
-                    setVersion(config.versionReleased, false, config.versionCodeReleased),
+                    params.skipSetVersion ? null : setVersion(config.versionReleased, false, config.versionCodeReleased),
                     updateSubmodules(config.masterBranch, params.submodulePaths),
                     commitAndPushMaster(),
-                    tagMaster(),
+                    tagMaster(params.noTagPrefix),
                     params.postReleaseGenerateCmd
                 ]
             },
@@ -338,7 +331,7 @@ async function releaseRepo(repo, params) {
                     checkoutBranch(config.devBranch),
                     mergeBranch(config.masterBranch, config.devBranch, params.submodulePaths),
                     params.devPostMergeCmd,
-                    setVersion(config.nextVersion, true, config.nextVersionCode),
+                    params.skipSetVersion ? null : setVersion(config.nextVersion, true, config.nextVersionCode),
                     updateSubmodules(config.devBranch, params.submodulePaths),
                     commitAndPushDev()
                 ]
