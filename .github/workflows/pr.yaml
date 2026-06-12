@@ -3,6 +3,11 @@ name: Pull Request
 on:
   pull_request:
     branches: [dev, master]
+    paths-ignore:
+      - '**/*.md'
+      - 'LICENSE'
+      - '.gitignore'
+      - 'CODEOWNERS'
 
 permissions:
   contents: read
