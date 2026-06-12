@@ -125,7 +125,7 @@ For detailed plugin documentation, see [sfdx/README.md](sfdx/README.md).
 
 ### Prerequisites
 
-- **Node.js**: 20 or higher
+- **Node.js**: 22 or higher
 - **npm**: 10 or higher
 - **Git**: 2.13 or higher
 
@@ -246,7 +246,7 @@ Output: `<name>-<version>.tgz` files in the current directory.
 
 ## Release Process
 
-The `release/release.js` script orchestrates releases across all 11 Mobile SDK repositories:
+The `release/release.js` script orchestrates releases across all 10 Mobile SDK repositories:
 
 1. **SalesforceMobileSDK-Shared**
 2. **SalesforceMobileSDK-Android**
@@ -383,7 +383,7 @@ When creating an app:
 The SDK version is defined in `shared/constants.js`:
 
 ```javascript
-var VERSION = '13.2.0';
+var VERSION = '14.0.0';
 ```
 
 This version:
