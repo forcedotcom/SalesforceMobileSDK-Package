@@ -123,6 +123,10 @@ cordova plugin add https://github.com/forcedotcom/SalesforceMobileSDK-CordovaPlu
 
 This triggers `plugin.xml` evaluation and runs both post-install hooks (`postinstall-ios.js` and `postinstall-android.js`) in the CordovaPlugin repo.
 
+**iOS:** `postinstall-ios.js` copies `AppDelegate.swift` from the plugin into the generated app at `platforms/ios/App/Plugins/com.salesforce/AppDelegate.swift` and redirects the Xcode project reference to it. This gives the generated app a customizable app delegate with `SalesforceHybridSDKManager` initialization already wired up.
+
+**Android:** `postinstall-android.js` injects a `MainApplication.kt` into the generated app at `platforms/android/app/src/main/java/<packagename>/MainApplication.kt`. It reads the app's `applicationId` from `app/build.gradle`, creates the source directory, copies and configures the file with the correct package name, and updates `android:name` in `AndroidManifest.xml` to point to the new class. The generated `MainApplication.kt` calls `SalesforceHybridSDKManager.initHybrid()` and includes commented-out hooks for IDP login and push notifications that developers can enable as needed.
+
 ### 6. Remove Default `www/` Directory
 
 The default Cordova app content is deleted.
