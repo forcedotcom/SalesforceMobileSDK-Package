@@ -305,6 +305,26 @@ function hasValidOAuthConfig(config) {
 }
 
 //
+// Parse a callback URL into its scheme, host and path components.
+// Used to populate the Android redirect <intent-filter> in generated apps.
+// Node yields '' for the host of a hostless URI (e.g. testsfdc:///mobilesdk/detect/oauth/done);
+// that empty host is intentional and must NOT be coerced to '*'.
+// On parse failure returns null so the placeholders remain and the app still builds.
+//
+function parseCallbackUrl(callbackurl) {
+    try {
+        var url = new URL(callbackurl);
+        return {
+            scheme: url.protocol.replace(/:$/, ''),
+            host: url.host,
+            path: url.pathname
+        };
+    } catch (error) {
+        return null;
+    }
+}
+
+//
 // Print next steps
 //
 function printNextSteps(ide, projectPath, result, hasValidOAuth) {
@@ -489,7 +509,17 @@ function actuallyCreateApp(forcecli, config) {
 
         // Adding version
         config.version = SDK.version;
-        
+
+        // Parsing callback URL into scheme/host/path for the template (e.g. Android redirect intent-filter)
+        if (hasValidOAuthConfig(config)) {
+            var cb = parseCallbackUrl(config.callbackurl);
+            if (cb) {
+                config.callbackUrlScheme = cb.scheme;
+                config.callbackUrlHost = cb.host;
+                config.callbackUrlPath = cb.path;
+            }
+        }
+
         // Figuring out template repo uri and path
         let localTemplatesRoot;
         if (config.templatesource) {
@@ -623,5 +653,6 @@ function validateCustomProperties(templateJsonPath, customProperties) {
 
 module.exports = {
     createApp,
-    validateCustomProperties
+    validateCustomProperties,
+    parseCallbackUrl
 };
