@@ -196,7 +196,8 @@ describe('createHelper', () => {
                 host: '',
                 path: '/mobilesdk/detect/oauth/done'
             });
-            // Android has no host wildcard - an empty host must never become '*'
+            // '*' IS an Android host wildcard (matches any host, over-broad); an empty
+            // host must mirror the empty authority as android:host="", never become '*'
             expect(result.host).not.toBe('*');
         });
 
