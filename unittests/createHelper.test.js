@@ -185,4 +185,39 @@ describe('createHelper', () => {
             });
         });
     });
+
+    describe('parseCallbackUrl', () => {
+
+        it('should parse a hostless callback URL with an empty host', () => {
+            const result = createHelper.parseCallbackUrl('testsfdc:///mobilesdk/detect/oauth/done');
+
+            expect(result).toEqual({
+                scheme: 'testsfdc',
+                host: '',
+                path: '/mobilesdk/detect/oauth/done'
+            });
+            // '*' IS an Android host wildcard (matches any host, over-broad); an empty
+            // host must mirror the empty authority as android:host="", never become '*'
+            expect(result.host).not.toBe('*');
+        });
+
+        it('should parse a callback URL with a real host', () => {
+            const result = createHelper.parseCallbackUrl('sfdc://login.salesforce.com/oauth/done');
+
+            expect(result).toEqual({
+                scheme: 'sfdc',
+                host: 'login.salesforce.com',
+                path: '/oauth/done'
+            });
+            expect(result.host).not.toBe('*');
+        });
+
+        it('should treat the authority as the host', () => {
+            const result = createHelper.parseCallbackUrl('scheme://success/done');
+
+            expect(result.host).toBe('success');
+            expect(result.path).toBe('/done');
+            expect(result.host).not.toBe('*');
+        });
+    });
 });
