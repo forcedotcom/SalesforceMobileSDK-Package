@@ -151,7 +151,7 @@ async function start() {
     }
 
     await prepareRepo(REPO.shared)
-    await prepareRepo(REPO.android, {hasDoc:true, filesWithOrg: ['.gitmodules', './libs/SalesforceReact/package.json'], submodulePaths:['./external/shared']})
+    await prepareRepo(REPO.android, {hasDoc:true, filesWithOrg: ['.gitmodules'], submodulePaths:['./external/shared']})
     await prepareRepo(REPO.ios, {hasDoc:true})
     await prepareRepo(REPO.ioshybrid, {filesWithOrg: ['.gitmodules'], submodulePaths:['./external/shared', './external/SalesforceMobileSDK-iOS']})
     await prepareRepo(REPO.iosspecs, {noTag: true, noDev: true, filesWithOrg:['update.sh']})
