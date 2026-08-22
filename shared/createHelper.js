@@ -511,14 +511,12 @@ function actuallyCreateApp(forcecli, config) {
         config.version = SDK.version;
 
         // Parsing callback URL into scheme/host/path for the template (e.g. Android redirect intent-filter)
-        if (hasValidOAuthConfig(config)) {
-            var cb = parseCallbackUrl(config.callbackurl);
-            if (cb) {
-                config.callbackUrlScheme = cb.scheme;
-                config.callbackUrlHost = cb.host;
-                config.callbackUrlPath = cb.path;
-            }
-        }
+        // Defaulting to '' (rather than leaving undefined) so templates that substitute these
+        // unconditionally on a non-empty callbackurl don't inject the literal string "undefined".
+        var cb = hasValidOAuthConfig(config) ? parseCallbackUrl(config.callbackurl) : null;
+        config.callbackUrlScheme = cb ? cb.scheme : '';
+        config.callbackUrlHost = cb ? cb.host : '';
+        config.callbackUrlPath = cb ? cb.path : '';
 
         // Figuring out template repo uri and path
         let localTemplatesRoot;
