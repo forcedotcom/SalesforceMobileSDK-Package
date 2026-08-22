@@ -372,7 +372,7 @@ function createCompileApp(tmpDir, os, actualAppType, templateRepoUri, pluginRepo
         + (isHybrid && pluginRepoUri ? ' --pluginrepouri=' + pluginRepoUri : '');
 
     if (sdkDependencies) {
-        execArgs += ' --sdkDependencies=' + JSON.stringify(sdkDependencies).replace(/"/g, '\\"');
+        execArgs += ' --sdkDependencies=' + sdkDependencies.replace(/"/g, '\\"');
     }
 
     // Generation
