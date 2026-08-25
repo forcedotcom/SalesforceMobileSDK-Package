@@ -72,6 +72,15 @@ function createHybridApp(config) {
     }
     utils.runProcessThrowError('cordova plugin add ' + config.cordovaPluginRepoUri + ' --force', config.projectDir);
 
+    // Override sdk dependencies in the generated iOS Podfile if an iOS override was provided.
+    // `cordova plugin add` above already ran `pod install` once against the plugin's hardcoded
+    // pod sources; the `cordova prepare` call further down always reparses and rewrites the
+    // Podfile (the plugin sets a deployment-target preference) and reruns `pod install`, which
+    // is what actually picks up this edit.
+    if (config.sdkdependencies && config.platform.split(',').includes('ios')) {
+        overrideHybridIosPodfile(path.join(config.projectDir, 'platforms', 'ios', 'Podfile'), config.sdkdependencies);
+    }
+
     // Web directory - the home for the template
     var webDir = path.join(config.projectDir, 'www');
     
@@ -479,6 +488,56 @@ function overrideSdkDependencies(packageJsonPath, sdkDependenciesString) {
     }
 }
 
+//
+// Override sdk dependencies in the generated hybrid app's iOS Podfile.
+// The Cordova plugin's plugin.xml hardcodes each Mobile SDK pod's :git repo and :branch => 'dev';
+// package.json has no influence over that Podfile, so overrideSdkDependencies() above is a no-op
+// for hybrid+iOS. This rewrites the :git/:branch of any pod line sourced from a repo named in
+// sdkDependenciesString (e.g. "SalesforceMobileSDK-iOS") to point at the given fork + branch.
+//
+function overrideHybridIosPodfile(podfilePath, sdkDependenciesString) {
+    try {
+        if (!fs.existsSync(podfilePath)) {
+            console.error(`Podfile not found at ${podfilePath}, skipping sdk dependencies override`);
+            return;
+        }
+
+        let sdkDependencies = JSON.parse(sdkDependenciesString);
+        let originalContent = fs.readFileSync(podfilePath, 'utf8');
+
+        let updatedContent = originalContent.split('\n').map(function(line) {
+            if (!/^\s*pod\s+'/.test(line)) {
+                return line;
+            }
+
+            for (var repoName in sdkDependencies) {
+                var gitRE = new RegExp(":git\\s*=>\\s*'[^']*\\/" + repoName + "(?:\\.git)?'");
+                if (!gitRE.test(line)) {
+                    continue;
+                }
+                if (!/:branch\s*=>\s*'[^']*'/.test(line)) {
+                    console.warn(`Skipping sdk dependencies override for ${repoName}: pod line is not pinned with :branch (e.g. it uses :tag or :commit instead), so it can't be safely rewritten: ${line.trim()}`);
+                    continue;
+                }
+
+                var parts = sdkDependencies[repoName].split('#');
+                var newGitUrl = parts[0];
+                var newBranch = parts.length > 1 ? parts[1] : 'dev';
+
+                line = line.replace(gitRE, ":git => '" + newGitUrl + "'");
+                line = line.replace(/:branch\s*=>\s*'[^']*'/, ":branch => '" + newBranch + "'");
+            }
+
+            return line;
+        }).join('\n');
+
+        fs.writeFileSync(podfilePath, updatedContent, 'utf8');
+
+    } catch (err) {
+        console.error(`Failed to override sdk dependencies in Podfile: ${err}`);
+    }
+}
+
 
 //
 // Actually create app
@@ -652,5 +711,6 @@ function validateCustomProperties(templateJsonPath, customProperties) {
 module.exports = {
     createApp,
     validateCustomProperties,
-    parseCallbackUrl
+    parseCallbackUrl,
+    overrideHybridIosPodfile
 };
