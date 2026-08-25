@@ -512,7 +512,11 @@ function overrideHybridIosPodfile(podfilePath, sdkDependenciesString) {
 
             for (var repoName in sdkDependencies) {
                 var gitRE = new RegExp(":git\\s*=>\\s*'[^']*\\/" + repoName + "(?:\\.git)?'");
-                if (!gitRE.test(line) || !/:branch\s*=>\s*'[^']*'/.test(line)) {
+                if (!gitRE.test(line)) {
+                    continue;
+                }
+                if (!/:branch\s*=>\s*'[^']*'/.test(line)) {
+                    console.warn(`Skipping sdk dependencies override for ${repoName}: pod line is not pinned with :branch (e.g. it uses :tag or :commit instead), so it can't be safely rewritten: ${line.trim()}`);
                     continue;
                 }
 

@@ -245,6 +245,7 @@ describe('createHelper', () => {
 
         beforeEach(() => {
             jest.spyOn(console, 'error').mockImplementation(() => {});
+            jest.spyOn(console, 'warn').mockImplementation(() => {});
         });
 
         afterEach(() => {
@@ -310,6 +311,26 @@ describe('createHelper', () => {
             const writtenContent = writeFileSyncSpy.mock.calls[0][1];
             expect(writtenContent).toContain("pod 'SalesforceHybridSDK', :branch => 'someBranch', :git => 'https://github.com/someFork/SalesforceMobileSDK-iOS-Hybrid'");
             expect(writtenContent).toContain("pod 'MobileSync', :branch => 'dev', :git => 'https://github.com/forcedotcom/SalesforceMobileSDK-iOS'");
+        });
+
+        it('should warn and leave a matching pod untouched when it is not pinned with :branch', () => {
+            jest.spyOn(fs, 'existsSync').mockReturnValue(true);
+            const podfileWithTaggedPod =
+                "target 'App' do\n" +
+                "\tpod 'MobileSync', :tag => 'v13.2.0', :git => 'https://github.com/forcedotcom/SalesforceMobileSDK-iOS'\n" +
+                "end\n";
+            jest.spyOn(fs, 'readFileSync').mockReturnValue(podfileWithTaggedPod);
+            const writeFileSyncSpy = jest.spyOn(fs, 'writeFileSync').mockImplementation(() => {});
+
+            const sdkDependencies = JSON.stringify({
+                'SalesforceMobileSDK-iOS': 'https://github.com/someFork/SalesforceMobileSDK-iOS#someBranch'
+            });
+
+            createHelper.overrideHybridIosPodfile(podfilePath, sdkDependencies);
+
+            const writtenContent = writeFileSyncSpy.mock.calls[0][1];
+            expect(writtenContent).toContain("pod 'MobileSync', :tag => 'v13.2.0', :git => 'https://github.com/forcedotcom/SalesforceMobileSDK-iOS'");
+            expect(console.warn).toHaveBeenCalled();
         });
 
         it('should skip writing and log an error when the Podfile does not exist', () => {
