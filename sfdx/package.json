@@ -1,6 +1,6 @@
 {
     "name": "sfdx-mobilesdk-plugin",
-    "version": "14.0.0",
+    "version": "14.0.0-rc.0",
     "description": "Salesforce CLI plugin for creating mobile apps based on the Salesforce Mobile SDK",
     "keywords": [
         "mobilesdk",
