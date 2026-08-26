@@ -91,9 +91,8 @@ forceclis: {
         purpose: 'an iOS native mobile application',
         platforms: ['ios'],
         toolNames: ['git', 'node', 'npm', 'pod'],
-        appTypes: ['native_swift', 'native'],
+        appTypes: ['native_swift'],
         appTypesToPath: {
-            'native': 'iOSNativeTemplate',
             'native_swift': 'iOSNativeSwiftTemplate'
         },
         commands: ['create', 'createwithtemplate', 'version', 'listtemplates', 'describetemplate', 'checkconfig']
@@ -373,7 +372,7 @@ Defined in `shared/constants.js` and checked before app creation:
 | Tool | Min Version | Used By |
 |------|-------------|---------|
 | **git** | 2.13 | All CLIs |
-| **node** | 20 | All CLIs |
+| **node** | 22 | All CLIs |
 | **npm** | 10 | All CLIs |
 | **yarn** | 1.22 | forcereact |
 | **tsc** | 4.1.2 | forcereact |
@@ -415,7 +414,7 @@ Tests actual app generation across all platforms and app types.
 
 ### JavaScript Standards
 
-- **Node.js**: 20+
+- **Node.js**: 22+
 - **Style**: Use existing code style (shelljs patterns, callback-based for older code)
 - **Error Handling**: Use `utils.runProcessThrowError()` for shell commands
 - **Logging**: Use `utils.log()`, `utils.logInfo()`, `utils.logError()` with colors

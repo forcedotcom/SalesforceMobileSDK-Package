@@ -47,7 +47,7 @@ function getArgsExpanded(cli, commandName) {
     var argNames = applyCli(SDK.commands[commandName].args, cli);
     return argNames
         .map(argName => SDK.args[argName])
-        .map(arg => 
+        .map(arg =>
             ({
                 name: arg.name,
                 'char': arg.char,
@@ -56,7 +56,7 @@ function getArgsExpanded(cli, commandName) {
                 prompt: applyCli(arg.prompt, cli),
                 error: applyCli(arg.error, cli),
                 validate: applyCli(arg.validate, cli),
-                promptIf: arg.promptIf,
+                promptIf: applyCli(arg.promptIf, cli),
                 required: arg.required === undefined ? true : arg.required,
                 hasValue: arg.hasValue === undefined ? true : arg.hasValue,
                 hidden: applyCli(arg.hidden, cli),

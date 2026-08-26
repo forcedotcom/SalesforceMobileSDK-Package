@@ -50,7 +50,6 @@ const templatesPackageJsons = [
     './AndroidIDPTemplate/package.json',
     './AndroidNativeKotlinTemplate/package.json',
     './AndroidNativeLoginTemplate/package.json',
-    './AndroidNativeTemplate/package.json',
     './HybridLocalTemplate/package.json',
     './HybridRemoteTemplate/package.json',
     './MobileSyncExplorerKotlinTemplate/package.json',
@@ -63,8 +62,7 @@ const templatesPackageJsons = [
     './iOSNativeLoginTemplate/package.json',
     './iOSNativeSwiftEncryptedNotificationTemplate/package.json',
     './iOSNativeSwiftPackageManagerTemplate/package.json',
-    './iOSNativeSwiftTemplate/package.json',
-    './iOSNativeTemplate/package.json'
+    './iOSNativeSwiftTemplate/package.json'
 ]
 
 // Questions
@@ -153,11 +151,11 @@ async function start() {
     }
 
     await prepareRepo(REPO.shared)
-    await prepareRepo(REPO.android, {hasDoc:true, filesWithOrg: ['.gitmodules', './libs/SalesforceReact/package.json'], submodulePaths:['./external/shared']})
+    await prepareRepo(REPO.android, {hasDoc:true, filesWithOrg: ['.gitmodules'], submodulePaths:['./external/shared']})
     await prepareRepo(REPO.ios, {hasDoc:true})
     await prepareRepo(REPO.ioshybrid, {filesWithOrg: ['.gitmodules'], submodulePaths:['./external/shared', './external/SalesforceMobileSDK-iOS']})
     await prepareRepo(REPO.iosspecs, {noTag: true, noDev: true, filesWithOrg:['update.sh']})
-    await prepareRepo(REPO.iosspm, {noTagPrefix: true, noDev: true})
+    await prepareRepo(REPO.iosspm, {noTagPrefix: true})
     await prepareRepo(REPO.cordovaplugin, {filesWithOrg:['./plugin.xml','./tools/update.sh']})
     await prepareRepo(REPO.reactnative)
     await prepareRepo(REPO.templates, {filesWithOrg:templatesPackageJsons})

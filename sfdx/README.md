@@ -65,8 +65,8 @@ COMMANDS
 create an iOS native mobile application
 
 USAGE
-  $ sf mobilesdk ios create -n <value> -k <value> -o <value> [-t <value>] [-d
-    <value>] [-c <value>] [-u <value>] [-l <value>]
+  $ sf mobilesdk ios create -n <value> -k <value> -o <value> [-d <value>] [-c
+    <value>] [-u <value>] [-l <value>]
 
 FLAGS
   -c, --consumerkey=<value>   OAuth consumer key for the Salesforce External
@@ -79,8 +79,6 @@ FLAGS
   -n, --appname=<value>       (required) application name
   -o, --organization=<value>  (required) organization name (your
                               company's/organization's name)
-  -t, --apptype=<value>       application type (native_swift or native, leave
-                              empty for native_swift)
   -u, --callbackurl=<value>   OAuth callback URL for the Salesforce External
                               Client App or Connected App
 
@@ -212,8 +210,8 @@ COMMANDS
 create an Android native mobile application
 
 USAGE
-  $ sf mobilesdk android create -n <value> -k <value> -o <value> [-t <value>] [-d
-    <value>] [-c <value>] [-u <value>] [-l <value>]
+  $ sf mobilesdk android create -n <value> -k <value> -o <value> [-d <value>] [-c
+    <value>] [-u <value>] [-l <value>]
 
 FLAGS
   -c, --consumerkey=<value>   OAuth consumer key for the Salesforce External
@@ -226,8 +224,6 @@ FLAGS
   -n, --appname=<value>       (required) application name
   -o, --organization=<value>  (required) organization name (your
                               company's/organization's name)
-  -t, --apptype=<value>       application type (native_kotlin or native, leave
-                              empty for native_kotlin)
   -u, --callbackurl=<value>   OAuth callback URL for the Salesforce External
                               Client App or Connected App
 

@@ -3,9 +3,19 @@ name: Pull Request
 on:
   pull_request:
     branches: [dev, master]
+    paths-ignore:
+      - '**/*.md'
+      - 'LICENSE'
+      - '.gitignore'
+      - 'CODEOWNERS'
+
+permissions:
+  contents: read
 
 jobs:
   android-pr:
+    permissions:
+      contents: read
     strategy:
       fail-fast: false
     uses: ./.github/workflows/android-reusable-workflow.yaml
@@ -13,6 +23,8 @@ jobs:
       is_pr: true
 
   ios-pr:
+    permissions:
+      contents: read
     strategy:
       fail-fast: false
     uses: ./.github/workflows/ios-reusable-workflow.yaml
