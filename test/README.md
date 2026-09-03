@@ -23,6 +23,7 @@ cd test
 | `--spmrepouri=URI` | Override iOS-SPM repo URI (default: `https://github.com/forcedotcom/SalesforceMobileSDK-iOS-SPM`) |
 | `--spm-update` | Clone the SPM repo and build xcframeworks locally, then use that local build |
 | `--exit-on-failure` | Stop on first failure instead of continuing |
+| `--skip-build` | Generate apps without compiling them afterward |
 | `--consumerkey=KEY` | OAuth consumer key injected into bootconfig |
 | `--callbackurl=URL` | OAuth callback URL injected into bootconfig |
 | `--loginserver=URL` | Login server URL (default: `https://login.salesforce.com`) |
@@ -32,7 +33,7 @@ cd test
 1. **Packages the CLI tool(s)** — runs `pack.js` to produce `.tgz` files, then `npm install`s them into a temp dir.
 2. **For each template** matching the requested CLI / OS / app type:
    - Runs `forceXXX createwithtemplate --templaterepouri=...` (or `create` for non-template types)
-   - Compiles with `xcodebuild clean build` (iOS) or `./gradlew assembleDebug` (Android)
+   - Unless `--skip-build` is set, compiles with `xcodebuild clean build` (iOS) or `./gradlew assembleDebug` (Android)
 3. **Reports** pass/fail per template.
 
 ### SDK Dependency Overrides (`--sdkdependencies`)

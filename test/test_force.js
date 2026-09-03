@@ -49,6 +49,7 @@ function main(args) {
     var noPluginUpdate = parsedArgs.hasOwnProperty('no-plugin-update');
     var spmUpdate = parsedArgs.hasOwnProperty('spm-update');
     var exitOnFailure = parsedArgs.hasOwnProperty('exit-on-failure');
+    var skipBuild = parsedArgs.hasOwnProperty('skip-build');
     var chosenOperatingSystems = cleanSplit(parsedArgs.os, ',').map(function(s) { return s.toLowerCase(); });
     var templateRepoUri = parsedArgs.templaterepouri || '';
     var pluginRepoUri = parsedArgs.pluginrepouri || SDK.tools.cordova.pluginRepoUri;
@@ -161,7 +162,7 @@ function main(args) {
                 for (var k=0; k<template.platforms.length; k++) {
                     var os = template.platforms[k];
                     if (chosenOperatingSystems.length == 0 || chosenOperatingSystems.indexOf(os) >= 0) {
-                        createCompileApp(tmpDir, os, template.appType, template.path, pluginRepoUri, useSfdxRequested, sdkDependencies, consumerKey, callbackURL, loginServer);
+                        createCompileApp(tmpDir, os, template.appType, template.path, pluginRepoUri, useSfdxRequested, sdkDependencies, consumerKey, callbackURL, loginServer, skipBuild);
                     }
                 }
             }
@@ -173,14 +174,14 @@ function main(args) {
             if (testingWithAppType) {
                 for (var j=0; j<chosenAppTypes.length; j++) {
                     var appType = chosenAppTypes[j];
-                    createCompileApp(tmpDir, os, appType, null, pluginRepoUri, useSfdxRequested, sdkDependencies, consumerKey, callbackURL, loginServer);
+                    createCompileApp(tmpDir, os, appType, null, pluginRepoUri, useSfdxRequested, sdkDependencies, consumerKey, callbackURL, loginServer, skipBuild);
                 }
             }
 
             if (testingWithTemplate) {
                 // NB: chosenAppTypes[0] is appType from template
                 var appType = chosenAppTypes.length > 0 ? chosenAppTypes[0] : [templateHelper.getAppTypeFromTemplate(templateRepoUri)];
-                createCompileApp(tmpDir, os, appType, templateRepoUri, pluginRepoUri, useSfdxRequested, sdkDependencies, consumerKey, callbackURL, loginServer);
+                createCompileApp(tmpDir, os, appType, templateRepoUri, pluginRepoUri, useSfdxRequested, sdkDependencies, consumerKey, callbackURL, loginServer, skipBuild);
             }
         }
     }
@@ -198,6 +199,7 @@ function shortUsage(exitCode) {
     utils.logInfo('    (when using --os) --apptype=appType1,appType2,etc OR --templaterepouri=TEMPLATE_REPO_URI', COLOR.magenta);
     utils.logInfo('    [--use-sfdx]', COLOR.magenta);
     utils.logInfo('    [--exit-on-failure]', COLOR.magenta);
+    utils.logInfo('    [--skip-build]', COLOR.magenta);
     utils.logInfo('    [--pluginrepouri=PLUGIN_REPO_URI (Defaults to uri in shared/constants.js)]', COLOR.magenta);
     utils.logInfo('    [--no-plugin-update]', COLOR.magenta);
     utils.logInfo('    [--spm-update]', COLOR.magenta);
@@ -249,6 +251,7 @@ function usage(exitCode) {
     utils.logInfo('  - creates and compiles applications for specified operating systems and template', COLOR.cyan);
     utils.logInfo('', COLOR.cyan);
     utils.logInfo('  If use-sfdx is specified, then the sfdx-mobilesdk-plugin package is generated and used through sfdx for creating the applications', COLOR.cyan);
+    utils.logInfo('  If skip-build is specified, generated applications are not compiled', COLOR.cyan);
 
     process.exit(exitCode);
 }
@@ -307,7 +310,7 @@ function updatePluginRepo(tmpDir, os, pluginRepoDir, sdkBranch) {
 //
 // Create and compile app
 //
-function createCompileApp(tmpDir, os, actualAppType, templateRepoUri, pluginRepoUri, useSfdxRequested, sdkDependencies, consumerKey, callbackURL, loginServer) {
+function createCompileApp(tmpDir, os, actualAppType, templateRepoUri, pluginRepoUri, useSfdxRequested, sdkDependencies, consumerKey, callbackURL, loginServer, skipBuild) {
     var execArgs = '';
     var isNative = actualAppType == APP_TYPE.native || actualAppType == APP_TYPE.native_swift || actualAppType == APP_TYPE.native_kotlin; 
     var isReactNative = actualAppType == APP_TYPE.react_native || actualAppType == APP_TYPE.react_native_typescript;
@@ -398,6 +401,11 @@ function createCompileApp(tmpDir, os, actualAppType, templateRepoUri, pluginRepo
         workspaceDir = path.join(outputDir, os);
     }
     
+    if (skipBuild) {
+        utils.logInfo('Skipping compilation of ' + target, COLOR.green);
+        return;
+    }
+
     if (os == OS.ios) {
         buildForiOS(target, workspaceDir, appName);
     }
