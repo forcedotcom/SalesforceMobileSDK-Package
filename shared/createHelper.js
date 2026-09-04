@@ -118,8 +118,8 @@ function createHybridApp(config) {
         utils.removeFile(path.join(webDir, SERVER_PROJECT_DIR));
     }
 
-    // Run cordova prepare
-    utils.runProcessThrowError('cordova prepare', config.projectDir);
+    // Run cordova prepare with explicit platform so after_prepare hooks fire correctly
+    utils.runProcessThrowError('cordova prepare ' + config.platform.split(',').join(' '), config.projectDir);
 
     // Remove CordovaLib subproject from iOS workspace to fix archiving issue
     if (config.platform.split(',').includes('ios')) {
