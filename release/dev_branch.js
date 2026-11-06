@@ -27,10 +27,10 @@
  */
 
 //
-// Manages a parallel development branch (default dev141) across the connected Mobile SDK repos.
+// Manages a parallel development branch (e.g. dev141) across the connected Mobile SDK repos.
 // See release/README.md ("Parallel development branch") for the runbook.
 //
-//   dev_branch.js <command> --org <org> [options]
+//   dev_branch.js <command> --org <org> --branch <name> [options]
 //
 // Commands:
 //   status     read-only: ahead/behind of origin/dev vs origin/<branch> per repo
@@ -43,10 +43,10 @@
 //
 // Options:
 //   --org <org>            GitHub org owning the repos (required; forcedotcom needs --really)
-//   --branch <name>        parallel branch name (default dev141)
+//   --branch <name>        parallel branch name, e.g. dev141 (required)
 //   --dir <path>           work directory (default: new tmp dir)
 //   --repos a,b            subset of repo keys (default all, dependency order)
-//   --version <v>          version set on <branch> by setup (default 14.1.0)
+//   --version <v>          version set on <branch> by setup, e.g. 14.1.0 (required for setup)
 //   --version-code <n>     Android versionCode for setup (default: current + 1)
 //   --ref <ref>            verify: ref to check (default origin/dev)
 //   --dry-run              do everything locally in the clones; no push, no PR, no update.sh
@@ -62,8 +62,6 @@ const fs = require('fs'),
       cfg = require('./dev_branch_config.js')
 
 const BASE = cfg.BASE_BRANCH
-const DEFAULT_BRANCH = 'dev141'
-const DEFAULT_VERSION = '14.1.0'
 
 //
 // Helpers
@@ -114,7 +112,8 @@ function makeContext(args) {
     if (!org) fail('--org is required (use your fork, e.g. --org wmathurin, to test)')
     if (org === cfg.MAIN_ORG && !args.really) fail(`--org ${cfg.MAIN_ORG} requires --really`)
 
-    const branch = args.branch || DEFAULT_BRANCH
+    const branch = args.branch
+    if (!branch) fail('--branch is required (e.g. --branch dev141)')
     if (branch === BASE || branch === 'master') fail(`--branch can't be ${branch}`)
 
     const keys = args.repos ? args.repos.split(',') : cfg.REPO_KEYS.slice()
@@ -124,7 +123,7 @@ function makeContext(args) {
     return {
         org, branch, dir, keys,
         dryRun: !!args['dry-run'],
-        version: args.version || DEFAULT_VERSION,
+        version: args.version,
         versionCode: args['version-code'],
         ref: args.ref || `origin/${BASE}`,
         rewriteCtx: {org, branch}
@@ -386,12 +385,13 @@ function main() {
     const command = args._[0]
     const commands = {status, setup, point, sync, mergeback, verify, dispatcher}
     if (!commands[command]) {
-        console.error(`Usage: dev_branch.js <${Object.keys(commands).join('|')}> --org <org> [options] (see header of this file)`)
+        console.error(`Usage: dev_branch.js <${Object.keys(commands).join('|')}> --org <org> --branch <name> [options] (see header of this file)`)
         process.exit(1)
     }
     utils.setLogLevel(utils.LOG_LEVELS.INFO)
     common.setAutoYesForPrompts(!!args['auto-yes'])
     const ctx = makeContext(args)
+    if (command === 'setup' && !ctx.version) fail('--version is required for setup (e.g. --version 14.1.0)')
     info(`${command} on ${ctx.org} (${ctx.branch}) in ${ctx.dir}${ctx.dryRun ? ' [dry-run]' : ''}`, COLOR.cyan)
     commands[command](ctx, args)
 }

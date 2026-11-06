@@ -211,14 +211,14 @@ Or set up fresh test branches by running `setup_test_branches.js` again (it dele
 Use when `dev` holds changes for a patch release that hasn't shipped and the next minor version's work must start. Creates `dev141` in Shared, iOS, Android, iOS-Hybrid, ReactNative, CordovaPlugin, Templates and Package, with every cross-repo pointer (submodule pins, `#dev` in package.json, `branch="dev"` in plugin.xml, hardcoded `dev` in `tools/update.sh` and `test_template.sh`) re-pointed, and `dev141` added to `pr.yaml` and the iOS/Android Danger files. Pointer rules live in `dev_branch_config.js` (unit tested in `unittests/devBranchConfig.test.js`); `point`/`unpoint` are exact inverses and idempotent.
 
 ```bash
-node release/dev_branch.js <status|setup|point|sync|mergeback|verify|dispatcher> --org <org> [--branch dev141] [--dir <dir>] [--repos a,b] [--dry-run]
+node release/dev_branch.js <status|setup|point|sync|mergeback|verify|dispatcher> --org <org> --branch <name> [--dir <dir>] [--repos a,b] [--dry-run]
 ```
 
-`--org` is required; `--org forcedotcom` additionally needs `--really`. **Always run against your fork first**, with `--dry-run` (all local work in the clones, no push/PR/`update.sh`). Repo keys, in dependency order: `shared, ios, android, ioshybrid, reactnative, cordovaplugin, templates, pkg`.
+`--org` and `--branch` (e.g. `dev141`) are required, as is `--version` for `setup` (nothing is defaulted); `--org forcedotcom` additionally needs `--really`. **Always run against your fork first**, with `--dry-run` (all local work in the clones, no push/PR/`update.sh`). Repo keys, in dependency order: `shared, ios, android, ioshybrid, reactnative, cordovaplugin, templates, pkg`.
 
 | Step | Command | Notes |
 |---|---|---|
-| Create | `setup --version 14.1.0` | Per repo: branch off `origin/dev`, `setversion.sh -v 14.1.0 -d yes` (Android `-c` = current versionCode + 1, or `--version-code`), `point`, repin submodules, push. Skips repos that already have the branch. Run `dispatcher` too. |
+| Create | `setup --branch dev141 --version 14.1.0` | Per repo: branch off `origin/dev`, `setversion.sh -v 14.1.0 -d yes` (Android `-c` = current versionCode + 1, or `--version-code`), `point`, repin submodules, push. Skips repos that already have the branch. Run `dispatcher` too. |
 | Nightlies | `dispatcher` | Opens a PR to `dev` in each repo adding `.github/workflows/nightly-dev141.yaml` (scheduled workflows only run from the default branch; this runs the nightlies with `--ref dev141`, crons +3h). |
 | Re-point | `point` | After anything that rewrote refs (e.g. a `setversion.sh` run on `dev141`). |
 | Sync | `sync` | Manual. Branch `sync-dev-into-dev141-<date>` off `dev141`, merge `origin/dev`, `point`, push, PR to `dev141`. Stops on non-pointer conflicts; fix, commit, then `--resume`. |
