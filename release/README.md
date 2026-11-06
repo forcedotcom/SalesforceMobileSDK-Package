@@ -230,5 +230,6 @@ Rules:
 - Merge sync and merge-back PRs with **merge commits, never squash** (submodule SHAs must stay reachable), **in dependency order**.
 - The patch release (`release.js`) must use next version `14.1.0` so version files on `dev` and `dev141` converge.
 - The iOS and Android `dev141` branches need the same branch protection as `dev` (repo admin, manual).
-- Not covered yet: UITests (`AppGenerator.kt`, `install.sh` hardcode `dev`), the Workspace `install.sh`, and CordovaPlugin `src/` regeneration is only run for real (non dry-run) once the other `dev141` branches are pushed.
+- `sync`/`mergeback` skip repos with nothing to merge, and re-running (or `--resume`) refreshes an already open PR instead of failing.
+- Not covered yet: UITests (`AppGenerator.kt`, `install.sh` hardcode `dev`) and the Workspace `install.sh`.
 - On forks, `runs-on: forcedotcom-ubuntu` in the workflows must be swapped for `ubuntu-latest` to run CI.

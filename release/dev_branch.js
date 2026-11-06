@@ -157,17 +157,42 @@ function commitIfChanged(dir, msg) {
     return true
 }
 
+// True if HEAD adds nothing on top of origin/<base>
+function noNewCommits(dir, base) {
+    return out(`git rev-list --count origin/${base}..HEAD`, dir) === '0'
+}
+
 function push(ctx, dir, branch) {
     if (ctx.dryRun) return info(`  [dry-run] would push ${branch}`, COLOR.yellow)
     sh(`git push -u origin ${branch}`, dir)
 }
 
+// Opens the PR, or refreshes it if one is already open for the head (re-runs, --resume)
 function openPr(ctx, key, head, base, title, body) {
     const repo = cfg.MANIFEST[key].repo
     if (ctx.dryRun) return info(`  [dry-run] would open PR ${head} -> ${base} on ${ctx.org}/${repo}`, COLOR.yellow)
-    const url = out(`gh pr create --repo ${ctx.org}/${repo} --base ${base} --head ${head} --title ${JSON.stringify(title)} --body ${JSON.stringify(body)}`, repoDir(ctx, key))
-    info(`  PR: ${url}`, COLOR.cyan)
-    return url
+    const dir = repoDir(ctx, key)
+    const bodyFile = path.join(ctx.dir, `${repo}-pr-body.md`)
+    fs.writeFileSync(bodyFile, body)
+    const target = `--repo ${ctx.org}/${repo}`
+    let lastError
+    for (let attempt = 1; attempt <= 3; attempt++) {
+        try {
+            const existing = out(`gh pr list ${target} --base ${base} --head ${head} --state open --json url -q '.[0].url'`, dir)
+            if (existing) {
+                sh(`gh pr edit ${existing} --title ${JSON.stringify(title)} --body-file ${JSON.stringify(bodyFile)}`, dir)
+                info(`  PR (updated): ${existing}`, COLOR.cyan)
+                return existing
+            }
+            const url = out(`gh pr create ${target} --base ${base} --head ${head} --title ${JSON.stringify(title)} --body-file ${JSON.stringify(bodyFile)}`, dir)
+            info(`  PR: ${url}`, COLOR.cyan)
+            return url
+        } catch (e) {
+            lastError = e
+            utils.logError(`PR attempt ${attempt} failed: ${e.message.split('\n')[0]}`)
+        }
+    }
+    throw lastError
 }
 
 //
@@ -296,18 +321,28 @@ function mergeDevInto(ctx, key, workBranch) {
     return dir
 }
 
+// --resume continues on the existing work branch; repos that never got one start from scratch
+function resumeOrMerge(ctx, key, workBranch, args) {
+    const dir = repoDir(ctx, key)
+    if (args.resume && fs.existsSync(dir) && ok(`git rev-parse --verify -q refs/heads/${workBranch}`, dir)) {
+        sh(`git checkout -q ${workBranch}`, dir)
+        return dir
+    }
+    return mergeDevInto(ctx, key, workBranch)
+}
+
 function sync(ctx, args) {
     const workBranch = `sync-${BASE}-into-${ctx.branch}-${stamp()}`
     ctx.keys.forEach(key => {
         const repo = cfg.MANIFEST[key].repo
         info(`\n=== sync ${repo} ===`, COLOR.magenta)
-        const dir = args.resume ? repoDir(ctx, key) : mergeDevInto(ctx, key, workBranch)
-        if (args.resume) sh(`git checkout -q ${workBranch}`, dir)
+        const dir = resumeOrMerge(ctx, key, workBranch, args)
         // Merging dev may have brought back dev refs (setversion on dev, new files...)
         applyPointers(ctx, key, 'point')
         repinSubmodules(ctx, key, () => workBranch)
         regenerateCordovaPlugin(ctx, key)
         commitIfChanged(dir, `Re-applying ${ctx.branch} pointers after merging ${BASE}`)
+        if (noNewCommits(dir, ctx.branch)) return info(`  ${ctx.branch} already contains ${BASE} - nothing to sync`)
         push(ctx, dir, workBranch)
         openPr(ctx, key, workBranch, ctx.branch,
                `Sync ${BASE} into ${ctx.branch} (${stamp()})`,
@@ -320,14 +355,14 @@ function mergeback(ctx, args) {
     ctx.keys.forEach(key => {
         const repo = cfg.MANIFEST[key].repo
         info(`\n=== mergeback ${repo} ===`, COLOR.magenta)
-        const dir = args.resume ? repoDir(ctx, key) : mergeDevInto(ctx, key, workBranch)
-        if (args.resume) sh(`git checkout -q ${workBranch}`, dir)
+        const dir = resumeOrMerge(ctx, key, workBranch, args)
         applyPointers(ctx, key, 'unpoint')
         // The nightly dispatcher only exists for the life of the branch
         sh(`git rm -q -f --ignore-unmatch ${cfg.dispatcherPath(ctx.branch)}`, dir)
         // Submodules go to the dependency's merge-back head: it lands on dev with a merge commit
         repinSubmodules(ctx, key, () => workBranch)
         commitIfChanged(dir, `Removing ${ctx.branch} pointers`)
+        if (noNewCommits(dir, BASE)) return info(`  nothing to merge back`)
         push(ctx, dir, workBranch)
         openPr(ctx, key, workBranch, BASE,
                `Merge ${ctx.branch} into ${BASE}`,
@@ -338,6 +373,7 @@ function mergeback(ctx, args) {
 function verify(ctx) {
     let bad = 0
     ctx.keys.forEach(key => {
+        const before = bad
         const repo = cfg.MANIFEST[key].repo
         const dir = prepareClone(ctx, key)
         const hits = out(`git grep -n -I -e ${JSON.stringify(ctx.branch)} ${ctx.ref} -- . ':!*.lock' ':!package-lock.json' || true`, dir)
@@ -355,7 +391,7 @@ function verify(ctx) {
                 utils.logError(`${repo}: ${sub.path} pin ${pin} is not reachable from ${cfg.MANIFEST[sub.dep].repo} origin/${BASE}`)
             }
         })
-        if (!bad) info(`${repo}: ok`)
+        if (bad === before) info(`${repo}: ok`)
     })
     if (bad) process.exit(1)
 }
