@@ -55,6 +55,7 @@
 //
 
 const fs = require('fs'),
+      childProcess = require('child_process'),
       path = require('path'),
       utils = require('../shared/utils'),
       COLOR = require('../shared/outputColors'),
@@ -297,6 +298,60 @@ function point(ctx) {
     })
 }
 
+// Three-way merges a pointer file on its dev form, so that a pointer rewrite on one side
+// does not conflict with real edits on the other. Returns merged (pointed) content, or null if
+// the two sides really changed the same lines.
+function mergePointerFile(ctx, key, dir, file) {
+    // raw bytes: sh() output may be trimmed
+    const stage = n => {
+        const r = childProcess.spawnSync('git', ['show', `:${n}:${file}`], {cwd: dir, maxBuffer: 64 * 1024 * 1024})
+        return r.status === 0 ? r.stdout.toString() : null
+    }
+    const base = stage(1), ours = stage(2), theirs = stage(3)
+    if (ours === null || theirs === null) return null      // deleted on one side
+    const norm = c => cfg.transformFile(key, dir, file, c, 'unpoint', ctx.rewriteCtx)
+    const tmp = fs.mkdtempSync(path.join(ctx.dir, 'merge-'))
+    try {
+        const paths = {ours: norm(ours), base: norm(base || ''), theirs: norm(theirs)}
+        Object.keys(paths).forEach(k => fs.writeFileSync(path.join(tmp, k), paths[k]))
+        const r = childProcess.spawnSync('git', ['merge-file', '-p', 'ours', 'base', 'theirs'], {cwd: tmp})
+        if (r.status !== 0) return null
+        return cfg.transformFile(key, dir, file, r.stdout.toString(), 'point', ctx.rewriteCtx)
+    } finally {
+        fs.rmSync(tmp, {recursive: true, force: true})
+    }
+}
+
+// Resolves what is mechanical in a conflicted merge; returns {remaining, notes}
+//   submodule pins     -> ours; repinned afterwards to the dependency's work branch
+//   generated files    -> ours; regenerated later by 'point' (update.sh reads pushed branches)
+//   pointer files      -> three-way merge on the dev form, then re-pointed
+//   anything else      -> left for a human, including pointer files where both sides edited the same lines
+function resolveConflicts(ctx, key, dir) {
+    const conflicts = out('git diff --name-only --diff-filter=U', dir).split('\n').filter(Boolean)
+    const subPaths = (cfg.MANIFEST[key].submodules || []).map(s => s.path)
+    const pointerFiles = new Set(cfg.filesToRead(key, dir))
+    const notes = []
+    let generated = 0
+    conflicts.forEach(f => {
+        if (subPaths.includes(f)) {
+            sh(`git checkout --ours -- ${f} && git add ${f}`, dir)
+        } else if (cfg.isGenerated(key, f)) {
+            sh(`git checkout --ours -- ${JSON.stringify(f)} && git add ${JSON.stringify(f)}`, dir)
+            generated++
+        } else if (pointerFiles.has(f)) {
+            const merged = mergePointerFile(ctx, key, dir, f)
+            if (merged === null) return
+            fs.writeFileSync(path.join(dir, f), merged)
+            sh(`git add ${JSON.stringify(f)}`, dir)
+            notes.push(`merged ${f} on its dev form (both sides edited it)`)
+        }
+    })
+    if (generated) notes.push(`${generated} generated file(s) kept as on ${ctx.branch}: once the dependency PRs are merged, run 'point --repos ${key}' to regenerate`)
+    const remaining = out('git diff --name-only --diff-filter=U', dir).split('\n').filter(Boolean)
+    return {remaining, notes}
+}
+
 // Shared by sync and mergeback: merge dev into a work branch cut from <branch>
 function mergeDevInto(ctx, key, workBranch) {
     const dir = prepareClone(ctx, key)
@@ -304,19 +359,15 @@ function mergeDevInto(ctx, key, workBranch) {
     try {
         sh(`git merge --no-ff --no-edit -m "Merge ${BASE} into ${ctx.branch}" origin/${BASE}`, dir)
     } catch (e) {
-        // Submodule pins and pointer files are re-derived below; anything else needs a human
-        const conflicts = out('git diff --name-only --diff-filter=U', dir).split('\n').filter(Boolean)
-        const subPaths = (cfg.MANIFEST[key].submodules || []).map(s => s.path)
-        const pointerFiles = new Set(cfg.filesToRead(key, dir))
-        const unresolvable = conflicts.filter(f => !subPaths.includes(f) && !pointerFiles.has(f))
-        if (unresolvable.length) {
-            fail(`Merge conflicts in ${cfg.MANIFEST[key].repo} (${dir}, branch ${workBranch}):\n  ${unresolvable.join('\n  ')}\n` +
-                 `Resolve them, 'git commit', then re-run with --resume --repos ${key}`)
+        const {remaining, notes} = resolveConflicts(ctx, key, dir)
+        notes.forEach(n => info(`  ${n}`, COLOR.yellow))
+        if (remaining.length) {
+            fail(`Merge conflicts in ${cfg.MANIFEST[key].repo} (${dir}, branch ${workBranch}): ${BASE} and ${ctx.branch} changed the same lines of:\n  ${remaining.join('\n  ')}\n` +
+                 `Resolve them, 'git add', 'git commit', then re-run with --resume --repos ${key}` +
+                 (cfg.MANIFEST[key].submodules || cfg.MANIFEST[key].generated ? ' (repos listed before this one are already done)' : ''))
         }
-        // Pointer-file conflicts: take the dev141 side, point/unpoint rewrites follow
-        conflicts.filter(f => !subPaths.includes(f)).forEach(f => sh(`git checkout --ours -- ${f} && git add ${f}`, dir))
-        subPaths.forEach(p => sh(`git checkout --ours -- ${p} && git add ${p}`, dir, {ignoreError: true}))
-        sh(`git commit -q --no-edit`, dir)
+        sh('git commit -q --no-edit', dir)
+        ctx.notes = (ctx.notes || []).concat(notes.map(n => `${cfg.MANIFEST[key].repo}: ${n}`))
     }
     return dir
 }
@@ -340,7 +391,6 @@ function sync(ctx, args) {
         // Merging dev may have brought back dev refs (setversion on dev, new files...)
         applyPointers(ctx, key, 'point')
         repinSubmodules(ctx, key, () => workBranch)
-        regenerateCordovaPlugin(ctx, key)
         commitIfChanged(dir, `Re-applying ${ctx.branch} pointers after merging ${BASE}`)
         if (noNewCommits(dir, ctx.branch)) return info(`  ${ctx.branch} already contains ${BASE} - nothing to sync`)
         push(ctx, dir, workBranch)
@@ -436,4 +486,4 @@ if (require.main === module) {
     main()
 }
 
-module.exports = {parseArgs}
+module.exports = {parseArgs, resolveConflicts, mergePointerFile}

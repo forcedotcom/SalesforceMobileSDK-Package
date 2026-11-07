@@ -139,4 +139,20 @@ describe('dev_branch_config', () => {
             ;(cfg.MANIFEST[k].submodules || []).forEach(s => expect(order.indexOf(s.dep)).toBeLessThan(order.indexOf(k)))
         })
     })
+
+    test('transformFile applies the rules of one file only', () => {
+        const f = 'androidTests/package.json'
+        const c = FIXTURES.reactnative[f]
+        const p = cfg.transformFile('reactnative', '.', f, c, 'point', FORCE)
+        expect(p).toContain('#dev141')
+        expect(cfg.transformFile('reactnative', '.', f, p, 'unpoint', FORCE)).toBe(c)
+        expect(cfg.transformFile('reactnative', '.', 'other.txt', 'x#dev', 'point', FORCE)).toBe('x#dev')
+    })
+
+    test('generated paths of cordovaplugin', () => {
+        expect(cfg.isGenerated('cordovaplugin', 'src/ios/A.m')).toBe(true)
+        expect(cfg.isGenerated('cordovaplugin', 'gradlew')).toBe(true)
+        expect(cfg.isGenerated('cordovaplugin', 'plugin.xml')).toBe(false)
+        expect(cfg.isGenerated('ios', 'src/x')).toBe(false)
+    })
 })

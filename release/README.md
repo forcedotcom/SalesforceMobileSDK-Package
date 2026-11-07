@@ -221,7 +221,7 @@ node release/dev_branch.js <status|setup|point|sync|mergeback|verify|dispatcher>
 | Create | `setup --branch dev141 --version 14.1.0` | Per repo: branch off `origin/dev`, `setversion.sh -v 14.1.0 -d yes` (Android `-c` = current versionCode + 1, or `--version-code`), `point`, repin submodules, push. Skips repos that already have the branch. Run `dispatcher` too. |
 | Nightlies | `dispatcher` | Opens a PR to `dev` in each repo adding `.github/workflows/nightly-dev141.yaml` (scheduled workflows only run from the default branch; this runs the nightlies with `--ref dev141`, crons +3h). |
 | Re-point | `point` | After anything that rewrote refs (e.g. a `setversion.sh` run on `dev141`). |
-| Sync | `sync` | Manual. Branch `sync-dev-into-dev141-<date>` off `dev141`, merge `origin/dev`, `point`, push, PR to `dev141`. Stops on non-pointer conflicts; fix, commit, then `--resume`. |
+| Sync | `sync` | Manual. Branch `sync-dev-into-dev141-<date>` off `dev141`, merge `origin/dev`, `point`, push, PR to `dev141`. Conflicts: submodule pins and CordovaPlugin generated files (`src/`, `www/`, gradle wrapper) take the `dev141` side (run `point --repos cordovaplugin` after dependency PRs merge); pointer files edited on both sides are three-way merged on their `dev` form and re-pointed. Stops when both branches changed the same lines; fix, commit, then `--resume`. |
 | Merge back | `mergeback` | After the patch release. Branch `dev141-merge-back`, merge `dev`, `unpoint` (also removes the dispatcher workflow, repins submodules), push, PR to `dev`. |
 | Check | `verify --ref origin/dev` | No `dev141` string left; every submodule pin reachable from the dependency's `origin/dev`. |
 | Report | `status` | Ahead/behind per repo. |
