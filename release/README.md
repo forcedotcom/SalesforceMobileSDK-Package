@@ -205,3 +205,31 @@ cd release
 
 Re-run with `cleanupOnly: true` to delete all test branches without recreating them.
 Or set up fresh test branches by running `setup_test_branches.js` again (it deletes then recreates).
+
+## dev_branch.js — Parallel development branch (e.g. `dev141`)
+
+Use when `dev` holds changes for a patch release that hasn't shipped and the next minor version's work must start. Creates `dev141` in Shared, iOS, Android, iOS-Hybrid, ReactNative, CordovaPlugin, Templates and Package, with every cross-repo pointer (submodule pins, `#dev` in package.json, `branch="dev"` in plugin.xml, hardcoded `dev` in `tools/update.sh` and `test_template.sh`) re-pointed, and `dev141` added to `pr.yaml` and the iOS/Android Danger files. Pointer rules live in `dev_branch_config.js` (unit tested in `unittests/devBranchConfig.test.js`); `point`/`unpoint` are exact inverses and idempotent.
+
+```bash
+node release/dev_branch.js <status|setup|point|sync|mergeback|verify|dispatcher> --org <org> --branch <name> [--dir <dir>] [--repos a,b] [--dry-run]
+```
+
+`--org` and `--branch` (e.g. `dev141`) are required, as is `--version` for `setup` (nothing is defaulted); `--org forcedotcom` additionally needs `--really`. **Always run against your fork first**, with `--dry-run` (all local work in the clones, no push/PR/`update.sh`). Repo keys, in dependency order: `shared, ios, android, ioshybrid, reactnative, cordovaplugin, templates, pkg`.
+
+| Step | Command | Notes |
+|---|---|---|
+| Create | `setup --branch dev141 --version 14.1.0` | Per repo: branch off `origin/dev`, `setversion.sh -v 14.1.0 -d yes` (Android `-c` = current versionCode + 1, or `--version-code`), `point`, repin submodules, push. Skips repos that already have the branch. Run `dispatcher` too. |
+| Nightlies | `dispatcher` | Opens a PR to `dev` in each repo adding `.github/workflows/nightly-dev141.yaml` (scheduled workflows only run from the default branch; this runs the nightlies with `--ref dev141`, crons +3h). |
+| Re-point | `point` | After anything that rewrote refs (e.g. a `setversion.sh` run on `dev141`). |
+| Sync | `sync` | Manual. Branch `sync-dev-into-dev141-<date>` off `dev141`, merge `origin/dev`, `point`, push, PR to `dev141`. Conflicts: submodule pins and CordovaPlugin generated files (`src/`, `www/`, gradle wrapper) take the `dev141` side (run `point --repos cordovaplugin` after dependency PRs merge); pointer files edited on both sides are three-way merged on their `dev` form and re-pointed. Stops when both branches changed the same lines; fix, commit, then `--resume`. |
+| Merge back | `mergeback` | After the patch release. Branch `dev141-merge-back`, merge `dev`, `unpoint` (also removes the dispatcher workflow, repins submodules), push, PR to `dev`. |
+| Check | `verify --ref origin/dev` | No `dev141` string left; every submodule pin reachable from the dependency's `origin/dev`. |
+| Report | `status` | Ahead/behind per repo. |
+
+Rules:
+- Merge sync and merge-back PRs with **merge commits, never squash** (submodule SHAs must stay reachable), **in dependency order**.
+- The patch release (`release.js`) must use next version `14.1.0` so version files on `dev` and `dev141` converge.
+- The iOS and Android `dev141` branches need the same branch protection as `dev` (repo admin, manual).
+- `sync`/`mergeback` skip repos with nothing to merge, and re-running (or `--resume`) refreshes an already open PR instead of failing.
+- Not covered yet: UITests (`AppGenerator.kt`, `install.sh` hardcode `dev`) and the Workspace `install.sh`.
+- On forks, `runs-on: forcedotcom-ubuntu` in the workflows must be swapped for `ubuntu-latest` to run CI.
