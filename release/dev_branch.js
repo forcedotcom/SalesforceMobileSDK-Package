@@ -92,6 +92,13 @@ function sh(cmd, dir, opts) {
     }
 }
 
+// Runs git with an argument array (no shell): safe for paths taken from the repository
+function git(args, dir) {
+    const r = childProcess.spawnSync('git', args, {cwd: dir, maxBuffer: 256 * 1024 * 1024})
+    if (r.status !== 0) throw new Error(`git ${args.join(' ')} failed in ${dir}: ${r.stderr}`)
+    return r.stdout.toString()
+}
+
 const out = (cmd, dir) => sh(cmd, dir).trim()
 const ok = (cmd, dir) => sh(cmd, dir, {ignoreError: true}) !== null
 const info = (msg, color) => utils.logInfo(msg, color || COLOR.green)
@@ -117,6 +124,12 @@ function makeContext(args) {
     if (!branch) fail('--branch is required (e.g. --branch dev141)')
     if (branch === BASE || branch === 'master') fail(`--branch can't be ${branch}`)
 
+    // values end up in git commands and file names
+    const SAFE = /^[\w][\w.\-\/]*$/
+    const check = (name, v) => { if (v !== undefined && !SAFE.test(v)) fail(`Invalid --${name} '${v}'`) }
+    check('org', org); check('branch', branch); check('version', args.version)
+    check('version-code', args['version-code']); check('ref', args.ref)
+
     const keys = args.repos ? args.repos.split(',') : cfg.REPO_KEYS.slice()
     keys.forEach(k => { if (!cfg.MANIFEST[k]) fail(`Unknown repo key ${k} (known: ${cfg.REPO_KEYS.join(',')})`) })
 
@@ -133,16 +146,22 @@ function makeContext(args) {
 
 const repoDir = (ctx, key) => path.join(ctx.dir, cfg.MANIFEST[key].repo)
 
-// Clones (or fetches) a repo; leaves it with a clean tree and up to date remotes
-function prepareClone(ctx, key) {
+// Clones (or fetches) a repo without touching the index or working tree (read-only commands, --resume)
+function fetchClone(ctx, key) {
     const repo = cfg.MANIFEST[key].repo
     const dir = repoDir(ctx, key)
     if (!fs.existsSync(dir)) {
         info(`Cloning ${ctx.org}/${repo}`)
         sh(`git clone ${common.urlForRepo(ctx.org, repo)} ${repo}`, ctx.dir)
     }
-    sh('git reset --hard -q && git clean -fdq', dir)
     sh('git fetch origin --prune', dir)
+    return dir
+}
+
+// Like fetchClone, and leaves a clean tree
+function prepareClone(ctx, key) {
+    const dir = fetchClone(ctx, key)
+    sh('git reset --hard -q && git clean -fdq', dir)
     return dir
 }
 
@@ -257,7 +276,7 @@ function runSetVersion(ctx, key, dir) {
 //
 function status(ctx) {
     ctx.keys.forEach(key => {
-        const dir = prepareClone(ctx, key)
+        const dir = fetchClone(ctx, key)
         if (!remoteHas(dir, ctx.branch)) return info(`${cfg.MANIFEST[key].repo}: no origin/${ctx.branch}`, COLOR.yellow)
         const [behind, ahead] = out(`git rev-list --left-right --count origin/${BASE}...origin/${ctx.branch}`, dir).split(/\s+/)
         info(`${cfg.MANIFEST[key].repo}: ${ctx.branch} is ${ahead} ahead and ${behind} behind ${BASE}`,
@@ -328,58 +347,69 @@ function mergePointerFile(ctx, key, dir, file) {
 //   pointer files      -> three-way merge on the dev form, then re-pointed
 //   anything else      -> left for a human, including pointer files where both sides edited the same lines
 function resolveConflicts(ctx, key, dir) {
-    const conflicts = out('git diff --name-only --diff-filter=U', dir).split('\n').filter(Boolean)
+    const unmerged = () => git(['diff', '--name-only', '-z', '--diff-filter=U'], dir).split('\0').filter(Boolean)
+    const conflicts = unmerged()
     const subPaths = (cfg.MANIFEST[key].submodules || []).map(s => s.path)
     const pointerFiles = new Set(cfg.filesToRead(key, dir))
     const notes = []
     let generated = 0
     conflicts.forEach(f => {
         if (subPaths.includes(f)) {
-            sh(`git checkout --ours -- ${f} && git add ${f}`, dir)
+            git(['checkout', '--ours', '--', f], dir)
+            git(['add', '--', f], dir)
         } else if (cfg.isGenerated(key, f)) {
-            sh(`git checkout --ours -- ${JSON.stringify(f)} && git add ${JSON.stringify(f)}`, dir)
+            git(['checkout', '--ours', '--', f], dir)
+            git(['add', '--', f], dir)
             generated++
         } else if (pointerFiles.has(f)) {
             const merged = mergePointerFile(ctx, key, dir, f)
             if (merged === null) return
             fs.writeFileSync(path.join(dir, f), merged)
-            sh(`git add ${JSON.stringify(f)}`, dir)
+            git(['add', '--', f], dir)
             notes.push(`merged ${f} on its dev form (both sides edited it)`)
         }
     })
     if (generated) notes.push(`${generated} generated file(s) kept as on ${ctx.branch}: once the dependency PRs are merged, run 'point --repos ${key}' to regenerate`)
-    const remaining = out('git diff --name-only --diff-filter=U', dir).split('\n').filter(Boolean)
-    return {remaining, notes}
+    return {remaining: unmerged(), notes}
 }
 
-// Shared by sync and mergeback: merge dev into a work branch cut from <branch>
-function mergeDevInto(ctx, key, workBranch) {
-    const dir = prepareClone(ctx, key)
-    sh(`git checkout -q -B ${workBranch} origin/${ctx.branch}`, dir)
+// Merges ref into the checked out work branch; resolves what is mechanical, stops on real divergence
+function mergeRef(ctx, key, dir, workBranch, ref) {
+    if (ok(`git merge-base --is-ancestor ${ref} HEAD`, dir)) return
     try {
-        sh(`git merge --no-ff --no-edit -m "Merge ${BASE} into ${ctx.branch}" origin/${BASE}`, dir)
+        sh(`git merge --no-ff --no-edit -m "Merge ${ref.replace('origin/', '')} into ${ctx.branch}" ${ref}`, dir)
     } catch (e) {
         const {remaining, notes} = resolveConflicts(ctx, key, dir)
         notes.forEach(n => info(`  ${n}`, COLOR.yellow))
         if (remaining.length) {
-            fail(`Merge conflicts in ${cfg.MANIFEST[key].repo} (${dir}, branch ${workBranch}): ${BASE} and ${ctx.branch} changed the same lines of:\n  ${remaining.join('\n  ')}\n` +
+            fail(`Merge conflicts in ${cfg.MANIFEST[key].repo} (${dir}, branch ${workBranch}): ${ref} and ${ctx.branch} changed the same lines of:\n  ${remaining.join('\n  ')}\n` +
                  `Resolve them, 'git add', 'git commit', then re-run with --resume --repos ${key}` +
                  (cfg.MANIFEST[key].submodules || cfg.MANIFEST[key].generated ? ' (repos listed before this one are already done)' : ''))
         }
         sh('git commit -q --no-edit', dir)
         ctx.notes = (ctx.notes || []).concat(notes.map(n => `${cfg.MANIFEST[key].repo}: ${n}`))
     }
+}
+
+// Shared by sync and mergeback: brings origin/dev (and origin/<branch>) into the work branch.
+// The work branch starts from, in order: the local one (--resume), the one already pushed (a
+// rerun refreshes the open PR, keeping its history and resolutions), or origin/<branch>.
+function mergeDevInto(ctx, key, workBranch, resume) {
+    const dir = resume ? fetchClone(ctx, key) : prepareClone(ctx, key)
+    if (resume && ok(`git rev-parse --verify -q refs/heads/${workBranch}`, dir)) {
+        sh(`git checkout -q ${workBranch}`, dir)
+    } else if (remoteHas(dir, workBranch)) {
+        sh(`git checkout -q -B ${workBranch} origin/${workBranch}`, dir)
+    } else {
+        sh(`git checkout -q -B ${workBranch} origin/${ctx.branch}`, dir)
+    }
+    mergeRef(ctx, key, dir, workBranch, `origin/${ctx.branch}`)
+    mergeRef(ctx, key, dir, workBranch, `origin/${BASE}`)
     return dir
 }
 
-// --resume continues on the existing work branch; repos that never got one start from scratch
 function resumeOrMerge(ctx, key, workBranch, args) {
-    const dir = repoDir(ctx, key)
-    if (args.resume && fs.existsSync(dir) && ok(`git rev-parse --verify -q refs/heads/${workBranch}`, dir)) {
-        sh(`git checkout -q ${workBranch}`, dir)
-        return dir
-    }
-    return mergeDevInto(ctx, key, workBranch)
+    return mergeDevInto(ctx, key, workBranch, !!args.resume)
 }
 
 function sync(ctx, args) {
@@ -420,13 +450,31 @@ function mergeback(ctx, args) {
     })
 }
 
+// Lines mentioning branch at ref, outside of the tool's own files (README, source, tests keep literals).
+// Throws if ref can't be read.
+function grepRef(dir, ref, branch) {
+    git(['rev-parse', '--verify', '-q', `${ref}^{commit}`], dir)
+    const r = childProcess.spawnSync('git', ['grep', '-n', '-I', '-F', '-e', branch, ref, '--', '.']
+        .concat(cfg.VERIFY_EXCLUDES.map(e => `:(exclude,glob)${e}`)), {cwd: dir, maxBuffer: 256 * 1024 * 1024})
+    if (r.status === 1) return ''                 // no match
+    if (r.status !== 0) throw new Error(`git grep failed at ${ref}: ${r.stderr}`)
+    return r.stdout.toString().trim()
+}
+
 function verify(ctx) {
     let bad = 0
     ctx.keys.forEach(key => {
         const before = bad
         const repo = cfg.MANIFEST[key].repo
-        const dir = prepareClone(ctx, key)
-        const hits = out(`git grep -n -I -e ${JSON.stringify(ctx.branch)} ${ctx.ref} -- . ':!*.lock' ':!package-lock.json' || true`, dir)
+        const dir = fetchClone(ctx, key)
+        let hits
+        try {
+            hits = grepRef(dir, ctx.ref, ctx.branch)
+        } catch (e) {
+            utils.logError(`${repo}: ${e.message}`)
+            bad++
+            return
+        }
         if (hits) {
             bad++
             utils.logError(`${repo}: ${ctx.branch} still referenced at ${ctx.ref}:\n${hits.split('\n').slice(0, 20).join('\n')}`)
@@ -435,7 +483,7 @@ function verify(ctx) {
         const refForPins = ctx.ref
         ;(cfg.MANIFEST[key].submodules || []).forEach(sub => {
             const pin = out(`git ls-tree ${refForPins} ${sub.path}`, dir).split(/\s+/)[2]
-            const depDir = prepareClone(ctx, sub.dep)
+            const depDir = fetchClone(ctx, sub.dep)
             if (!ok(`git merge-base --is-ancestor ${pin} origin/${BASE}`, depDir)) {
                 bad++
                 utils.logError(`${repo}: ${sub.path} pin ${pin} is not reachable from ${cfg.MANIFEST[sub.dep].repo} origin/${BASE}`)
@@ -486,4 +534,4 @@ if (require.main === module) {
     main()
 }
 
-module.exports = {parseArgs, resolveConflicts, mergePointerFile}
+module.exports = {parseArgs, makeContext, git, fetchClone, prepareClone, mergeDevInto, resolveConflicts, mergePointerFile, grepRef}
