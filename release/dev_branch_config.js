@@ -43,7 +43,7 @@ const BASE_BRANCH = 'dev'
 const MAIN_ORG = 'forcedotcom'
 
 // Repos in dependency order (a repo is processed after the repos it points to)
-const REPO_KEYS = ['shared', 'ios', 'android', 'ioshybrid', 'reactnative', 'cordovaplugin', 'templates', 'pkg']
+const REPO_KEYS = ['shared', 'ios', 'iosspm', 'android', 'ioshybrid', 'reactnative', 'cordovaplugin', 'templates', 'pkg']
 
 function escapeRegExp(s) {
     return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
@@ -130,6 +130,12 @@ const MANIFEST = {
             {workflow: 'nightly.yaml', cron: '0 8 * * 2-6'},
             {workflow: 'ui-test-nightly.yaml', cron: '0 10 * * 2-6'}
         ]
+    },
+    // Holds the xcframeworks built from iOS at release time. Nothing points at its branch, so the
+    // branch only carries its own changes (no rules); release.js merges dev -> master there.
+    iosspm: {
+        repo: 'SalesforceMobileSDK-iOS-SPM',
+        rules: []
     },
     android: {
         repo: 'SalesforceMobileSDK-Android',
