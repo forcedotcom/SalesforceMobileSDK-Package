@@ -155,4 +155,11 @@ describe('dev_branch_config', () => {
         expect(cfg.isGenerated('cordovaplugin', 'plugin.xml')).toBe(false)
         expect(cfg.isGenerated('ios', 'src/x')).toBe(false)
     })
+
+    test('iOS-SPM gets a branch but has no pointers', () => {
+        expect(cfg.REPO_KEYS.indexOf('iosspm')).toBeGreaterThan(cfg.REPO_KEYS.indexOf('ios'))
+        expect(cfg.MANIFEST.iosspm.repo).toBe('SalesforceMobileSDK-iOS-SPM')
+        expect(cfg.MANIFEST.iosspm.rules).toEqual([])
+        expect(run('iosspm', {}, 'point', FORCE).problems).toEqual([])
+    })
 })
