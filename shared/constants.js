@@ -61,6 +61,11 @@ module.exports = {
         cordova: {
             checkCmd: 'cordova -v',
             pluginRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-CordovaPlugin#dev141',    // dev
+            iosDevelopmentPlugin: {
+                sdkVersion: '14.1.0',
+                branch: 'dev141',
+                repoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-CordovaPlugin#7d2028842a0b33e0a2537bd0150f9beb2db2739e'
+            },
             minVersion: '13.0.0',
 //             pluginRepoUri: 'salesforce-mobilesdk-cordova-plugin@v' + VERSION, // GA
             iosRequirements: {

@@ -651,7 +651,7 @@ function actuallyCreateApp(forcecli, config) {
 
         // Adding hybrid only config
         if (!isNative) {
-            config.cordovaPluginRepoUri = config.pluginrepouri || SDK.tools.cordova.pluginRepoUri;
+            config.cordovaPluginRepoUri = resolveCordovaPluginRepoUri(config);
         }
 
         // Print details
@@ -684,6 +684,20 @@ function actuallyCreateApp(forcecli, config) {
     }
 }
 
+function resolveCordovaPluginRepoUri(config) {
+    if (config.pluginrepouri) {
+        return config.pluginrepouri;
+    }
+    const cordova = SDK.tools.cordova;
+    const matched = cordova.iosDevelopmentPlugin;
+    if (config.platform.split(',').includes('ios') && SDK.version === matched.sdkVersion &&
+        cordova.pluginRepoUri.endsWith('#' + matched.branch)) {
+        return matched.repoUri;
+    }
+    return cordova.pluginRepoUri;
+}
+
+
 function validateCustomProperties(templateJsonPath, customProperties) {
     // skip if template json file does not exist
     if (!fs.existsSync(templateJsonPath)) {
@@ -714,5 +728,6 @@ module.exports = {
     createApp,
     validateCustomProperties,
     parseCallbackUrl,
-    overrideHybridIosPodfile
+    overrideHybridIosPodfile,
+    resolveCordovaPluginRepoUri
 };
