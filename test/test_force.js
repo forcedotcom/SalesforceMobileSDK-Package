@@ -11,6 +11,7 @@ var spawnSync = require('child_process').spawnSync,
     SDK = require('../shared/constants'),
     COLOR = require('../shared/outputColors')
 ;
+const {verifyHybridAndroidApp} = require('./hybridAndroidVerification');
 
 // Enums
 var OS = {
@@ -34,6 +35,7 @@ try {
     main(process.argv);
 } catch (error) {
     utils.logError(`Error in main:`, error);
+    process.exitCode = 1;
 }
 
 //
@@ -410,7 +412,17 @@ function createCompileApp(tmpDir, os, actualAppType, templateRepoUri, pluginRepo
         buildForiOS(target, workspaceDir, appName);
     }
     else {
-        buildForAndroid(target, workspaceDir);
+        const built = buildForAndroid(target, workspaceDir);
+        if (!built) {
+            process.exitCode = 1;
+            return;
+        }
+        if (isHybrid) {
+            verifyHybridAndroidApp({projectDir: outputDir,
+                expectedVersion: SDK.tools.cordova.platformVersion.android});
+            utils.logInfo('Verified Cordova platform, native framework and packaged JavaScript for ' + target,
+                COLOR.green);
+        }
     }
 }
 
@@ -434,7 +446,7 @@ function buildForiOS(target, workspaceDir, appName) {
 
 function buildForAndroid(target, workspaceDir) {
     var gradle = isWindows() ? '.\\gradlew.bat' : './gradlew';
-    utils.runProcessCatchError(gradle + ' assembleDebug', 'COMPILING ' + target, workspaceDir);
+    return utils.runProcessCatchError(gradle + ' assembleDebug', 'COMPILING ' + target, workspaceDir);
 }
 
 //

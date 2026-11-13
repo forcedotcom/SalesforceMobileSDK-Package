@@ -214,6 +214,39 @@ The `test/test_force.js` script performs comprehensive app generation testing:
 
 ### What Gets Tested
 
+Hybrid Android builds additionally verify the installed platform version, the resolved `org.apache.cordova:framework` version, and the Cordova and plugin JavaScript actually packaged in the debug APK. Templates that generate a server project must also have matching Android server static resources. Generic remote apps can use an existing server and have no generated server project. A failed build or verification returns a failing process status. `--skip-build` skips these APK checks.
+
+Use explicit inputs when testing changes that have not been published:
+
+```bash
+./test/test_force.js --os=android --apptype=hybrid_local,hybrid_remote \
+  --pluginrepouri=/path/to/SalesforceMobileSDK-CordovaPlugin \
+  --no-plugin-update \
+  --sdkdependencies='{"SalesforceMobileSDK-Android":"file:///path/to/SalesforceMobileSDK-Android#feature-branch"}' \
+  --exit-on-failure
+```
+
+The native input must contain the commits being tested. Inspect the resulting `hybrid-android-verification.json`: its native source revision must match the intended checkout. Release templates can use published SDK artifacts instead of a source composite build; their report has no native source revision. The verification report contains tool versions and artifact hashes, without copying OAuth configuration or signing credentials.
+
+To verify an app that has already been built, set `JAVA_HOME` and `ANDROID_HOME`, then run:
+
+```bash
+node test/hybridAndroidVerification.js /path/to/local-app
+node test/hybridAndroidVerification.js /path/to/app-with-server --require-remote-resources
+```
+
+The optional version argument selects a platform version explicitly, for example when verifying the old side of an upgrade. The verifier requires a single debug APK, the JDK `jar` tool and a working Gradle environment. It checks dependency and JavaScript consistency; it does not replace runtime, authentication or plugin behavior tests.
+
+#### Upgrading an existing hybrid Android app
+
+Preserve app configuration, signing inputs and native customizations before recreating a platform. Keep durable customizations in supported root configuration and hooks. Reinstall the compatible Salesforce plugin and update the Android platform version together; changing the app-generation constants does not update an existing app. Follow the selected Cordova release's platform remove/add instructions, run `cordova prepare android`, build, and run the verifier. Repeat prepare and verification to detect generated configuration being overwritten.
+
+Restore the app's `LoginActivity` OAuth redirect intent filter and login-server resources after platform recreation. The creation template substitutes these values when generating a new app; adding a platform to an existing app does not rerun that template. The plugin's placeholder redirect values are not a usable OAuth callback, even if the APK builds. The verifier rejects unresolved manifest placeholders. Preserve the callback configured for the app and test the browser return flow separately.
+
+For pre-release apps, reattach the intended native SDK source checkout after platform recreation and verify its revision. For release apps, verify that the selected SDK Maven artifacts are published and resolve to the expected Cordova framework. Do not accept an upgraded platform version as evidence of the native version.
+
+For apps with generated server resources, refresh the Android Cordova static resource from `platforms/android/platform_www`, including `cordova.js`, `cordova_plugins.js` and the plugin scripts. Platform recreation alone does not refresh a previously generated server project. Verify those resources with `--require-remote-resources` before deploying them through the app's normal release process. For generic remote apps, update the existing server's corresponding resources. Test the deployed remote page separately; an APK build cannot prove which JavaScript the server serves.
+
 The integration tests verify:
 - ✅ App generation succeeds for all app types
 - ✅ All required files are created
