@@ -29,6 +29,7 @@
 var path = require('path'),
     SDK = require('./constants'),
     utils = require('./utils'),
+    checkHybridRequirements = require('./hybridRequirements'),
     configHelper = require('./configHelper'),
     prepareTemplate = require('./templateHelper').prepareTemplate,
     getSDKTemplateURI = require('./templateHelper').getSDKTemplateURI,
@@ -62,6 +63,7 @@ function createNativeApp(config) {
 // Helper for hybrid application creation
 //
 function createHybridApp(config) {
+    checkHybridRequirements(config);
 
     // Create app with cordova
     utils.runProcessThrowError('cordova create "' + config.projectDir + '" ' + config.packagename + ' ' + config.appname);
