@@ -238,4 +238,13 @@ describe('PR event filter planning', () => {
     test('a manifest event that differs from the source is not assumed ready', () => {
         expect(() => ci.planPrWorkflow(workflow('pull_request'), 'pull_request_target', 'dev141')).toThrow()
     })
+
+    test.each([
+        '      branches : [dev, master]',
+        '      "branches" : [dev, master]',
+        '      branches-ignore : [dev141]'
+    ])('rejects alternate mapping before reporting readiness: %s', filter => {
+        const content = workflow().replace('    branches: [dev, master]', filter)
+        expect(() => ci.planPrWorkflow(content, 'pull_request_target', 'dev141')).toThrow(/Unsupported PR trigger/)
+    })
 })

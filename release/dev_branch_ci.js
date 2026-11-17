@@ -48,11 +48,20 @@ function planPrWorkflow(content, event, branch) {
     let stop = start + 1
     while (stop < triggers.length && !/^  [^\s#]/.test(triggers[stop])) stop++
     const fields = triggers.slice(start + 1, stop)
-    if (fields.some(line => /^    [^\s#]/.test(line)
-        && !/^    (?:branches|paths|paths-ignore|types):/.test(line))) unsupported()
-    if (fields.some(line => /^\s+<<:/.test(line))) unsupported()
-    if (fields.some(line => /^\s+(?:branches-ignore|['"]branches(?:-ignore)?['"]):/.test(line))) unsupported()
-    if (fields.some(line => /^\s+branches:/.test(line) && !/^    branches:/.test(line))) unsupported()
+    let sequenceField = false
+    for (const line of fields) {
+        if (/^\s*(?:#.*)?$/.test(line)) continue
+        if (/^    (?:paths|paths-ignore|types):(?:\s|$)/.test(line)) {
+            sequenceField = true
+            continue
+        }
+        if (/^    branches:(?:\s|$)/.test(line)) {
+            sequenceField = false
+            continue
+        }
+        if (sequenceField && /^      -(?:\s|$)/.test(line)) continue
+        unsupported()
+    }
     const filters = fields.map((line, i) => ({line, i})).filter(({line}) => /^    branches:/.test(line))
     if (filters.length === 0) return {ready: true, content}
     if (filters.length !== 1) unsupported()
