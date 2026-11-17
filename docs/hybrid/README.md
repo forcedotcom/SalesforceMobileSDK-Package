@@ -52,7 +52,7 @@ module.exports = {
 //             pluginRepoUri: 'salesforce-mobilesdk-cordova-plugin@v' + VERSION, // GA
             platformVersion: {
                 ios: '7.1.1',
-                android: '15.0.0'
+                android: '15.1.0'
             }
         },
         // ...
@@ -112,7 +112,7 @@ For each platform in the comma-separated list (ios, android, or both):
 
 ```bash
 cordova platform add ios@7.1.1
-cordova platform add android@15.0.0
+cordova platform add android@15.1.0
 ```
 
 ### 5. Install CordovaPlugin
