@@ -35,6 +35,7 @@ describe('hybrid Android consumer verification', () => {
     let frameworkVersion;
     let packagedJs;
     let packagedPlugin;
+    let missingPackagedAsset;
     let run;
     const version = '15.1.0';
     const cordovaJs = `var PLATFORM_VERSION_BUILD_LABEL = '${version}';\n`;
@@ -50,6 +51,7 @@ describe('hybrid Android consumer verification', () => {
         frameworkVersion = version;
         packagedJs = cordovaJs;
         packagedPlugin = 'module.exports = {};\n';
+        missingPackagedAsset = null;
         write('platforms/android/cordova/version', '');
         write('platforms/android/app/src/main/AndroidManifest.xml', '<manifest/>');
         write('plugins/com.salesforce/plugin.xml', '<plugin id="com.salesforce"/>');
@@ -74,6 +76,7 @@ describe('hybrid Android consumer verification', () => {
                 for (const relative of args.slice(2)) {
                     const asset = path.join(options.cwd, relative);
                     const name = relative.replace('assets/www/', '');
+                    if (name === missingPackagedAsset) continue;
                     const contents = name === 'cordova.js' ? packagedJs
                         : name.startsWith('plugins/') ? packagedPlugin
                         : fs.readFileSync(path.join(projectDir, 'platforms/android/platform_www', name));
@@ -120,6 +123,23 @@ describe('hybrid Android consumer verification', () => {
 
         expect(() => verifyHybridAndroidApp({projectDir, expectedVersion: version, run}))
             .toThrow('Packaged Cordova JavaScript');
+    });
+
+    it.each(['cordova.js', 'plugins/com.salesforce/sdkinfo.js'])(
+        'identifies an asset absent from the APK: %s', file => {
+            missingPackagedAsset = file;
+
+            expect(() => verifyHybridAndroidApp({projectDir, expectedVersion: version, run}))
+                .toThrow('Asset missing from APK: ' + file);
+        });
+
+    it('explains how to repair an incomplete remote resource directory', () => {
+        write('server/force-app/main/default/staticresources/cordovaandroid/cordova.js',
+            cordovaJs);
+
+        expect(() => verifyHybridAndroidApp({projectDir, expectedVersion: version, run}))
+            .toThrow('Remote Cordova JavaScript is missing: cordova_plugins.js; '
+                + 'refresh it from platforms/android/platform_www');
     });
 
     it('rejects matching APK and platform assets with the wrong version', () => {

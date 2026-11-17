@@ -95,7 +95,8 @@ function verifyHybridAndroidApp({projectDir, expectedVersion,
         ...pluginScripts(path.join(platformWww, 'plugins'))];
     const remoteDir = path.join(projectDir, 'server', 'force-app', 'main',
         'default', 'staticresources', 'cordovaandroid');
-    if (remoteResourcesRequired && !fs.existsSync(remoteDir)) {
+    const hasRemoteResources = fs.existsSync(remoteDir);
+    if (remoteResourcesRequired && !hasRemoteResources) {
         throw new Error('Remote Cordova JavaScript static resource is missing');
     }
     const temporaryDir = fs.mkdtempSync(path.join(os.tmpdir(), 'hybrid-apk-'));
@@ -107,13 +108,21 @@ function verifyHybridAndroidApp({projectDir, expectedVersion,
         run(jar, ['xf', apk, ...assetPaths.map(file => 'assets/www/' + file)],
             {...options, cwd: temporaryDir});
         for (const file of assetPaths) {
+            const packagedFile = path.join(temporaryDir, 'assets', 'www', file);
+            if (!fs.existsSync(packagedFile)) {
+                throw new Error('Asset missing from APK: ' + file);
+            }
             const platformAsset = fs.readFileSync(path.join(platformWww, file));
-            const packagedAsset = fs.readFileSync(path.join(temporaryDir, 'assets', 'www', file));
+            const packagedAsset = fs.readFileSync(packagedFile);
             if (!platformAsset.equals(packagedAsset)) {
                 throw new Error('Packaged Cordova JavaScript differs from platform asset: ' + file);
             }
-            const remoteAsset = fs.existsSync(remoteDir)
-                ? fs.readFileSync(path.join(remoteDir, file)) : null;
+            const remoteFile = path.join(remoteDir, file);
+            if (hasRemoteResources && !fs.existsSync(remoteFile)) {
+                throw new Error('Remote Cordova JavaScript is missing: ' + file
+                    + '; refresh it from platforms/android/platform_www');
+            }
+            const remoteAsset = hasRemoteResources ? fs.readFileSync(remoteFile) : null;
             if (remoteAsset && !remoteAsset.equals(platformAsset)) {
                 throw new Error('Remote Cordova JavaScript differs from platform asset: ' + file);
             }
