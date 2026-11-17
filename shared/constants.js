@@ -64,7 +64,7 @@ module.exports = {
             iosDevelopmentPlugin: {
                 sdkVersion: '14.1.0',
                 branch: 'dev141',
-                repoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-CordovaPlugin#5d3ab619b3252a157e4daf6b9fcb217a25dddbaa'
+                repoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-CordovaPlugin#bc0f818060f4414ba3130eb95710faf22824256d'
             },
             minVersion: '13.0.0',
 //             pluginRepoUri: 'salesforce-mobilesdk-cordova-plugin@v' + VERSION, // GA

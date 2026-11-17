@@ -51,7 +51,7 @@ module.exports = {
             minVersion: '13.0.0',
 //             pluginRepoUri: 'salesforce-mobilesdk-cordova-plugin@v' + VERSION, // GA
             platformVersion: {
-                ios: '7.1.1',
+                ios: '8.2.0',
                 android: '15.0.0'
             }
         },
@@ -75,6 +75,12 @@ The dev/GA toggle is managed automatically by `setversion.sh` — do not edit th
 The script uncomments all `*RepoUri` lines, then comments out the ones that don't apply:
 - **Dev** (`-d yes`): comments out lines pointing to a version tag (`@#v`), leaving `#dev` active.
 - **GA** (`-d no`): comments out lines pointing to `#dev`, leaving versioned URIs like `salesforce-mobilesdk-cordova-plugin@v14.0.0` active.
+
+## Matched iOS Hybrid source promotion
+
+For SDK 14.1 hybrid apps whose selected platforms include iOS and whose default source is `dev141`, the plugin URI selects an immutable plugin commit whose iOS pod declaration selects the matching Hybrid commit. Before promoting this default, make both reviewed commits available through their declared upstream Git URLs and validate a fresh app without local source mappings. Publish Hybrid first, then the matching plugin, then Package. Squash or rebase changes require updating the dependent pins to the final upstream commit IDs and repeating that validation. Review-time local commits alone are not a publishable release set.
+
+GA package selection and other SDK versions/development branches retain the release tooling's existing source selection. Review and refresh the matched development pins for each subsequent upgrade; this reviewed pin is not carried automatically into another release.
 
 ## `createHybridApp()` Step-by-Step Workflow
 
@@ -111,7 +117,7 @@ Required by the Android post-install hook (`postinstall-android.js`) that runs d
 For each platform in the comma-separated list (ios, android, or both):
 
 ```bash
-cordova platform add ios@7.1.1
+cordova platform add ios@8.2.0
 cordova platform add android@15.0.0
 ```
 
