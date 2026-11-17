@@ -318,6 +318,15 @@ function createCompileApp(tmpDir, os, actualAppType, templateRepoUri, pluginRepo
     var isReactNative = actualAppType == APP_TYPE.react_native || actualAppType == APP_TYPE.react_native_typescript;
     var isHybrid = actualAppType == APP_TYPE.hybrid_local || actualAppType == APP_TYPE.hybrid_remote;
     var isHybridRemote = actualAppType == APP_TYPE.hybrid_remote;
+    // Build-verification fixtures need usable redirect syntax, not live credentials.
+    if (isHybrid && os === OS.android) {
+        if (consumerKey === '__INSERT_CONSUMER_KEY_HERE__') {
+            consumerKey = 'verification-client-id';
+        }
+        if (callbackURL === '__INSERT_CALLBACK_URL_HERE__') {
+            callbackURL = 'cordovaverify://oauth/done';
+        }
+    }
     if (isHybridRemote) {
         // XXX createwithtemplate doesn't work for hybrid remote template
         //     because the arg validation only accept startpage if apptype is available as an arg

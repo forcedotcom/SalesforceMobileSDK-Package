@@ -216,6 +216,10 @@ The `test/test_force.js` script performs comprehensive app generation testing:
 
 Hybrid Android builds additionally verify the installed platform version, the resolved `org.apache.cordova:framework` version, and the Cordova and plugin JavaScript actually packaged in the debug APK. Templates that generate a server project must also have matching Android server static resources. Generic remote apps can use an existing server and have no generated server project. A failed build or verification returns a failing process status. `--skip-build` skips these APK checks.
 
+Android hybrid build-test fixtures use synthetic OAuth identifiers and a valid
+callback URI when explicit values are absent. These fixtures do not perform
+authenticated testing.
+
 Use explicit inputs when testing changes that have not been published:
 
 ```bash
