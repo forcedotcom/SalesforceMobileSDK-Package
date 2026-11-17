@@ -341,8 +341,8 @@ ${dispatches}
 
 // Files that legitimately mention the branch name after merge-back: the tool, its docs and tests,
 // lock files. `verify` ignores them.
-const VERIFY_EXCLUDES = ['release/dev_branch*.js', 'release/README.md', 'unittests/devBranchConfig.test.js',
-                         'unittests/devBranchScript.test.js', '**/*.lock', '**/package-lock.json']
+const VERIFY_EXCLUDES = ['release/dev_branch*.js', 'release/README.md', 'unittests/devBranch*.test.js',
+                         '**/*.lock', '**/package-lock.json']
 
 function dispatcherPath(branch) {
     return `.github/workflows/nightly-${branch}.yaml`
