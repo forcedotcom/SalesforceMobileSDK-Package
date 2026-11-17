@@ -541,8 +541,8 @@ function prCIState(ctx, key) {
 }
 
 /*
- * Reuse an identical open workflow PR without editing it. A different PR that
- * touches the same workflow needs review before another one can be created.
+ * Reuse a filter-only PR, allowing harmless target-branch quoting differences.
+ * Other PRs touching the workflow need review before another can be created.
  */
 function existingPrCI(ctx, key, state) {
     const {repo, pr} = cfg.MANIFEST[key]
@@ -556,7 +556,14 @@ function existingPrCI(ctx, key, state) {
         if (!files.some(file => file.filename === pr.workflow)) continue
         const file = ghJSON(['api', `${endpoint}/contents/${pr.workflow}?ref=${candidate.head.sha}`], state.dir)
         const content = Buffer.from(file.content, 'base64').toString('utf8')
-        if (files.length === 1 && content === state.content) return candidate.html_url
+        if (files.length === 1) {
+            try {
+                const plan = ci.planPrWorkflow(content, pr.event, ctx.branch, {quoteExistingBranch: true})
+                if (plan.ready && plan.content === state.content) return candidate.html_url
+            } catch (error) {
+                // Unsupported candidate workflows require review before reuse.
+            }
+        }
         conflicts.push(candidate.html_url)
     }
     if (conflicts.length) throw new Error(`Review existing workflow PR(s) before preparing another: ${conflicts.join(', ')}`)

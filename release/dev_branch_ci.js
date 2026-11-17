@@ -30,7 +30,14 @@
  * Limit edits to that format and reject unsupported filters rather than guess
  * at YAML semantics. Never apply SDK pointer rewrites to the default branch.
  */
-function planPrWorkflow(content, event, branch) {
+function plainScalarIsString(value) {
+    return !/^(?:null|true|false)$/i.test(value)
+        && !/^[-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:e[-+]?\d+)?$/i.test(value)
+        && !/^0(?:b[01]+|o[0-7]+|x[\da-f]+)$/i.test(value)
+        && !/^[-+]?\.(?:inf|nan)$/i.test(value)
+}
+
+function planPrWorkflow(content, event, branch, options = {}) {
     const unsupported = () => { throw new Error('Unsupported PR trigger format; review the workflow manually') }
     if (!/^[\w][\w.\-/]*$/.test(branch)) unsupported()
     const lines = content.split('\n')
@@ -73,13 +80,19 @@ function planPrWorkflow(content, event, branch) {
         if (token.startsWith('*')) unsupported()
         const scalar = token.match(/^(?:'([\w./*?+@{}-]+)'|"([\w./*?+@{}-]+)"|([\w./*?+@{}-]+))$/)
         if (!scalar) unsupported()
+        if (scalar[3] && !plainScalarIsString(scalar[3])) unsupported()
         return scalar[1] || scalar[2] || scalar[3]
     })
-    if (names.includes(branch)) return {ready: true, content}
-    const master = names.indexOf('master')
-    tokens.splice(master === -1 ? tokens.length : master, 0, branch)
+    const ready = names.includes(branch)
+    if (ready && !options.quoteExistingBranch) return {ready: true, content}
+    if (ready) {
+        names.forEach((name, index) => { if (name === branch) tokens[index] = JSON.stringify(branch) })
+    } else {
+        const master = names.indexOf('master')
+        tokens.splice(master === -1 ? tokens.length : master, 0, JSON.stringify(branch))
+    }
     lines[on + 1 + start + 1 + i] = match[1] + tokens.join(', ') + match[3]
-    return {ready: false, content: lines.join('\n')}
+    return {ready, content: lines.join('\n')}
 }
 
 module.exports = {planPrWorkflow}

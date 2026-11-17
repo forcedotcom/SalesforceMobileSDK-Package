@@ -210,7 +210,7 @@ describe('PR event filter planning', () => {
             .replace('permissions:', '  push:\n    branches: [master]\npermissions:')
         const result = ci.planPrWorkflow(original, 'pull_request_target', 'dev141')
         expect(result.ready).toBe(false)
-        expect(result.content).toBe(original.replace("['dev', release/*, 'master']", "['dev', release/*, dev141, 'master']"))
+        expect(result.content).toBe(original.replace("['dev', release/*, 'master']", "['dev', release/*, \"dev141\", 'master']"))
         expect(ci.planPrWorkflow(result.content, 'pull_request_target', 'dev141')).toEqual({ready: true, content: result.content})
     })
 
@@ -246,5 +246,19 @@ describe('PR event filter planning', () => {
     ])('rejects alternate mapping before reporting readiness: %s', filter => {
         const content = workflow().replace('    branches: [dev, master]', filter)
         expect(() => ci.planPrWorkflow(content, 'pull_request_target', 'dev141')).toThrow(/Unsupported PR trigger/)
+    })
+
+    test.each(['1.0', '00141', 'True', 'null', '0x10'])('preserves the exact branch scalar %s', branch => {
+        exec(['check-ref-format', '--branch', branch], process.cwd())
+        const result = ci.planPrWorkflow(workflow(), 'pull_request_target', branch)
+        const line = result.content.split('\n').find(value => value.includes('branches:'))
+        const inserted = line.match(/\[dev, (.+), master\]/)[1]
+        expect(JSON.parse(inserted)).toBe(branch)
+        expect(ci.planPrWorkflow(result.content, 'pull_request_target', branch).ready).toBe(true)
+    })
+
+    test.each(['1.0', '00141', 'True', 'null', '0x10'])('rejects an existing non-string branch scalar %s', branch => {
+        expect(() => ci.planPrWorkflow(workflow('pull_request_target', `dev, ${branch}, master`),
+            'pull_request_target', branch)).toThrow(/Unsupported PR trigger/)
     })
 })
