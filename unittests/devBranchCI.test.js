@@ -12,7 +12,8 @@ const workflow = (event = 'pull_request_target', branches = 'dev, master') =>
 
 const exec = (args, cwd) => cp.execFileSync('git', args, {cwd, stdio: 'pipe'}).toString().trim()
 
-function fixture({defaultBranch = 'dev', event = 'pull_request_target', ready = false} = {}) {
+function fixture({defaultBranch = 'dev', event = 'pull_request_target', ready = false,
+    repoKey = event === 'pull_request' ? 'pkg' : 'ioshybrid'} = {}) {
     const root = fs.mkdtempSync(path.join(os.tmpdir(), 'pr-ci-'))
     const origin = path.join(root, 'origin.git'), seed = path.join(root, 'seed')
     exec(['init', '-q', '--bare', '-b', defaultBranch, origin], root)
@@ -30,7 +31,7 @@ function fixture({defaultBranch = 'dev', event = 'pull_request_target', ready = 
     exec(['add', '.'], seed)
     if (!ready) exec(['commit', '-qm', 'parallel'], seed)
     exec(['push', '-q', 'origin', 'dev141'], seed)
-    const work = path.join(root, 'work'), key = event === 'pull_request' ? 'pkg' : 'ioshybrid'
+    const work = path.join(root, 'work'), key = repoKey
     fs.mkdirSync(work)
     const dir = path.join(work, cfg.MANIFEST[key].repo)
     exec(['clone', '-q', origin, dir], root)
@@ -120,11 +121,26 @@ describe('parallel branch PR CI preparation', () => {
     })
 
     test('ordinary PR workflows are checked on the parallel branch without a default-branch PR', () => {
-        const f = fixture({event: 'pull_request'})
+        const original = cfg.MANIFEST.pkg.pr
+        cfg.MANIFEST.pkg.pr = {...original, event: 'pull_request'}
+        try {
+            const f = fixture({event: 'pull_request'})
+            script.prCI(f.ctx)
+            expect(script.verifyPrCI(f.ctx)).toBe(true)
+            expect(f.responses.created).toBeUndefined()
+            expect(f.ghCalls.some(args => args[args.length - 1].includes('/pulls?'))).toBe(false)
+        } finally {
+            cfg.MANIFEST.pkg.pr = original
+        }
+    })
+
+    test('Package PR-target CI needs the default workflow even when the parallel copy is ready', () => {
+        const f = fixture({repoKey: 'pkg'})
+        expect(script.verifyPrCI(f.ctx)).toBe(false)
         script.prCI(f.ctx)
-        expect(script.verifyPrCI(f.ctx)).toBe(true)
-        expect(f.responses.created).toBeUndefined()
-        expect(f.ghCalls.some(args => args[args.length - 1].includes('/pulls?'))).toBe(false)
+        expect(f.responses.created).toBeDefined()
+        expect(f.responses.created.args).toEqual(expect.arrayContaining(['--base', 'dev']))
+        expect(script.verifyPrCI(f.ctx)).toBe(false)
     })
 
     test('an undeclared workflow is unassessed, not a readiness pass', () => {

@@ -33,7 +33,7 @@ const FIXTURES = {
         '.gitmodules': '[submodule "external/shared"]\n\turl = https://github.com/forcedotcom/SalesforceMobileSDK-Shared\n'
     },
     pkg: {
-        '.github/workflows/pr.yaml': 'on:\n  pull_request:\n    branches: [dev, master]\n',
+        '.github/workflows/pr.yaml': 'on:\n  pull_request_target:\n    branches: [dev, master]\n',
         'shared/constants.js': "pluginRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-CordovaPlugin#dev',\ntemplatesRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-Templates#dev',\n"
     },
     reactnative: {

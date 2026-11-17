@@ -205,7 +205,7 @@ const MANIFEST = {
     },
     pkg: {
         repo: 'SalesforceMobileSDK-Package',
-        pr: {workflow: PR_YAML, event: 'pull_request'},
+        pr: {workflow: PR_YAML, event: 'pull_request_target'},
         rules: [
             {files: [PR_YAML], ...prBranches('pkg')},
             {files: ['shared/constants.js'], ...SDK_REPO_REF}
