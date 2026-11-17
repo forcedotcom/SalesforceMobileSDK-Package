@@ -164,7 +164,7 @@ function main(args) {
                 for (var k=0; k<template.platforms.length; k++) {
                     var os = template.platforms[k];
                     if (chosenOperatingSystems.length == 0 || chosenOperatingSystems.indexOf(os) >= 0) {
-                        createCompileApp(tmpDir, os, template.appType, template.path, pluginRepoUri, useSfdxRequested, sdkDependencies, consumerKey, callbackURL, loginServer, skipBuild);
+                        createCompileApp(tmpDir, os, template.appType, template.path, pluginRepoUri, useSfdxRequested, sdkDependencies, consumerKey, callbackURL, loginServer, skipBuild, exitOnFailure);
                     }
                 }
             }
@@ -176,14 +176,14 @@ function main(args) {
             if (testingWithAppType) {
                 for (var j=0; j<chosenAppTypes.length; j++) {
                     var appType = chosenAppTypes[j];
-                    createCompileApp(tmpDir, os, appType, null, pluginRepoUri, useSfdxRequested, sdkDependencies, consumerKey, callbackURL, loginServer, skipBuild);
+                    createCompileApp(tmpDir, os, appType, null, pluginRepoUri, useSfdxRequested, sdkDependencies, consumerKey, callbackURL, loginServer, skipBuild, exitOnFailure);
                 }
             }
 
             if (testingWithTemplate) {
                 // NB: chosenAppTypes[0] is appType from template
                 var appType = chosenAppTypes.length > 0 ? chosenAppTypes[0] : [templateHelper.getAppTypeFromTemplate(templateRepoUri)];
-                createCompileApp(tmpDir, os, appType, templateRepoUri, pluginRepoUri, useSfdxRequested, sdkDependencies, consumerKey, callbackURL, loginServer, skipBuild);
+                createCompileApp(tmpDir, os, appType, templateRepoUri, pluginRepoUri, useSfdxRequested, sdkDependencies, consumerKey, callbackURL, loginServer, skipBuild, exitOnFailure);
             }
         }
     }
@@ -312,7 +312,7 @@ function updatePluginRepo(tmpDir, os, pluginRepoDir, sdkBranch) {
 //
 // Create and compile app
 //
-function createCompileApp(tmpDir, os, actualAppType, templateRepoUri, pluginRepoUri, useSfdxRequested, sdkDependencies, consumerKey, callbackURL, loginServer, skipBuild) {
+function createCompileApp(tmpDir, os, actualAppType, templateRepoUri, pluginRepoUri, useSfdxRequested, sdkDependencies, consumerKey, callbackURL, loginServer, skipBuild, exitOnFailure) {
     var execArgs = '';
     var isNative = actualAppType == APP_TYPE.native || actualAppType == APP_TYPE.native_swift || actualAppType == APP_TYPE.native_kotlin; 
     var isReactNative = actualAppType == APP_TYPE.react_native || actualAppType == APP_TYPE.react_native_typescript;
@@ -427,10 +427,16 @@ function createCompileApp(tmpDir, os, actualAppType, templateRepoUri, pluginRepo
             return;
         }
         if (isHybrid) {
-            verifyHybridAndroidApp({projectDir: outputDir,
-                expectedVersion: SDK.tools.cordova.platformVersion.android});
-            utils.logInfo('Verified Cordova platform, native framework and packaged JavaScript for ' + target,
-                COLOR.green);
+            try {
+                verifyHybridAndroidApp({projectDir: outputDir,
+                    expectedVersion: SDK.tools.cordova.platformVersion.android});
+                utils.logInfo('Verified Cordova platform, native framework and packaged JavaScript for ' + target,
+                    COLOR.green);
+            } catch (error) {
+                utils.logError('VERIFYING ' + target, error);
+                process.exitCode = 1;
+                if (exitOnFailure) throw error;
+            }
         }
     }
 }
