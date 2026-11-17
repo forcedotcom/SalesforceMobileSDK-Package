@@ -122,6 +122,7 @@ const MANIFEST = {
     },
     ios: {
         repo: 'SalesforceMobileSDK-iOS',
+        pr: {workflow: PR_YAML, event: 'pull_request_target'},
         rules: [
             {files: [PR_YAML], ...PR_BRANCHES},
             {files: [DANGER], ...DANGER_IOS}
@@ -139,6 +140,7 @@ const MANIFEST = {
     },
     android: {
         repo: 'SalesforceMobileSDK-Android',
+        pr: {workflow: PR_YAML, event: 'pull_request_target'},
         rules: [
             {files: [PR_YAML], ...PR_BRANCHES},
             {files: [DANGER], ...DANGER_ANDROID}
@@ -150,6 +152,7 @@ const MANIFEST = {
     },
     ioshybrid: {
         repo: 'SalesforceMobileSDK-iOS-Hybrid',
+        pr: {workflow: PR_YAML, event: 'pull_request_target'},
         rules: [
             {files: [PR_YAML], ...PR_BRANCHES}
         ],
@@ -159,6 +162,7 @@ const MANIFEST = {
     },
     reactnative: {
         repo: 'SalesforceMobileSDK-ReactNative',
+        pr: {workflow: PR_YAML, event: 'pull_request_target'},
         rules: [
             {files: [PR_YAML], ...PR_BRANCHES},
             {files: ['androidTests/package.json', 'iosTests/package.json'], ...SDK_REPO_REF}
@@ -179,6 +183,7 @@ const MANIFEST = {
     },
     templates: {
         repo: 'SalesforceMobileSDK-Templates',
+        pr: {workflow: PR_YAML, event: 'pull_request_target'},
         rules: [
             {files: [PR_YAML], ...PR_BRANCHES},
             {listFiles: templatePackageJsons, ...SDK_REPO_REF},
@@ -189,6 +194,7 @@ const MANIFEST = {
     },
     pkg: {
         repo: 'SalesforceMobileSDK-Package',
+        pr: {workflow: PR_YAML, event: 'pull_request'},
         rules: [
             {files: [PR_YAML], ...PR_BRANCHES},
             {files: ['shared/constants.js'], ...SDK_REPO_REF}

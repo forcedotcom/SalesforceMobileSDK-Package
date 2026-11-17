@@ -40,6 +40,8 @@
 //   mergeback  merge dev into <branch> on a mergeback branch, unpoint, push, open a PR to dev
 //   verify     check that --ref (default origin/dev) has no <branch> pointers left
 //   dispatcher write the nightly dispatcher workflows (to be committed on dev) - see README
+//   pr-ci      prepare default-branch PR trigger updates (separate from SDK pointers)
+//   verify-pr-ci read-only: check PR filters at the authoritative workflow refs
 //
 // Options:
 //   --org <org>            GitHub org owning the repos (required; forcedotcom needs --really)
@@ -60,7 +62,8 @@ const fs = require('fs'),
       utils = require('../shared/utils'),
       COLOR = require('../shared/outputColors'),
       common = require('./common.js'),
-      cfg = require('./dev_branch_config.js')
+      cfg = require('./dev_branch_config.js'),
+      ci = require('./dev_branch_ci.js')
 
 const BASE = cfg.BASE_BRANCH
 
@@ -511,13 +514,128 @@ function dispatcher(ctx) {
     })
 }
 
+function gh(args, dir) {
+    const result = childProcess.spawnSync('gh', args, {cwd: dir, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024})
+    if (result.status !== 0) throw new Error(`gh failed: ${result.stderr || result.error}`)
+    return result.stdout.trim()
+}
+
+const ghJSON = (args, dir) => JSON.parse(gh(args, dir))
+
+function prCIState(ctx, key) {
+    const {repo, pr} = cfg.MANIFEST[key]
+    const dir = fetchClone(ctx, key)
+    const repository = ghJSON(['api', `repos/${ctx.org}/${repo}`], dir)
+    const origin = git(['remote', 'get-url', 'origin'], dir).trim().replace(/\.git$/, '')
+    if (![repository.clone_url, repository.ssh_url].filter(Boolean).some(url => url.replace(/\.git$/, '') === origin)) {
+        throw new Error(`${repo}: origin does not match ${ctx.org}/${repo}; use a separate work directory`)
+    }
+    const sourceBranch = pr.event === 'pull_request_target'
+        ? repository.default_branch : ctx.branch
+    if (typeof sourceBranch !== 'string' || !/^[\w][\w.\-/]*$/.test(sourceBranch)) {
+        throw new Error(`Invalid default branch for ${repo}`)
+    }
+    const original = git(['show', `origin/${sourceBranch}:${pr.workflow}`], dir)
+    return {dir, sourceBranch, original, ...ci.planPrWorkflow(original, pr.event, ctx.branch)}
+}
+
+/*
+ * Reuse an identical open workflow PR without editing it. A different PR that
+ * touches the same workflow needs review before another one can be created.
+ */
+function existingPrCI(ctx, key, state) {
+    const {repo, pr} = cfg.MANIFEST[key]
+    const endpoint = `repos/${ctx.org}/${repo}`
+    const prs = ghJSON(['api', '--paginate', '--slurp',
+        `${endpoint}/pulls?state=open&base=${encodeURIComponent(state.sourceBranch)}&per_page=100`], state.dir).flat()
+    const conflicts = []
+    for (const candidate of prs) {
+        const files = ghJSON(['api', '--paginate', '--slurp',
+            `${endpoint}/pulls/${candidate.number}/files?per_page=100`], state.dir).flat()
+        if (!files.some(file => file.filename === pr.workflow)) continue
+        const file = ghJSON(['api', `${endpoint}/contents/${pr.workflow}?ref=${candidate.head.sha}`], state.dir)
+        const content = Buffer.from(file.content, 'base64').toString('utf8')
+        if (files.length === 1 && content === state.content) return candidate.html_url
+        conflicts.push(candidate.html_url)
+    }
+    if (conflicts.length) throw new Error(`Review existing workflow PR(s) before preparing another: ${conflicts.join(', ')}`)
+    return null
+}
+
+function prCI(ctx) {
+    for (const key of ctx.keys) {
+        const {repo, pr} = cfg.MANIFEST[key]
+        if (!pr || pr.event !== 'pull_request_target') {
+            info(`${repo}: no declared PR-target workflow requiring a default-branch update`)
+            continue
+        }
+        const state = prCIState(ctx, key)
+        if (state.ready) {
+            info(`${repo}: ${state.sourceBranch} already allows PRs to ${ctx.branch}`)
+            continue
+        }
+        const existing = existingPrCI(ctx, key, state)
+        if (existing) {
+            info(`${repo}: default-branch activation pending in ${existing}`, COLOR.yellow)
+            continue
+        }
+        if (ctx.dryRun) {
+            info(`${repo}: [dry-run] would prepare ${pr.workflow} PR to ${state.sourceBranch}`, COLOR.yellow)
+            continue
+        }
+        if (git(['status', '--porcelain'], state.dir).trim()) throw new Error(`${repo}: pr-ci requires a clean worktree`)
+        const workBranch = `pr-ci-${ctx.branch}`
+        if (ok(`git show-ref --verify --quiet refs/heads/${workBranch}`, state.dir)
+            || remoteHas(state.dir, workBranch)) {
+            throw new Error(`${repo}: ${workBranch} already exists; preserve it and inspect before retrying`)
+        }
+        git(['checkout', '--no-overwrite-ignore', '-b', workBranch, `origin/${state.sourceBranch}`], state.dir)
+        fs.writeFileSync(path.join(state.dir, pr.workflow), state.content)
+        commitIfChanged(state.dir, `Allow PR workflows targeting ${ctx.branch}`)
+        push(ctx, state.dir, workBranch)
+        const bodyFile = path.join(ctx.dir, `${repo}-pr-ci-body.md`)
+        fs.writeFileSync(bodyFile, `Allows PRs targeting \`${ctx.branch}\` in the default-branch PR workflow. SDK dependency pointers are unchanged.\n\nAfter merge, retrigger a representative PR and verify its actual test jobs and tested revision.\n`)
+        const url = gh(['pr', 'create', '--repo', `${ctx.org}/${repo}`, '--base', state.sourceBranch,
+            '--head', workBranch, '--title', `Allow PR workflows targeting ${ctx.branch}`, '--body-file', bodyFile], state.dir)
+        info(`${repo}: default-branch activation pending in ${url}`, COLOR.yellow)
+    }
+}
+
+function verifyPrCI(ctx) {
+    let ready = true
+    let assessed = 0
+    for (const key of ctx.keys) {
+        const {repo, pr} = cfg.MANIFEST[key]
+        if (!pr) {
+            info(`${repo}: no PR workflow declared; not assessed`, COLOR.yellow)
+            continue
+        }
+        assessed++
+        try {
+            const state = prCIState(ctx, key)
+            if (!state.ready) {
+                ready = false
+                utils.logError(`${repo}: ${pr.event} filter on ${state.sourceBranch} does not explicitly allow ${ctx.branch}`)
+            } else {
+                info(`${repo}: ${pr.event} filter on ${state.sourceBranch} allows ${ctx.branch}`)
+            }
+        } catch (error) {
+            ready = false
+            utils.logError(`${repo}: ${error.message}`)
+        }
+    }
+    if (!assessed) utils.logError('No PR workflows were assessed; add a manifest entry or select a declared workflow.')
+    info('Filter verification only; inspect actual hosted jobs and tested revisions after retriggering a PR.', COLOR.yellow)
+    return ready && assessed > 0
+}
+
 //
 // Main
 //
 function main() {
     const args = parseArgs(process.argv.slice(2))
     const command = args._[0]
-    const commands = {status, setup, point, sync, mergeback, verify, dispatcher}
+    const commands = {status, setup, point, sync, mergeback, verify, dispatcher, 'pr-ci': prCI, 'verify-pr-ci': verifyPrCI}
     if (!commands[command]) {
         console.error(`Usage: dev_branch.js <${Object.keys(commands).join('|')}> --org <org> --branch <name> [options] (see header of this file)`)
         process.exit(1)
@@ -527,11 +645,11 @@ function main() {
     const ctx = makeContext(args)
     if (command === 'setup' && !ctx.version) fail('--version is required for setup (e.g. --version 14.1.0)')
     info(`${command} on ${ctx.org} (${ctx.branch}) in ${ctx.dir}${ctx.dryRun ? ' [dry-run]' : ''}`, COLOR.cyan)
-    commands[command](ctx, args)
+    if (commands[command](ctx, args) === false) process.exitCode = 1
 }
 
 if (require.main === module) {
     main()
 }
 
-module.exports = {parseArgs, makeContext, git, fetchClone, prepareClone, mergeDevInto, resolveConflicts, mergePointerFile, grepRef}
+module.exports = {parseArgs, makeContext, git, fetchClone, prepareClone, mergeDevInto, resolveConflicts, mergePointerFile, grepRef, prCI, verifyPrCI}

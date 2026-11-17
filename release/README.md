@@ -211,14 +211,16 @@ Or set up fresh test branches by running `setup_test_branches.js` again (it dele
 Use when `dev` holds changes for a patch release that hasn't shipped and the next minor version's work must start. Creates `dev141` in Shared, iOS, iOS-SPM, Android, iOS-Hybrid, ReactNative, CordovaPlugin, Templates and Package, with every cross-repo pointer (submodule pins, `#dev` in package.json, `branch="dev"` in plugin.xml, hardcoded `dev` in `tools/update.sh` and `test_template.sh`) re-pointed, and `dev141` added to `pr.yaml` and the iOS/Android Danger files. Pointer rules live in `dev_branch_config.js` (unit tested in `unittests/devBranchConfig.test.js`); `point`/`unpoint` are exact inverses and idempotent.
 
 ```bash
-node release/dev_branch.js <status|setup|point|sync|mergeback|verify|dispatcher> --org <org> --branch <name> [--dir <dir>] [--repos a,b] [--dry-run]
+node release/dev_branch.js <status|setup|point|sync|mergeback|verify|dispatcher|pr-ci|verify-pr-ci> --org <org> --branch <name> [--dir <dir>] [--repos a,b] [--dry-run]
 ```
 
 `--org` and `--branch` (e.g. `dev141`) are required, as is `--version` for `setup` (nothing is defaulted); `--org forcedotcom` additionally needs `--really`. **Always run against your fork first**, with `--dry-run` (all local work in the clones, no push/PR/`update.sh`). Repo keys, in dependency order: `shared, ios, iosspm, android, ioshybrid, reactnative, cordovaplugin, templates, pkg`.
 
 | Step | Command | Notes |
 |---|---|---|
-| Create | `setup --branch dev141 --version 14.1.0` | Per repo: branch off `origin/dev`, `setversion.sh -v 14.1.0 -d yes` (Android `-c` = current versionCode + 1, or `--version-code`), `point`, repin submodules, push. Skips repos that already have the branch. Run `dispatcher` too. |
+| Create | `setup --branch dev141 --version 14.1.0` | Per repo: branch off `origin/dev`, `setversion.sh -v 14.1.0 -d yes` (Android `-c` = current versionCode + 1, or `--version-code`), `point`, repin submodules, push. Skips repos that already have the branch. Run `pr-ci`, review its default-branch PRs, and run `dispatcher` too. |
+| PR CI | `pr-ci` | Prepares a filter-only PR against the actual repository default branch for each declared `pull_request_target` workflow. Reuses an identical open PR; stops for other open PRs touching that workflow. Does not apply dependency pointer rewrites to the default branch. `--dry-run` reports changes without checkout, commit, push or PR creation. |
+| Check PR CI | `verify-pr-ci` | Read-only configuration check: `pull_request_target` uses the default branch; ordinary `pull_request` uses the parallel branch. Exits nonzero for missing, unsupported or insufficient filters. This is not a hosted test result. |
 | Nightlies | `dispatcher` | Opens a PR to `dev` in each repo adding `.github/workflows/nightly-dev141.yaml` (scheduled workflows only run from the default branch; this runs the nightlies with `--ref dev141`, crons +3h). |
 | Re-point | `point` | After anything that rewrote refs (e.g. a `setversion.sh` run on `dev141`). |
 | Sync | `sync` | Manual. Branch `sync-dev-into-dev141-<date>` off `dev141`, merge `origin/dev`, `point`, push, PR to `dev141`. Conflicts: submodule pins and CordovaPlugin generated files (`src/`, `www/`, gradle wrapper) take the `dev141` side (run `point --repos cordovaplugin` after dependency PRs merge); pointer files edited on both sides are three-way merged on their `dev` form and re-pointed. Stops when both branches changed the same lines; fix, commit, then `--resume`. |
@@ -233,3 +235,13 @@ Rules:
 - `sync`/`mergeback` skip repos with nothing to merge, and re-running (or `--resume`) refreshes an already open PR instead of failing.
 - Not covered yet: UITests (`AppGenerator.kt`, `install.sh` hardcode `dev`) and the Workspace `install.sh`.
 - On forks, `runs-on: forcedotcom-ubuntu` in the workflows must be swapped for `ubuntu-latest` to run CI.
+
+### Activate PR CI before relying on the parallel branch
+
+`setup` and `point` edit the parallel branch only. For `pull_request_target`, GitHub loads the workflow from the repository default branch, so adding the target to the parallel branch's copy does not activate CI. `pr-ci` prepares the separate default-branch prerequisite; `dispatcher` handles scheduled nightlies independently. See [GitHub's event comparison](https://docs.github.com/en/actions/reference/security/securely-using-pull_request_target).
+
+After `setup`, run `pr-ci` on forks first, review and merge the default-branch filter PRs, then run `verify-pr-ci`. Pass explicit `--org` and `--branch`, reuse the same `--dir`, and optionally select `--repos` as with the other commands. The preparation command requires a clean worktree and preserves any existing `pr-ci-<branch>` work branch on failure rather than resetting it. After an interrupted push or PR creation, inspect that branch and open PRs before retrying. An already-merged filter or an identical open PR is a no-op.
+
+The manifest declares the workflow and event for each assessed repository. Repositories without a declared PR workflow are reported as unassessed; new workflows need an explicit manifest entry. The filter editor supports block event mappings with inline positive branch lists, the format used by these workflows. It preserves other branches, path filters, jobs and permissions. Unsupported filters (including negation and block lists) require manual review; no rewrite is guessed. Ordinary `pull_request` workflows need no default-branch filter PR.
+
+Finally, retrigger a representative PR targeting the parallel branch and verify actual test jobs, the tested revision and their results. Green scans, successful filter checks and a pointed branch do not establish hosted test acceptance. Keep the temporary default-branch entry while the parallel branch is active. At merge-back, review its removal alongside the dispatcher removal, preserving any other active branches, and run the existing `verify` check afterward.
