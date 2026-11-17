@@ -157,6 +157,21 @@ describe('parallel branch PR CI preparation', () => {
         expect(exec(['branch', '--list', 'pr-ci-*'], f.dir)).toBe('')
     })
 
+    test.each(['separate', 'multiple'])('rejects a different push destination (%s push URLs) before any write', mode => {
+        const f = fixture()
+        const other = path.join(f.root, 'other.git')
+        exec(['init', '-q', '--bare', '-b', 'dev', other], f.root)
+        if (mode === 'multiple') exec(['config', '--add', 'remote.origin.pushurl', f.origin], f.dir)
+        exec(['config', '--add', 'remote.origin.pushurl', other], f.dir)
+        const head = exec(['rev-parse', 'HEAD'], f.dir)
+        expect(() => script.prCI(f.ctx)).toThrow(/push destination does not match/)
+        expect(exec(['rev-parse', 'HEAD'], f.dir)).toBe(head)
+        expect(exec(['branch', '--list', 'pr-ci-*'], f.dir)).toBe('')
+        expect(exec(['--git-dir', other, 'for-each-ref', '--format=%(refname)', 'refs/heads/pr-ci-dev141'], f.root)).toBe('')
+        expect(exec(['--git-dir', f.origin, 'for-each-ref', '--format=%(refname)', 'refs/heads/pr-ci-dev141'], f.root)).toBe('')
+        expect(f.responses.created).toBeUndefined()
+    })
+
     test('checkout does not overwrite an ignored local file', () => {
         const f = fixture()
         exec(['checkout', '-q', 'dev'], f.seed)

@@ -526,8 +526,9 @@ function prCIState(ctx, key) {
     const {repo, pr} = cfg.MANIFEST[key]
     const dir = fetchClone(ctx, key)
     const repository = ghJSON(['api', `repos/${ctx.org}/${repo}`], dir)
+    const repositoryURLs = [repository.clone_url, repository.ssh_url].filter(Boolean).map(url => url.replace(/\.git$/, ''))
     const origin = git(['remote', 'get-url', 'origin'], dir).trim().replace(/\.git$/, '')
-    if (![repository.clone_url, repository.ssh_url].filter(Boolean).some(url => url.replace(/\.git$/, '') === origin)) {
+    if (!repositoryURLs.includes(origin)) {
         throw new Error(`${repo}: origin does not match ${ctx.org}/${repo}; use a separate work directory`)
     }
     const sourceBranch = pr.event === 'pull_request_target'
@@ -536,7 +537,7 @@ function prCIState(ctx, key) {
         throw new Error(`Invalid default branch for ${repo}`)
     }
     const original = git(['show', `origin/${sourceBranch}:${pr.workflow}`], dir)
-    return {dir, sourceBranch, original, ...ci.planPrWorkflow(original, pr.event, ctx.branch)}
+    return {dir, sourceBranch, original, repositoryURLs, ...ci.planPrWorkflow(original, pr.event, ctx.branch)}
 }
 
 /*
@@ -578,6 +579,10 @@ function prCI(ctx) {
         if (existing) {
             info(`${repo}: default-branch activation pending in ${existing}`, COLOR.yellow)
             continue
+        }
+        const pushURLs = git(['remote', 'get-url', '--push', '--all', 'origin'], state.dir).trim().split('\n')
+        if (pushURLs.some(url => !state.repositoryURLs.includes(url.replace(/\.git$/, '')))) {
+            throw new Error(`${repo}: origin push destination does not match ${ctx.org}/${repo}`)
         }
         if (ctx.dryRun) {
             info(`${repo}: [dry-run] would prepare ${pr.workflow} PR to ${state.sourceBranch}`, COLOR.yellow)
