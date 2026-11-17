@@ -24,20 +24,20 @@ const FIXTURES = {
         ].join('\n')
     },
     ios: {
-        '.github/workflows/pr.yaml': '    branches: [dev, master]\n',
+        '.github/workflows/pr.yaml': 'on:\n  pull_request_target:\n    branches: [dev, master]\n',
         '.github/DangerFiles/TestOrchestrator.rb': 'fail("x") if github.branch_for_base != "dev"\n'
     },
     android: {
-        '.github/workflows/pr.yaml': '    branches: [dev, master]\n',
+        '.github/workflows/pr.yaml': 'on:\n  pull_request_target:\n    branches: [dev, master]\n',
         '.github/DangerFiles/TestOrchestrator.rb': 'fail("x") if !["dev", "dpop"].include?(github.branch_for_base)\n',
         '.gitmodules': '[submodule "external/shared"]\n\turl = https://github.com/forcedotcom/SalesforceMobileSDK-Shared\n'
     },
     pkg: {
-        '.github/workflows/pr.yaml': '    branches: [dev, master]\n',
+        '.github/workflows/pr.yaml': 'on:\n  pull_request:\n    branches: [dev, master]\n',
         'shared/constants.js': "pluginRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-CordovaPlugin#dev',\ntemplatesRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-Templates#dev',\n"
     },
     reactnative: {
-        '.github/workflows/pr.yaml': '    branches: [dev, master]\n',
+        '.github/workflows/pr.yaml': 'on:\n  pull_request_target:\n    branches: [dev, master]\n',
         'androidTests/package.json': '{"dependencies": {"react-native-force": "git+https://github.com/forcedotcom/SalesforceMobileSDK-ReactNative.git#dev"}}',
         'iosTests/package.json': '{"dependencies": {"react-native-force": "git+https://github.com/forcedotcom/SalesforceMobileSDK-ReactNative.git#dev"}}'
     }
@@ -88,13 +88,13 @@ describe('dev_branch_config', () => {
         expect(r.files['test_template.sh']).toContain('${MSDK_IOS_BRANCH:-dev141}')
         expect(r.files['test_template.sh']).toContain('${MSDK_ANDROID_BRANCH:-dev141}')
         expect(r.files['test_template.sh']).toContain('${RN_FORCE_BRANCH:-dev141}')
-        expect(r.files['.github/workflows/pr.yaml']).toContain('branches: [dev, dev141, master]')
+        expect(r.files['.github/workflows/pr.yaml']).toContain('branches: [dev, "dev141", master]')
     })
 
     test('point leaves #master and similar refs alone', () => {
         const files = {'androidTests/package.json': '"a": "SalesforceMobileSDK-ReactNative#master", "b": "SalesforceMobileSDK-X#developer", "c": "SalesforceMobileSDK-Y#dev"',
                        'iosTests/package.json': '"c": "SalesforceMobileSDK-Y#dev"',
-                       '.github/workflows/pr.yaml': 'branches: [dev, master]'}
+                       '.github/workflows/pr.yaml': 'on:\n  pull_request_target:\n    branches: [dev, master]\n'}
         const r = run('reactnative', files, 'point', FORCE)
         expect(r.files['androidTests/package.json']).toBe('"a": "SalesforceMobileSDK-ReactNative#master", "b": "SalesforceMobileSDK-X#developer", "c": "SalesforceMobileSDK-Y#dev141"')
     })
@@ -161,5 +161,25 @@ describe('dev_branch_config', () => {
         expect(cfg.MANIFEST.iosspm.repo).toBe('SalesforceMobileSDK-iOS-SPM')
         expect(cfg.MANIFEST.iosspm.rules).toEqual([])
         expect(run('iosspm', {}, 'point', FORCE).problems).toEqual([])
+    })
+
+    test('CI pointer cleanup preserves other branch values and quoted entries', () => {
+        const file = '.github/workflows/pr.yaml'
+        const original = 'on:\n  pull_request_target:\n    branches: [dev, stable, "master"]\n'
+        const pointed = run('ioshybrid', {[file]: original}, 'point', FORCE)
+        expect(pointed.problems).toEqual([])
+        expect(pointed.files[file]).toContain('[dev, stable, "dev141", "master"]')
+        const back = run('ioshybrid', pointed.files, 'unpoint', FORCE)
+        expect(back.problems).toEqual([])
+        expect(back.files[file]).toBe(original)
+    })
+
+    test('an unfiltered CI event is a valid no-op in both pointer directions', () => {
+        const file = '.github/workflows/pr.yaml', original = 'on:\n  pull_request_target:\n'
+        for (const direction of ['point', 'unpoint']) {
+            const result = run('ioshybrid', {[file]: original}, direction, FORCE)
+            expect(result.problems).toEqual([])
+            expect(result.files[file]).toBe(original)
+        }
     })
 })

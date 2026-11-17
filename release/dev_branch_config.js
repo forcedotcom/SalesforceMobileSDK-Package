@@ -30,14 +30,15 @@
 //
 // A "pointer" is anything in a repo that names the branch of another repo (or of itself):
 // #dev refs in package.json, branch="dev" in plugin.xml, hardcoded dev in scripts, the
-// branches list of pr.yaml, ...  `point` rewrites dev -> <branch>, `unpoint` is its exact inverse.
+// branches list of pr.yaml, ... `point` adds parallel refs, `unpoint` removes them.
 // Both are idempotent so they can be re-run after setversion.sh / merges rewrote things.
 //
 // Nothing in here touches git or the file system except listFiles(), which makes it unit testable.
 //
 
 const fs = require('fs'),
-      path = require('path')
+      path = require('path'),
+      ci = require('./dev_branch_ci.js')
 
 const BASE_BRANCH = 'dev'
 const MAIN_ORG = 'forcedotcom'
@@ -90,7 +91,17 @@ const SDK_REPO_REF = swapBranch('SalesforceMobileSDK-[\\w-]+(?:\\.git)?#')     /
 const POD_BRANCH = swapBranch('<pod [^>]*branch="')                           // plugin.xml
 const UPDATE_SH_CLONE = swapBranch('update_repo "\\$\\{(?:IOS_SDK|SHARED_SDK)_FOLDER\\}" "\\$\\{\\w+\\}" "')  // CordovaPlugin tools/update.sh
 const TEST_TEMPLATE_DEFAULT = swapBranch('\\$\\{(?:MSDK_IOS_BRANCH|MSDK_ANDROID_BRANCH|RN_FORCE_BRANCH):-')  // Templates test_template.sh
-const PR_BRANCHES = swapLiteral('branches: [dev, master]', b => `branches: [dev, ${b}, master]`)
+function prBranches(key) {
+    const transform = (content, ctx, removeBranch) => ci.planPrWorkflow(
+        content, MANIFEST[key].pr.event, ctx.branch, {removeBranch}).content
+    return {
+        point: (content, ctx) => transform(content, ctx, false),
+        unpoint: (content, ctx) => transform(content, ctx, true),
+        matches: (content, ctx) => {
+            try { transform(content, ctx, false); return true } catch (error) { return false }
+        }
+    }
+}
 const DANGER_IOS = swapLiteral('github.branch_for_base != "dev"', b => `!["dev", "${b}"].include?(github.branch_for_base)`)
 const DANGER_ANDROID = swapLiteral('!["dev", "dpop"].include?(github.branch_for_base)', b => `!["dev", "dpop", "${b}"].include?(github.branch_for_base)`)
 
@@ -124,7 +135,7 @@ const MANIFEST = {
         repo: 'SalesforceMobileSDK-iOS',
         pr: {workflow: PR_YAML, event: 'pull_request_target'},
         rules: [
-            {files: [PR_YAML], ...PR_BRANCHES},
+            {files: [PR_YAML], ...prBranches('ios')},
             {files: [DANGER], ...DANGER_IOS}
         ],
         nightly: [
@@ -142,7 +153,7 @@ const MANIFEST = {
         repo: 'SalesforceMobileSDK-Android',
         pr: {workflow: PR_YAML, event: 'pull_request_target'},
         rules: [
-            {files: [PR_YAML], ...PR_BRANCHES},
+            {files: [PR_YAML], ...prBranches('android')},
             {files: [DANGER], ...DANGER_ANDROID}
         ],
         forkExtra: ['.gitmodules'],
@@ -154,7 +165,7 @@ const MANIFEST = {
         repo: 'SalesforceMobileSDK-iOS-Hybrid',
         pr: {workflow: PR_YAML, event: 'pull_request_target'},
         rules: [
-            {files: [PR_YAML], ...PR_BRANCHES}
+            {files: [PR_YAML], ...prBranches('ioshybrid')}
         ],
         forkExtra: ['.gitmodules'],
         submodules: [{path: 'external/shared', dep: 'shared'}, {path: 'external/SalesforceMobileSDK-iOS', dep: 'ios'}],
@@ -164,7 +175,7 @@ const MANIFEST = {
         repo: 'SalesforceMobileSDK-ReactNative',
         pr: {workflow: PR_YAML, event: 'pull_request_target'},
         rules: [
-            {files: [PR_YAML], ...PR_BRANCHES},
+            {files: [PR_YAML], ...prBranches('reactnative')},
             {files: ['androidTests/package.json', 'iosTests/package.json'], ...SDK_REPO_REF}
         ],
         nightly: [{workflow: 'nightly.yaml', cron: '30 8 * * 2,4,6'}]
@@ -185,7 +196,7 @@ const MANIFEST = {
         repo: 'SalesforceMobileSDK-Templates',
         pr: {workflow: PR_YAML, event: 'pull_request_target'},
         rules: [
-            {files: [PR_YAML], ...PR_BRANCHES},
+            {files: [PR_YAML], ...prBranches('templates')},
             {listFiles: templatePackageJsons, ...SDK_REPO_REF},
             {files: ['test_template.sh'], ...swapBranch('SalesforceMobileSDK-CordovaPlugin#')},
             {files: ['test_template.sh'], ...TEST_TEMPLATE_DEFAULT}
@@ -196,7 +207,7 @@ const MANIFEST = {
         repo: 'SalesforceMobileSDK-Package',
         pr: {workflow: PR_YAML, event: 'pull_request'},
         rules: [
-            {files: [PR_YAML], ...PR_BRANCHES},
+            {files: [PR_YAML], ...prBranches('pkg')},
             {files: ['shared/constants.js'], ...SDK_REPO_REF}
         ],
         nightly: [{workflow: 'nightly.yaml', cron: '0 13 * * 2,4'}]
@@ -239,11 +250,15 @@ function applyRules(repoKey, files, direction, ctx, rules) {
             if (required) problems.push(`${repoKey}: missing file ${relPath} (${label})`)
             return
         }
+        if (rule.matches && !rule.matches(out[relPath], ctx)) {
+            problems.push(`${repoKey}: ${relPath} has an unsupported PR workflow (${label}) - review the filter format`)
+            return
+        }
         const result = rule[direction](out[relPath], ctx)
         if (result !== out[relPath]) {
             out[relPath] = result
             changedPaths.add(relPath)
-        } else if (required && rule.point(out[relPath], ctx) === out[relPath]
+        } else if (required && !rule.matches && rule.point(out[relPath], ctx) === out[relPath]
                    && rule.unpoint(out[relPath], ctx) === out[relPath]) {
             problems.push(`${repoKey}: ${relPath} matches neither the dev nor the ${ctx.branch} form of rule ${label} - pointer rules need updating`)
         }

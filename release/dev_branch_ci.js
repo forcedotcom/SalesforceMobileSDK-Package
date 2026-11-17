@@ -84,8 +84,14 @@ function planPrWorkflow(content, event, branch, options = {}) {
         return scalar[1] || scalar[2] || scalar[3]
     })
     const ready = names.includes(branch)
-    if (ready && !options.quoteExistingBranch) return {ready: true, content}
-    if (ready) {
+    if (options.removeBranch) {
+        if (!ready) return {ready, content}
+        for (let index = names.length - 1; index >= 0; index--) {
+            if (names[index] === branch) tokens.splice(index, 1)
+        }
+    } else if (ready && !options.quoteExistingBranch) {
+        return {ready: true, content}
+    } else if (ready) {
         names.forEach((name, index) => { if (name === branch) tokens[index] = JSON.stringify(branch) })
     } else {
         const master = names.indexOf('master')

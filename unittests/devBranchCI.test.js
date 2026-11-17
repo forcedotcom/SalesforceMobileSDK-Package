@@ -261,4 +261,17 @@ describe('PR event filter planning', () => {
         expect(() => ci.planPrWorkflow(workflow('pull_request_target', `dev, ${branch}, master`),
             'pull_request_target', branch)).toThrow(/Unsupported PR trigger/)
     })
+
+    test.each(['dev141', '1.0'])('CI-generated filters compose with pointer add/remove for %s', branch => {
+        const original = workflow()
+        const generated = ci.planPrWorkflow(original, 'pull_request_target', branch).content
+        const ctx = {org: 'forcedotcom', branch}
+        const pointed = cfg.applyRules('ioshybrid', {[FILE]: generated}, 'point', ctx)
+        expect(pointed.problems).toEqual([])
+        expect(pointed.files[FILE]).toBe(generated)
+        const back = cfg.applyRules('ioshybrid', pointed.files, 'unpoint', ctx)
+        expect(back.problems).toEqual([])
+        expect(back.files[FILE]).toBe(original)
+        expect(cfg.applyRules('ioshybrid', back.files, 'unpoint', ctx).problems).toEqual([])
+    })
 })
