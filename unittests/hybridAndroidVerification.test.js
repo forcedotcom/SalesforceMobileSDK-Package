@@ -110,13 +110,16 @@ describe('hybrid Android consumer verification', () => {
             .toThrow('Resolved Cordova framework');
     });
 
-    it('rejects unresolved OAuth redirect placeholders after platform recreation', () => {
-        write('platforms/android/app/src/main/AndroidManifest.xml',
-            '<manifest><data scheme="__INSERT_CALLBACK_URL_SCHEME_HERE__"/></manifest>');
+    it.each(['__INSERT_CALLBACK_URL_SCHEME_HERE__',
+        '__INSERT_CALLBACK_URL_HOST_HERE__', '__INSERT_CALLBACK_URL_PATH_HERE__'])(
+        'identifies an unresolved OAuth redirect placeholder: %s', token => {
+            write('platforms/android/app/src/main/AndroidManifest.xml',
+                '<manifest><data scheme="' + token + '"/></manifest>');
 
-        expect(() => verifyHybridAndroidApp({projectDir, expectedVersion: version, run}))
-            .toThrow('Unresolved template placeholders');
-    });
+            expect(() => verifyHybridAndroidApp({projectDir, expectedVersion: version, run}))
+                .toThrow('Unresolved template placeholders in AndroidManifest.xml ('
+                    + token + '); restore app configuration');
+        });
 
     it('rejects an APK that still contains the old Cordova JavaScript', () => {
         packagedJs = "var PLATFORM_VERSION_BUILD_LABEL = '15.0.0';\n";

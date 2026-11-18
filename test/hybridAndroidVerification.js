@@ -62,8 +62,10 @@ function verifyHybridAndroidApp({projectDir, expectedVersion,
     }
     const manifest = fs.readFileSync(path.join(androidDir, 'app', 'src', 'main',
         'AndroidManifest.xml'), 'utf8');
-    if (/__INSERT_[A-Z_]+__/.test(manifest)) {
-        throw new Error('Unresolved template placeholders in AndroidManifest.xml; restore app configuration');
+    const unresolvedPlaceholder = manifest.match(/__INSERT_[A-Z_]+__/);
+    if (unresolvedPlaceholder) {
+        throw new Error('Unresolved template placeholders in AndroidManifest.xml ('
+            + unresolvedPlaceholder[0] + '); restore app configuration');
     }
 
     const dependencyArgs = ['--console=plain', ':app:dependencyInsight',
