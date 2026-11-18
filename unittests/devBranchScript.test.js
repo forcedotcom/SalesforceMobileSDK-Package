@@ -46,9 +46,9 @@ function lifecycleFixture(branch) {
     run(`git clone -q ${origin} ${seed}`, root)
     fs.mkdirSync(path.join(seed, '.github/workflows'), {recursive: true})
     fs.writeFileSync(path.join(seed, '.github/workflows/pr.yaml'),
-        'on:\n  pull_request_target:\n    branches: [dev, master]\n')
+        "on:\n  pull_request_target:\n    branches: [dev, 'dev[0-9]*', master]\n")
     fs.mkdirSync(path.join(seed, 'unittests'))
-    fs.writeFileSync(path.join(seed, 'unittests/devBranchCI.test.js'), `// Tool fixture for ${branch}\n`)
+    fs.writeFileSync(path.join(seed, 'unittests/devBranchScript.test.js'), `// Tool fixture for ${branch}\n`)
     ;['androidTests', 'iosTests'].forEach(name => {
         fs.mkdirSync(path.join(seed, name))
         fs.writeFileSync(path.join(seed, name, 'package.json'), pkgJson('dev'))
@@ -86,20 +86,19 @@ if (args[0] === 'api') {
 }
 
 describe('dev_branch.js', () => {
-    test.each(['dev141', '1.0'])('complete parallel-branch CLI lifecycle for %s', branch => {
+    test.each(['dev141', 'dev150'])('complete glob-filter CLI lifecycle for %s', branch => {
         const f = lifecycleFixture(branch)
         f.cli('setup')
-        f.cli('verify-pr-ci', 1)
-        f.cli('pr-ci')
-        f.land(`pr-ci-${branch}`, 'dev')
-        f.cli('verify-pr-ci')
+        f.cli('point')
+        fs.writeFileSync(path.join(f.seed, 'src.txt'), 'dev advances\n')
+        run(`git checkout -q dev && git add -A && ${GIT} commit -qm advance && git push -q origin dev`, f.seed)
         f.cli('sync')
         const syncBranch = run('git branch --list --format="%(refname:short)" "sync-dev-into-*"', f.dir).trim()
         f.land(syncBranch, branch)
         f.cli('mergeback')
         f.land(`${branch}-merge-back`, 'dev')
         f.cli('verify')
-        expect(run('git show origin/dev:.github/workflows/pr.yaml', f.dir)).toContain('branches: [dev, master]')
+        expect(run('git show origin/dev:.github/workflows/pr.yaml', f.dir)).toContain("branches: [dev, 'dev[0-9]*', master]")
         expect(run('git show origin/dev:androidTests/package.json', f.dir)).toContain('#dev"')
     })
 
@@ -177,7 +176,7 @@ describe('dev_branch.js', () => {
         fs.mkdirSync(path.join(f.seed, 'release'))
         fs.writeFileSync(path.join(f.seed, 'release/README.md'), 'use dev141\n')
         fs.mkdirSync(path.join(f.seed, 'unittests'))
-        fs.writeFileSync(path.join(f.seed, 'unittests/devBranchCI.test.js'), '// Tool fixture for dev141\n')
+        fs.writeFileSync(path.join(f.seed, 'unittests/devBranchScript.test.js'), '// Tool fixture for dev141\n')
         run(`git add -A && ${GIT} commit -qm doc && git push -q origin dev`, f.seed)
         commitSeed(f, 'androidTests/package.json', pkgJson('dev141'), 'dev141', 'point')
         run('git fetch -q origin', f.dir)
@@ -189,7 +188,7 @@ describe('dev_branch.js', () => {
         run('git fetch -q origin', f.dir)
         const remaining = script.grepRef(f.dir, 'origin/dev', 'dev141')
         expect(remaining).toContain('unittests/runtimeDependency.test.js')
-        expect(remaining).not.toContain('unittests/devBranchCI.test.js')
+        expect(remaining).not.toContain('unittests/devBranchScript.test.js')
         expect(() => script.grepRef(f.dir, 'origin/does-not-exist', 'dev141')).toThrow()
     })
 })

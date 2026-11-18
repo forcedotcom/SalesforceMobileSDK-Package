@@ -162,24 +162,95 @@ describe('dev_branch_config', () => {
         expect(cfg.MANIFEST.iosspm.rules).toEqual([])
         expect(run('iosspm', {}, 'point', FORCE).problems).toEqual([])
     })
+    test.each(['ios', 'android', 'ioshybrid', 'reactnative', 'templates', 'pkg'])(
+        '%s keeps the persistent release glob while pointing and unpointing dependencies', key => {
+            const file = '.github/workflows/pr.yaml'
+            const workflow = "on:\n  pull_request_target:\n    branches: [dev, 'dev[0-9]*', master]\n"
+            const original = {...FIXTURES[key], [file]: workflow}
+            const pointed = run(key, original, 'point', FORCE)
+            expect(pointed.problems).toEqual([])
+            expect(pointed.files[file]).toBe(workflow)
+            const back = run(key, pointed.files, 'unpoint', FORCE)
+            expect(back.problems).toEqual([])
+            expect(back.files).toEqual(original)
+        })
 
-    test('CI pointer cleanup preserves other branch values and quoted entries', () => {
+    test.each(['devops', 'dev/141', '1.0'])(
+        'a release glob does not silently accept an uncovered branch %s', branch => {
+            const file = '.github/workflows/pr.yaml'
+            const workflow = "on:\n  pull_request_target:\n    branches: [dev, 'dev[0-9]*', master]\n"
+            const result = run('ioshybrid', {[file]: workflow}, 'point', {...FORCE, branch})
+            expect(result.problems).toHaveLength(1)
+            expect(result.files[file]).toBe(workflow)
+        })
+
+    test.each([
+        "on:\n  push:\n    branches: [dev, 'dev[0-9]*', master]\n  pull_request_target:\n    branches: [main]\n",
+        "on:\n  pull_request_target:\n    branches-ignore: [dev141]\n",
+        "on:\n  pull_request_target:\n    branches: [dev, 'dev[0-9]*', master]\n    branches-ignore: [dev141]\n",
+        "on:\n  pull_request_target:\n    branches: [dev, 'dev[0-9]*', master]\n  pull_request:\n    branches: [main]\n"
+    ])('unsupported or unrelated filters still require review', workflow => {
         const file = '.github/workflows/pr.yaml'
-        const original = 'on:\n  pull_request_target:\n    branches: [dev, stable, "master"]\n'
-        const pointed = run('ioshybrid', {[file]: original}, 'point', FORCE)
-        expect(pointed.problems).toEqual([])
-        expect(pointed.files[file]).toContain('[dev, stable, "dev141", "master"]')
-        const back = run('ioshybrid', pointed.files, 'unpoint', FORCE)
-        expect(back.problems).toEqual([])
-        expect(back.files[file]).toBe(original)
+        const result = run('ioshybrid', {[file]: workflow}, 'point', FORCE)
+        expect(result.problems).toHaveLength(1)
+        expect(result.files[file]).toBe(workflow)
     })
 
-    test('an unfiltered CI event is a valid no-op in both pointer directions', () => {
-        const file = '.github/workflows/pr.yaml', original = 'on:\n  pull_request_target:\n'
+    test('an unrestricted PR event remains unchanged during both lifecycle directions', () => {
+        const file = '.github/workflows/pr.yaml', workflow = 'on:\n  pull_request_target:\n'
         for (const direction of ['point', 'unpoint']) {
-            const result = run('ioshybrid', {[file]: original}, direction, FORCE)
+            const result = run('ioshybrid', {[file]: workflow}, direction, FORCE)
             expect(result.problems).toEqual([])
-            expect(result.files[file]).toBe(original)
+            expect(result.files[file]).toBe(workflow)
         }
     })
+
+    test.each(['1.0', '00141', 'True'])('legacy filters preserve branch %s as a string', branch => {
+        const file = '.github/workflows/pr.yaml'
+        const original = {[file]: 'on:\n  pull_request_target:\n    branches: [dev, master]\n'}
+        const ctx = {...FORCE, branch}
+        const pointed = run('ioshybrid', original, 'point', ctx)
+        expect(pointed.problems).toEqual([])
+        const value = pointed.files[file].match(/branches: \[dev, (.+), master\]/)[1]
+        expect(JSON.parse(value)).toBe(branch)
+        expect(run('ioshybrid', pointed.files, 'unpoint', ctx).files).toEqual(original)
+    })
+
+    test('the PR rule leaves an unrelated push filter alone', () => {
+        const file = '.github/workflows/pr.yaml'
+        const original = {[file]: "on:\n  push:\n    branches: [dev, master]\n  pull_request_target:\n    branches: [dev, 'dev[0-9]*', master]\n"}
+        const pointed = run('ioshybrid', original, 'point', FORCE)
+        expect(pointed.problems).toEqual([])
+        expect(pointed.files).toEqual(original)
+        expect(run('ioshybrid', original, 'point', {...FORCE, branch: 'devops'}).problems).toHaveLength(1)
+    })
+
+    test.each(["'branches'", '"branches"', ' branches'])(
+        'an unsupported %s key is not mistaken for an unrestricted event', key => {
+            const file = '.github/workflows/pr.yaml'
+            const original = {[file]: `on:\n  pull_request_target:\n    ${key}: [main]\n`}
+            const result = run('ioshybrid', original, 'point', FORCE)
+            expect(result.problems).toHaveLength(1)
+            expect(result.files).toEqual(original)
+        })
+
+    test('CRLF and comments survive a scoped legacy rewrite and cleanup', () => {
+        const file = '.github/workflows/pr.yaml'
+        const original = {[file]: 'on:\r\n  pull_request_target: # retained\r\n    branches: [dev, master] # retained\r\n'}
+        const pointed = run('ioshybrid', original, 'point', FORCE)
+        expect(pointed.problems).toEqual([])
+        expect(pointed.files[file]).toContain('"dev141"')
+        expect(run('ioshybrid', pointed.files, 'unpoint', FORCE).files).toEqual(original)
+    })
+
+    test('ordinary pull_request filters use the same persistent branch policy', () => {
+        const file = '.github/workflows/pr.yaml'
+        const original = {...FIXTURES.pkg, [file]: "on:\n  pull_request:\n    branches: [dev, 'dev[0-9]*', master]\n"}
+        const result = run('pkg', original, 'point', FORCE)
+        expect(result.problems).toEqual([])
+        expect(result.files[file]).toBe(original[file])
+        expect(result.files['shared/constants.js']).toContain('#dev141')
+        expect(run('pkg', result.files, 'unpoint', FORCE).files).toEqual(original)
+    })
+
 })

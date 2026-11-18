@@ -30,15 +30,14 @@
 //
 // A "pointer" is anything in a repo that names the branch of another repo (or of itself):
 // #dev refs in package.json, branch="dev" in plugin.xml, hardcoded dev in scripts, the
-// branches list of pr.yaml, ... `point` adds parallel refs, `unpoint` removes them.
+// branches list of pr.yaml, ...  `point` rewrites dev -> <branch>, `unpoint` is its exact inverse.
 // Both are idempotent so they can be re-run after setversion.sh / merges rewrote things.
 //
 // Nothing in here touches git or the file system except listFiles(), which makes it unit testable.
 //
 
 const fs = require('fs'),
-      path = require('path'),
-      ci = require('./dev_branch_ci.js')
+      path = require('path')
 
 const BASE_BRANCH = 'dev'
 const MAIN_ORG = 'forcedotcom'
@@ -91,16 +90,57 @@ const SDK_REPO_REF = swapBranch('SalesforceMobileSDK-[\\w-]+(?:\\.git)?#')     /
 const POD_BRANCH = swapBranch('<pod [^>]*branch="')                           // plugin.xml
 const UPDATE_SH_CLONE = swapBranch('update_repo "\\$\\{(?:IOS_SDK|SHARED_SDK)_FOLDER\\}" "\\$\\{\\w+\\}" "')  // CordovaPlugin tools/update.sh
 const TEST_TEMPLATE_DEFAULT = swapBranch('\\$\\{(?:MSDK_IOS_BRANCH|MSDK_ANDROID_BRANCH|RN_FORCE_BRANCH):-')  // Templates test_template.sh
-function prBranches(key) {
-    const transform = (content, ctx, removeBranch) => ci.planPrWorkflow(
-        content, MANIFEST[key].pr.event, ctx.branch, {removeBranch}).content
-    return {
-        point: (content, ctx) => transform(content, ctx, false),
-        unpoint: (content, ctx) => transform(content, ctx, true),
-        matches: (content, ctx) => {
-            try { transform(content, ctx, false); return true } catch (error) { return false }
+/*
+ * Persistent release filters need no per-branch rewrite. Recognize only the
+ * standard PR event shape and approved glob; other filters still require review.
+ * This checks pointer-rule compatibility, not hosted workflow execution.
+ */
+function rewritePrBranches(content, ctx, removeBranch = false) {
+    const events = [...content.matchAll(/^  pull_request(?:_target)?:[ \t]*(?:#[^\r\n]*)?\r?$/gm)]
+    if (events.length !== 1) return null
+    const event = events[0]
+    const parent = content.slice(0, event.index).split(/\r?\n/).filter(line => /^\S/.test(line)).pop()
+    if (!/^(?:on|'on'|"on"):[ \t]*(?:#.*)?$/.test(parent || '')) return null
+    const start = event.index + event[0].length
+    const body = content.slice(start).split(/\r?\n(?=\S|  \S)/)[0]
+    let sequence = false
+    for (const line of body.split(/\r?\n/)) {
+        if (/^\s*(?:#.*)?$/.test(line)) continue
+        if (/^    (?:paths|paths-ignore|types):(?:\s|$)/.test(line)) {
+            sequence = true
+            continue
         }
+        if (/^    branches(?:-ignore)?:/.test(line)) {
+            sequence = false
+            continue
+        }
+        if (sequence && /^      -(?:\s|$)/.test(line)) continue
+        return null
     }
+    const filters = [...body.matchAll(/^    branches(?:-ignore)?:[^\r\n]*/gm)]
+    if (!filters.length) return {content}
+    if (filters.length !== 1) return null
+    const filter = filters[0]
+    const parts = filter[0].match(/^(    branches:[ \t]*)\[(.*)\]([ \t]*(?:#.*)?)$/)
+    if (!parts) return null
+    const values = parts[2].trim()
+    if (/^dev,[ \t]*(['"])dev\[0-9\]\*\1,[ \t]*master$/.test(values)) {
+        return /^(?:dev|master|dev[0-9][^/]*)$/.test(ctx.branch) ? {content} : null
+    }
+    const quoted = `dev, ${JSON.stringify(ctx.branch)}, master`
+    const safePlain = /^[A-Za-z_][\w./-]*$/.test(ctx.branch) && !/^(?:true|false|null)$/i.test(ctx.branch)
+    const pointed = values === quoted || (safePlain && values === `dev, ${ctx.branch}, master`)
+    if (values !== 'dev, master' && !pointed) return null
+    if (removeBranch ? !pointed : pointed) return {content}
+    const replacement = parts[1] + '[' + (removeBranch ? 'dev, master' : quoted) + ']' + parts[3]
+    const offset = start + filter.index
+    return {content: content.slice(0, offset) + replacement + content.slice(offset + filter[0].length)}
+}
+
+const PR_BRANCHES = {
+    point: (content, ctx) => (rewritePrBranches(content, ctx) || {content}).content,
+    unpoint: (content, ctx) => (rewritePrBranches(content, ctx, true) || {content}).content,
+    matches: (content, ctx) => rewritePrBranches(content, ctx) !== null
 }
 const DANGER_IOS = swapLiteral('github.branch_for_base != "dev"', b => `!["dev", "${b}"].include?(github.branch_for_base)`)
 const DANGER_ANDROID = swapLiteral('!["dev", "dpop"].include?(github.branch_for_base)', b => `!["dev", "dpop", "${b}"].include?(github.branch_for_base)`)
@@ -133,9 +173,8 @@ const MANIFEST = {
     },
     ios: {
         repo: 'SalesforceMobileSDK-iOS',
-        pr: {workflow: PR_YAML, event: 'pull_request_target'},
         rules: [
-            {files: [PR_YAML], ...prBranches('ios')},
+            {files: [PR_YAML], ...PR_BRANCHES},
             {files: [DANGER], ...DANGER_IOS}
         ],
         nightly: [
@@ -151,9 +190,8 @@ const MANIFEST = {
     },
     android: {
         repo: 'SalesforceMobileSDK-Android',
-        pr: {workflow: PR_YAML, event: 'pull_request_target'},
         rules: [
-            {files: [PR_YAML], ...prBranches('android')},
+            {files: [PR_YAML], ...PR_BRANCHES},
             {files: [DANGER], ...DANGER_ANDROID}
         ],
         forkExtra: ['.gitmodules'],
@@ -163,9 +201,8 @@ const MANIFEST = {
     },
     ioshybrid: {
         repo: 'SalesforceMobileSDK-iOS-Hybrid',
-        pr: {workflow: PR_YAML, event: 'pull_request_target'},
         rules: [
-            {files: [PR_YAML], ...prBranches('ioshybrid')}
+            {files: [PR_YAML], ...PR_BRANCHES}
         ],
         forkExtra: ['.gitmodules'],
         submodules: [{path: 'external/shared', dep: 'shared'}, {path: 'external/SalesforceMobileSDK-iOS', dep: 'ios'}],
@@ -173,9 +210,8 @@ const MANIFEST = {
     },
     reactnative: {
         repo: 'SalesforceMobileSDK-ReactNative',
-        pr: {workflow: PR_YAML, event: 'pull_request_target'},
         rules: [
-            {files: [PR_YAML], ...prBranches('reactnative')},
+            {files: [PR_YAML], ...PR_BRANCHES},
             {files: ['androidTests/package.json', 'iosTests/package.json'], ...SDK_REPO_REF}
         ],
         nightly: [{workflow: 'nightly.yaml', cron: '30 8 * * 2,4,6'}]
@@ -194,9 +230,8 @@ const MANIFEST = {
     },
     templates: {
         repo: 'SalesforceMobileSDK-Templates',
-        pr: {workflow: PR_YAML, event: 'pull_request_target'},
         rules: [
-            {files: [PR_YAML], ...prBranches('templates')},
+            {files: [PR_YAML], ...PR_BRANCHES},
             {listFiles: templatePackageJsons, ...SDK_REPO_REF},
             {files: ['test_template.sh'], ...swapBranch('SalesforceMobileSDK-CordovaPlugin#')},
             {files: ['test_template.sh'], ...TEST_TEMPLATE_DEFAULT}
@@ -205,9 +240,8 @@ const MANIFEST = {
     },
     pkg: {
         repo: 'SalesforceMobileSDK-Package',
-        pr: {workflow: PR_YAML, event: 'pull_request_target'},
         rules: [
-            {files: [PR_YAML], ...prBranches('pkg')},
+            {files: [PR_YAML], ...PR_BRANCHES},
             {files: ['shared/constants.js'], ...SDK_REPO_REF}
         ],
         nightly: [{workflow: 'nightly.yaml', cron: '0 13 * * 2,4'}]
@@ -250,15 +284,12 @@ function applyRules(repoKey, files, direction, ctx, rules) {
             if (required) problems.push(`${repoKey}: missing file ${relPath} (${label})`)
             return
         }
-        if (rule.matches && !rule.matches(out[relPath], ctx)) {
-            problems.push(`${repoKey}: ${relPath} has an unsupported PR workflow (${label}) - review the filter format`)
-            return
-        }
         const result = rule[direction](out[relPath], ctx)
         if (result !== out[relPath]) {
             out[relPath] = result
             changedPaths.add(relPath)
-        } else if (required && !rule.matches && rule.point(out[relPath], ctx) === out[relPath]
+        } else if (required && !(rule.matches && rule.matches(out[relPath], ctx))
+                   && rule.point(out[relPath], ctx) === out[relPath]
                    && rule.unpoint(out[relPath], ctx) === out[relPath]) {
             problems.push(`${repoKey}: ${relPath} matches neither the dev nor the ${ctx.branch} form of rule ${label} - pointer rules need updating`)
         }
@@ -341,8 +372,8 @@ ${dispatches}
 
 // Files that legitimately mention the branch name after merge-back: the tool, its docs and tests,
 // lock files. `verify` ignores them.
-const VERIFY_EXCLUDES = ['release/dev_branch*.js', 'release/README.md', 'unittests/devBranch*.test.js',
-                         '**/*.lock', '**/package-lock.json']
+const VERIFY_EXCLUDES = ['release/dev_branch*.js', 'release/README.md', 'unittests/devBranchConfig.test.js',
+                         'unittests/devBranchScript.test.js', '**/*.lock', '**/package-lock.json']
 
 function dispatcherPath(branch) {
     return `.github/workflows/nightly-${branch}.yaml`
