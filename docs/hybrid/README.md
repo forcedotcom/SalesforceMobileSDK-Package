@@ -51,7 +51,7 @@ module.exports = {
             minVersion: '13.0.0',
 //             pluginRepoUri: 'salesforce-mobilesdk-cordova-plugin@v' + VERSION, // GA
             platformVersion: {
-                ios: '7.1.1',
+                ios: '8.2.0',
                 android: '15.0.0'
             }
         },
@@ -75,6 +75,18 @@ The dev/GA toggle is managed automatically by `setversion.sh` — do not edit th
 The script uncomments all `*RepoUri` lines, then comments out the ones that don't apply:
 - **Dev** (`-d yes`): comments out lines pointing to a version tag (`@#v`), leaving `#dev` active.
 - **GA** (`-d no`): comments out lines pointing to `#dev`, leaving versioned URIs like `salesforce-mobilesdk-cordova-plugin@v14.0.0` active.
+
+## Matched iOS Hybrid source promotion
+
+For hybrid apps whose selected platforms include iOS, validate the Package CLI, plugin and Hybrid source as a matched set before promoting a Cordova upgrade on `dev` or a numbered development branch. When the selected development configuration pins the plugin to an immutable commit, its iOS pod declaration must select the matching Hybrid commit. Make both reviewed commits available through their declared upstream Git URLs and validate a fresh app without local source mappings. Publish Hybrid first, then the matching plugin, then Package. Squash or rebase changes require updating the dependent pins to the final upstream commit IDs and repeating that validation. Review-time local commits alone are not a publishable release set.
+
+GA package selection and development configurations without matched pins retain the release tooling's existing source selection. Review and refresh the configured SDK version, branch selector and matched development pins in `shared/constants.js` for each upgrade or branch promotion; these pins are not carried automatically into another release.
+
+## Cordova iOS upgrade validation
+
+Use the [upgrade validation matrix](cordova-upgrade-validation.md) to record the source set and the coverage exercised.
+
+On each Cordova iOS upgrade, check whether [apache/cordova-ios issue 1751](https://github.com/apache/cordova-ios/issues/1751) is fixed. CordovaPlugin's `tools/cordova-ios-podfile.js` compatibility hook is gated to exactly 8.2.0. If the issue remains, extend the version gate to the newly validated version. If it is fixed, remove the hook, its `plugin.xml` registrations and its tests.
 
 ## `createHybridApp()` Step-by-Step Workflow
 
@@ -111,7 +123,7 @@ Required by the Android post-install hook (`postinstall-android.js`) that runs d
 For each platform in the comma-separated list (ios, android, or both):
 
 ```bash
-cordova platform add ios@7.1.1
+cordova platform add ios@8.2.0
 cordova platform add android@15.0.0
 ```
 
