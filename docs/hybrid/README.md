@@ -78,9 +78,15 @@ The script uncomments all `*RepoUri` lines, then comments out the ones that don'
 
 ## Matched iOS Hybrid source promotion
 
-For SDK 14.1 hybrid apps whose selected platforms include iOS and whose default source is `dev141`, the plugin URI selects an immutable plugin commit whose iOS pod declaration selects the matching Hybrid commit. Before promoting this default, make both reviewed commits available through their declared upstream Git URLs and validate a fresh app without local source mappings. Publish Hybrid first, then the matching plugin, then Package. Squash or rebase changes require updating the dependent pins to the final upstream commit IDs and repeating that validation. Review-time local commits alone are not a publishable release set.
+For hybrid apps whose selected platforms include iOS, validate the Package CLI, plugin and Hybrid source as a matched set before promoting a Cordova upgrade on `dev` or a numbered development branch. When the selected development configuration pins the plugin to an immutable commit, its iOS pod declaration must select the matching Hybrid commit. Make both reviewed commits available through their declared upstream Git URLs and validate a fresh app without local source mappings. Publish Hybrid first, then the matching plugin, then Package. Squash or rebase changes require updating the dependent pins to the final upstream commit IDs and repeating that validation. Review-time local commits alone are not a publishable release set.
 
-GA package selection and other SDK versions/development branches retain the release tooling's existing source selection. Review and refresh the matched development pins for each subsequent upgrade; this reviewed pin is not carried automatically into another release.
+GA package selection and development configurations without matched pins retain the release tooling's existing source selection. Review and refresh the configured SDK version, branch selector and matched development pins in `shared/constants.js` for each upgrade or branch promotion; these pins are not carried automatically into another release.
+
+## Cordova iOS upgrade validation
+
+Use the [upgrade validation matrix](cordova-upgrade-validation.md) to record the source set and the coverage exercised.
+
+On each Cordova iOS upgrade, check whether [apache/cordova-ios issue 1751](https://github.com/apache/cordova-ios/issues/1751) is fixed. CordovaPlugin's `tools/cordova-ios-podfile.js` compatibility hook is gated to exactly 8.2.0. If the issue remains, extend the version gate to the newly validated version. If it is fixed, remove the hook, its `plugin.xml` registrations and its tests.
 
 ## `createHybridApp()` Step-by-Step Workflow
 
