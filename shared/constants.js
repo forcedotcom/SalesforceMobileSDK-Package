@@ -60,12 +60,12 @@ module.exports = {
         },
         cordova: {
             checkCmd: 'cordova -v',
-            pluginRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-CordovaPlugin#dev141',    // dev
+            pluginRepoUri: 'https://github.com/JohnsonEricAtSalesforce/SalesforceMobileSDK-CordovaPlugin#feature/hybrid-android-move-to-cordova-android-15-1-0',    // dev
             minVersion: '13.0.0',
 //             pluginRepoUri: 'salesforce-mobilesdk-cordova-plugin@v' + VERSION, // GA
             platformVersion: {
                 ios: '8.1.0',
-                android: '15.0.0'
+                android: '15.1.0'
             }
         },
         sf: {
@@ -79,7 +79,7 @@ module.exports = {
         android: 'Android Studio'
     },
 
-    templatesRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-Templates#dev141',    // dev
+    templatesRepoUri: 'https://github.com/JohnsonEricAtSalesforce/SalesforceMobileSDK-Templates#feature/hybrid-android-move-to-cordova-android-15-1-0',    // dev
 //     templatesRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-Templates#v' + VERSION, // GA
 
     forceclis: {
