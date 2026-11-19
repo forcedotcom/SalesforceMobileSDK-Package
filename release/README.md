@@ -208,7 +208,7 @@ Or set up fresh test branches by running `setup_test_branches.js` again (it dele
 
 ## dev_branch.js — Parallel development branch (e.g. `dev141`)
 
-Use when `dev` holds changes for a patch release that hasn't shipped and the next minor version's work must start. Creates `dev141` in Shared, iOS, iOS-SPM, Android, iOS-Hybrid, ReactNative, CordovaPlugin, Templates and Package, with every cross-repo pointer (submodule pins, `#dev` in package.json, `branch="dev"` in plugin.xml, hardcoded `dev` in `tools/update.sh` and `test_template.sh`) re-pointed, and `dev141` added to `pr.yaml` and the iOS/Android Danger files. Pointer rules live in `dev_branch_config.js` (unit tested in `unittests/devBranchConfig.test.js`); `point`/`unpoint` are exact inverses and idempotent.
+Use when `dev` holds changes for a patch release that hasn't shipped and the next minor version's work must start. Creates `dev141` in Shared, iOS, iOS-SPM, Android, iOS-Hybrid, ReactNative, CordovaPlugin, Templates and Package, with every cross-repo pointer (submodule pins, `#dev` in package.json, `branch="dev"` in plugin.xml, hardcoded `dev` in `tools/update.sh` and `test_template.sh`) re-pointed, and legacy PR workflow filters plus the iOS/Android Danger files updated as needed. Pointer rules live in `dev_branch_config.js` (unit tested in `unittests/devBranchConfig.test.js`); `point`/`unpoint` are exact inverses and idempotent.
 
 ```bash
 node release/dev_branch.js <status|setup|point|sync|mergeback|verify|dispatcher> --org <org> --branch <name> [--dir <dir>] [--repos a,b] [--dry-run]
@@ -233,3 +233,11 @@ Rules:
 - `sync`/`mergeback` skip repos with nothing to merge, and re-running (or `--resume`) refreshes an already open PR instead of failing.
 - Not covered yet: UITests (`AppGenerator.kt`, `install.sh` hardcode `dev`) and the Workspace `install.sh`.
 - On forks, `runs-on: forcedotcom-ubuntu` in the workflows must be swapped for `ubuntu-latest` to run CI.
+
+### Persistent PR workflow coverage
+
+For workflows that support development and numbered release branches, use `branches: [dev, 'dev[0-9]*', master]`. The existing `point` and `unpoint` rules preserve that filter, so creating or merging back a release branch does not add or remove a workflow entry. Legacy `[dev, master]` lists still receive a quoted explicit branch entry; cleanup accepts older unquoted entries too. Unsupported filters require manual review.
+
+For `pull_request_target`, verify coverage in the repository's default-branch workflow before relying on a new release branch. GitHub loads that workflow from the default branch; `setup` only edits the new branch. See [GitHub's event documentation](https://docs.github.com/en/actions/reference/security/securely-using-pull_request_target). Review event policies and actor restrictions separately. An unrestricted PR event also needs no branch-filter rewrite.
+
+These rules do not create CI workflows or prerequisite PRs. Repositories without the required tests or workflow need a separate reviewed setup. Confirm actual hosted jobs, tested revisions and results after a representative PR event; pointer-rule compatibility does not establish test acceptance. Scheduled nightlies still use the separate dispatcher step.
