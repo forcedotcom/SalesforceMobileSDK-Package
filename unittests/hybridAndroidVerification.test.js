@@ -173,7 +173,15 @@ describe('hybrid Android consumer verification', () => {
             remoteResourcesRequired: true, run})).toThrow('static resource is missing');
     });
 
+    it('requires Android static resources when a generated Salesforce server project exists', () => {
+        write('server/sfdx-project.json', '{}');
+
+        expect(() => verifyHybridAndroidApp({projectDir, expectedVersion: version, run}))
+            .toThrow('Remote Cordova JavaScript static resource is missing');
+    });
+
     it('verifies every generated server asset against the platform and APK', () => {
+        write('server/sfdx-project.json', '{}');
         const platform = path.join(projectDir, 'platforms/android/platform_www');
         const remote = path.join(projectDir,
             'server/force-app/main/default/staticresources/cordovaandroid');

@@ -98,7 +98,9 @@ function verifyHybridAndroidApp({projectDir, expectedVersion,
     const remoteDir = path.join(projectDir, 'server', 'force-app', 'main',
         'default', 'staticresources', 'cordovaandroid');
     const hasRemoteResources = fs.existsSync(remoteDir);
-    if (remoteResourcesRequired && !hasRemoteResources) {
+    const hasServerProject = fs.existsSync(path.join(projectDir, 'server',
+        'sfdx-project.json'));
+    if ((remoteResourcesRequired || hasServerProject) && !hasRemoteResources) {
         throw new Error('Remote Cordova JavaScript static resource is missing');
     }
     const temporaryDir = fs.mkdtempSync(path.join(os.tmpdir(), 'hybrid-apk-'));
