@@ -1,0 +1,14 @@
+{
+  "name": "Mobile SDK CI Result",
+  "url": "https://github.com/forcedotcom",
+  "description": "Publishes the Mobile SDK CI result after independently checking approved validation workflows and PR execution provenance.",
+  "public": false,
+  "default_permissions": {
+    "actions": "read",
+    "checks": "write",
+    "contents": "read",
+    "pull_requests": "read"
+  },
+  "default_events": [],
+  "request_oauth_on_install": false
+}

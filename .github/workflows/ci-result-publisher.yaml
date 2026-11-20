@@ -1,0 +1,54 @@
+name: Publish Mobile SDK CI result
+
+on:
+  schedule:
+    - cron: '*/5 * * * *' # UTC; every five minutes in all time zones.
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mobile-sdk-ci-result-publisher
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: github.repository == 'forcedotcom/SalesforceMobileSDK-Package' && github.ref == 'refs/heads/dev'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    # Configure this environment to allow only branch dev. Store the App key
+    # here, never as an ordinary repository or organization Actions secret.
+    environment: mobile-sdk-ci-publisher
+    steps:
+      - name: Validate deployment configuration
+        env:
+          SOURCE_REVISION: ${{ vars.MSDK_CI_PUBLISHER_REVISION }}
+          APP_ID: ${{ vars.MSDK_CI_APP_ID }}
+        run: |
+          python3 - <<'PYTHON'
+          import os, re
+          if not re.fullmatch(r'[0-9a-f]{40}', os.environ['SOURCE_REVISION']):
+              raise SystemExit('Set the protected environment source revision to a reviewed commit SHA')
+          if not re.fullmatch(r'[1-9][0-9]*', os.environ['APP_ID']):
+              raise SystemExit('Set the dedicated GitHub App ID')
+          PYTHON
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          repository: forcedotcom/SalesforceMobileSDK-Package
+          ref: ${{ vars.MSDK_CI_PUBLISHER_REVISION }}
+          persist-credentials: false
+          sparse-checkout: .github/ci-result-publisher
+      - name: Publish independently verified CI results
+        env:
+          APP_ID: ${{ vars.MSDK_CI_APP_ID }}
+          APP_PRIVATE_KEY: ${{ secrets.MSDK_CI_APP_PRIVATE_KEY }}
+        run: |
+          umask 077
+          key_file="$RUNNER_TEMP/msdk-ci-app.pem"
+          trap 'rm -f "$key_file"' EXIT
+          printf '%s' "$APP_PRIVATE_KEY" > "$key_file"
+          unset APP_PRIVATE_KEY
+          python3 .github/ci-result-publisher/publisher.py \
+            --policy .github/ci-result-publisher/policy.json \
+            --app-id "$APP_ID" --key-file "$key_file" --write

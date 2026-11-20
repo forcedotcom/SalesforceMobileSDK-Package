@@ -1,0 +1,1311 @@
+{
+  "schema": 1,
+  "repositories": [
+    {
+      "repository": "forcedotcom/SalesforceMobileSDK-Android",
+      "repository_id": 2782691,
+      "branches": {
+        "dev": {
+          "audited_revision": "05a89a5ec37ac0aacbf1a76a2f0e562caef85ac4",
+          "workflows": [
+            {
+              "path": ".github/workflows/pr.yaml",
+              "id": 0,
+              "event": "pull_request_target",
+              "paths": [],
+              "paths_ignore": [
+                "**/*.md",
+                "LICENSE",
+                ".gitignore",
+                "CODEOWNERS"
+              ],
+              "configured_branches": [
+                "dev",
+                "dev[0-9]*",
+                "master"
+              ]
+            },
+            {
+              "path": ".github/workflows/ci-integrity.yaml",
+              "id": 0,
+              "event": "pull_request",
+              "paths": [],
+              "paths_ignore": []
+            }
+          ],
+          "trusted_files": {
+            ".github/DangerFiles/Gemfile": [
+              "559c551979e9dccbac567090d528ecd1d473eaf8"
+            ],
+            ".github/DangerFiles/Gemfile.lock": [
+              "78a979f5e599e2f33e70149225642c056f2328ae"
+            ],
+            ".github/DangerFiles/StaticAnalysis.rb": [
+              "4b5191e951cd49934e85371ae1d9a98fb2c5cc66"
+            ],
+            ".github/DangerFiles/TestOrchestrator.rb": [
+              "436e0eb71c336550cbdd09ee03fd9c0d6e2cdd6c"
+            ],
+            ".github/workflows/nightly.yaml": [
+              "1b3dceb9cd05ca8117af24409d0b642cfd145790"
+            ],
+            ".github/workflows/pr.yaml": [
+              "de6d67793474ad98287183a56126098fc7ba2a36"
+            ],
+            ".github/workflows/reusable-lib-workflow.yaml": [
+              "282f82a14272b75aea7072078e8937e1186367d2"
+            ],
+            ".github/workflows/reusable-ui-workflow.yaml": [
+              "96759360fbc4bab00250e4687ea1be87c8b7ff29"
+            ],
+            ".github/workflows/ci-integrity.yaml": [
+              "3832c170cc96a6959b0833be17e4268ce9066ec8"
+            ]
+          }
+        },
+        "dev141": {
+          "audited_revision": "d1a496325fa4e3efff1d4cac5031cb5e65dd6100",
+          "workflows": [
+            {
+              "path": ".github/workflows/pr.yaml",
+              "id": 0,
+              "event": "pull_request_target",
+              "paths": [],
+              "paths_ignore": [
+                "**/*.md",
+                "LICENSE",
+                ".gitignore",
+                "CODEOWNERS"
+              ],
+              "configured_branches": [
+                "dev",
+                "dev141",
+                "master"
+              ]
+            },
+            {
+              "path": ".github/workflows/ci-integrity.yaml",
+              "id": 0,
+              "event": "pull_request",
+              "paths": [],
+              "paths_ignore": []
+            }
+          ],
+          "trusted_files": {
+            ".github/DangerFiles/Gemfile": [
+              "559c551979e9dccbac567090d528ecd1d473eaf8"
+            ],
+            ".github/DangerFiles/Gemfile.lock": [
+              "78a979f5e599e2f33e70149225642c056f2328ae"
+            ],
+            ".github/DangerFiles/StaticAnalysis.rb": [
+              "4b5191e951cd49934e85371ae1d9a98fb2c5cc66"
+            ],
+            ".github/DangerFiles/TestOrchestrator.rb": [
+              "7b2a28d6719acbdfd11581bb5eebdd93b7734390"
+            ],
+            ".github/workflows/nightly.yaml": [
+              "0182ff1c51ead4abc6534860977ed89ddad4c566"
+            ],
+            ".github/workflows/pr.yaml": [
+              "149c2bfb3362bc32c868926c6a0890b968650e0b"
+            ],
+            ".github/workflows/reusable-lib-workflow.yaml": [
+              "040ab3af23ed8bea213e2cf419ba4adc06263e4c"
+            ],
+            ".github/workflows/reusable-ui-workflow.yaml": [
+              "27b4766e4bb9e06c9805d39cb8d03b438ff6de15"
+            ],
+            ".github/workflows/ci-integrity.yaml": [
+              "3832c170cc96a6959b0833be17e4268ce9066ec8"
+            ]
+          }
+        },
+        "master": {
+          "audited_revision": "ed4ba7773b3366776748863f2506de4e0b2a3a0a",
+          "workflows": [
+            {
+              "path": ".github/workflows/pr.yaml",
+              "id": 0,
+              "event": "pull_request_target",
+              "paths": [],
+              "paths_ignore": [
+                "**/*.md",
+                "LICENSE",
+                ".gitignore",
+                "CODEOWNERS"
+              ],
+              "configured_branches": [
+                "dev",
+                "master"
+              ]
+            },
+            {
+              "path": ".github/workflows/ci-integrity.yaml",
+              "id": 0,
+              "event": "pull_request",
+              "paths": [],
+              "paths_ignore": []
+            }
+          ],
+          "trusted_files": {
+            ".github/DangerFiles/Gemfile": [
+              "559c551979e9dccbac567090d528ecd1d473eaf8"
+            ],
+            ".github/DangerFiles/Gemfile.lock": [
+              "78a979f5e599e2f33e70149225642c056f2328ae"
+            ],
+            ".github/DangerFiles/StaticAnalysis.rb": [
+              "4b5191e951cd49934e85371ae1d9a98fb2c5cc66"
+            ],
+            ".github/DangerFiles/TestOrchestrator.rb": [
+              "436e0eb71c336550cbdd09ee03fd9c0d6e2cdd6c"
+            ],
+            ".github/workflows/nightly.yaml": [
+              "0182ff1c51ead4abc6534860977ed89ddad4c566"
+            ],
+            ".github/workflows/pr.yaml": [
+              "0cfb5a57e9a2ce240f58e646c86721f2baf3fb7a"
+            ],
+            ".github/workflows/reusable-lib-workflow.yaml": [
+              "040ab3af23ed8bea213e2cf419ba4adc06263e4c"
+            ],
+            ".github/workflows/reusable-ui-workflow.yaml": [
+              "96759360fbc4bab00250e4687ea1be87c8b7ff29"
+            ],
+            ".github/workflows/ci-integrity.yaml": [
+              "3832c170cc96a6959b0833be17e4268ce9066ec8"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "repository": "forcedotcom/SalesforceMobileSDK-CordovaPlugin",
+      "repository_id": 23411868,
+      "branches": {
+        "dev": {
+          "audited_revision": "2c59fa7a2c3e6516e1ebe0d63f75c74824c196ef",
+          "workflows": [
+            {
+              "path": ".github/workflows/cordova-ios-podfile.yaml",
+              "id": 0,
+              "event": "pull_request",
+              "paths": [
+                ".github/workflows/cordova-ios-podfile.yaml",
+                "tools/**",
+                "package.json",
+                "plugin.xml"
+              ],
+              "paths_ignore": [],
+              "configured_branches": [
+                "dev[0-9]*"
+              ]
+            },
+            {
+              "path": ".github/workflows/ci-integrity.yaml",
+              "id": 0,
+              "event": "pull_request",
+              "paths": [],
+              "paths_ignore": []
+            }
+          ],
+          "trusted_files": {
+            ".github/workflows/cordova-ios-podfile.yaml": [
+              "dd528e0b76229411afb9c50c6d0739b70d9160eb"
+            ],
+            ".github/workflows/ci-integrity.yaml": [
+              "dc3ff1b64c2d2f6368c969e6650dcb187af8425a"
+            ]
+          }
+        },
+        "dev141": {
+          "audited_revision": "7e30a49e037e863338797002b0fa6955d39eddf0",
+          "workflows": [
+            {
+              "path": ".github/workflows/cordova-ios-podfile.yaml",
+              "id": 0,
+              "event": "pull_request",
+              "paths": [
+                ".github/workflows/cordova-ios-podfile.yaml",
+                "tools/**",
+                "package.json",
+                "plugin.xml"
+              ],
+              "paths_ignore": [],
+              "configured_branches": [
+                "dev",
+                "dev[0-9]*",
+                "master"
+              ]
+            },
+            {
+              "path": ".github/workflows/ci-integrity.yaml",
+              "id": 0,
+              "event": "pull_request",
+              "paths": [],
+              "paths_ignore": []
+            }
+          ],
+          "trusted_files": {
+            ".github/workflows/cordova-ios-podfile.yaml": [
+              "a22349dde9b7767320e9fdd34aed30469530baf5"
+            ],
+            ".github/workflows/ci-integrity.yaml": [
+              "dc3ff1b64c2d2f6368c969e6650dcb187af8425a"
+            ]
+          }
+        },
+        "master": {
+          "audited_revision": "d74bc7eb8e28f0a29927b219d70294cc0febfc61",
+          "workflows": [
+            {
+              "path": ".github/workflows/ci-integrity.yaml",
+              "id": 0,
+              "event": "pull_request",
+              "paths": [],
+              "paths_ignore": []
+            }
+          ],
+          "trusted_files": {
+            ".github/workflows/ci-integrity.yaml": [
+              "dc3ff1b64c2d2f6368c969e6650dcb187af8425a"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "repository": "forcedotcom/SalesforceMobileSDK-Package",
+      "repository_id": 72245629,
+      "branches": {
+        "dev": {
+          "audited_revision": "4b89031b82958c87c15bb6f27e378b38e27ac053",
+          "workflows": [
+            {
+              "path": ".github/workflows/pr.yaml",
+              "id": 0,
+              "event": "pull_request",
+              "paths": [],
+              "paths_ignore": [
+                "**/*.md",
+                "LICENSE",
+                ".gitignore",
+                "CODEOWNERS"
+              ],
+              "configured_branches": [
+                "dev",
+                "dev[0-9]*",
+                "master"
+              ]
+            },
+            {
+              "path": ".github/workflows/ci-integrity.yaml",
+              "id": 0,
+              "event": "pull_request",
+              "paths": [],
+              "paths_ignore": []
+            }
+          ],
+          "trusted_files": {
+            ".github/workflows/android-reusable-workflow.yaml": [
+              "e3ef237767562d590ccafc28978086818a134940"
+            ],
+            ".github/workflows/ios-reusable-workflow.yaml": [
+              "73d536b019eb53c846d0118465b21a97e46ae689"
+            ],
+            ".github/workflows/nightly.yaml": [
+              "c3f04dbdcbd47a26e2cb26f641c5bd66e687b33a"
+            ],
+            ".github/workflows/pr.yaml": [
+              "0bfb8c7a3661968c97e8a6bc8ffdaf3e57ec9482"
+            ],
+            ".github/workflows/ci-integrity.yaml": [
+              "3832c170cc96a6959b0833be17e4268ce9066ec8"
+            ]
+          }
+        },
+        "dev141": {
+          "audited_revision": "6569edcfc9e240f72e6afd2eb1dd2a5764652ee0",
+          "workflows": [
+            {
+              "path": ".github/workflows/pr.yaml",
+              "id": 0,
+              "event": "pull_request",
+              "paths": [],
+              "paths_ignore": [
+                "**/*.md",
+                "LICENSE",
+                ".gitignore",
+                "CODEOWNERS"
+              ],
+              "configured_branches": [
+                "dev",
+                "dev141",
+                "master"
+              ]
+            },
+            {
+              "path": ".github/workflows/ci-integrity.yaml",
+              "id": 0,
+              "event": "pull_request",
+              "paths": [],
+              "paths_ignore": []
+            }
+          ],
+          "trusted_files": {
+            ".github/workflows/android-reusable-workflow.yaml": [
+              "323f2e444da99e2a79c4a1b25197adfc6bdf1487"
+            ],
+            ".github/workflows/ios-reusable-workflow.yaml": [
+              "73d536b019eb53c846d0118465b21a97e46ae689"
+            ],
+            ".github/workflows/nightly.yaml": [
+              "c3f04dbdcbd47a26e2cb26f641c5bd66e687b33a"
+            ],
+            ".github/workflows/pr.yaml": [
+              "367694a43fc5543ff0b6918541ea0ccf98a1a940"
+            ],
+            ".github/workflows/ci-integrity.yaml": [
+              "3832c170cc96a6959b0833be17e4268ce9066ec8"
+            ]
+          }
+        },
+        "master": {
+          "audited_revision": "adeb3c2d4f5965220a23d130c7f508d75b61fe55",
+          "workflows": [
+            {
+              "path": ".github/workflows/pr.yaml",
+              "id": 0,
+              "event": "pull_request",
+              "paths": [],
+              "paths_ignore": [
+                "**/*.md",
+                "LICENSE",
+                ".gitignore",
+                "CODEOWNERS"
+              ],
+              "configured_branches": [
+                "dev",
+                "master"
+              ]
+            },
+            {
+              "path": ".github/workflows/ci-integrity.yaml",
+              "id": 0,
+              "event": "pull_request",
+              "paths": [],
+              "paths_ignore": []
+            }
+          ],
+          "trusted_files": {
+            ".github/workflows/android-reusable-workflow.yaml": [
+              "323f2e444da99e2a79c4a1b25197adfc6bdf1487"
+            ],
+            ".github/workflows/ios-reusable-workflow.yaml": [
+              "73d536b019eb53c846d0118465b21a97e46ae689"
+            ],
+            ".github/workflows/nightly.yaml": [
+              "c3f04dbdcbd47a26e2cb26f641c5bd66e687b33a"
+            ],
+            ".github/workflows/pr.yaml": [
+              "9f7fc3e5f1e7450ef6a3565211f0dfacc5bb4ac1"
+            ],
+            ".github/workflows/ci-integrity.yaml": [
+              "3832c170cc96a6959b0833be17e4268ce9066ec8"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "repository": "forcedotcom/SalesforceMobileSDK-ReactNative",
+      "repository_id": 72247720,
+      "branches": {
+        "dev": {
+          "audited_revision": "ee8be6e340fbc775a57f6f010d50c672c5e7a2b7",
+          "workflows": [
+            {
+              "path": ".github/workflows/pr.yaml",
+              "id": 0,
+              "event": "pull_request_target",
+              "paths": [],
+              "paths_ignore": [
+                "**/*.md",
+                "LICENSE",
+                ".gitignore",
+                "CODEOWNERS"
+              ],
+              "configured_branches": [
+                "dev",
+                "dev[0-9]*",
+                "master"
+              ]
+            },
+            {
+              "path": ".github/workflows/ci-integrity.yaml",
+              "id": 0,
+              "event": "pull_request",
+              "paths": [],
+              "paths_ignore": []
+            }
+          ],
+          "trusted_files": {
+            ".github/workflows/nightly.yaml": [
+              "434dfe8898319db53f7c0d775a14149583ad4d0f"
+            ],
+            ".github/workflows/pr.yaml": [
+              "1fad7e1b79578c63ebb8beb179d87e193e01ebfc"
+            ],
+            ".github/workflows/reusable-android-workflow.yaml": [
+              "51714a1280b28a02fce54071d6ce85f0108bdb97"
+            ],
+            ".github/workflows/reusable-workflow.yaml": [
+              "271d0c9aae50756efd785bcda78290af905b5480"
+            ],
+            ".github/workflows/ci-integrity.yaml": [
+              "3832c170cc96a6959b0833be17e4268ce9066ec8"
+            ]
+          }
+        },
+        "dev141": {
+          "audited_revision": "1a9003764938feeb6b724640c3a6a49106c37b5b",
+          "workflows": [
+            {
+              "path": ".github/workflows/pr.yaml",
+              "id": 0,
+              "event": "pull_request_target",
+              "paths": [],
+              "paths_ignore": [
+                "**/*.md",
+                "LICENSE",
+                ".gitignore",
+                "CODEOWNERS"
+              ],
+              "configured_branches": [
+                "dev",
+                "dev141",
+                "master"
+              ]
+            },
+            {
+              "path": ".github/workflows/ci-integrity.yaml",
+              "id": 0,
+              "event": "pull_request",
+              "paths": [],
+              "paths_ignore": []
+            }
+          ],
+          "trusted_files": {
+            ".github/workflows/nightly.yaml": [
+              "434dfe8898319db53f7c0d775a14149583ad4d0f"
+            ],
+            ".github/workflows/pr.yaml": [
+              "069da1a0426b1dff45ab2c01c23fe4d4aa7dc7df"
+            ],
+            ".github/workflows/reusable-android-workflow.yaml": [
+              "51714a1280b28a02fce54071d6ce85f0108bdb97"
+            ],
+            ".github/workflows/reusable-workflow.yaml": [
+              "271d0c9aae50756efd785bcda78290af905b5480"
+            ],
+            ".github/workflows/ci-integrity.yaml": [
+              "3832c170cc96a6959b0833be17e4268ce9066ec8"
+            ]
+          }
+        },
+        "master": {
+          "audited_revision": "944810a973558c5a7aaeb78d10230783ca5c38fa",
+          "workflows": [
+            {
+              "path": ".github/workflows/pr.yaml",
+              "id": 0,
+              "event": "pull_request_target",
+              "paths": [],
+              "paths_ignore": [
+                "**/*.md",
+                "LICENSE",
+                ".gitignore",
+                "CODEOWNERS"
+              ],
+              "configured_branches": [
+                "dev",
+                "master"
+              ]
+            },
+            {
+              "path": ".github/workflows/ci-integrity.yaml",
+              "id": 0,
+              "event": "pull_request",
+              "paths": [],
+              "paths_ignore": []
+            }
+          ],
+          "trusted_files": {
+            ".github/workflows/nightly.yaml": [
+              "434dfe8898319db53f7c0d775a14149583ad4d0f"
+            ],
+            ".github/workflows/pr.yaml": [
+              "fcaca297fd3367bd8a957a96414d6f59f33fb787"
+            ],
+            ".github/workflows/reusable-android-workflow.yaml": [
+              "51714a1280b28a02fce54071d6ce85f0108bdb97"
+            ],
+            ".github/workflows/reusable-workflow.yaml": [
+              "271d0c9aae50756efd785bcda78290af905b5480"
+            ],
+            ".github/workflows/ci-integrity.yaml": [
+              "3832c170cc96a6959b0833be17e4268ce9066ec8"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "repository": "forcedotcom/SalesforceMobileSDK-Shared",
+      "repository_id": 2806605,
+      "branches": {
+        "dev": {
+          "audited_revision": "34c4a578c5781dcc745c821db00e8b0a6968827a",
+          "workflows": [
+            {
+              "path": ".github/workflows/ci-integrity.yaml",
+              "id": 0,
+              "event": "pull_request",
+              "paths": [],
+              "paths_ignore": []
+            }
+          ],
+          "trusted_files": {
+            ".github/workflows/ci-integrity.yaml": [
+              "8eab7c597d6c535d732cf45004757e0f2b110bba"
+            ]
+          }
+        },
+        "dev141": {
+          "audited_revision": "8e59a085591ebc245d8bc61ff9c1581e5f533950",
+          "workflows": [
+            {
+              "path": ".github/workflows/ci-integrity.yaml",
+              "id": 0,
+              "event": "pull_request",
+              "paths": [],
+              "paths_ignore": []
+            }
+          ],
+          "trusted_files": {
+            ".github/workflows/ci-integrity.yaml": [
+              "8eab7c597d6c535d732cf45004757e0f2b110bba"
+            ]
+          }
+        },
+        "master": {
+          "audited_revision": "e4580aafe5b57330cf5bdd8d2b197eb96c4ec20e",
+          "workflows": [
+            {
+              "path": ".github/workflows/ci-integrity.yaml",
+              "id": 0,
+              "event": "pull_request",
+              "paths": [],
+              "paths_ignore": []
+            }
+          ],
+          "trusted_files": {
+            ".github/workflows/ci-integrity.yaml": [
+              "8eab7c597d6c535d732cf45004757e0f2b110bba"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "repository": "forcedotcom/SalesforceMobileSDK-Templates",
+      "repository_id": 72050972,
+      "branches": {
+        "dev": {
+          "audited_revision": "1f7e1adcb2325a698326c5d2919921dfb08ec67e",
+          "workflows": [
+            {
+              "path": ".github/workflows/pr.yaml",
+              "id": 0,
+              "event": "pull_request",
+              "paths": [
+                "*/install.js",
+                "*/installios.js",
+                "*/installandroid.js",
+                "**/*.xcodeproj/**",
+                "**/*.xcworkspace/**",
+                "**/build.gradle",
+                "**/build.gradle.kts",
+                "**/settings.gradle",
+                "**/package.json",
+                "**/*.swift",
+                "**/*.kt",
+                "**/*.java",
+                "**/*.m",
+                "**/*.h",
+                "**/*.js",
+                "**/*.jsx",
+                "**/*.ts",
+                "**/*.tsx",
+                "templates.json",
+                "test_template.sh"
+              ],
+              "paths_ignore": [],
+              "configured_branches": [
+                "dev",
+                "dev[0-9]*",
+                "master"
+              ]
+            },
+            {
+              "path": ".github/workflows/ci-integrity.yaml",
+              "id": 0,
+              "event": "pull_request",
+              "paths": [],
+              "paths_ignore": []
+            }
+          ],
+          "trusted_files": {
+            ".github/workflows/android-reusable-workflow.yaml": [
+              "33992f967f4cd96171c7d3d64ee2fbb23d756668"
+            ],
+            ".github/workflows/ios-reusable-workflow.yaml": [
+              "ab82adfc1f90d53d33369247ffda7421b8717f9c"
+            ],
+            ".github/workflows/nightly.yaml": [
+              "dea4a33c8c34d481c3d12328c6898220432698f8"
+            ],
+            ".github/workflows/pr.yaml": [
+              "db8efab9bb3eb760ee6898d396dfe2091b6c1866"
+            ],
+            ".github/workflows/ci-integrity.yaml": [
+              "3832c170cc96a6959b0833be17e4268ce9066ec8"
+            ]
+          }
+        },
+        "dev141": {
+          "audited_revision": "b078b0926f21053854ead5b630df62a065522176",
+          "workflows": [
+            {
+              "path": ".github/workflows/pr.yaml",
+              "id": 0,
+              "event": "pull_request_target",
+              "paths": [
+                "*/install.js",
+                "*/installios.js",
+                "*/installandroid.js",
+                "**/*.xcodeproj/**",
+                "**/*.xcworkspace/**",
+                "**/build.gradle",
+                "**/build.gradle.kts",
+                "**/settings.gradle",
+                "**/package.json",
+                "**/*.swift",
+                "**/*.kt",
+                "**/*.java",
+                "**/*.m",
+                "**/*.h",
+                "**/*.js",
+                "**/*.jsx",
+                "**/*.ts",
+                "**/*.tsx",
+                "templates.json",
+                "test_template.sh"
+              ],
+              "paths_ignore": [],
+              "configured_branches": [
+                "dev",
+                "dev141",
+                "master"
+              ]
+            },
+            {
+              "path": ".github/workflows/ci-integrity.yaml",
+              "id": 0,
+              "event": "pull_request",
+              "paths": [],
+              "paths_ignore": []
+            }
+          ],
+          "trusted_files": {
+            ".github/workflows/android-reusable-workflow.yaml": [
+              "7daf3d6b1bcf30f2e8f12a5530cfcaaca6a61c98"
+            ],
+            ".github/workflows/ios-reusable-workflow.yaml": [
+              "cfc575bfaaa14cc72b5ef991cde83073cde1ebaf"
+            ],
+            ".github/workflows/nightly.yaml": [
+              "dea4a33c8c34d481c3d12328c6898220432698f8"
+            ],
+            ".github/workflows/pr.yaml": [
+              "414951db3445500fe56cba81ef84064a536acea1"
+            ],
+            ".github/workflows/ci-integrity.yaml": [
+              "3832c170cc96a6959b0833be17e4268ce9066ec8"
+            ]
+          }
+        },
+        "master": {
+          "audited_revision": "ee2c25dd80d4ee34d1046cbf93b471ebe0735732",
+          "workflows": [
+            {
+              "path": ".github/workflows/pr.yaml",
+              "id": 0,
+              "event": "pull_request_target",
+              "paths": [
+                "*/install.js",
+                "*/installios.js",
+                "*/installandroid.js",
+                "**/*.xcodeproj/**",
+                "**/*.xcworkspace/**",
+                "**/build.gradle",
+                "**/build.gradle.kts",
+                "**/settings.gradle",
+                "**/package.json",
+                "**/*.swift",
+                "**/*.kt",
+                "**/*.java",
+                "**/*.m",
+                "**/*.h",
+                "**/*.js",
+                "**/*.jsx",
+                "**/*.ts",
+                "**/*.tsx",
+                "templates.json",
+                "test_template.sh"
+              ],
+              "paths_ignore": [],
+              "configured_branches": [
+                "dev",
+                "master"
+              ]
+            },
+            {
+              "path": ".github/workflows/ci-integrity.yaml",
+              "id": 0,
+              "event": "pull_request",
+              "paths": [],
+              "paths_ignore": []
+            }
+          ],
+          "trusted_files": {
+            ".github/workflows/android-reusable-workflow.yaml": [
+              "7daf3d6b1bcf30f2e8f12a5530cfcaaca6a61c98"
+            ],
+            ".github/workflows/ios-reusable-workflow.yaml": [
+              "cfc575bfaaa14cc72b5ef991cde83073cde1ebaf"
+            ],
+            ".github/workflows/nightly.yaml": [
+              "dea4a33c8c34d481c3d12328c6898220432698f8"
+            ],
+            ".github/workflows/pr.yaml": [
+              "c9f4bb64538e9cd94ce5499b47792ae304d69fb2"
+            ],
+            ".github/workflows/ci-integrity.yaml": [
+              "3832c170cc96a6959b0833be17e4268ce9066ec8"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "repository": "forcedotcom/SalesforceMobileSDK-UITests",
+      "repository_id": 126856647,
+      "branches": {
+        "master": {
+          "audited_revision": "9815987562fbd681e5e31bf840dfff0aeecf7247",
+          "workflows": [
+            {
+              "path": ".github/workflows/pr.yaml",
+              "id": 0,
+              "event": "pull_request_target",
+              "paths": [],
+              "paths_ignore": [],
+              "configured_branches": [
+                "master"
+              ]
+            },
+            {
+              "path": ".github/workflows/ci-integrity.yaml",
+              "id": 0,
+              "event": "pull_request",
+              "paths": [],
+              "paths_ignore": []
+            }
+          ],
+          "trusted_files": {
+            ".github/workflows/android-reusable-workflow.yaml": [
+              "88dd73203a48dc876dc467aaeafb3ceb3e19f7b3"
+            ],
+            ".github/workflows/android-upgrade-reusable-workflow.yaml": [
+              "f1c5b7d7ee7224009d8a77379ba0e2ed22c4b8c7"
+            ],
+            ".github/workflows/ios-reusable-workflow.yaml": [
+              "b7ec1a720d747b673643c83993d564a7e54b0885"
+            ],
+            ".github/workflows/nightly.yaml": [
+              "82138fcc9af2e9db6776562c5adfd49790aa2068"
+            ],
+            ".github/workflows/pr.yaml": [
+              "633e3f79eac7b4e996f356e89bc35e63b66527ff"
+            ],
+            ".github/workflows/version-test.yaml": [
+              "ef3b9a9367f13fc518fabca641adb2cee3482cdf"
+            ],
+            ".github/workflows/ci-integrity.yaml": [
+              "3832c170cc96a6959b0833be17e4268ce9066ec8"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "repository": "forcedotcom/SalesforceMobileSDK-iOS-Hybrid",
+      "repository_id": 155285029,
+      "branches": {
+        "dev": {
+          "audited_revision": "a116f329b98b4bb3a3c67efd7f0d432b40859494",
+          "workflows": [
+            {
+              "path": ".github/workflows/pr.yaml",
+              "id": 0,
+              "event": "pull_request_target",
+              "paths": [],
+              "paths_ignore": [
+                "**/*.md",
+                "LICENSE",
+                ".gitignore",
+                "CODEOWNERS"
+              ],
+              "configured_branches": [
+                "dev",
+                "dev[0-9]*",
+                "master"
+              ]
+            },
+            {
+              "path": ".github/workflows/ci-integrity.yaml",
+              "id": 0,
+              "event": "pull_request",
+              "paths": [],
+              "paths_ignore": []
+            }
+          ],
+          "trusted_files": {
+            ".github/DangerFiles/Gemfile": [
+              "a6220bb33af4124663e2e6ca567078280027c802"
+            ],
+            ".github/DangerFiles/Gemfile.lock": [
+              "240048654d1639db8591b050a7b1f63811d6faac"
+            ],
+            ".github/DangerFiles/StaticAnalysis.rb": [
+              "7dbe650738fe46aa2814678ada4dcdd96f473ab2"
+            ],
+            ".github/workflows/nightly.yaml": [
+              "abe56f9ebf00c28e0faa73c01425da9a1b2be038"
+            ],
+            ".github/workflows/pr.yaml": [
+              "d071195cd713c67f4e56ce55ad717129f8987779"
+            ],
+            ".github/workflows/reusable-build-workflow.yaml": [
+              "f6bb382775bed4ea78661d8b63fb369eaddd4ed2"
+            ],
+            ".github/workflows/reusable-test-workflow.yaml": [
+              "cc05e700d82d86df25bb63d54c285c0240aacbac"
+            ],
+            ".github/workflows/ci-integrity.yaml": [
+              "3832c170cc96a6959b0833be17e4268ce9066ec8"
+            ]
+          }
+        },
+        "dev141": {
+          "audited_revision": "fb880a6c138c1668da8970b164694e1c8d82f67c",
+          "workflows": [
+            {
+              "path": ".github/workflows/pr.yaml",
+              "id": 0,
+              "event": "pull_request_target",
+              "paths": [],
+              "paths_ignore": [
+                "**/*.md",
+                "LICENSE",
+                ".gitignore",
+                "CODEOWNERS"
+              ],
+              "configured_branches": [
+                "dev",
+                "dev141",
+                "master"
+              ]
+            },
+            {
+              "path": ".github/workflows/ci-integrity.yaml",
+              "id": 0,
+              "event": "pull_request",
+              "paths": [],
+              "paths_ignore": []
+            }
+          ],
+          "trusted_files": {
+            ".github/DangerFiles/Gemfile": [
+              "a6220bb33af4124663e2e6ca567078280027c802"
+            ],
+            ".github/DangerFiles/Gemfile.lock": [
+              "240048654d1639db8591b050a7b1f63811d6faac"
+            ],
+            ".github/DangerFiles/StaticAnalysis.rb": [
+              "7dbe650738fe46aa2814678ada4dcdd96f473ab2"
+            ],
+            ".github/workflows/nightly.yaml": [
+              "abe56f9ebf00c28e0faa73c01425da9a1b2be038"
+            ],
+            ".github/workflows/pr.yaml": [
+              "8116aa151fe4a47d95389cc12dff015ed19a18e2"
+            ],
+            ".github/workflows/reusable-build-workflow.yaml": [
+              "f6bb382775bed4ea78661d8b63fb369eaddd4ed2"
+            ],
+            ".github/workflows/reusable-test-workflow.yaml": [
+              "cc05e700d82d86df25bb63d54c285c0240aacbac"
+            ],
+            ".github/workflows/ci-integrity.yaml": [
+              "3832c170cc96a6959b0833be17e4268ce9066ec8"
+            ]
+          }
+        },
+        "master": {
+          "audited_revision": "28994f7ec300d90f475ca75ffa60aca2aee6118d",
+          "workflows": [
+            {
+              "path": ".github/workflows/pr.yaml",
+              "id": 0,
+              "event": "pull_request_target",
+              "paths": [],
+              "paths_ignore": [
+                "**/*.md",
+                "LICENSE",
+                ".gitignore",
+                "CODEOWNERS"
+              ],
+              "configured_branches": [
+                "dev",
+                "master"
+              ]
+            },
+            {
+              "path": ".github/workflows/ci-integrity.yaml",
+              "id": 0,
+              "event": "pull_request",
+              "paths": [],
+              "paths_ignore": []
+            }
+          ],
+          "trusted_files": {
+            ".github/DangerFiles/Gemfile": [
+              "a6220bb33af4124663e2e6ca567078280027c802"
+            ],
+            ".github/DangerFiles/Gemfile.lock": [
+              "240048654d1639db8591b050a7b1f63811d6faac"
+            ],
+            ".github/DangerFiles/StaticAnalysis.rb": [
+              "7dbe650738fe46aa2814678ada4dcdd96f473ab2"
+            ],
+            ".github/workflows/nightly.yaml": [
+              "abe56f9ebf00c28e0faa73c01425da9a1b2be038"
+            ],
+            ".github/workflows/pr.yaml": [
+              "29bcf2ff6ccc28df0983399ac6afe67c74ce3ade"
+            ],
+            ".github/workflows/reusable-build-workflow.yaml": [
+              "f6bb382775bed4ea78661d8b63fb369eaddd4ed2"
+            ],
+            ".github/workflows/reusable-test-workflow.yaml": [
+              "cc05e700d82d86df25bb63d54c285c0240aacbac"
+            ],
+            ".github/workflows/ci-integrity.yaml": [
+              "3832c170cc96a6959b0833be17e4268ce9066ec8"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "repository": "forcedotcom/SalesforceMobileSDK-iOS-SPM",
+      "repository_id": 699520242,
+      "branches": {
+        "dev": {
+          "audited_revision": "29071633f7058b2169ed96fd7671fa0bc72747a8",
+          "workflows": [
+            {
+              "path": ".github/workflows/ci-integrity.yaml",
+              "id": 0,
+              "event": "pull_request",
+              "paths": [],
+              "paths_ignore": []
+            }
+          ],
+          "trusted_files": {
+            ".github/workflows/ci-integrity.yaml": [
+              "312ef657c3664bea311eecd607c34988616bf256"
+            ]
+          }
+        },
+        "dev141": {
+          "audited_revision": "6edc5722bea15579985dabf10db4736bd2c89f1e",
+          "workflows": [
+            {
+              "path": ".github/workflows/ci-integrity.yaml",
+              "id": 0,
+              "event": "pull_request",
+              "paths": [],
+              "paths_ignore": []
+            }
+          ],
+          "trusted_files": {
+            ".github/workflows/ci-integrity.yaml": [
+              "312ef657c3664bea311eecd607c34988616bf256"
+            ]
+          }
+        },
+        "master": {
+          "audited_revision": "925da736ea7505fe0b03d0f89f0c3cbea96a7fc9",
+          "workflows": [
+            {
+              "path": ".github/workflows/ci-integrity.yaml",
+              "id": 0,
+              "event": "pull_request",
+              "paths": [],
+              "paths_ignore": []
+            }
+          ],
+          "trusted_files": {
+            ".github/workflows/ci-integrity.yaml": [
+              "312ef657c3664bea311eecd607c34988616bf256"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "repository": "forcedotcom/SalesforceMobileSDK-iOS-Specs",
+      "repository_id": 48205096,
+      "branches": {
+        "master": {
+          "audited_revision": "3e00fbe624875bb3d7d59a1985f4d9969773bd38",
+          "workflows": [
+            {
+              "path": ".github/workflows/ci-integrity.yaml",
+              "id": 0,
+              "event": "pull_request",
+              "paths": [],
+              "paths_ignore": []
+            }
+          ],
+          "trusted_files": {
+            ".github/workflows/ci-integrity.yaml": [
+              "36118fca1116b8b578e0b6bc4cc8b195165c3504"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "repository": "forcedotcom/SalesforceMobileSDK-iOS",
+      "repository_id": 2338086,
+      "branches": {
+        "dev": {
+          "audited_revision": "46f6518de92b11de71ac29a1bc1f2b8b4fdb9fb8",
+          "workflows": [
+            {
+              "path": ".github/workflows/pr.yaml",
+              "id": 0,
+              "event": "pull_request_target",
+              "paths": [],
+              "paths_ignore": [
+                "**/*.md",
+                "LICENSE",
+                ".gitignore",
+                "CODEOWNERS"
+              ],
+              "configured_branches": [
+                "dev",
+                "dev[0-9]*",
+                "master"
+              ]
+            },
+            {
+              "path": ".github/workflows/ci-integrity.yaml",
+              "id": 0,
+              "event": "pull_request",
+              "paths": [],
+              "paths_ignore": []
+            }
+          ],
+          "trusted_files": {
+            ".github/DangerFiles/Gemfile": [
+              "a6220bb33af4124663e2e6ca567078280027c802"
+            ],
+            ".github/DangerFiles/Gemfile.lock": [
+              "0d52600295fe0c11e937d37d2d9c13e704ca4292"
+            ],
+            ".github/DangerFiles/StaticAnalysis.rb": [
+              "974a8f50a91dbadd639e1c0d5f0a89ed03cc670e"
+            ],
+            ".github/DangerFiles/TestOrchestrator.rb": [
+              "da76266cc9e7631a2fd6e7d255586cdfc5e00c3d"
+            ],
+            ".github/workflows/nightly.yaml": [
+              "e17cfdd703b63d10b43d36cb70065bb449bbfee4"
+            ],
+            ".github/workflows/pr.yaml": [
+              "7ac55beb8f670ba660cf7e5853cc525b5d0b02da"
+            ],
+            ".github/workflows/reusable-build-workflow.yaml": [
+              "f5d36f6da2788faf6297657c5603c88d03fda862"
+            ],
+            ".github/workflows/reusable-test-workflow.yaml": [
+              "ad9293a20d3344b1b6d48df61a785f6b3d37303d"
+            ],
+            ".github/workflows/reusable-ui-test-workflow.yaml": [
+              "4a6d08e5b9e6daa4e7f0bd58d59d033ca6096024"
+            ],
+            ".github/workflows/ui-test-nightly.yaml": [
+              "6e07120cf6e8a962b6e3cb7418f37239da5046dc"
+            ],
+            ".github/workflows/ci-integrity.yaml": [
+              "3832c170cc96a6959b0833be17e4268ce9066ec8"
+            ]
+          }
+        },
+        "dev141": {
+          "audited_revision": "2962d50e30b98e75695fc119334ff1cd8cfb24e7",
+          "workflows": [
+            {
+              "path": ".github/workflows/pr.yaml",
+              "id": 0,
+              "event": "pull_request_target",
+              "paths": [],
+              "paths_ignore": [
+                "**/*.md",
+                "LICENSE",
+                ".gitignore",
+                "CODEOWNERS"
+              ],
+              "configured_branches": [
+                "dev",
+                "dev141",
+                "master"
+              ]
+            },
+            {
+              "path": ".github/workflows/ci-integrity.yaml",
+              "id": 0,
+              "event": "pull_request",
+              "paths": [],
+              "paths_ignore": []
+            }
+          ],
+          "trusted_files": {
+            ".github/DangerFiles/Gemfile": [
+              "a6220bb33af4124663e2e6ca567078280027c802"
+            ],
+            ".github/DangerFiles/Gemfile.lock": [
+              "0d52600295fe0c11e937d37d2d9c13e704ca4292"
+            ],
+            ".github/DangerFiles/StaticAnalysis.rb": [
+              "974a8f50a91dbadd639e1c0d5f0a89ed03cc670e"
+            ],
+            ".github/DangerFiles/TestOrchestrator.rb": [
+              "c6e1152ffff166c4401ed78eb33ee5a5a2b68f28"
+            ],
+            ".github/workflows/nightly.yaml": [
+              "e17cfdd703b63d10b43d36cb70065bb449bbfee4"
+            ],
+            ".github/workflows/pr.yaml": [
+              "aee757dc001ee7b69aa43e56f8dc549ac49448d1"
+            ],
+            ".github/workflows/reusable-build-workflow.yaml": [
+              "f5d36f6da2788faf6297657c5603c88d03fda862"
+            ],
+            ".github/workflows/reusable-test-workflow.yaml": [
+              "ad9293a20d3344b1b6d48df61a785f6b3d37303d"
+            ],
+            ".github/workflows/reusable-ui-test-workflow.yaml": [
+              "4a6d08e5b9e6daa4e7f0bd58d59d033ca6096024"
+            ],
+            ".github/workflows/ui-test-nightly.yaml": [
+              "6e07120cf6e8a962b6e3cb7418f37239da5046dc"
+            ],
+            ".github/workflows/ci-integrity.yaml": [
+              "3832c170cc96a6959b0833be17e4268ce9066ec8"
+            ]
+          }
+        },
+        "master": {
+          "audited_revision": "45fa3ccf08f8d50f4eef45612feac33385508f92",
+          "workflows": [
+            {
+              "path": ".github/workflows/pr.yaml",
+              "id": 0,
+              "event": "pull_request_target",
+              "paths": [],
+              "paths_ignore": [
+                "**/*.md",
+                "LICENSE",
+                ".gitignore",
+                "CODEOWNERS"
+              ],
+              "configured_branches": [
+                "dev",
+                "master"
+              ]
+            },
+            {
+              "path": ".github/workflows/ci-integrity.yaml",
+              "id": 0,
+              "event": "pull_request",
+              "paths": [],
+              "paths_ignore": []
+            }
+          ],
+          "trusted_files": {
+            ".github/DangerFiles/Gemfile": [
+              "a6220bb33af4124663e2e6ca567078280027c802"
+            ],
+            ".github/DangerFiles/Gemfile.lock": [
+              "0d52600295fe0c11e937d37d2d9c13e704ca4292"
+            ],
+            ".github/DangerFiles/StaticAnalysis.rb": [
+              "974a8f50a91dbadd639e1c0d5f0a89ed03cc670e"
+            ],
+            ".github/DangerFiles/TestOrchestrator.rb": [
+              "0f500587a1d2728142d565ec419c7d7c93ebca9e"
+            ],
+            ".github/workflows/nightly.yaml": [
+              "e17cfdd703b63d10b43d36cb70065bb449bbfee4"
+            ],
+            ".github/workflows/pr.yaml": [
+              "4461bf12167ecbcef15326903ca997a065dd9f94"
+            ],
+            ".github/workflows/reusable-build-workflow.yaml": [
+              "f5d36f6da2788faf6297657c5603c88d03fda862"
+            ],
+            ".github/workflows/reusable-test-workflow.yaml": [
+              "ad9293a20d3344b1b6d48df61a785f6b3d37303d"
+            ],
+            ".github/workflows/reusable-ui-test-workflow.yaml": [
+              "4a6d08e5b9e6daa4e7f0bd58d59d033ca6096024"
+            ],
+            ".github/workflows/ui-test-nightly.yaml": [
+              "6e07120cf6e8a962b6e3cb7418f37239da5046dc"
+            ],
+            ".github/workflows/ci-integrity.yaml": [
+              "3832c170cc96a6959b0833be17e4268ce9066ec8"
+            ]
+          }
+        }
+      }
+    }
+  ]
+}
