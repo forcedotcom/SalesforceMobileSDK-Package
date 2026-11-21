@@ -82,6 +82,8 @@ preserved. The provenance job runs in a fresh job without checkout, caches,
 PR artifacts or PR code. It receives GitHub context through environment
 variables, serializes it as JSON, and uses an immutable upload-artifact action.
 Its artifact name includes both run ID and attempt. Overwrite is disabled.
+`policy.json` records the proposed source graph and enrolled workflow IDs; zero
+IDs for not-yet-registered upstream workflows deliberately block deployment.
 
 The artifact is **not a cryptographic attestation of the workflow source**.
 Trust depends on independently enforcing the approved workflow graph and
@@ -111,10 +113,13 @@ selectors and API failures produce a pending result rather than success.
 
 All selected jobs must conclude `success`. Failure, cancellation, timeout,
 neutral and unexpected skipped jobs fail, even if Actions reports workflow
-success (for example with `continue-on-error`). No static list of matrix/job
-names is used. Legitimate job skips currently fail conservatively; any exception
-needs an independently reviewed selection policy, not a blanket skipped-job
-allowance. Workflow-level path exclusions are evaluated from the trusted policy
+success (for example with `continue-on-error`). No list of required matrix/job
+names is used. Two narrow unselected-job policies are recorded: Android's
+nightly-only shard, whose pinned caller supplies `is_pr: true`, and Templates'
+platform jobs only when the App independently selects no template directories
+from the audited registry and changed paths. Changes to `templates.json` or
+`test_template.sh` always select builds. Other skipped jobs fail conservatively;
+new exceptions need an independently reviewed selection policy. Workflow-level branch/path exclusions are evaluated from the trusted policy
 against the full changed-file inventory, including both names of a rename.
 The integrity workflow still runs for documentation-only changes, so an empty
 set of validation workflows never becomes success.

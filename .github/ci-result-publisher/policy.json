@@ -10,7 +10,7 @@
           "workflows": [
             {
               "path": ".github/workflows/pr.yaml",
-              "id": 0,
+              "id": 141053997,
               "event": "pull_request_target",
               "paths": [],
               "paths_ignore": [
@@ -23,11 +23,14 @@
                 "dev",
                 "dev[0-9]*",
                 "master"
+              ],
+              "unselected_jobs": [
+                "ui-tests-pr / nightly-shard"
               ]
             },
             {
               "path": ".github/workflows/ci-integrity.yaml",
-              "id": 0,
+              "id": 425560340,
               "event": "pull_request",
               "paths": [],
               "paths_ignore": []
@@ -68,7 +71,7 @@
           "workflows": [
             {
               "path": ".github/workflows/pr.yaml",
-              "id": 0,
+              "id": 141053997,
               "event": "pull_request_target",
               "paths": [],
               "paths_ignore": [
@@ -85,7 +88,7 @@
             },
             {
               "path": ".github/workflows/ci-integrity.yaml",
-              "id": 0,
+              "id": 425560340,
               "event": "pull_request",
               "paths": [],
               "paths_ignore": []
@@ -126,7 +129,7 @@
           "workflows": [
             {
               "path": ".github/workflows/pr.yaml",
-              "id": 0,
+              "id": 141053997,
               "event": "pull_request_target",
               "paths": [],
               "paths_ignore": [
@@ -138,11 +141,14 @@
               "configured_branches": [
                 "dev",
                 "master"
+              ],
+              "unselected_jobs": [
+                "ui-tests-pr / nightly-shard"
               ]
             },
             {
               "path": ".github/workflows/ci-integrity.yaml",
-              "id": 0,
+              "id": 425560340,
               "event": "pull_request",
               "paths": [],
               "paths_ignore": []
@@ -189,7 +195,7 @@
           "workflows": [
             {
               "path": ".github/workflows/cordova-ios-podfile.yaml",
-              "id": 0,
+              "id": 424186813,
               "event": "pull_request",
               "paths": [
                 ".github/workflows/cordova-ios-podfile.yaml",
@@ -204,7 +210,7 @@
             },
             {
               "path": ".github/workflows/ci-integrity.yaml",
-              "id": 0,
+              "id": 425560478,
               "event": "pull_request",
               "paths": [],
               "paths_ignore": []
@@ -224,7 +230,7 @@
           "workflows": [
             {
               "path": ".github/workflows/cordova-ios-podfile.yaml",
-              "id": 0,
+              "id": 424186813,
               "event": "pull_request",
               "paths": [
                 ".github/workflows/cordova-ios-podfile.yaml",
@@ -241,7 +247,7 @@
             },
             {
               "path": ".github/workflows/ci-integrity.yaml",
-              "id": 0,
+              "id": 425560478,
               "event": "pull_request",
               "paths": [],
               "paths_ignore": []
@@ -261,7 +267,7 @@
           "workflows": [
             {
               "path": ".github/workflows/ci-integrity.yaml",
-              "id": 0,
+              "id": 425560478,
               "event": "pull_request",
               "paths": [],
               "paths_ignore": []
@@ -284,7 +290,7 @@
           "workflows": [
             {
               "path": ".github/workflows/pr.yaml",
-              "id": 0,
+              "id": 149111172,
               "event": "pull_request",
               "paths": [],
               "paths_ignore": [
@@ -301,7 +307,7 @@
             },
             {
               "path": ".github/workflows/ci-integrity.yaml",
-              "id": 0,
+              "id": 425560312,
               "event": "pull_request",
               "paths": [],
               "paths_ignore": []
@@ -322,6 +328,9 @@
             ],
             ".github/workflows/ci-integrity.yaml": [
               "3832c170cc96a6959b0833be17e4268ce9066ec8"
+            ],
+            ".github/workflows/ci-result-publisher.yaml": [
+              "3856af9d3dd9afaa0a7e2794a21a1252403f3e7f"
             ]
           }
         },
@@ -330,7 +339,7 @@
           "workflows": [
             {
               "path": ".github/workflows/pr.yaml",
-              "id": 0,
+              "id": 149111172,
               "event": "pull_request",
               "paths": [],
               "paths_ignore": [
@@ -347,7 +356,7 @@
             },
             {
               "path": ".github/workflows/ci-integrity.yaml",
-              "id": 0,
+              "id": 425560312,
               "event": "pull_request",
               "paths": [],
               "paths_ignore": []
@@ -376,7 +385,7 @@
           "workflows": [
             {
               "path": ".github/workflows/pr.yaml",
-              "id": 0,
+              "id": 149111172,
               "event": "pull_request",
               "paths": [],
               "paths_ignore": [
@@ -392,7 +401,7 @@
             },
             {
               "path": ".github/workflows/ci-integrity.yaml",
-              "id": 0,
+              "id": 425560312,
               "event": "pull_request",
               "paths": [],
               "paths_ignore": []
@@ -427,7 +436,7 @@
           "workflows": [
             {
               "path": ".github/workflows/pr.yaml",
-              "id": 0,
+              "id": 149182893,
               "event": "pull_request_target",
               "paths": [],
               "paths_ignore": [
@@ -444,7 +453,7 @@
             },
             {
               "path": ".github/workflows/ci-integrity.yaml",
-              "id": 0,
+              "id": 425560660,
               "event": "pull_request",
               "paths": [],
               "paths_ignore": []
@@ -473,7 +482,7 @@
           "workflows": [
             {
               "path": ".github/workflows/pr.yaml",
-              "id": 0,
+              "id": 149182893,
               "event": "pull_request_target",
               "paths": [],
               "paths_ignore": [
@@ -490,7 +499,7 @@
             },
             {
               "path": ".github/workflows/ci-integrity.yaml",
-              "id": 0,
+              "id": 425560660,
               "event": "pull_request",
               "paths": [],
               "paths_ignore": []
@@ -519,7 +528,7 @@
           "workflows": [
             {
               "path": ".github/workflows/pr.yaml",
-              "id": 0,
+              "id": 149182893,
               "event": "pull_request_target",
               "paths": [],
               "paths_ignore": [
@@ -535,7 +544,7 @@
             },
             {
               "path": ".github/workflows/ci-integrity.yaml",
-              "id": 0,
+              "id": 425560660,
               "event": "pull_request",
               "paths": [],
               "paths_ignore": []
@@ -627,7 +636,7 @@
           "workflows": [
             {
               "path": ".github/workflows/pr.yaml",
-              "id": 0,
+              "id": 248658681,
               "event": "pull_request",
               "paths": [
                 "*/install.js",
@@ -656,11 +665,32 @@
                 "dev",
                 "dev[0-9]*",
                 "master"
-              ]
+              ],
+              "selection": {
+                "type": "templates",
+                "template_paths": [
+                  "AndroidIDPTemplate",
+                  "AndroidNativeKotlinTemplate",
+                  "AndroidNativeLoginTemplate",
+                  "HybridLocalTemplate",
+                  "HybridRemoteTemplate",
+                  "MobileSyncExplorerKotlinTemplate",
+                  "MobileSyncExplorerReactNative",
+                  "MobileSyncExplorerSwift",
+                  "ReactNativeDeferredTemplate",
+                  "ReactNativeTemplate",
+                  "ReactNativeTypeScriptTemplate",
+                  "iOSIDPTemplate",
+                  "iOSNativeLoginTemplate",
+                  "iOSNativeSwiftEncryptedNotificationTemplate",
+                  "iOSNativeSwiftPackageManagerTemplate",
+                  "iOSNativeSwiftTemplate"
+                ]
+              }
             },
             {
               "path": ".github/workflows/ci-integrity.yaml",
-              "id": 0,
+              "id": 425560857,
               "event": "pull_request",
               "paths": [],
               "paths_ignore": []
@@ -689,7 +719,7 @@
           "workflows": [
             {
               "path": ".github/workflows/pr.yaml",
-              "id": 0,
+              "id": 248658681,
               "event": "pull_request_target",
               "paths": [
                 "*/install.js",
@@ -718,11 +748,32 @@
                 "dev",
                 "dev141",
                 "master"
-              ]
+              ],
+              "selection": {
+                "type": "templates",
+                "template_paths": [
+                  "AndroidIDPTemplate",
+                  "AndroidNativeKotlinTemplate",
+                  "AndroidNativeLoginTemplate",
+                  "HybridLocalTemplate",
+                  "HybridRemoteTemplate",
+                  "MobileSyncExplorerKotlinTemplate",
+                  "MobileSyncExplorerReactNative",
+                  "MobileSyncExplorerSwift",
+                  "ReactNativeDeferredTemplate",
+                  "ReactNativeTemplate",
+                  "ReactNativeTypeScriptTemplate",
+                  "iOSIDPTemplate",
+                  "iOSNativeLoginTemplate",
+                  "iOSNativeSwiftEncryptedNotificationTemplate",
+                  "iOSNativeSwiftPackageManagerTemplate",
+                  "iOSNativeSwiftTemplate"
+                ]
+              }
             },
             {
               "path": ".github/workflows/ci-integrity.yaml",
-              "id": 0,
+              "id": 425560857,
               "event": "pull_request",
               "paths": [],
               "paths_ignore": []
@@ -751,7 +802,7 @@
           "workflows": [
             {
               "path": ".github/workflows/pr.yaml",
-              "id": 0,
+              "id": 248658681,
               "event": "pull_request_target",
               "paths": [
                 "*/install.js",
@@ -779,11 +830,32 @@
               "configured_branches": [
                 "dev",
                 "master"
-              ]
+              ],
+              "selection": {
+                "type": "templates",
+                "template_paths": [
+                  "AndroidIDPTemplate",
+                  "AndroidNativeKotlinTemplate",
+                  "AndroidNativeLoginTemplate",
+                  "HybridLocalTemplate",
+                  "HybridRemoteTemplate",
+                  "MobileSyncExplorerKotlinTemplate",
+                  "MobileSyncExplorerReactNative",
+                  "MobileSyncExplorerSwift",
+                  "ReactNativeDeferredTemplate",
+                  "ReactNativeTemplate",
+                  "ReactNativeTypeScriptTemplate",
+                  "iOSIDPTemplate",
+                  "iOSNativeLoginTemplate",
+                  "iOSNativeSwiftEncryptedNotificationTemplate",
+                  "iOSNativeSwiftPackageManagerTemplate",
+                  "iOSNativeSwiftTemplate"
+                ]
+              }
             },
             {
               "path": ".github/workflows/ci-integrity.yaml",
-              "id": 0,
+              "id": 425560857,
               "event": "pull_request",
               "paths": [],
               "paths_ignore": []
@@ -818,7 +890,7 @@
           "workflows": [
             {
               "path": ".github/workflows/pr.yaml",
-              "id": 0,
+              "id": 146530965,
               "event": "pull_request_target",
               "paths": [],
               "paths_ignore": [],
@@ -828,7 +900,7 @@
             },
             {
               "path": ".github/workflows/ci-integrity.yaml",
-              "id": 0,
+              "id": 425560941,
               "event": "pull_request",
               "paths": [],
               "paths_ignore": []
@@ -869,7 +941,7 @@
           "workflows": [
             {
               "path": ".github/workflows/pr.yaml",
-              "id": 0,
+              "id": 149182546,
               "event": "pull_request_target",
               "paths": [],
               "paths_ignore": [
@@ -886,7 +958,7 @@
             },
             {
               "path": ".github/workflows/ci-integrity.yaml",
-              "id": 0,
+              "id": 425561066,
               "event": "pull_request",
               "paths": [],
               "paths_ignore": []
@@ -924,7 +996,7 @@
           "workflows": [
             {
               "path": ".github/workflows/pr.yaml",
-              "id": 0,
+              "id": 149182546,
               "event": "pull_request_target",
               "paths": [],
               "paths_ignore": [
@@ -941,7 +1013,7 @@
             },
             {
               "path": ".github/workflows/ci-integrity.yaml",
-              "id": 0,
+              "id": 425561066,
               "event": "pull_request",
               "paths": [],
               "paths_ignore": []
@@ -979,7 +1051,7 @@
           "workflows": [
             {
               "path": ".github/workflows/pr.yaml",
-              "id": 0,
+              "id": 149182546,
               "event": "pull_request_target",
               "paths": [],
               "paths_ignore": [
@@ -995,7 +1067,7 @@
             },
             {
               "path": ".github/workflows/ci-integrity.yaml",
-              "id": 0,
+              "id": 425561066,
               "event": "pull_request",
               "paths": [],
               "paths_ignore": []
@@ -1119,7 +1191,7 @@
           "workflows": [
             {
               "path": ".github/workflows/pr.yaml",
-              "id": 0,
+              "id": 125824858,
               "event": "pull_request_target",
               "paths": [],
               "paths_ignore": [
@@ -1136,7 +1208,7 @@
             },
             {
               "path": ".github/workflows/ci-integrity.yaml",
-              "id": 0,
+              "id": 425560973,
               "event": "pull_request",
               "paths": [],
               "paths_ignore": []
@@ -1183,7 +1255,7 @@
           "workflows": [
             {
               "path": ".github/workflows/pr.yaml",
-              "id": 0,
+              "id": 125824858,
               "event": "pull_request_target",
               "paths": [],
               "paths_ignore": [
@@ -1200,7 +1272,7 @@
             },
             {
               "path": ".github/workflows/ci-integrity.yaml",
-              "id": 0,
+              "id": 425560973,
               "event": "pull_request",
               "paths": [],
               "paths_ignore": []
@@ -1247,7 +1319,7 @@
           "workflows": [
             {
               "path": ".github/workflows/pr.yaml",
-              "id": 0,
+              "id": 125824858,
               "event": "pull_request_target",
               "paths": [],
               "paths_ignore": [
@@ -1263,7 +1335,7 @@
             },
             {
               "path": ".github/workflows/ci-integrity.yaml",
-              "id": 0,
+              "id": 425560973,
               "event": "pull_request",
               "paths": [],
               "paths_ignore": []

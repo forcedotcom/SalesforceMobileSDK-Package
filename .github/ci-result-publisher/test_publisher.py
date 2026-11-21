@@ -108,6 +108,24 @@ class DecisionTests(unittest.TestCase):
         self.workflow['paths'] = ['unrelated/**']
         self.assertEqual('pending', self.result().status)
 
+    def test_only_reviewed_unselected_job_can_skip(self):
+        self.workflow['unselected_jobs'] = ['nightly-only']
+        self.jobs.insert(0, {'name': 'nightly-only', 'run_attempt': 2,
+                             'status': 'completed', 'conclusion': 'skipped'})
+        self.assertEqual('success', self.result().status)
+        self.jobs[0]['name'] = 'selected-library-tests'
+        self.assertEqual('failure', self.result().status)
+
+    def test_template_skip_requires_independent_no_template_selection(self):
+        self.workflow['selection'] = {'type': 'templates', 'template_paths': ['NativeTemplate']}
+        self.jobs.insert(0, {'name': 'ios-pr', 'run_attempt': 2,
+                             'status': 'completed', 'conclusion': 'skipped'})
+        self.assertEqual('success', self.result().status)
+        for change in ['NativeTemplate/App.swift', 'templates.json', 'test_template.sh']:
+            with self.subTest(change=change):
+                result = assess(self.pr, self.policy, [change], self.evidence)
+                self.assertEqual('failure', result.status)
+
     def test_base_head_or_target_change_invalidates_snapshot(self):
         original = fingerprint(self.pr)
         for part, key in [('head', 'sha'), ('base', 'sha'), ('base', 'ref')]:
@@ -117,6 +135,14 @@ class DecisionTests(unittest.TestCase):
 
 
 class BoundaryTests(unittest.TestCase):
+    def test_trusted_branch_selectors_preserve_applicable_workflow_scope(self):
+        workflow = {'configured_branches': ['dev[0-9]*']}
+        self.assertTrue(applicable(workflow, ['src/a.js'], 'dev141'))
+        self.assertFalse(applicable(workflow, ['src/a.js'], 'dev'))
+        self.assertFalse(applicable(workflow, ['src/a.js'], 'master'))
+        with self.assertRaises(NotReady):
+            applicable({'configured_branches': ['release/**']}, ['src/a.js'], 'release/a')
+
     def test_glob_filters_and_renamed_paths(self):
         ignored = {'paths_ignore': ['**/*.md', 'LICENSE']}
         self.assertFalse(applicable(ignored, ['README.md', 'docs/a/b.md']))

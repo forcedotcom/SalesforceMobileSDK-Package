@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Isolated GitHub App worker. Never imports or executes code from a PR.
 
-Run once per minute on a trusted host. The policy and App key belong to that
+Run periodically from the protected publisher workflow or a trusted host. The policy and App key belong to that
 host, never to a validation job. See README.md before deploying.
 """
 import argparse
@@ -85,7 +85,19 @@ def matches(path, patterns):
     return False
 
 
-def applicable(workflow, changes):
+def applicable(workflow, changes, target=None):
+    patterns = workflow.get("configured_branches", [])
+    if patterns and target is not None:
+        selected = False
+        for pattern in patterns:
+            if pattern == "dev[0-9]*":
+                selected |= bool(re.fullmatch(r"dev[0-9].*", target))
+            elif re.fullmatch(r"[A-Za-z0-9_./-]+", pattern):
+                selected |= pattern == target
+            else:
+                raise NotReady("Unsupported branch selector: " + pattern)
+        if not selected:
+            return False
     if changes is None or not changes:
         raise NotReady("Missing or empty changed-file inventory")
     # Renames include both paths: changing a tested file into an ignored path
@@ -102,6 +114,20 @@ def fingerprint(pr):
             pr["base"]["ref"], pr.get("merge_commit_sha"), pr["state"])
 
 
+def allowed_skips(workflow, changes):
+    """Only independently justified exclusions from a pinned workflow graph."""
+    allowed = set(workflow.get("unselected_jobs", []))
+    selection = workflow.get("selection")
+    if selection:
+        if selection.get("type") != "templates" or not selection.get("template_paths"):
+            raise NotReady("Unsupported or incomplete selection policy")
+        selected = (any(p in ("templates.json", "test_template.sh") for p in changes)
+                    or any(p.split("/")[0] in selection["template_paths"] for p in changes))
+        if not selected:
+            allowed.update(("ios-pr", "android-pr"))
+    return allowed
+
+
 def assess(pr, policy, changes, evidence):
     """Pure decision function; evidence comes only from authenticated API reads."""
     accepted = []
@@ -114,7 +140,7 @@ def assess(pr, policy, changes, evidence):
         if not branch or not branch.get("workflows"):
             raise NotReady("Target branch has not been onboarded")
         for workflow in branch["workflows"]:
-            if not applicable(workflow, changes):
+            if not applicable(workflow, changes, pr["base"]["ref"]):
                 continue
             item = evidence.get(workflow["path"])
             if not item:
@@ -154,13 +180,18 @@ def assess(pr, policy, changes, evidence):
             real_jobs = [j for j in jobs if j["name"] != PROVENANCE_JOB]
             if len(reporters) != 1 or reporters[0].get("conclusion") != "success" or not real_jobs:
                 raise NotReady("Provenance job or real validation jobs missing")
+            allowed = allowed_skips(workflow, changes)
+            selected_jobs = []
             for job in real_jobs:
                 if job["status"] != "completed":
                     raise NotReady("A selected job is incomplete")
+                if job["conclusion"] == "skipped" and job["name"] in allowed:
+                    continue
+                selected_jobs.append(job)
                 if job["conclusion"] != "success":
-                    # No broad skip allowance: a new legitimate skip needs an
-                    # independently reviewed selection policy before activation.
                     return Result("failure", "Selected job did not succeed: " + job["name"], tuple(accepted))
+            if not selected_jobs:
+                raise NotReady("No selected validation jobs ran")
         if not accepted:
             raise NotReady("No applicable validation ran")
         return Result("success", "All applicable workflows and selected jobs succeeded", tuple(accepted))
@@ -261,7 +292,7 @@ def collect(api, repo_policy, pr):
     branch = repo_policy["branches"].get(pr["base"]["ref"], {})
     evidence = {}
     for workflow in branch.get("workflows", []):
-        if not applicable(workflow, changes):
+        if not applicable(workflow, changes, pr["base"]["ref"]):
             continue
         if not workflow.get("id"):
             raise NotReady("Workflow ID not enrolled: " + workflow["path"])
