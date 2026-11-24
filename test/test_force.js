@@ -52,7 +52,7 @@ function main(args) {
     var skipBuild = parsedArgs.hasOwnProperty('skip-build');
     var chosenOperatingSystems = cleanSplit(parsedArgs.os, ',').map(function(s) { return s.toLowerCase(); });
     var templateRepoUri = parsedArgs.templaterepouri || '';
-    var pluginRepoUri = parsedArgs.pluginrepouri || SDK.tools.cordova.pluginRepoUri;
+    var pluginRepoUri = parsedArgs.pluginrepouri || (noPluginUpdate ? '' : SDK.tools.cordova.pluginRepoUri);
     var spmRepoUri = parsedArgs.spmrepouri || 'https://github.com/forcedotcom/SalesforceMobileSDK-iOS-SPM' // not in constants.js because it's for testing only
     var chosenAppTypes = cleanSplit(parsedArgs.apptype, ',');
     var chosenClis = cleanSplit(parsedArgs.cli, ',');
@@ -122,11 +122,11 @@ function main(args) {
     }
 
     // Get cordova plugin repo if any hybrid testing requested
-    if (testingHybrid) {
+    if (testingHybrid && !noPluginUpdate) {
         var sdkBranch = utils.separateRepoUrlPathBranch(pluginRepoUri).branch;
 
         // Using updated local clone of plugin repo if pluginRepoUri does not point to tag and noPluginUpdate is false
-        if (!pluginRepoUri.indexOf('//') >= 0 && !sdkBranch.match(/v[0-9.]+/) && !noPluginUpdate) {
+        if (!pluginRepoUri.indexOf('//') >= 0 && !sdkBranch.match(/v[0-9.]+/)) {
             var pluginRepoDir = utils.cloneRepo(tmpDir, pluginRepoUri);
             if (testingIOS && testingAndroid) updatePluginRepo(tmpDir, 'all', pluginRepoDir, sdkBranch);
             if (testingIOS && !testingAndroid) updatePluginRepo(tmpDir, OS.ios, pluginRepoDir, sdkBranch);
@@ -200,7 +200,7 @@ function shortUsage(exitCode) {
     utils.logInfo('    [--use-sfdx]', COLOR.magenta);
     utils.logInfo('    [--exit-on-failure]', COLOR.magenta);
     utils.logInfo('    [--skip-build]', COLOR.magenta);
-    utils.logInfo('    [--pluginrepouri=PLUGIN_REPO_URI (Defaults to uri in shared/constants.js)]', COLOR.magenta);
+    utils.logInfo('    [--pluginrepouri=PLUGIN_REPO_URI]', COLOR.magenta);
     utils.logInfo('    [--no-plugin-update]', COLOR.magenta);
     utils.logInfo('    [--spm-update]', COLOR.magenta);
     utils.logInfo('    [--spmrepouri=SPM_REPO_URI]', COLOR.magenta);
@@ -236,6 +236,7 @@ function usage(exitCode) {
     utils.logInfo('  If hybrid is targeted:', COLOR.cyan);
     utils.logInfo('  - if plugin_repo_uri points to a branch, use local clone of plugin repo (where we first run ./tools/update.sh)', COLOR.cyan);
     utils.logInfo('  - generates forcehybrid package and deploys it to a temporary directory', COLOR.cyan);
+    utils.logInfo('  - with --no-plugin-update, an omitted plugin URI uses the CLI default for each platform', COLOR.cyan);
     utils.logInfo('  - creates and compiles applications for specified operating systems, template and plugin', COLOR.cyan);
     utils.logInfo('', COLOR.cyan);
     utils.logInfo('  If apptype is react_native:', COLOR.cyan);

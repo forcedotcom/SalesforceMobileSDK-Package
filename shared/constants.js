@@ -61,11 +61,20 @@ module.exports = {
         cordova: {
             checkCmd: 'cordova -v',
             pluginRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-CordovaPlugin#dev141',    // dev
+            iosDevelopmentPlugin: {
+                sdkVersion: '14.1.0',
+                branch: 'dev141',
+                repoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-CordovaPlugin#923f96b6291e22d05739bca9e1b3dc664672b549'
+            },
             minVersion: '13.0.0',
 //             pluginRepoUri: 'salesforce-mobilesdk-cordova-plugin@v' + VERSION, // GA
+            iosRequirements: {
+                node: '22.9.0',
+                pod: '1.16.0'
+            },
             platformVersion: {
-                ios: '8.1.0',
-                android: '15.0.0'
+                ios: '8.2.0',
+                android: '15.1.0'
             }
         },
         sf: {

@@ -344,3 +344,58 @@ describe('createHelper', () => {
         });
     });
 });
+
+
+describe('hybrid plugin source selection', () => {
+    const SDK = require('../shared/constants');
+
+    test.each(['ios', 'ios,android', 'android,ios'])(
+        'selects the matched immutable plugin for %s', platform => {
+            expect(createHelper.resolveCordovaPluginRepoUri({platform}))
+                .toBe(SDK.tools.cordova.iosDevelopmentPlugin.repoUri);
+        });
+
+    test('preserves the existing Android-only plugin source', () => {
+        expect(createHelper.resolveCordovaPluginRepoUri({platform: 'android'}))
+            .toBe(SDK.tools.cordova.pluginRepoUri);
+    });
+
+    test('preserves the GA package selected by release versioning', () => {
+        const original = SDK.tools.cordova.pluginRepoUri;
+        try {
+            SDK.tools.cordova.pluginRepoUri = 'salesforce-mobilesdk-cordova-plugin@v14.1.0';
+            expect(createHelper.resolveCordovaPluginRepoUri({platform: 'ios'}))
+                .toBe(SDK.tools.cordova.pluginRepoUri);
+        } finally {
+            SDK.tools.cordova.pluginRepoUri = original;
+        }
+    });
+
+    test('does not carry the reviewed pin into a different SDK version', () => {
+        const original = SDK.version;
+        try {
+            SDK.version = '14.2.0';
+            expect(createHelper.resolveCordovaPluginRepoUri({platform: 'ios'}))
+                .toBe(SDK.tools.cordova.pluginRepoUri);
+        } finally {
+            SDK.version = original;
+        }
+    });
+
+    test('preserves a different development branch selected by release tooling', () => {
+        const original = SDK.tools.cordova.pluginRepoUri;
+        try {
+            SDK.tools.cordova.pluginRepoUri = original.replace('#dev141', '#dev142');
+            expect(createHelper.resolveCordovaPluginRepoUri({platform: 'ios'}))
+                .toBe(SDK.tools.cordova.pluginRepoUri);
+        } finally {
+            SDK.tools.cordova.pluginRepoUri = original;
+        }
+    });
+
+    test('honors an explicit matched-plugin override for iOS', () => {
+        const pluginrepouri = '/tmp/custom-matched-plugin';
+        expect(createHelper.resolveCordovaPluginRepoUri({platform: 'ios', pluginrepouri}))
+            .toBe(pluginrepouri);
+    });
+});
