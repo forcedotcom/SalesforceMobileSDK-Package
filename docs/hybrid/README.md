@@ -36,10 +36,13 @@ The packaging step is run by `pack/pack.js` in this repo, and the publish is per
 
 ## Version Configuration (`shared/constants.js`)
 
-All version pins live in `shared/constants.js`. This is the single source of truth:
+Platform versions and source configuration live in `shared/constants.js`. This
+abbreviated example shows the Mobile SDK 14.1 development configuration. Consult
+that file for the complete configuration, including the immutable iOS development
+Plugin source:
 
 ```javascript
-var VERSION = '14.0.0';
+var VERSION = '14.1.0';
 
 module.exports = {
     version: VERSION,
@@ -47,34 +50,55 @@ module.exports = {
     tools: {
         cordova: {
             checkCmd: 'cordova -v',
-            pluginRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-CordovaPlugin#dev',    // dev
+            pluginRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-CordovaPlugin#dev141',    // dev
             minVersion: '13.0.0',
 //             pluginRepoUri: 'salesforce-mobilesdk-cordova-plugin@v' + VERSION, // GA
             platformVersion: {
-                ios: '7.1.1',
+                ios: '8.2.0',
                 android: '15.1.0'
             }
         },
         // ...
     },
 
-    templatesRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-Templates#dev',    // dev
+    templatesRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-Templates#dev141',    // dev
 //     templatesRepoUri: 'https://github.com/forcedotcom/SalesforceMobileSDK-Templates#v' + VERSION, // GA
 };
 ```
 
 ### Switching Between Dev and GA
 
-The dev/GA toggle is managed automatically by `setversion.sh` — do not edit the comments in `constants.js` by hand:
+Use `setversion.sh` to update the SDK version and toggle the configured development
+and GA source lines; do not edit their comment markers by hand:
 
 ```bash
-./setversion.sh -v 14.0.0 -d yes   # dev build: activates #dev URIs
-./setversion.sh -v 14.0.0 -d no    # GA build: activates versioned tag URIs
+./setversion.sh -v 14.1.0 -d yes   # development build
+./setversion.sh -v 14.1.0 -d no    # GA build
 ```
 
-The script uncomments all `*RepoUri` lines, then comments out the ones that don't apply:
-- **Dev** (`-d yes`): comments out lines pointing to a version tag (`@#v`), leaving `#dev` active.
-- **GA** (`-d no`): comments out lines pointing to `#dev`, leaving versioned URIs like `salesforce-mobilesdk-cordova-plugin@v14.0.0` active.
+The script uncomments the matching `*RepoUri` lines, then comments out the sources
+that do not apply:
+
+- **Dev** (`-d yes`): comments out versioned sources containing `@v` or `#v`,
+  leaving the configured development URIs active.
+- **GA** (`-d no`): comments out development sources containing `#dev`, including
+  `#dev141`, leaving the configured versioned sources active.
+
+The script does not choose a development branch, change Cordova platform versions
+or refresh the matched iOS development Plugin pin. Review those settings
+separately when promoting an upgrade.
+
+## Matched iOS Hybrid source promotion
+
+For hybrid apps whose selected platforms include iOS, validate the Package CLI, plugin and Hybrid source as a matched set before promoting a Cordova upgrade on `dev` or a numbered development branch. When the selected development configuration pins the plugin to an immutable commit, its iOS pod declaration must select the matching Hybrid commit. Make both reviewed commits available through their declared upstream Git URLs and validate a fresh app without local source mappings. Publish Hybrid first, then the matching plugin, then Package. Squash or rebase changes require updating the dependent pins to the final upstream commit IDs and repeating that validation. Review-time local commits alone are not a publishable release set.
+
+GA package selection and development configurations without matched pins retain the release tooling's existing source selection. Review and refresh the configured SDK version, branch selector and matched development pins in `shared/constants.js` for each upgrade or branch promotion; these pins are not carried automatically into another release.
+
+## Cordova iOS upgrade validation
+
+Use the [upgrade validation matrix](cordova-upgrade-validation.md) to record the source set and the coverage exercised.
+
+On each Cordova iOS upgrade, check whether [apache/cordova-ios issue 1751](https://github.com/apache/cordova-ios/issues/1751) is fixed. CordovaPlugin's `tools/cordova-ios-podfile.js` compatibility hook is gated to exactly 8.2.0. If the issue remains, extend the version gate to the newly validated version. If it is fixed, remove the hook, its `plugin.xml` registrations and its tests.
 
 ## `createHybridApp()` Step-by-Step Workflow
 
@@ -91,6 +115,10 @@ The CLI verifies minimum tool versions before proceeding:
 | npm | 10 |
 | cordova | 13.0.0 |
 | sf | 2.0.0 |
+
+When the selected hybrid platforms include iOS, the CLI also requires Node.js
+22.9.0+ and CocoaPods 1.16.0+ before creating the Cordova app. Android-only hybrid
+creation retains the general requirements above.
 
 ### 2. Create Bare Cordova Project
 
@@ -111,15 +139,23 @@ Required by the Android post-install hook (`postinstall-android.js`) that runs d
 For each platform in the comma-separated list (ios, android, or both):
 
 ```bash
-cordova platform add ios@7.1.1
+cordova platform add ios@8.2.0
 cordova platform add android@15.1.0
 ```
 
 ### 5. Install CordovaPlugin
 
+The CLI resolves the Plugin URI before installation, then runs:
+
 ```bash
-cordova plugin add https://github.com/forcedotcom/SalesforceMobileSDK-CordovaPlugin#dev --force
+cordova plugin add "<resolved-plugin-uri>" --force
 ```
+
+An explicit `--pluginrepouri` takes precedence. For SDK 14.1.0 on `dev141`, a
+selection that includes iOS uses the configured immutable development Plugin
+source. Android-only selections use the configured Plugin source. Other SDK
+versions, development branches and GA configurations retain their source
+selection. The selected Plugin must be compatible with both requested platforms.
 
 This triggers `plugin.xml` evaluation and runs both post-install hooks (`postinstall-ios.js` and `postinstall-android.js`) in the CordovaPlugin repo.
 

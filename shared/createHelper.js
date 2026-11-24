@@ -29,6 +29,7 @@
 var path = require('path'),
     SDK = require('./constants'),
     utils = require('./utils'),
+    checkHybridRequirements = require('./hybridRequirements'),
     configHelper = require('./configHelper'),
     prepareTemplate = require('./templateHelper').prepareTemplate,
     getSDKTemplateURI = require('./templateHelper').getSDKTemplateURI,
@@ -62,6 +63,7 @@ function createNativeApp(config) {
 // Helper for hybrid application creation
 //
 function createHybridApp(config) {
+    checkHybridRequirements(config);
 
     // Create app with cordova
     utils.runProcessThrowError('cordova create "' + config.projectDir + '" ' + config.packagename + ' ' + config.appname);
@@ -649,7 +651,7 @@ function actuallyCreateApp(forcecli, config) {
 
         // Adding hybrid only config
         if (!isNative) {
-            config.cordovaPluginRepoUri = config.pluginrepouri || SDK.tools.cordova.pluginRepoUri;
+            config.cordovaPluginRepoUri = resolveCordovaPluginRepoUri(config);
         }
 
         // Print details
@@ -682,6 +684,20 @@ function actuallyCreateApp(forcecli, config) {
     }
 }
 
+function resolveCordovaPluginRepoUri(config) {
+    if (config.pluginrepouri) {
+        return config.pluginrepouri;
+    }
+    const cordova = SDK.tools.cordova;
+    const matched = cordova.iosDevelopmentPlugin;
+    if (config.platform.split(',').includes('ios') && SDK.version === matched.sdkVersion &&
+        cordova.pluginRepoUri.endsWith('#' + matched.branch)) {
+        return matched.repoUri;
+    }
+    return cordova.pluginRepoUri;
+}
+
+
 function validateCustomProperties(templateJsonPath, customProperties) {
     // skip if template json file does not exist
     if (!fs.existsSync(templateJsonPath)) {
@@ -712,5 +728,6 @@ module.exports = {
     createApp,
     validateCustomProperties,
     parseCallbackUrl,
-    overrideHybridIosPodfile
+    overrideHybridIosPodfile,
+    resolveCordovaPluginRepoUri
 };

@@ -54,6 +54,22 @@ forceios checkconfig --configpath=config.json --configtype=store
 
 Replace `forceios` with `forcedroid`, `forcehybrid`, or `forcereact` for other platforms.
 
+### iOS Hybrid prerequisites
+
+Creating an iOS hybrid app requires Node.js 22.9.0 or later and CocoaPods 1.16.0 or later for Cordova iOS 8.2.0. Both `forcehybrid` and the Salesforce CLI hybrid commands check these versions before Cordova creates the app. The additional checks apply when the selected hybrid platforms include iOS; Android-only and native app requirements remain unchanged.
+
+### Development hybrid plugin selection
+
+For Mobile SDK 14.1.0 on `dev141`, a hybrid platform selection that includes
+iOS uses the reviewed immutable development-plugin source configured in
+`shared/constants.js`. An explicit `--pluginrepouri` takes precedence. GA
+packages, other SDK versions and other development branches retain their
+configured plugin source.
+
+### Custom iOS Hybrid sources
+
+For a custom Hybrid source, provide a matched plugin with `--pluginrepouri` that selects the compatible Hybrid revision before first installation. The existing `--sdkdependencies` Podfile override handles branch-based sources and deliberately leaves tag/commit pins unchanged; it cannot substitute for selecting that matched plugin. Other platforms keep their existing plugin/platform requirements.
+
 ### OAuth Configuration
 
 Optionally provide External Client App credentials to auto-configure OAuth:
@@ -128,6 +144,8 @@ For detailed plugin documentation, see [sfdx/README.md](sfdx/README.md).
 - **Node.js**: 22 or higher
 - **npm**: 10 or higher
 - **Git**: 2.13 or higher
+- **iOS hybrid generation**: Node.js 22.9.0+ and CocoaPods 1.16.0+; see
+  [iOS Hybrid prerequisites](#ios-hybrid-prerequisites).
 
 ### Setup
 
