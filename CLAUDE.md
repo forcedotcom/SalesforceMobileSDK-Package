@@ -404,6 +404,15 @@ Tests cover:
 - Template helpers
 - Config validation
 
+### Development hybrid source selection
+
+For SDK 14.1.0 on `dev141`, `resolveCordovaPluginRepoUri` selects the reviewed
+immutable `iosDevelopmentPlugin.repoUri` when hybrid platforms include iOS.
+Explicit `--pluginrepouri` overrides take precedence. Other SDK versions,
+development branches and GA packages retain their configured plugin source.
+Keep the selected Plugin compatible with both platform defaults before
+publishing the CLI.
+
 ### Integration Tests
 
 Location: `test/test_force.js`
@@ -415,6 +424,8 @@ Tests actual app generation across all platforms and app types.
 ### JavaScript Standards
 
 - **Node.js**: 22+
+- **iOS hybrid generation**: Node.js 22.9.0+ and CocoaPods 1.16.0+; the
+  additional checks apply only when the selected hybrid platforms include iOS.
 - **Style**: Use existing code style (shelljs patterns, callback-based for older code)
 - **Error Handling**: Use `utils.runProcessThrowError()` for shell commands
 - **Logging**: Use `utils.log()`, `utils.logInfo()`, `utils.logError()` with colors
